@@ -11,7 +11,7 @@ function fft_2048ch_6a_core_config(this_block)
 
   this_block.setTopLevelLanguage('VHDL');
 
-  this_block.setEntityName('fft_2048ch_6a_core');
+  this_block.setEntityName('fft_2048ch_6a_core_ip_struct');
 
   % System Generator has to assume that your entity  has a combinational feed through; 
   %   if it  doesn't, then comment out the following line:
@@ -44,8 +44,7 @@ function fft_2048ch_6a_core_config(this_block)
   this_block.addSimulinkOutport('overflow');
 
   overflow_port = this_block.port('overflow');
-  overflow_port.setType('Bool');
-  overflow_port.useHDLVector(false);
+  overflow_port.setType('UFix_6_0');
   out0_port = this_block.port('out0');
   out0_port.setType('UFix_36_0');
   out1_port = this_block.port('out1');
@@ -59,8 +58,7 @@ function fft_2048ch_6a_core_config(this_block)
   out5_port = this_block.port('out5');
   out5_port.setType('UFix_36_0');
   sync_out_port = this_block.port('sync_out');
-  sync_out_port.setType('Bool');
-  sync_out_port.useHDLVector(false);
+  sync_out_port.setType('UFix_1_0');
 
   % -----------------------------
   if (this_block.inputTypesKnown)
@@ -107,11 +105,11 @@ function fft_2048ch_6a_core_config(this_block)
       this_block.setError('Input data type for port "shift" must have width=16.');
     end
 
-    if (this_block.port('sync').width ~= 1);
-      this_block.setError('Input data type for port "sync" must have width=1.');
+    if (this_block.port('sync').width ~= 32);
+      this_block.setError('Input data type for port "sync" must have width=32.');
     end
 
-    this_block.port('sync').useHDLVector(false);
+    %this_block.port('sync').useHDLVector(false);
 
   end  % if(inputTypesKnown)
   % -----------------------------
@@ -140,7 +138,8 @@ function fft_2048ch_6a_core_config(this_block)
 
   %    this_block.addFile('');
   %    this_block.addFile('');
-  this_block.addFile('fft_1024ch_core.vhd');
+  %this_block.addFile('fft_2048ch_6a_core/sysgen/fft_2048ch_6a_core.vhd');
+  this_block.addFile('fft_2048ch_6a_core.vhd');
 
 return;
 

@@ -11,7 +11,7 @@ function pfb_fir_2048ch_2i_core_config(this_block)
 
   this_block.setTopLevelLanguage('VHDL');
 
-  this_block.setEntityName('pfb_fir_1024ch_core');
+  this_block.setEntityName('pfb_fir_2048ch_2i_core_ip_struct');
 
   % System Generator has to assume that your entity  has a combinational feed through; 
   %   if it  doesn't, then comment out the following line:
@@ -39,8 +39,7 @@ function pfb_fir_2048ch_2i_core_config(this_block)
   pol1_out1_port.setType('Fix_18_17');
 
   sync_out_port = this_block.port('sync_out');
-  sync_out_port.setType('Bool');
-  sync_out_port.useHDLVector(false);
+  sync_out_port.setType('UFix_1_0');
 
   % -----------------------------
   if (this_block.inputTypesKnown)
@@ -62,11 +61,11 @@ function pfb_fir_2048ch_2i_core_config(this_block)
       this_block.setError('Input data type for port "pol1_in1" must have width=8.');
     end
 
-    if (this_block.port('sync').width ~= 1);
-      this_block.setError('Input data type for port "sync" must have width=1.');
+    if (this_block.port('sync').width ~= 32);
+      this_block.setError('Input data type for port "sync" must have width=32.');
     end
 
-    this_block.port('sync').useHDLVector(false);
+    %this_block.port('sync').useHDLVector(false);
 
   end  % if(inputTypesKnown)
   % -----------------------------
@@ -95,7 +94,9 @@ function pfb_fir_2048ch_2i_core_config(this_block)
 
   %    this_block.addFile('');
   %    this_block.addFile('');
-  this_block.addFile('pfb_fir_2048ch_core.vhd');
+  %this_block.addFile('pfb_fir_2048ch_2i_core/sysgen/pfb_fir_2048ch_2i_core.vhd');
+  this_block.addFile('pfb_fir_2048ch_2i_core.vhd');
+
 
 return;
 
