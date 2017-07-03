@@ -1,22 +1,43 @@
 import logging
 import numpy as np
 import struct
-logger = logging.get_logger('blocks')
+from casperfpga import CasperFpga
+logger = logging.getLogger(__name__)
 
 
 class SnapFengine(object):
-    def __init__(self):
+    def __init__(self, host):
+        self.host = host
+        self.fpga = CasperFpga(host=host, port=69)
+
+        # blocks
+        self.sync        = Sync(self.fpga, 'sync'),
+        self.noise       = NoiseGen(self.fpga, 'noise', nstreams=6),
+        self.input       = Input(self.fpga, 'input', nstreams=12),
+        self.delay       = Delay(self.fpga, 'delay', nstreams=6),
+        self.pfb         = Pfb(self.fpga, 'pfb'),
+        self.eq          = Eq(self.fpga, 'eq', nstreams=6),
+        self.eq_tvg      = EqTvg(self.fpga, 'eq_tvg', nstreams=6, nchans=2**11),
+        self.reorder     = ChanReorder(self.fpga, 'chan_reorder', nchans=2**11),
+        self.packetizer  = Packetizer(self.fpga, 'packetizer'),
+        self.eth         = Eth(self.fpga, 'eth'),
+
         self.blocks = [
-            Sync('sync'),
-            NoiseGen('noise', nstreams=6),
-            Input('input', nstreams=12),
-            Delay('delay', nstreams=6),
-            Pfb('pfb'),
-            Eq('eq', nstreams=6),
-            EqTvg('eq_tvg', nstreams=6, nchans=2**11),
-            ChanReorder('chan_reorder', nchans=2**11),
-            Packetizer('packetizer'),
+            self.sync,
+            self.noise,
+            self.input,
+            self.delay,
+            self.pfb,
+            self.eq,
+            self.eq_tvg,
+            self.reorder,
+            self.packetizer,
+            self.eth,
         ]
+
+        for block in self.blocks:
+            block.initialize()
+
 
 # Block Classes
 class Block(object):
@@ -44,19 +65,19 @@ class Block(object):
         the block.
         """
         devs = host.listdev()
-        return [x.lstrip(self.prefix) in devs if x.startswith(self.prefix)]
+        return [x.lstrip(self.prefix) for x in devs if x.startswith(self.prefix)]
 
     def read_int(self, reg, offset=0, **kwargs):
         return host.read_int(self.prefix + reg, 4, offset=offset, **kwargs)
 
     def write_int(self, reg, val, offset=0, **kwargs):
-        host.write_int(self.prefix + reg, val, offset=offset, **kwargs))
+        host.write_int(self.prefix + reg, val, offset=offset, **kwargs)
 
     def read_uint(self, reg, offset=0, **kwargs):
         return host.read_uint(self.prefix + reg, 4, offset=offset, **kwargs)
 
     def write_uint(self, reg, val, offset=0, **kwargs):
-        host.write_int(self.prefix + reg, val, offset=offset, **kwargs))
+        host.write_int(self.prefix + reg, val, offset=offset, **kwargs)
 
     def read(self, reg, nbytes, **kwargs):
         return host.read(self.prefix + reg, nbytes, **kwargs)
@@ -231,7 +252,7 @@ class Delay(Block):
     def set_delay(self, stream, delay):
         if stream > self.nstreams:
             logger.error('Tried to set delay for stream %d > nstreams (%d)' % (stream, self.nstreams))
-        self.write_int(change_reg_bits(self.host.read_uint('delays'), delay, 4*stream, 4)
+        self.write_int(change_reg_bits(self.host.read_uint('delays'), delay, 4*stream, 4))
 
     def initialize(self):
         self.write_int('delays', 0)
@@ -297,7 +318,7 @@ class EqTvg(Block):
         self.nchans = nchans
         self.format = 'Q'
 
-    def tvg_en(self):
+    def tvg_enable(self):
         self.write_int('tvg_en', 1)
 
     def tvg_disable(self):
