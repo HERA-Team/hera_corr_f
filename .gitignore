@@ -1,1 +1,4 @@
 *.autosave
+*.log
+snap_fengine/
+!snap_fengine/outputs/
