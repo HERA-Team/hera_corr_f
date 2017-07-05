@@ -64,29 +64,29 @@ class Block(object):
         return a list of all register names within
         the block.
         """
-        devs = host.listdev()
+        devs = self.host.listdev()
         return [x.lstrip(self.prefix) for x in devs if x.startswith(self.prefix)]
 
     def read_int(self, reg, offset=0, **kwargs):
-        return host.read_int(self.prefix + reg, 4, offset=offset, **kwargs)
+        return self.host.read_int(self.prefix + reg, 4, offset=offset, **kwargs)
 
     def write_int(self, reg, val, offset=0, **kwargs):
-        host.write_int(self.prefix + reg, val, offset=offset, **kwargs)
+        self.host.write_int(self.prefix + reg, val, offset=offset, **kwargs)
 
     def read_uint(self, reg, offset=0, **kwargs):
         return host.read_uint(self.prefix + reg, 4, offset=offset, **kwargs)
 
     def write_uint(self, reg, val, offset=0, **kwargs):
-        host.write_int(self.prefix + reg, val, offset=offset, **kwargs)
+        self.host.write_int(self.prefix + reg, val, offset=offset, **kwargs)
 
     def read(self, reg, nbytes, **kwargs):
-        return host.read(self.prefix + reg, nbytes, **kwargs)
+        return self.host.read(self.prefix + reg, nbytes, **kwargs)
 
     def write(self, reg, val, **kwargs):
-        host.write(self.prefix + reg, val, **kwargs)
+        self.host.write(self.prefix + reg, val, **kwargs)
 
     def blindwrite(self, reg, val, **kwargs):
-        host.blindwrite(self.prefix + reg, val, **kwargs)
+        self.host.blindwrite(self.prefix + reg, val, **kwargs)
 
     def change_reg_bits(self, reg, val, start, width=1):
         orig_val = self.read_uint(reg)
@@ -378,6 +378,19 @@ class Eth(Block):
     def __init__(self, host, name, port=10000):
         super(ChanReorder, self).__init__(host, name)
         self.port = port
+
+    def set_arp_table(self, macs):
+        """
+        Set the ARP table with a list of MAC addresses.
+        The list, `macs`, is passed such that the zeroth
+        element is the MAC address of the device with
+        IP XXX.XXX.XXX.0, and element N is the MAC
+        address of the device with IP XXX.XXX.XXX.N
+        """
+        macs = list(macs)
+        macs_pack = struct.pack('>%dQ' % (len(macs)), *macs)
+        self.write('sw', macs_pack, offset=0x3000)
+
 
     def get_status(self):
         stat = self.read_uint('sw_status')
