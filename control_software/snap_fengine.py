@@ -2,6 +2,7 @@ import logging
 import numpy as np
 import struct
 from casperfpga import CasperFpga
+import casperfpga.snapadc
 logger = logging.getLogger(__name__)
 
 
@@ -11,6 +12,8 @@ class SnapFengine(object):
         self.fpga = CasperFpga(host=host, port=69)
 
         # blocks
+        self.synth       = Synth(self.fpga, 'lmx_ctrl')
+        self.adc         = Adc(self.fpga) # not a subclass of Block
         self.sync        = Sync(self.fpga, 'sync'),
         self.noise       = NoiseGen(self.fpga, 'noise', nstreams=6),
         self.input       = Input(self.fpga, 'input', nstreams=12),
@@ -22,7 +25,11 @@ class SnapFengine(object):
         self.packetizer  = Packetizer(self.fpga, 'packetizer'),
         self.eth         = Eth(self.fpga, 'eth'),
 
+        # The order here can be important, blocks are initialized in the
+        # order they appear here
         self.blocks = [
+            self.synth,
+            self.adc,
             self.sync,
             self.noise,
             self.input,
@@ -35,6 +42,7 @@ class SnapFengine(object):
             self.eth,
         ]
 
+    def initialize(self):
         for block in self.blocks:
             block.initialize()
 
@@ -94,8 +102,35 @@ class Block(object):
         new_val = (orig_val & mask) + (val << start)
         self.write_int(reg, new_val)
 
+class Synth(casperfpga.synth.LMX2581):
+    def __init__(self, host, name):
+         super(Synth, self).__init__(host, name)
 
-def Sync(Block):
+    def initialize(self):
+        """
+        Seem to have to do this if reference
+        was not present when board was powered up(?)
+        """
+        self.powerDown()
+        self.powerUp()
+
+class Adc(casperfpga.snapadc.SNAPADC):
+    def __init__(self, host, sample_rate=500, num_chans=2):
+        super(Adc, self).__init__(host)
+        self.num_chans       = num_chans
+        self.interleave_mode = 4 >> num_chans
+        self.clock_divide    = 1
+        self.sample_rate     = sample_rate
+
+    def initialize(self):
+        self.init(self.sample_rate, self.num_chans) # from the SNAPADC class
+        self.alignLineClock(mode='dual_pat')
+        self.alignFrameClock()
+        # If aligning complete, alignFrameClock should not output any warning
+        self.setInterleavingMode(self.interleave_mode, self.clock_divide)
+
+
+class Sync(Block):
     def __init__(self, host, name):
         super(Sync, self).__init__(host, name)
         self.ARM_SYNC  = 1<<0
@@ -259,7 +294,7 @@ class Delay(Block):
 
 class Pfb(Block):
     def __init__(self, host, name):
-        super(Delay, self).__init__(host, name)
+        super(Pfb, self).__init__(host, name)
         self.SHIFT_OFFSET = 0
         self.SHIFT_WIDTH  = 12
         self.PRESHIFT_OFFSET = 12
@@ -351,7 +386,7 @@ class ChanReorder(Block):
 
 class Packetizer(Block):
     def __init__(self, host, name):
-        super(ChanReorder, self).__init__(host, name)
+        super(Packetizer, self).__init__(host, name)
 
     def set_nants(self, nants):
         self.write_int('n_ants', nants)
@@ -376,7 +411,7 @@ class Packetizer(Block):
         
 class Eth(Block):
     def __init__(self, host, name, port=10000):
-        super(ChanReorder, self).__init__(host, name)
+        super(Eth, self).__init__(host, name)
         self.port = port
 
     def set_arp_table(self, macs):
