@@ -290,7 +290,7 @@ class Eq(Block):
         self.ncoeffs = ncoeffs
         self.width = 18
         self.bp = 7
-        self.format = 'B'#'Q' (??Jack wants 1byte/8bytes??)
+        self.format = 'H' #'L' is still overflowing the BRAM
 
     def set_coeffs(self, stream, coeffs):
         coeffs = coeffs << self.bp
@@ -318,7 +318,7 @@ class EqTvg(Block):
         super(EqTvg, self).__init__(host, name)
         self.nstreams = nstreams
         self.nchans = nchans
-        self.format = 'B'#'Q' (?? Same here??)
+        self.format = 'H'
 
     def tvg_enable(self):
         self.write_int('tvg_en', 1)
@@ -371,10 +371,11 @@ class Packetizer(Block):
         self.write('ants', struct.pack('>%dL' % len(ants), *ants))
         
     def set_chan_headers(self, chans):
-        self.write('chans', struct.pack('>%dL' % len(chans), *chans))
+        self.write('chans', struct.pack('>%dH' % len(chans), *chans))
 
     def initialize(self):
         self.set_dest_ips(np.zeros(1024))
+        self.use_fpga_packing()
         
 class Eth(Block):
     def __init__(self, host, name, port=10000):
@@ -397,14 +398,14 @@ class Eth(Block):
     def get_status(self):
         stat = self.read_uint('sw_status')
         rv = {}
-        rv['rx_overrun'  : (stat >> 0) & 1]
-        rv['rx_bad_frame': (stat >> 1) & 1]
-        rv['tx_of'       : (stat >> 2) & 1]
-        rv['tx_afull'    : (stat >> 3) & 1]
-        rv['tx_led'      : (stat >> 4) & 1]
-        rv['rx_led'      : (stat >> 5) & 1]
-        rv['up'          : (stat >> 6) & 1]
-        rv['eof_cnt'     : (stat >> 7) & (2**25-1)]
+        rv['rx_overrun'  ] =  (stat >> 0) & 1   
+        rv['rx_bad_frame'] =  (stat >> 1) & 1
+        rv['tx_of'       ] =  (stat >> 2) & 1   # Transmission FIFO overflow
+        rv['tx_afull'    ] =  (stat >> 3) & 1   # Transmission FIFO almost full
+        rv['tx_led'      ] =  (stat >> 4) & 1   # Transmission LED? 
+        rv['rx_led'      ] =  (stat >> 5) & 1   # Receive LED
+        rv['up'          ] =  (stat >> 6) & 1   # LED up
+        rv['eof_cnt'     ] =  (stat >> 7) & (2**25-1)
         return rv
 
     def status_reset(self):
@@ -426,5 +427,7 @@ class Eth(Block):
     def enable_tx(self):
         self.change_reg_bits('ctrl', 1, 1)
 
-
-
+    def print_status(self):
+        rv = self.get_status()
+        for key in rv.keys():
+            print '%12s : %d'%(key,rv[key])
