@@ -29,8 +29,8 @@ class SnapFengine(object):
         # The order here can be important, blocks are initialized in the
         # order they appear here
         self.blocks = [
-            # self.synth,
-            # self.adc,
+            self.synth,
+            self.adc,
             self.sync,
             self.noise,
             self.input,
@@ -436,7 +436,7 @@ class Eth(Block):
         rv['rx_bad_frame'] =  (stat >> 1) & 1
         rv['tx_of'       ] =  (stat >> 2) & 1   # Transmission FIFO overflow
         rv['tx_afull'    ] =  (stat >> 3) & 1   # Transmission FIFO almost full
-        rv['tx_led'      ] =  (stat >> 4) & 1   # Transmission LED? 
+        rv['tx_led'      ] =  (stat >> 4) & 1   # Transmission LED
         rv['rx_led'      ] =  (stat >> 5) & 1   # Receive LED
         rv['up'          ] =  (stat >> 6) & 1   # LED up
         rv['eof_cnt'     ] =  (stat >> 7) & (2**25-1)
