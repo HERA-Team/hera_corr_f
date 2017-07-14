@@ -1,7 +1,9 @@
 import logging
 import numpy as np
 import struct
+import time
 from casperfpga import CasperFpga
+import casperfpga.snapadc
 logger = logging.getLogger(__name__)
 
 
@@ -11,18 +13,24 @@ class SnapFengine(object):
         self.fpga = CasperFpga(host=host, port=69)
 
         # blocks
+        self.synth       = Synth(self.fpga, 'lmx_ctrl')
+        self.adc         = Adc(self.fpga) # not a subclass of Block
         self.sync        = Sync(self.fpga, 'sync')
         self.noise       = NoiseGen(self.fpga, 'noise', nstreams=6)
         self.input       = Input(self.fpga, 'input', nstreams=12)
         self.delay       = Delay(self.fpga, 'delay', nstreams=6)
         self.pfb         = Pfb(self.fpga, 'pfb')
         self.eq          = Eq(self.fpga, 'eq', nstreams=6)
-        self.eq_tvg       = EqTvg(self.fpga, 'eq_tvg', nstreams=6, nchans=2**11)
+        self.eq_tvg      = EqTvg(self.fpga, 'eqtvg', nstreams=6, nchans=2**11)
         self.reorder     = ChanReorder(self.fpga, 'chan_reorder', nchans=2**11)
         self.packetizer  = Packetizer(self.fpga, 'packetizer')
         self.eth         = Eth(self.fpga, 'eth')
 
+        # The order here can be important, blocks are initialized in the
+        # order they appear here
         self.blocks = [
+            # self.synth,
+            # self.adc,
             self.sync,
             self.noise,
             self.input,
@@ -35,9 +43,10 @@ class SnapFengine(object):
             self.eth,
         ]
 
+    def initialize(self):
         for block in self.blocks:
             block.initialize()
-
+            
 
 # Block Classes
 class Block(object):
@@ -94,6 +103,32 @@ class Block(object):
         new_val = (orig_val & mask) + (val << start)
         self.write_int(reg, new_val)
 
+class Synth(casperfpga.synth.LMX2581):
+    def __init__(self, host, name):
+         super(Synth, self).__init__(host, name)
+
+    def initialize(self):
+        """
+        Seem to have to do this if reference
+        was not present when board was powered up(?)
+        """
+        self.powerDown()
+        self.powerUp()
+
+class Adc(casperfpga.snapadc.SNAPADC):
+    def __init__(self, host, sample_rate=500, num_chans=2):
+        super(Adc, self).__init__(host)
+        self.num_chans       = num_chans
+        self.interleave_mode = 4 >> num_chans
+        self.clock_divide    = 1
+        self.sample_rate     = sample_rate
+
+    def initialize(self):
+        self.init(self.sample_rate, self.num_chans) # from the SNAPADC class
+        self.alignLineClock(mode='dual_pat')
+        self.alignFrameClock()
+        # If aligning complete, alignFrameClock should not output any warning
+        self.setInterleavingMode(self.interleave_mode, self.clock_divide)
 
 class Sync(Block):
     def __init__(self, host, name):
@@ -318,7 +353,7 @@ class EqTvg(Block):
         super(EqTvg, self).__init__(host, name)
         self.nstreams = nstreams
         self.nchans = nchans
-        self.format = 'H'
+        self.format = 'Q'
 
     def tvg_enable(self):
         self.write_int('tvg_en', 1)
@@ -368,7 +403,7 @@ class Packetizer(Block):
         self.write('ips', struct.pack('>%dL' % len(ips), *ips))
 
     def set_ant_headers(self, ants):
-        self.write('ants', struct.pack('>%dL' % len(ants), *ants))
+        self.write('ants', struct.pack('>%dH' % len(ants), *ants))
         
     def set_chan_headers(self, chans):
         self.write('chans', struct.pack('>%dH' % len(chans), *chans))
@@ -393,7 +428,6 @@ class Eth(Block):
         macs = list(macs)
         macs_pack = struct.pack('>%dQ' % (len(macs)), *macs)
         self.write('sw', macs_pack, offset=0x3000)
-
 
     def get_status(self):
         stat = self.read_uint('sw_status')
@@ -427,6 +461,12 @@ class Eth(Block):
     def enable_tx(self):
         self.change_reg_bits('ctrl', 1, 1)
 
+    def initialize(self):
+        #Set ip address of the SNAP
+        ipaddr = (10 << 24) + (0 << 16) + (10 << 8) + 112
+        self.blindwrite('sw', struct.pack('>L', ipaddr), offset=0x10)
+        self.set_port(self.port)
+                        
     def print_status(self):
         rv = self.get_status()
         for key in rv.keys():
