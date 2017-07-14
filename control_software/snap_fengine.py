@@ -74,25 +74,25 @@ class Block(object):
         the block.
         """
         devs = self.host.listdev()
-        return [x[len(self.prefix):] for x in devs if x.startswith(self.prefix)]
+        return [x.lstrip(self.prefix) for x in devs if x.startswith(self.prefix)]
 
     def read_int(self, reg, offset=0, **kwargs):
-        return self.host.read_int(self.prefix + reg, word_offset=offset, **kwargs)#4, 
+        return self.host.read_int(self.prefix + reg, 4, offset=offset, **kwargs)
 
     def write_int(self, reg, val, offset=0, **kwargs):
-        self.host.write_int(self.prefix + reg, val, word_offset=offset, **kwargs)
+        self.host.write_int(self.prefix + reg, val, offset=offset, **kwargs)
 
     def read_uint(self, reg, offset=0, **kwargs):
-        return self.host.read_uint(self.prefix + reg, word_offset=offset, **kwargs)#4, 
+        return host.read_uint(self.prefix + reg, 4, offset=offset, **kwargs)
 
     def write_uint(self, reg, val, offset=0, **kwargs):
-        self.host.write_int(self.prefix + reg, val, word_offset=offset, **kwargs)
+        self.host.write_int(self.prefix + reg, val, offset=offset, **kwargs)
 
     def read(self, reg, nbytes, **kwargs):
         return self.host.read(self.prefix + reg, nbytes, **kwargs)
 
-    def write(self, reg, val, offset=0, **kwargs):
-        self.host.write(self.prefix + reg, val, offset=offset, **kwargs)
+    def write(self, reg, val, **kwargs):
+        self.host.write(self.prefix + reg, val, **kwargs)
 
     def blindwrite(self, reg, val, **kwargs):
         self.host.blindwrite(self.prefix + reg, val, **kwargs)
@@ -202,7 +202,7 @@ class NoiseGen(Block):
         if stream > self.nstreams:
             logger.error('Tried to set noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
             return
-        regname = 'seed_%d' % (stream // 4)
+        reg_name = 'seed%d' % (stream // 4)
         val = self.read_uint(regname)
         masked_val = val & (0xffffffff - (0xff << stream))
         self.write_int(regname, masked_val + (seed << stream))
@@ -219,11 +219,11 @@ class NoiseGen(Block):
 
 
     def initialize(self):
-        for stream in range(self.nstreams):
+        for stream in self.nstreams:
             self.set_seed(0, stream)
 
     def print_status(self):
-        for stream in range(self.nstreams):
+        for stream in self.nstreams:
             print 'NoiseGen block: %s: stream %d seed: %d' % (self.name, stream, self.get_seed(stream))
        
 
@@ -308,14 +308,14 @@ class Pfb(Block):
         self.change_reg_bits('ctrl', shift, self.PRESHIFT_OFFSET, self.PRESHIFT_WIDTH)
 
     def rst_stats(self):
-        self.change_reg_bits('ctrl', 1, self.STAT_RST_BIT)
-        self.change_reg_bits('ctrl', 0, self.STAT_RST_BIT)
+        self.change_reg_bits('ctrl', 1, self.RST_BIT)
+        self.change_reg_bits('ctrl', 0, self.RST_BIT)
 
     def is_overflowing(self):
         return self.read_uint('status') != 0
         
     def initialize(self):
-        self.write_int('ctrl', 0)
+        self.host.write_int('ctrl', 0)
         self.rst_stats()
 
 class Eq(Block):
@@ -325,14 +325,14 @@ class Eq(Block):
         self.ncoeffs = ncoeffs
         self.width = 18
         self.bp = 7
-        self.format = 'H' #'L' is still overflowing the BRAM
+        self.format = 'Q'
 
     def set_coeffs(self, stream, coeffs):
         coeffs = coeffs << self.bp
-        if np.any(coeffs > (2**self.width - 1)):
+        if np.any(self.coeffs > (2**width - 1)):
             logger.warning("Some coefficients out of range")
         # saturate coefficients
-        coeffs[coeffs>(2**self.width - 1)] = 2**self.width - 1
+        coeffs[coeffs>(2**width - 1)] = 2**width - 1
         coeffs = list(coeffs)
         coeffs_str = struct.pack('>%d%s' % (len(coeffs), self.format), *coeffs)
         self.write('%d_coeffs' % stream, coeffs_str)
@@ -340,13 +340,11 @@ class Eq(Block):
     def get_coeffs(self, stream):
         coeffs_str = self.read('%d_coeffs' % stream, self.ncoeffs*struct.calcsize(self.format))
         coeffs = np.array(struct.unpack('>%d%s' % (self.ncoeffs, self.format), coeffs_str))
-        return coeffs / (2.**self.bp)
+        return coeffs / (2.**bp)
 
     def initialize(self):
-        for stream in range(self.nstreams):
-            # Below change is because bit wise operators were not working
-            # on np.float64
-            self.set_coeffs(stream, np.ones(self.ncoeffs,dtype='>%s'%self.format))
+        for stream in self.nstreams:
+            self.set_coeffs(self, stream, np.ones(self.ncoeffs))
 
 class EqTvg(Block):
     def __init__(self, host, name, nstreams=6, nchans=2**11):
@@ -363,7 +361,7 @@ class EqTvg(Block):
 
     def write_freq_ramp(self):
         ramp = np.arange(self.nchans)
-        ramp = np.array(ramp%256,dtype='>%s'%self.format) # tvg values are only 8 bits
+        ramp = ramp % 256 # tvg values are only 8 bits
         tv = np.zeros(self.nchans, dtype='>%s'%self.format) 
         for stream in range(self.nstreams):
             tv += (ramp << (8*stream))
@@ -406,11 +404,10 @@ class Packetizer(Block):
         self.write('ants', struct.pack('>%dH' % len(ants), *ants))
         
     def set_chan_headers(self, chans):
-        self.write('chans', struct.pack('>%dH' % len(chans), *chans))
+        self.write('chans', struct.pack('>%dL' % len(chans), *chans))
 
     def initialize(self):
         self.set_dest_ips(np.zeros(1024))
-        self.use_fpga_packing()
         
 class Eth(Block):
     def __init__(self, host, name, port=10000):
