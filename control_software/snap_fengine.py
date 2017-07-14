@@ -1,6 +1,7 @@
 import logging
 import numpy as np
 import struct
+import time
 from casperfpga import CasperFpga
 import casperfpga.snapadc
 logger = logging.getLogger(__name__)
@@ -14,16 +15,16 @@ class SnapFengine(object):
         # blocks
         self.synth       = Synth(self.fpga, 'lmx_ctrl')
         self.adc         = Adc(self.fpga) # not a subclass of Block
-        self.sync        = Sync(self.fpga, 'sync'),
-        self.noise       = NoiseGen(self.fpga, 'noise', nstreams=6),
-        self.input       = Input(self.fpga, 'input', nstreams=12),
-        self.delay       = Delay(self.fpga, 'delay', nstreams=6),
-        self.pfb         = Pfb(self.fpga, 'pfb'),
-        self.eq          = Eq(self.fpga, 'eq', nstreams=6),
-        self.eq_tvg      = EqTvg(self.fpga, 'eq_tvg', nstreams=6, nchans=2**11),
-        self.reorder     = ChanReorder(self.fpga, 'chan_reorder', nchans=2**11),
-        self.packetizer  = Packetizer(self.fpga, 'packetizer'),
-        self.eth         = Eth(self.fpga, 'eth'),
+        self.sync        = Sync(self.fpga, 'sync')
+        self.noise       = NoiseGen(self.fpga, 'noise', nstreams=6)
+        self.input       = Input(self.fpga, 'input', nstreams=12)
+        self.delay       = Delay(self.fpga, 'delay', nstreams=6)
+        self.pfb         = Pfb(self.fpga, 'pfb')
+        self.eq          = Eq(self.fpga, 'eq', nstreams=6)
+        self.eq_tvg      = EqTvg(self.fpga, 'eqtvg', nstreams=6, nchans=2**11)
+        self.reorder     = ChanReorder(self.fpga, 'chan_reorder', nchans=2**11)
+        self.packetizer  = Packetizer(self.fpga, 'packetizer')
+        self.eth         = Eth(self.fpga, 'eth')
 
         # The order here can be important, blocks are initialized in the
         # order they appear here
@@ -45,7 +46,7 @@ class SnapFengine(object):
     def initialize(self):
         for block in self.blocks:
             block.initialize()
-
+            
 
 # Block Classes
 class Block(object):
@@ -128,7 +129,6 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.alignFrameClock()
         # If aligning complete, alignFrameClock should not output any warning
         self.setInterleavingMode(self.interleave_mode, self.clock_divide)
-
 
 class Sync(Block):
     def __init__(self, host, name):
@@ -401,7 +401,7 @@ class Packetizer(Block):
         self.write('ips', struct.pack('>%dL' % len(ips), *ips))
 
     def set_ant_headers(self, ants):
-        self.write('ants', struct.pack('>%dL' % len(ants), *ants))
+        self.write('ants', struct.pack('>%dH' % len(ants), *ants))
         
     def set_chan_headers(self, chans):
         self.write('chans', struct.pack('>%dL' % len(chans), *chans))
@@ -426,18 +426,17 @@ class Eth(Block):
         macs_pack = struct.pack('>%dQ' % (len(macs)), *macs)
         self.write('sw', macs_pack, offset=0x3000)
 
-
     def get_status(self):
         stat = self.read_uint('sw_status')
         rv = {}
-        rv['rx_overrun'  : (stat >> 0) & 1]
-        rv['rx_bad_frame': (stat >> 1) & 1]
-        rv['tx_of'       : (stat >> 2) & 1]
-        rv['tx_afull'    : (stat >> 3) & 1]
-        rv['tx_led'      : (stat >> 4) & 1]
-        rv['rx_led'      : (stat >> 5) & 1]
-        rv['up'          : (stat >> 6) & 1]
-        rv['eof_cnt'     : (stat >> 7) & (2**25-1)]
+        rv['rx_overrun'  ] =  (stat >> 0) & 1   
+        rv['rx_bad_frame'] =  (stat >> 1) & 1
+        rv['tx_of'       ] =  (stat >> 2) & 1   # Transmission FIFO overflow
+        rv['tx_afull'    ] =  (stat >> 3) & 1   # Transmission FIFO almost full
+        rv['tx_led'      ] =  (stat >> 4) & 1   # Transmission LED
+        rv['rx_led'      ] =  (stat >> 5) & 1   # Receive LED
+        rv['up'          ] =  (stat >> 6) & 1   # LED up
+        rv['eof_cnt'     ] =  (stat >> 7) & (2**25-1)
         return rv
 
     def status_reset(self):
@@ -459,5 +458,13 @@ class Eth(Block):
     def enable_tx(self):
         self.change_reg_bits('ctrl', 1, 1)
 
-
-
+    def initialize(self):
+        #Set ip address of the SNAP
+        ipaddr = (10 << 24) + (0 << 16) + (10 << 8) + 112
+        self.blindwrite('sw', struct.pack('>L', ipaddr), offset=0x10)
+        self.set_port(self.port)
+                        
+    def print_status(self):
+        rv = self.get_status()
+        for key in rv.keys():
+            print '%12s : %d'%(key,rv[key])
