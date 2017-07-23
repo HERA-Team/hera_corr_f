@@ -2,19 +2,16 @@ import logging
 import numpy as np
 import struct
 import time
-from casperfpga import CasperFpga
-import casperfpga.snapadc
+import corr.katcp_wrapper as kp
 logger = logging.getLogger(__name__)
 
 
 class SnapFengine(object):
     def __init__(self, host):
         self.host = host
-        self.fpga = CasperFpga(host=host, port=69)
+        self.fpga = kp.FpgaClient(host=host)
 
         # blocks
-        self.synth       = Synth(self.fpga, 'lmx_ctrl')
-        self.adc         = Adc(self.fpga) # not a subclass of Block
         self.sync        = Sync(self.fpga, 'sync')
         self.noise       = NoiseGen(self.fpga, 'noise', nstreams=6)
         self.input       = Input(self.fpga, 'input', nstreams=12)
@@ -29,8 +26,6 @@ class SnapFengine(object):
         # The order here can be important, blocks are initialized in the
         # order they appear here
         self.blocks = [
-            self.synth,
-            self.adc,
             self.sync,
             self.noise,
             self.input,
@@ -46,7 +41,6 @@ class SnapFengine(object):
     def initialize(self):
         for block in self.blocks:
             block.initialize()
-            
 
 # Block Classes
 class Block(object):
@@ -74,25 +68,25 @@ class Block(object):
         the block.
         """
         devs = self.host.listdev()
-        return [x[len(self.prefix):] for x in devs if x.startswith(self.prefix)]
+        return [x.lstrip(self.prefix) for x in devs if x.startswith(self.prefix)]
 
     def read_int(self, reg, offset=0, **kwargs):
-        return self.host.read_int(self.prefix + reg, word_offset=offset, **kwargs)
+        return self.host.read_int(self.prefix + reg, offset=offset, **kwargs)
 
     def write_int(self, reg, val, offset=0, **kwargs):
-        self.host.write_int(self.prefix + reg, val, word_offset=offset, **kwargs)
+        self.host.write_int(self.prefix + reg, val, offset=offset, **kwargs)
 
     def read_uint(self, reg, offset=0, **kwargs):
-        return self.host.read_uint(self.prefix + reg, word_offset=offset, **kwargs)
+        return self.host.read_uint(self.prefix + reg, offset=offset, **kwargs)
 
     def write_uint(self, reg, val, offset=0, **kwargs):
-        self.host.write_int(self.prefix + reg, val, word_offset=offset, **kwargs)
+        self.host.write_int(self.prefix + reg, val, offset=offset, **kwargs)
 
     def read(self, reg, nbytes, **kwargs):
         return self.host.read(self.prefix + reg, nbytes, **kwargs)
 
-    def write(self, reg, val, offset=0, **kwargs):
-        self.host.write(self.prefix + reg, val, word_offset=offset, **kwargs)
+    def write(self, reg, val, **kwargs):
+        self.host.write(self.prefix + reg, val, **kwargs)
 
     def blindwrite(self, reg, val, **kwargs):
         self.host.blindwrite(self.prefix + reg, val, **kwargs)
@@ -102,33 +96,6 @@ class Block(object):
         mask = (2**32 - 1) - ((2**width - 1) << start)
         new_val = (orig_val & mask) + (val << start)
         self.write_int(reg, new_val)
-
-class Synth(casperfpga.synth.LMX2581):
-    def __init__(self, host, name):
-         super(Synth, self).__init__(host, name)
-
-    def initialize(self):
-        """
-        Seem to have to do this if reference
-        was not present when board was powered up(?)
-        """
-        self.powerDown()
-        self.powerUp()
-
-class Adc(casperfpga.snapadc.SNAPADC):
-    def __init__(self, host, sample_rate=500, num_chans=2):
-        super(Adc, self).__init__(host)
-        self.num_chans       = num_chans
-        self.interleave_mode = 4 >> num_chans
-        self.clock_divide    = 1
-        self.sample_rate     = sample_rate
-
-    def initialize(self):
-        self.init(self.sample_rate, self.num_chans) # from the SNAPADC class
-        self.alignLineClock(mode='dual_pat')
-        self.alignFrameClock()
-        # If aligning complete, alignFrameClock should not output any warning
-        self.setInterleavingMode(self.interleave_mode, self.clock_divide)
 
 class Sync(Block):
     def __init__(self, host, name):
@@ -329,10 +296,10 @@ class Eq(Block):
 
     def set_coeffs(self, stream, coeffs):
         coeffs = coeffs << self.bp
-        if np.any(self.coeffs > (2**self.width - 1)):
+        if np.any(self.coeffs > (2**width - 1)):
             logger.warning("Some coefficients out of range")
         # saturate coefficients
-        coeffs[coeffs>(2**self.width - 1)] = 2**self.width - 1
+        coeffs[coeffs>(2**width - 1)] = 2**width - 1
         coeffs = list(coeffs)
         coeffs_str = struct.pack('>%d%s' % (len(coeffs), self.format), *coeffs)
         self.write('%d_coeffs' % stream, coeffs_str)
@@ -340,18 +307,18 @@ class Eq(Block):
     def get_coeffs(self, stream):
         coeffs_str = self.read('%d_coeffs' % stream, self.ncoeffs*struct.calcsize(self.format))
         coeffs = np.array(struct.unpack('>%d%s' % (self.ncoeffs, self.format), coeffs_str))
-        return coeffs / (2.**self.bp)
+        return coeffs / (2.**bp)
 
     def initialize(self):
         for stream in self.nstreams:
-            self.set_coeffs(stream, np.ones(self.ncoeffs,dype='>%s'%self.format))
+            self.set_coeffs(self, stream, np.ones(self.ncoeffs))
 
 class EqTvg(Block):
     def __init__(self, host, name, nstreams=6, nchans=2**11):
         super(EqTvg, self).__init__(host, name)
         self.nstreams = nstreams
         self.nchans = nchans
-        self.format = 'Q'
+        self.format = 'H'
 
     def tvg_enable(self):
         self.write_int('tvg_en', 1)
@@ -361,7 +328,7 @@ class EqTvg(Block):
 
     def write_freq_ramp(self):
         ramp = np.arange(self.nchans)
-        ramp = ramp % 256 # tvg values are only 8 bits
+        ramp = np.array(ramp%256,dtype='>%s'%self.format) #tvg values are only 8 bits
         tv = np.zeros(self.nchans, dtype='>%s'%self.format) 
         for stream in range(self.nstreams):
             tv += (ramp << (8*stream))
@@ -404,11 +371,10 @@ class Packetizer(Block):
         self.write('ants', struct.pack('>%dH' % len(ants), *ants))
         
     def set_chan_headers(self, chans):
-        self.write('chans', struct.pack('>%dH' % len(chans), *chans))
+        self.write('chans', struct.pack('>%dL' % len(chans), *chans))
 
     def initialize(self):
         self.set_dest_ips(np.zeros(1024))
-        self.use_fpga_packing()
         
 class Eth(Block):
     def __init__(self, host, name, port=10000):
@@ -469,3 +435,6 @@ class Eth(Block):
         rv = self.get_status()
         for key in rv.keys():
             print '%12s : %d'%(key,rv[key])
+
+
+
