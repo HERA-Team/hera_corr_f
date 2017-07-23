@@ -2,7 +2,7 @@ import logging
 import numpy as np
 import struct
 #from casperfpga import CasperFpga
-from corr import katcp_wrapper
+import katcp_wrapper
 from blocks import *
 logger = logging.getLogger(__name__)
 
