@@ -445,17 +445,18 @@ class RoachInput(Block):
         super(RoachInput, self).__init__(host, name)
         self.nstreams  = nstreams
         self.nregs     = nstreams // 8
-        self.nstreams_per_reg = 4
-        self.USE_NOISE = 0
-        self.USE_ADC   = 1
-        self.USE_ZERO  = 2
+        self.nstreams_per_reg = 8
+        self.USE_ADC   = 0
+	# There are two separate noise streams we can switch in. TODO: figure out how (and why) to use these.
+        self.USE_NOISE = 1
+        self.USE_ZERO  = 3
 
     def use_noise(self, stream=None):
         if stream is None:
             for reg in range(self.nregs):
                 v = 0
                 for stream in range(self.nstreams_per_reg):
-                    v += self.USE_NOISE*(2<<stream)
+                    v += self.USE_NOISE << (4 * stream)
                 self.write_int('sel%d' % reg, v)
         else:
             raise NotImplementedError('Different input selects not supported yet!')
@@ -465,7 +466,7 @@ class RoachInput(Block):
             for reg in range(self.nregs):
                 v = 0
                 for stream in range(self.nstreams_per_reg):
-                    v += self.USE_ADC*(2<<stream)
+                    v += self.USE_ADC << (4 * stream)
                 self.write_int('sel%d' % reg, v)
         else:
             raise NotImplementedError('Different input selects not supported yet!')
@@ -475,7 +476,7 @@ class RoachInput(Block):
             for reg in range(self.nregs):
                 v = 0
                 for stream in range(self.nstreams_per_reg):
-                    v += self.USE_ZERO*(2<<stream)
+                    v += self.USE_ZERO << (4 * stream)
                 self.write_int('sel%d' % reg, v)
         else:
             raise NotImplementedError('Different input selects not supported yet!')
