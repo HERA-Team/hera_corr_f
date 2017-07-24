@@ -17,7 +17,7 @@ class RoachFengine(object):
         self.sync        = Sync(self.fpga, 'sync')
         self.noise       = NoiseGen(self.fpga, None, nstreams=32)
         self.input       = RoachInput(self.fpga, 'input', nstreams=32)
-        self.delay       = RoachDelay(self.fpga, 'delay', nstreams=6)
+        self.delay       = RoachDelay(self.fpga, 'delay', nstreams=32)
         self.pfb         = RoachPfb(self.fpga, None)
         self.eq          = Eq(self.fpga, 'eq', nstreams=16, ncoeffs=2**11)
         self.eq_tvg      = EqTvg(self.fpga, 'eq_tvg', nstreams=16, nchans=2**11)
