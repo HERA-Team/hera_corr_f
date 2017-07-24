@@ -84,10 +84,13 @@ for fn, feng in enumerate(fengs):
         print("  Disabling %s" % feng.host)
     feng.eth.disable_tx()
 
-print("Setting FID registers")
-for fn, feng in enumerate(fengs):
-    print("  Setting FID of %s to %d" % (feng.host, fids[fn]))
-    feng.set_fid(fids[fn])
+# The new packetizer has brams to store antenna
+# numbers, so it doesn't require an FID register
+if not new_packetizer:
+    print("Setting FID registers")
+    for fn, feng in enumerate(fengs):
+        print("  Setting FID of %s to %d" % (feng.host, fids[fn]))
+        feng.set_fid(fids[fn])
 
 if not new_packetizer:
     print("Setting Corner-Turn mode to 0 (8 boards)")
@@ -106,28 +109,6 @@ for fn, feng in enumerate(fengs):
 
 # Setup details of 10 GbE cores
 print("configuring 10 GbE interfaces")
-# On the ROACHs, port 0 sends chans 256-512
-# On the ROACHs, port 1 sends chans 0-256
-# On the ROACHs, port 2 sends chans 768-1024
-# On the ROACHs, port 3 sends chans 512-768
-# In the original design with the loopback, packets would be sprayed between ports 0<->1, and 2<->3.
-# This had the effect that (for ROACH0) channels 0,8,16,etc. ended up back at port 0, chans 256,264,.. -> port 1,
-# chans 512,520,... -> port 3, chans 768,776,... -> port 4. 
-# The direct connect was then configured so that anything arriving at ROACH<N> port<P> was forwarded
-# to X-Engine <N>, port<P>. Host naming conventions mean that X-Engine hosts are px1..8, and have ports
-# with hostnames px{1..8}-{2..5}.tenge.pvt
-# Thus, channels 0,8,.. should go to px1-2.tenge.pvt
-# channels 1,9,.. should go to px2-2.tenge.pvt
-# ....
-# channels 7,15,.. should go to px8-2.tenge.pvt
-
-# Channels 256,264... should go to px1-3.tenge.pvt
-# etc.
-# The port mapping is such that ports [0,1,2,3] on the ROACH send to ports [1,0,3,2] on the X-engines
-# which have hostnames px<N>-[3,2,5,4].tenge.pvt
-
-port_map = [3,2,5,4]
-
 # We could do something smart here with mac addresses and IPs, but let's just hard code them for now
 macs = {
   'px1-2.tenge.pvt' : 0x02c9ed7250, # 1/1
@@ -164,41 +145,121 @@ macs = {
   'px8-5.tenge.pvt' : 0x02c9ed6df1, # 8/4
 }
 
-mac_base = 0x020200000000
-
-arp_table = np.arange(256) + mac_base
-
-for fn, feng in enumerate(fengs):
-  for p in range(4):
-    arp_table = np.zeros(256)
-    if args.verbose:
-        print("  configuring %s:eth%d" % (feng.host, p))
-
-    # Configure Destination Addresses
-    # These are stored for each ROACH port in an 8-element RAM.
-    # The n-th element is the address where you want channels <chan_num> % d = n to go
-    # Eveything out of port P should go to X-engine port P,
-    # so the n-th element address map in the ram for port P is:
-    # px<n+1>-port_map[P]
-    for n in range(len(fengs)):
-        hostname = ('px%d-%d.tenge.pvt' % (n+1, port_map[p]))
-	ip_asc = socket.gethostbyname(hostname)
-        ip_str = socket.inet_aton(ip_asc)
-        ip_int = struct.unpack('>L', ip_str)[0]
-        feng.fpga.write('eth_%d_dest_ips' % p, ip_str, offset=4*n)
-        # add this IP's mac to the arp_table for this core
-        ip_low_octet = ip_int & 0xff
-        ip_base = ip_int & 0xffffff00
-        mac = macs[hostname]
-        arp_table[ip_low_octet] = mac
-	if args.verbose:
-	    print "Wrote %s port %d ip %s mac 0x%.12x" % (feng.fpga.host, p, ip_asc, mac)
+if not new_packetizer:
+    # On the ROACHs, port 0 sends chans 256-512
+    # On the ROACHs, port 1 sends chans 0-256
+    # On the ROACHs, port 2 sends chans 768-1024
+    # On the ROACHs, port 3 sends chans 512-768
+    # In the original design with the loopback, packets would be sprayed between ports 0<->1, and 2<->3.
+    # This had the effect that (for ROACH0) channels 0,8,16,etc. ended up back at port 0, chans 256,264,.. -> port 1,
+    # chans 512,520,... -> port 3, chans 768,776,... -> port 4. 
+    # The direct connect was then configured so that anything arriving at ROACH<N> port<P> was forwarded
+    # to X-Engine <N>, port<P>. Host naming conventions mean that X-Engine hosts are px1..8, and have ports
+    # with hostnames px{1..8}-{2..5}.tenge.pvt
+    # Thus, channels 0,8,.. should go to px1-2.tenge.pvt
+    # channels 1,9,.. should go to px2-2.tenge.pvt
+    # ....
+    # channels 7,15,.. should go to px8-2.tenge.pvt
     
-    my_ip   = ip_base + 16 + fn # doesn't have to depend on port since each port is a different subnet (included in ip_base)
-    my_mac  = mac_base + my_ip
-    tx_port = 8511
+    # Channels 256,264... should go to px1-3.tenge.pvt
+    # etc.
+    # The port mapping is such that ports [0,1,2,3] on the ROACH send to ports [1,0,3,2] on the X-engines
+    # which have hostnames px<N>-[3,2,5,4].tenge.pvt
+    
+    port_map = [3,2,5,4]
+    
+    
+    mac_base = 0x020200000000
+    
+    arp_table = np.arange(256) + mac_base
+    
+    for fn, feng in enumerate(fengs):
+      for p in range(4):
+        arp_table = np.zeros(256)
+        if args.verbose:
+            print("  configuring %s:eth%d" % (feng.host, p))
+    
+        # Configure Destination Addresses
+        # These are stored for each ROACH port in an 8-element RAM.
+        # The n-th element is the address where you want channels <chan_num> % d = n to go
+        # Eveything out of port P should go to X-engine port P,
+        # so the n-th element address map in the ram for port P is:
+        # px<n+1>-port_map[P]
+        for n in range(len(fengs)):
+            hostname = ('px%d-%d.tenge.pvt' % (n+1, port_map[p]))
+    	    ip_asc = socket.gethostbyname(hostname)
+            ip_str = socket.inet_aton(ip_asc)
+            ip_int = struct.unpack('>L', ip_str)[0]
+            feng.fpga.write('eth_%d_dest_ips' % p, ip_str, offset=4*n)
+            # add this IP's mac to the arp_table for this core
+            ip_low_octet = ip_int & 0xff
+            ip_base = ip_int & 0xffffff00
+            mac = macs[hostname]
+            arp_table[ip_low_octet] = mac
+    	    if args.verbose:
+    	        print "Wrote arp of %s port %d: ip %s mac 0x%.12x (%s)" % (feng.fpga.host, p, ip_asc, mac, hostname)
+        
+        my_ip   = ip_base + 16 + 4*fn + p
+        my_mac  = mac_base + my_ip
+        tx_port = 8511
+	if args.verbose:
+	    print "Setting %s port %d to have ip 0x%.8x and mac 0x%.12x" % (feng.fpga.host, p, my_ip, my_mac)
+    
+        feng.eth.config_tge_core(p, my_mac, my_ip, tx_port, arp_table)
+else:
+    for fn, feng in enumerate(fengs):
+	for i in range(4): # loop over 4 interfaces
+	    feng.packetizers[i].use_gpu_packing()
+            feng.packetizers[i].set_nants(8) # Each interface outputs 8 antennas
+	    # Set antenna numbers, based on the FID of this board
+	    if i < 2:
+	        # ports 0,1 output even numbered antennas
+		# first board does ants 0-15, the second 16-31, etc.
+	        feng.packetizers[i].set_ant_headers(np.arange(0,8,2) + 16 * fids[fn])
+	    else:
+	        # ports 2,3 output odd numbered antennas
+		# first board does ants 0-15, the second 16-31, etc.
+	        feng.packetizers[i].set_ant_headers(np.arange(1,8,2) + 16 * fids[fn])
 
-    feng.eth.config_tge_core(p, my_mac, my_ip, tx_port, arp_table)
+            # The even numbered ports send even-numbered blocks of 16 channels
+	    if (i % 2) == 0:
+	        # Each packet has 16 channels, the header index contains the
+		# value of the first channel in the packet. So consecutive packets have headers:
+	        chans = np.arange(0,1024,32)
+	        feng.packetizers[i].set_chan_headers(chans)
+            # The odd numbered ports send odd-numbered blocks of 16 channels
+	    else:
+	        # Each packet has 16 channels, the header index contains the
+		# value of the first channel in the packet. So consecutive packets have headers:
+	        chans = np.arange(16,1024,32)
+	        feng.packetizers[i].set_chan_headers(chans)
+	    # Each packetizer stream is 512 channels -> 32 blocks of 16-channel packets
+	    # Pairs of ports together send consecutive blocks, so at any given time:
+	    # Port 0 is sending antennas 0-7,  chans    n -> n+15
+	    # Port 1 is sending antennas 0-7,  chans n+16 -> n+31
+	    # Port 2 is sending antennas 8-15, chans    n -> n+15
+	    # Port 3 is sending antennas 8-15, chans n+16 -> n+31
+	    # Inkeeping with the original PAPER correlator, we can make each X-destination
+	    # responsible for a contiguous block of channels by setting the IP destination
+	    # lookup tables for all four interfaces to be the same.
+	    # Conveniently, this means we can just cycle through the 32 X-destinations.
+	    # Massage the hostnames so that we count through px1-px8, interfaces 2-5
+	    ips  = np.zeros(256) 
+	    arp_table = np.zeros(256)
+            for n in range(4 * len(fengs)):
+                hostname = 'px%d-%d.tenge.pvt' % ((n >> 2) + 1, (n % 4) + 2)
+    	        ip_asc = socket.gethostbyname(hostname)
+                ip_str = socket.inet_aton(ip_asc)
+                ip_int = struct.unpack('>L', ip_str)[0]
+                ip_low_octet = ip_int & 0xff
+                ip_base = ip_int & 0xffffff00
+		ips[n] = ip_int
+                # add this IP's mac to the arp_table for this core
+                mac = macs[hostname]
+                arp_table[ip_low_octet] = mac
+            feng.eth.config_tge_core(i, my_mac, my_ip, tx_port, arp_table)
+
+    
 
 if args.noise:
     print("Configuring inputs to use noise generators")

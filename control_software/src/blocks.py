@@ -351,17 +351,18 @@ class ChanReorder(Block):
         self.write('reorder1_map1', order_str)
 
 class Packetizer(Block):
-    def __init__(self, host, name):
+    def __init__(self, host, name, n_interfaces=1):
         super(Packetizer, self).__init__(host, name)
+	self.n_interfaces = n_interfaces
 
     def set_nants(self, nants):
         self.write_int('n_ants', nants)
 
     def use_gpu_packing(self):
-        self.write_int('stupid_gpu_packing', 1)
+        self.write_int('ri_swap', 1)
 
     def use_fpga_packing(self):
-        self.write_int('stupid_gpu_packing', 0)
+        self.write_int('ri_swap', 0)
 
     def set_dest_ips(self, ips):
         self.write('ips', struct.pack('>%dL' % len(ips), *ips))
@@ -374,6 +375,7 @@ class Packetizer(Block):
 
     def initialize(self):
         self.set_dest_ips(np.zeros(1024))
+	self.use_fpga_packing()
         
 class Eth(Block):
     def __init__(self, host, name, port=10000):
