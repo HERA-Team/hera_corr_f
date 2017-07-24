@@ -15,13 +15,13 @@ class RoachFengine(object):
 
         # blocks
         self.sync        = Sync(self.fpga, 'sync')
-        self.noise       = NoiseGen(self.fpga, None, nstreams=32)
+        self.noise       = NoiseGen(self.fpga, None, nstreams=16)
         self.input       = RoachInput(self.fpga, 'input', nstreams=32)
         self.delay       = RoachDelay(self.fpga, 'delay', nstreams=32)
         self.pfb         = RoachPfb(self.fpga, None)
         self.eq          = Eq(self.fpga, 'eq', nstreams=16, ncoeffs=2**11)
-        self.eq_tvg      = EqTvg(self.fpga, 'eq_tvg', nstreams=16, nchans=2**11)
-        self.packetizer  = Packetizer(self.fpga, 'transpose_packetizer')
+        #self.eq_tvg      = EqTvg(self.fpga, 'eq_tvg', nstreams=16, nchans=2**11)
+        #self.packetizer  = Packetizer(self.fpga, 'transpose_packetizer')
         self.eth         = RoachEth(self.fpga, 'eth')
 
         # The order here can be important, blocks are initialized in the
@@ -33,8 +33,8 @@ class RoachFengine(object):
             self.delay,
             self.pfb,
             self.eq,
-            self.eq_tvg,
-            self.packetizer,
+            #self.eq_tvg,
+            #self.packetizer,
             self.eth,
         ]
 

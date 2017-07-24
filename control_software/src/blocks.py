@@ -127,28 +127,25 @@ class Sync(Block):
         """
         Arm sync pulse generator.
         """
-        curr = self.read_int('arm')
-        self.write_int('arm', (curr & (self.SW_SYNC | self.ARM_NOISE)))
-        self.write_int('arm', (curr & (self.SW_SYNC | self.ARM_NOISE)) | self.ARM_SYNC)
-        self.write_int('arm', (curr & (self.SW_SYNC | self.ARM_NOISE)))
+        self.change_reg_bits('arm', 0, self.ARM_SYNC)
+        self.change_reg_bits('arm', 1, self.ARM_SYNC)
+        self.change_reg_bits('arm', 0, self.ARM_SYNC)
 
     def arm_noise(self):
         """
         Arm noise generator resets
         """
-        curr = self.read_int('arm')
-        self.write_int('arm', (curr & (self.SW_SYNC | self.ARM_SYNC)))
-        self.write_int('arm', (curr & (self.SW_SYNC | self.ARM_SYNC)) | self.ARM_NOISE)
-        self.write_int('arm', (curr & (self.SW_SYNC | self.ARM_SYNC)))
+        self.change_reg_bits('arm', 0, self.ARM_NOISE)
+        self.change_reg_bits('arm', 1, self.ARM_NOISE)
+        self.change_reg_bits('arm', 0, self.ARM_NOISE)
 
     def sw_sync(self):
         """
         Issue a software sync pulse
         """
-        curr = self.read_int('arm')
-        self.write_int('arm', (curr & (self.ARM_NOISE | self.ARM_SYNC)))
-        self.write_int('arm', (curr & (self.ARM_NOISE | self.ARM_SYNC)) | self.SW_SYNC)
-        self.write_int('arm', (curr & (self.ARM_NOISE | self.ARM_SYNC)))
+        self.change_reg_bits('arm', 0, self.SW_SYNC)
+        self.change_reg_bits('arm', 1, self.SW_SYNC)
+        self.change_reg_bits('arm', 0, self.SW_SYNC)
 
     def print_status(self):
         print 'Sync block: %s: Uptime: %d seconds' % (self.name, self.uptime())
@@ -174,9 +171,7 @@ class NoiseGen(Block):
 	    logger.error('Seed value is an 8-bit integer. It cannot be %d' % seed)
 	    return
         regname = 'seed_%d' % (stream // 4)
-        val = self.read_uint(regname)
-        masked_val = val & (0xffffffff - (0xff << stream))
-        self.write_int(regname, masked_val + (seed << stream))
+	self.change_reg_bits(regname, seed, 8 * (stream % 4), 8)
 
     def get_seed(self, stream):
         """
@@ -186,15 +181,15 @@ class NoiseGen(Block):
             logger.error('Tried to get noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
             return
         reg_name = 'seed_%d' % (stream // 4)
-        return self.read_uint(regname) & (0xff << stream)
+        return (self.read_uint(regname) >> (8 * stream % 4)) & 0xff
 
 
     def initialize(self):
-        for stream in self.nstreams:
+        for stream in range(self.nstreams):
             self.set_seed(0, stream)
 
     def print_status(self):
-        for stream in self.nstreams:
+        for stream in range(self.nstreams):
             print 'NoiseGen block: %s: stream %d seed: %d' % (self.name, stream, self.get_seed(stream))
        
 
@@ -314,8 +309,8 @@ class Eq(Block):
         return coeffs / (2.**bp)
 
     def initialize(self):
-        for stream in self.nstreams:
-            self.set_coeffs(self, stream, np.ones(self.ncoeffs))
+        for stream in range(self.nstreams):
+            self.set_coeffs(stream, np.ones(self.ncoeffs))
 
 class EqTvg(Block):
     def __init__(self, host, name, nstreams=6, nchans=2**11):
@@ -509,7 +504,7 @@ class RoachDelay(Block):
             logger.error('Tried to set delay for stream %d > nstreams (%d)' % (stream, self.nstreams))
         delay_reg = stream // 4
         reg_pos   = stream % 4
-        self.write_int(change_reg_bits(self.host.read_uint('%d' % delay_reg), delay, 8*reg_pos, 8))
+        self.change_reg_bits('%d' % delay_reg, delay, 8*reg_pos, 8)
 
     def initialize(self):
         for i in range(self.nregs):

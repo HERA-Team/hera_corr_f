@@ -72,6 +72,12 @@ if 'ctmode' in fengs[0].fpga.listdev():
 else:
     new_packetizer = True
 
+# initialize all registers to their default values
+print("Initializing registers")
+for fn, feng in enumerate(fengs):
+    feng.initialize()
+
+
 print("Disabling network transmission")
 for fn, feng in enumerate(fengs):
     if args.verbose:
@@ -194,29 +200,16 @@ for fn, feng in enumerate(fengs):
 
     feng.eth.config_tge_core(p, my_mac, my_ip, tx_port, arp_table)
 
-if args.sync:
-    print("Arming sync generators")
-    for i in range(2): # evidence suggests two arms are required(?!?)
-        if args.verbose:
-            print("  Beginning waiting for sync at %.2" % time.time())
-        fengs[0].sync.wait_for_sync() # wait until the last sync has passed
-        if args.verbose:
-            print("  Got sync at %.2" % time.time())
-        # time how long the arm takes, to catch problems
-        t0 = time.time()
-        for fn, feng in enumerate(fengs):
-            feng.sync.arm_sync()
-        t1 = time.time()
-        if args.verbose:
-            print("  Finished arming syncs at %.2" % time.time())
-        if ((t1 - t0) > 0.5):
-            print("  WARNING: Took over 0.5 seconds (%.2f s) to arm syncs." % (t1 - t0))
-        sync_time = int(time.time()) + 1
-        print("  Setting sync time to %d" % sync_time)
-    time.sleep(1) # wait for the sync
-    print("Storing sync time %d to redis server at %s" % (sync_time, args.redishost))
-    redis['roachf_init_time'] = sync_time
+if args.noise:
+    print("Configuring inputs to use noise generators")
+    for fn, feng in enumerate(fengs):
+        feng.input.use_noise()
+else:
+    print("Configuring inputs to use ADC signals")
+    for fn, feng in enumerate(fengs):
+        feng.input.use_adc()
 
+if args.sync:
     print("Setting Noise seeds to %d" % args.seed)
     for fn, feng in enumerate(fengs):
         for i in range(16):
@@ -227,14 +220,27 @@ if args.sync:
     for fn, feng in enumerate(fengs):
         feng.sync.arm_noise()
 
-if args.noise:
-    print("Configuring inputs to use noise generators")
-    for fn, feng in enumerate(fengs):
-        feng.input.use_noise()
-else:
-    print("Configuring inputs to use ADC signals")
-    for fn, feng in enumerate(fengs):
-        feng.input.use_adc()
+    print("Arming sync generators")
+    for i in range(2): # evidence suggests two arms are required(?!?)
+        if args.verbose:
+            print("  Beginning waiting for sync at %.2f" % time.time())
+        fengs[0].sync.wait_for_sync() # wait until the last sync has passed
+        if args.verbose:
+            print("  Got sync at %.2f" % time.time())
+        # time how long the arm takes, to catch problems
+        t0 = time.time()
+        for fn, feng in enumerate(fengs):
+            feng.sync.arm_sync()
+        t1 = time.time()
+        if args.verbose:
+            print("  Finished arming syncs at %.2f" % time.time())
+        if ((t1 - t0) > 0.5):
+            print("  WARNING: Took over 0.5 seconds (%.2f s) to arm syncs." % (t1 - t0))
+        sync_time = int(time.time()) + 1
+        print("  Setting sync time to %d" % sync_time)
+    time.sleep(1) # wait for the sync
+    print("Storing sync time %d to redis server at %s" % (sync_time, args.redishost))
+    redis['roachf_init_time'] = sync_time
 
 print("Resetting network interfaces")
 for fn, feng in enumerate(fengs):
