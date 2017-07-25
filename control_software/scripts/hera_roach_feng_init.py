@@ -297,7 +297,7 @@ if args.sync:
             print("  Finished arming syncs at %.2f" % time.time())
         if ((t1 - t0) > 0.5):
             print("  WARNING: Took over 0.5 seconds (%.2f s) to arm syncs." % (t1 - t0))
-        sync_time = int(time.time()) + 1
+        sync_time = int(t1) + 1
         print("  Setting sync time to %d" % sync_time)
     time.sleep(1) # wait for the sync
     print("Storing sync time %d to redis server at %s" % (sync_time, args.redishost))
