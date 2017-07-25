@@ -59,8 +59,8 @@ class Block(object):
 
     def change_reg_bits(self, reg, val, start, width=1):
         orig_val = self.read_uint(reg)
-        mask = (2**32 - 1) - ((2**width - 1) << start)
-        new_val = (orig_val & mask) + (val << start)
+        masked   = orig_val & (0xffffffff - ((2**width - 1) << start))
+        new_val  = masked + (val << start)
         self.write_int(reg, new_val)
 
 class Synth(casperfpga.synth.LMX2581):
@@ -93,9 +93,9 @@ class Adc(casperfpga.snapadc.SNAPADC):
 class Sync(Block):
     def __init__(self, host, name):
         super(Sync, self).__init__(host, name)
-        self.ARM_SYNC  = 1<<0
-        self.ARM_NOISE = 1<<1
-        self.SW_SYNC   = 1<<4
+        self.OFFSET_ARM_SYNC  = 0
+        self.OFFSET_ARM_NOISE = 1
+        self.OFFSET_SW_SYNC   = 4
     
     def uptime(self):
         """
@@ -127,25 +127,25 @@ class Sync(Block):
         """
         Arm sync pulse generator.
         """
-        self.change_reg_bits('arm', 0, self.ARM_SYNC)
-        self.change_reg_bits('arm', 1, self.ARM_SYNC)
-        self.change_reg_bits('arm', 0, self.ARM_SYNC)
+        self.change_reg_bits('arm', 0, self.OFFSET_ARM_SYNC)
+        self.change_reg_bits('arm', 1, self.OFFSET_ARM_SYNC)
+        self.change_reg_bits('arm', 0, self.OFFSET_ARM_SYNC)
 
     def arm_noise(self):
         """
         Arm noise generator resets
         """
-        self.change_reg_bits('arm', 0, self.ARM_NOISE)
-        self.change_reg_bits('arm', 1, self.ARM_NOISE)
-        self.change_reg_bits('arm', 0, self.ARM_NOISE)
+        self.change_reg_bits('arm', 0, self.OFFSET_ARM_NOISE)
+        self.change_reg_bits('arm', 1, self.OFFSET_ARM_NOISE)
+        self.change_reg_bits('arm', 0, self.OFFSET_ARM_NOISE)
 
     def sw_sync(self):
         """
         Issue a software sync pulse
         """
-        self.change_reg_bits('arm', 0, self.SW_SYNC)
-        self.change_reg_bits('arm', 1, self.SW_SYNC)
-        self.change_reg_bits('arm', 0, self.SW_SYNC)
+        self.change_reg_bits('arm', 0, self.OFFSET_SW_SYNC)
+        self.change_reg_bits('arm', 1, self.OFFSET_SW_SYNC)
+        self.change_reg_bits('arm', 0, self.OFFSET_SW_SYNC)
 
     def print_status(self):
         print 'Sync block: %s: Uptime: %d seconds' % (self.name, self.uptime())
@@ -586,6 +586,3 @@ class RoachEth(Block):
 
     def config_tge_core(self, core_num, mac, ip, port, arp_table):
         self.host.config_10gbe_core(self.name + '_%d_sw' % core_num, mac, ip, port, arp_table)
-
-
-
