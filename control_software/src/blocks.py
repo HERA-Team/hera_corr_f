@@ -59,8 +59,8 @@ class Block(object):
 
     def change_reg_bits(self, reg, val, start, width=1):
         orig_val = self.read_uint(reg)
-        mask = (2**32 - 1) - ((2**width - 1) << start)
-        new_val = (orig_val & mask) + (val << start)
+        masked   = orig_val & (0xffffffff - ((2**width - 1) << start))
+        new_val  = masked + (val << start)
         self.write_int(reg, new_val)
 
 class Synth(casperfpga.synth.LMX2581):
@@ -93,9 +93,9 @@ class Adc(casperfpga.snapadc.SNAPADC):
 class Sync(Block):
     def __init__(self, host, name):
         super(Sync, self).__init__(host, name)
-        self.ARM_SYNC  = 1<<0
-        self.ARM_NOISE = 1<<1
-        self.SW_SYNC   = 1<<4
+        self.OFFSET_ARM_SYNC  = 0
+        self.OFFSET_ARM_NOISE = 1
+        self.OFFSET_SW_SYNC   = 4
     
     def uptime(self):
         """
@@ -127,28 +127,25 @@ class Sync(Block):
         """
         Arm sync pulse generator.
         """
-        curr = self.read_int('arm')
-        self.write_int('arm', (curr & (self.SW_SYNC | self.ARM_NOISE)))
-        self.write_int('arm', (curr & (self.SW_SYNC | self.ARM_NOISE)) | self.ARM_SYNC)
-        self.write_int('arm', (curr & (self.SW_SYNC | self.ARM_NOISE)))
+        self.change_reg_bits('arm', 0, self.OFFSET_ARM_SYNC)
+        self.change_reg_bits('arm', 1, self.OFFSET_ARM_SYNC)
+        self.change_reg_bits('arm', 0, self.OFFSET_ARM_SYNC)
 
     def arm_noise(self):
         """
         Arm noise generator resets
         """
-        curr = self.read_int('arm')
-        self.write_int('arm', (curr & (self.SW_SYNC | self.ARM_SYNC)))
-        self.write_int('arm', (curr & (self.SW_SYNC | self.ARM_SYNC)) | self.ARM_NOISE)
-        self.write_int('arm', (curr & (self.SW_SYNC | self.ARM_SYNC)))
+        self.change_reg_bits('arm', 0, self.OFFSET_ARM_NOISE)
+        self.change_reg_bits('arm', 1, self.OFFSET_ARM_NOISE)
+        self.change_reg_bits('arm', 0, self.OFFSET_ARM_NOISE)
 
     def sw_sync(self):
         """
         Issue a software sync pulse
         """
-        curr = self.read_int('arm')
-        self.write_int('arm', (curr & (self.ARM_NOISE | self.ARM_SYNC)))
-        self.write_int('arm', (curr & (self.ARM_NOISE | self.ARM_SYNC)) | self.SW_SYNC)
-        self.write_int('arm', (curr & (self.ARM_NOISE | self.ARM_SYNC)))
+        self.change_reg_bits('arm', 0, self.OFFSET_SW_SYNC)
+        self.change_reg_bits('arm', 1, self.OFFSET_SW_SYNC)
+        self.change_reg_bits('arm', 0, self.OFFSET_SW_SYNC)
 
     def print_status(self):
         print 'Sync block: %s: Uptime: %d seconds' % (self.name, self.uptime())
@@ -174,9 +171,7 @@ class NoiseGen(Block):
 	    logger.error('Seed value is an 8-bit integer. It cannot be %d' % seed)
 	    return
         regname = 'seed_%d' % (stream // 4)
-        val = self.read_uint(regname)
-        masked_val = val & (0xffffffff - (0xff << stream))
-        self.write_int(regname, masked_val + (seed << stream))
+	self.change_reg_bits(regname, seed, 8 * (stream % 4), 8)
 
     def get_seed(self, stream):
         """
@@ -186,15 +181,15 @@ class NoiseGen(Block):
             logger.error('Tried to get noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
             return
         reg_name = 'seed_%d' % (stream // 4)
-        return self.read_uint(regname) & (0xff << stream)
+        return (self.read_uint(regname) >> (8 * stream % 4)) & 0xff
 
 
     def initialize(self):
-        for stream in self.nstreams:
+        for stream in range(self.nstreams):
             self.set_seed(0, stream)
 
     def print_status(self):
-        for stream in self.nstreams:
+        for stream in range(self.nstreams):
             print 'NoiseGen block: %s: stream %d seed: %d' % (self.name, stream, self.get_seed(stream))
        
 
@@ -314,8 +309,8 @@ class Eq(Block):
         return coeffs / (2.**bp)
 
     def initialize(self):
-        for stream in self.nstreams:
-            self.set_coeffs(self, stream, np.ones(self.ncoeffs))
+        for stream in range(self.nstreams):
+            self.set_coeffs(stream, np.ones(self.ncoeffs))
 
 class EqTvg(Block):
     def __init__(self, host, name, nstreams=6, nchans=2**11):
@@ -356,17 +351,18 @@ class ChanReorder(Block):
         self.write('reorder1_map1', order_str)
 
 class Packetizer(Block):
-    def __init__(self, host, name):
+    def __init__(self, host, name, n_interfaces=1):
         super(Packetizer, self).__init__(host, name)
+	self.n_interfaces = n_interfaces
 
     def set_nants(self, nants):
         self.write_int('n_ants', nants)
 
     def use_gpu_packing(self):
-        self.write_int('stupid_gpu_packing', 1)
+        self.write_int('ri_swap', 1)
 
     def use_fpga_packing(self):
-        self.write_int('stupid_gpu_packing', 0)
+        self.write_int('ri_swap', 0)
 
     def set_dest_ips(self, ips):
         self.write('ips', struct.pack('>%dL' % len(ips), *ips))
@@ -379,6 +375,7 @@ class Packetizer(Block):
 
     def initialize(self):
         self.set_dest_ips(np.zeros(1024))
+	self.use_fpga_packing()
         
 class Eth(Block):
     def __init__(self, host, name, port=10000):
@@ -445,17 +442,18 @@ class RoachInput(Block):
         super(RoachInput, self).__init__(host, name)
         self.nstreams  = nstreams
         self.nregs     = nstreams // 8
-        self.nstreams_per_reg = 4
-        self.USE_NOISE = 0
-        self.USE_ADC   = 1
-        self.USE_ZERO  = 2
+        self.nstreams_per_reg = 8
+        self.USE_ADC   = 0
+	# There are two separate noise streams we can switch in. TODO: figure out how (and why) to use these.
+        self.USE_NOISE = 1
+        self.USE_ZERO  = 3
 
     def use_noise(self, stream=None):
         if stream is None:
             for reg in range(self.nregs):
                 v = 0
                 for stream in range(self.nstreams_per_reg):
-                    v += self.USE_NOISE*(2<<stream)
+                    v += self.USE_NOISE << (4 * stream)
                 self.write_int('sel%d' % reg, v)
         else:
             raise NotImplementedError('Different input selects not supported yet!')
@@ -465,7 +463,7 @@ class RoachInput(Block):
             for reg in range(self.nregs):
                 v = 0
                 for stream in range(self.nstreams_per_reg):
-                    v += self.USE_ADC*(2<<stream)
+                    v += self.USE_ADC << (4 * stream)
                 self.write_int('sel%d' % reg, v)
         else:
             raise NotImplementedError('Different input selects not supported yet!')
@@ -475,7 +473,7 @@ class RoachInput(Block):
             for reg in range(self.nregs):
                 v = 0
                 for stream in range(self.nstreams_per_reg):
-                    v += self.USE_ZERO*(2<<stream)
+                    v += self.USE_ZERO << (4 * stream)
                 self.write_int('sel%d' % reg, v)
         else:
             raise NotImplementedError('Different input selects not supported yet!')
@@ -508,7 +506,7 @@ class RoachDelay(Block):
             logger.error('Tried to set delay for stream %d > nstreams (%d)' % (stream, self.nstreams))
         delay_reg = stream // 4
         reg_pos   = stream % 4
-        self.write_int(change_reg_bits(self.host.read_uint('%d' % delay_reg), delay, 8*reg_pos, 8))
+        self.change_reg_bits('%d' % delay_reg, delay, 8*reg_pos, 8)
 
     def initialize(self):
         for i in range(self.nregs):
@@ -588,6 +586,3 @@ class RoachEth(Block):
 
     def config_tge_core(self, core_num, mac, ip, port, arp_table):
         self.host.config_10gbe_core(self.name + '_%d_sw' % core_num, mac, ip, port, arp_table)
-
-
-
