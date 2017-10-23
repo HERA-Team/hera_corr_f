@@ -3,3 +3,6 @@
 snap_fengine/
 !snap_fengine/outputs/
 .Xil/
+vivado*.jou
+vivado*.str
+slprj/
