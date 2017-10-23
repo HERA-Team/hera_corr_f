@@ -31,7 +31,7 @@ entity fft_2048ch_6a_core_stub is
 end fft_2048ch_6a_core_stub;
 architecture structural of fft_2048ch_6a_core_stub is 
 begin
-  sysgen_dut : entity xil_defaultlib.fft_2048ch_6a_core 
+  sysgen_dut : entity xil_defaultlib.fft_2048ch_6a_core_0 
   port map (
     pol0_in0 => pol0_in0,
     pol0_in1 => pol0_in1,

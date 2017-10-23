@@ -1,8 +1,8 @@
---Copyright 1986-2014 Xilinx, Inc. All Rights Reserved.
+--Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
---Tool Version: Vivado v.2014.4 (lin64) Build 1071353 Tue Nov 18 16:47:07 MST 2014
---Date        : Fri Aug 21 16:58:27 2015
---Host        : simech1 running 64-bit Ubuntu 12.04.4 LTS
+--Tool Version: Vivado v.2016.4 (lin64) Build 1733598 Wed Dec 14 22:35:42 MST 2016
+--Date        : Thu Sep 14 14:25:29 2017
+--Host        : acme1 running 64-bit Ubuntu 16.04.2 LTS
 --Command     : generate_target fft_2048ch_6a_core_bd_wrapper.bd
 --Design      : fft_2048ch_6a_core_bd_wrapper
 --Purpose     : IP block netlist
@@ -69,7 +69,7 @@ architecture STRUCTURE of fft_2048ch_6a_core_bd_wrapper is
   end component fft_2048ch_6a_core_bd;
 begin
 fft_2048ch_6a_core_bd_i: component fft_2048ch_6a_core_bd
-    port map (
+     port map (
       clk => clk,
       out0(35 downto 0) => out0(35 downto 0),
       out1(35 downto 0) => out1(35 downto 0),

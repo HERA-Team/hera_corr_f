@@ -1,8 +1,8 @@
---Copyright 1986-2014 Xilinx, Inc. All Rights Reserved.
+--Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
---Tool Version: Vivado v.2014.4 (lin64) Build 1071353 Tue Nov 18 16:47:07 MST 2014
---Date        : Fri Aug 21 16:58:26 2015
---Host        : simech1 running 64-bit Ubuntu 12.04.4 LTS
+--Tool Version: Vivado v.2016.4 (lin64) Build 1733598 Wed Dec 14 22:35:42 MST 2016
+--Date        : Thu Sep 14 14:25:29 2017
+--Host        : acme1 running 64-bit Ubuntu 16.04.2 LTS
 --Command     : generate_target fft_2048ch_6a_core_bd.bd
 --Design      : fft_2048ch_6a_core_bd
 --Purpose     : IP block netlist
@@ -37,6 +37,10 @@ entity fft_2048ch_6a_core_bd is
     sync : in STD_LOGIC_VECTOR ( 31 downto 0 );
     sync_out : out STD_LOGIC_VECTOR ( 0 to 0 )
   );
+  attribute CORE_GENERATION_INFO : string;
+  attribute CORE_GENERATION_INFO of fft_2048ch_6a_core_bd : entity is "fft_2048ch_6a_core_bd,IP_Integrator,{x_ipVendor=xilinx.com,x_ipLibrary=BlockDiagram,x_ipName=fft_2048ch_6a_core_bd,x_ipVersion=1.00.a,x_ipLanguage=VHDL,numBlks=1,numReposBlks=1,numNonXlnxBlks=1,numHierBlks=0,maxHierDepth=0,numSysgenBlks=1,numHlsBlks=0,numHdlrefBlks=0,numPkgbdBlks=0,bdsource=SYSGEN,synth_mode=OOC_per_IP}";
+  attribute HW_HANDOFF : string;
+  attribute HW_HANDOFF of fft_2048ch_6a_core_bd : entity is "fft_2048ch_6a_core_bd.hwdef";
 end fft_2048ch_6a_core_bd;
 
 architecture STRUCTURE of fft_2048ch_6a_core_bd is
@@ -115,7 +119,7 @@ begin
   sync_1(31 downto 0) <= sync(31 downto 0);
   sync_out(0) <= fft_2048ch_6a_core_1_sync_out(0);
 fft_2048ch_6a_core_1: component fft_2048ch_6a_core_bd_fft_2048ch_6a_core_1_0
-    port map (
+     port map (
       clk => clk_1,
       out0(35 downto 0) => fft_2048ch_6a_core_1_out0(35 downto 0),
       out1(35 downto 0) => fft_2048ch_6a_core_1_out1(35 downto 0),
