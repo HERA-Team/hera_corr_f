@@ -34,25 +34,25 @@ class Block(object):
         the block.
         """
         devs = self.host.listdev()
-        return [x.lstrip(self.prefix) for x in devs if x.startswith(self.prefix)]
+        return [x[len(self.prefix):] for x in devs if x.startswith(self.prefix)]
 
-    def read_int(self, reg, offset=0):
-        return self.host.read_int(self.prefix + reg, offset=offset)
-
-    def read_uint(self, reg, offset=0):
-        return self.host.read_uint(self.prefix + reg, offset=offset)
+    def read_int(self, reg, offset=0, **kwargs):
+        return self.host.read_int(self.prefix + reg, word_offset=offset, **kwargs)
 
     def write_int(self, reg, val, offset=0, **kwargs):
-        self.host.write_int(self.prefix + reg, val, offset=offset, **kwargs)
+        self.host.write_int(self.prefix + reg, val, word_offset=offset, **kwargs)
+
+    def read_uint(self, reg, offset=0, **kwargs):
+        return self.host.read_uint(self.prefix + reg, word_offset=offset, **kwargs)
 
     def write_uint(self, reg, val, offset=0, **kwargs):
-        self.host.write_int(self.prefix + reg, val, offset=offset, **kwargs)
+        self.host.write_int(self.prefix + reg, val, word_offset=offset, **kwargs)
 
     def read(self, reg, nbytes, **kwargs):
         return self.host.read(self.prefix + reg, nbytes, **kwargs)
 
-    def write(self, reg, val, **kwargs):
-        self.host.write(self.prefix + reg, val, **kwargs)
+    def write(self, reg, val, offset=0, **kwargs):
+        self.host.write(self.prefix + reg, val, word_offset=offset, **kwargs)
 
     def blindwrite(self, reg, val, **kwargs):
         self.host.blindwrite(self.prefix + reg, val, **kwargs)
@@ -295,7 +295,7 @@ class Eq(Block):
 
     def set_coeffs(self, stream, coeffs):
         coeffs *= 2**self.bp
-        if np.any(coeffs > (2**self.width - 1)):
+        if np.any(self.coeffs > (2**self.width - 1)):
             logger.warning("Some coefficients out of range")
         # saturate coefficients
         coeffs[coeffs>(2**self.width - 1)] = 2**self.width - 1
@@ -306,11 +306,11 @@ class Eq(Block):
     def get_coeffs(self, stream):
         coeffs_str = self.read('%d_coeffs' % stream, self.ncoeffs*struct.calcsize(self.format))
         coeffs = np.array(struct.unpack('>%d%s' % (self.ncoeffs, self.format), coeffs_str))
-        return coeffs / (2.**bp)
+        return coeffs / (2.**self.bp)
 
     def initialize(self):
-        for stream in range(self.nstreams):
-            self.set_coeffs(stream, np.ones(self.ncoeffs))
+        for stream in self.nstreams:
+            self.set_coeffs(stream, np.ones(self.ncoeffs,dype='>%s'%self.format))
 
 class EqTvg(Block):
     def __init__(self, host, name, nstreams=6, nchans=2**11):
@@ -371,7 +371,7 @@ class Packetizer(Block):
         self.write('ants', struct.pack('>%dH' % len(ants), *ants))
         
     def set_chan_headers(self, chans):
-        self.write('chans', struct.pack('>%dL' % len(chans), *chans))
+        self.write('chans', struct.pack('>%dH' % len(chans), *chans))
 
     def initialize(self):
         self.set_dest_ips(np.zeros(1024))
@@ -380,7 +380,10 @@ class Packetizer(Block):
 class Eth(Block):
     def __init__(self, host, name, port=10000):
         super(Eth, self).__init__(host, name)
+        self.tx = self.host.gbes[name]
         self.port = port
+        self.ipaddr = (10 << 24) + (0 << 16) + (10 << 8) + 112
+        self.macaddr = 0x1122334455
 
     def set_arp_table(self, macs):
         """
@@ -390,22 +393,24 @@ class Eth(Block):
         IP XXX.XXX.XXX.0, and element N is the MAC
         address of the device with IP XXX.XXX.XXX.N
         """
-        macs = list(macs)
-        macs_pack = struct.pack('>%dQ' % (len(macs)), *macs)
-        self.write('sw', macs_pack, offset=0x3000)
+        self.tx.set_arp_table(list(macs))
+        #macs = list(macs)
+        #macs_pack = struct.pack('>%dQ' % (len(macs)), *macs)
+        #self.write('sw', macs_pack, offset=0x3000)
 
     def get_status(self):
         stat = self.read_uint('sw_status')
-        rv = {}
-        rv['rx_overrun'  ] =  (stat >> 0) & 1   
-        rv['rx_bad_frame'] =  (stat >> 1) & 1
-        rv['tx_of'       ] =  (stat >> 2) & 1   # Transmission FIFO overflow
-        rv['tx_afull'    ] =  (stat >> 3) & 1   # Transmission FIFO almost full
-        rv['tx_led'      ] =  (stat >> 4) & 1   # Transmission LED
-        rv['rx_led'      ] =  (stat >> 5) & 1   # Receive LED
-        rv['up'          ] =  (stat >> 6) & 1   # LED up
-        rv['eof_cnt'     ] =  (stat >> 7) & (2**25-1)
-        return rv
+        self.tx.print_10gbe_core_details()
+        # rv = {}
+        # rv['rx_overrun'  ] =  (stat >> 0) & 1   
+        # rv['rx_bad_frame'] =  (stat >> 1) & 1
+        # rv['tx_of'       ] =  (stat >> 2) & 1   # Transmission FIFO overflow
+        # rv['tx_afull'    ] =  (stat >> 3) & 1   # Transmission FIFO almost full
+        # rv['tx_led'      ] =  (stat >> 4) & 1   # Transmission LED
+        # rv['rx_led'      ] =  (stat >> 5) & 1   # Receive LED
+        # rv['up'          ] =  (stat >> 6) & 1   # LED up
+        # rv['eof_cnt'     ] =  (stat >> 7) & (2**25-1)
+        # return rv
 
     def status_reset(self):
         self.change_reg_bits('ctrl', 0, 18)
@@ -427,15 +432,23 @@ class Eth(Block):
         self.change_reg_bits('ctrl', 1, 1)
 
     def initialize(self):
-        #Set ip address of the SNAP
-        ipaddr = (10 << 24) + (0 << 16) + (10 << 8) + 112
-        self.blindwrite('sw', struct.pack('>L', ipaddr), offset=0x10)
-        self.set_port(self.port)
+        ## Set IP address of the SNAP
+        ## mac-location 0x00
+        ## ip-location 0x10
+        ## port-location 0x8
+        self.tx.setup(self.macaddr,self.ipaddr,self.port)
+        self.host.write(self.name, self.tx.mac.packed(), 0x00)
+        self.host.write(self.name,self.tx.ip_address.packed(),0x10)
+        value = (fpga.read_int(self.name, word_offset = 0x10)& 0xffff0000)
+        self.host.write_int(self.name,value,word_offset=0x10)
+        self.tx.fabric_enable()
+        #self.blindwrite('sw', struct.pack('>L', ipaddr), offset=0x10)
+        #self.set_port(self.port)
                         
-    def print_status(self):
-        rv = self.get_status()
-        for key in rv.keys():
-            print '%12s : %d'%(key,rv[key])
+    # def print_status(self):
+    #     rv = self.get_status()
+    #     for key in rv.keys():
+    #         print '%12s : %d'%(key,rv[key])
 
 class RoachInput(Block):
     def __init__(self, host, name, nstreams=32):
