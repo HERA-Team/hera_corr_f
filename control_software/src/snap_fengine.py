@@ -2,15 +2,15 @@ import logging
 import numpy as np
 import struct
 import time
-from casperfpga import CasperFpga
+import casperfpga
 from blocks import *
 logger = logging.getLogger(__name__)
 
 
 class SnapFengine(object):
-    def __init__(self, host):
+    def __init__(self, host,port):
         self.host = host
-        self.fpga = CasperFpga(host=host, port=69)
+        self.fpga = casperfpga.CasperFpga(host=host,port=port)
 
         # blocks
         self.synth       = Synth(self.fpga, 'lmx_ctrl')
@@ -30,7 +30,7 @@ class SnapFengine(object):
         # order they appear here
         self.blocks = [
             self.synth,
-            self.adc,
+            #self.adc,
             self.sync,
             self.noise,
             self.input,

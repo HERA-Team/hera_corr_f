@@ -2,6 +2,7 @@ import logging
 import numpy as np
 import struct
 import time
+import casperfpga
 import casperfpga.snapadc
 logger = logging.getLogger(__name__)
 
@@ -52,7 +53,7 @@ class Block(object):
         return self.host.read(self.prefix + reg, nbytes, **kwargs)
 
     def write(self, reg, val, offset=0, **kwargs):
-        self.host.write(self.prefix + reg, val, word_offset=offset, **kwargs)
+        self.host.write(self.prefix + reg, val, offset=offset, **kwargs)
 
     def blindwrite(self, reg, val, **kwargs):
         self.host.blindwrite(self.prefix + reg, val, **kwargs)
@@ -72,8 +73,8 @@ class Synth(casperfpga.synth.LMX2581):
         Seem to have to do this if reference
         was not present when board was powered up(?)
         """
-        self.powerDown()
-        self.powerUp()
+        self.powerOff()
+        self.powerOn()
 
 class Adc(casperfpga.snapadc.SNAPADC):
     def __init__(self, host, sample_rate=500, num_chans=2):
@@ -87,7 +88,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.init(self.sample_rate, self.num_chans) # from the SNAPADC class
         self.alignLineClock(mode='dual_pat')
         self.alignFrameClock()
-        # If aligning complete, alignFrameClock should not output any warning
+        ##If aligning complete, alignFrameClock should not output any warning
         self.setInterleavingMode(self.interleave_mode, self.clock_divide)
 
 class Sync(Block):
@@ -108,6 +109,13 @@ class Sync(Block):
         Returns period of sync in pulses, in FPGA clock ticks
         """
         return self.read_uint('period')
+
+    def change_period(self,period):
+        """
+        Change the period of the sync pulse
+        """
+        self.host.write_int('timebase_sync_period',period)
+        print "Changed period to %.2f"%period
 
     def count(self):
         """
@@ -274,14 +282,14 @@ class Pfb(Block):
         self.change_reg_bits('ctrl', shift, self.PRESHIFT_OFFSET, self.PRESHIFT_WIDTH)
 
     def rst_stats(self):
-        self.change_reg_bits('ctrl', 1, self.RST_BIT)
-        self.change_reg_bits('ctrl', 0, self.RST_BIT)
+        self.change_reg_bits('ctrl', 1, self.STAT_RST_BIT)
+        self.change_reg_bits('ctrl', 0, self.STAT_RST_BIT)
 
     def is_overflowing(self):
         return self.read_uint('status') != 0
         
     def initialize(self):
-        self.host.write_int('ctrl', 0)
+        self.write_int('ctrl', 0)
         self.rst_stats()
 
 class Eq(Block):
@@ -291,11 +299,11 @@ class Eq(Block):
         self.ncoeffs = ncoeffs
         self.width = 18
         self.bp = 7
-        self.format = 'L'
+        self.format = 'H'#'L'
 
     def set_coeffs(self, stream, coeffs):
         coeffs *= 2**self.bp
-        if np.any(self.coeffs > (2**self.width - 1)):
+        if np.any(coeffs > (2**self.width - 1)):
             logger.warning("Some coefficients out of range")
         # saturate coefficients
         coeffs[coeffs>(2**self.width - 1)] = 2**self.width - 1
@@ -309,8 +317,8 @@ class Eq(Block):
         return coeffs / (2.**self.bp)
 
     def initialize(self):
-        for stream in self.nstreams:
-            self.set_coeffs(stream, np.ones(self.ncoeffs,dype='>%s'%self.format))
+        for stream in range(self.nstreams):
+            self.set_coeffs(stream, np.ones(self.ncoeffs,dtype='>%s'%self.format))
 
 class EqTvg(Block):
     def __init__(self, host, name, nstreams=6, nchans=2**11):
@@ -327,7 +335,7 @@ class EqTvg(Block):
 
     def write_freq_ramp(self):
         ramp = np.arange(self.nchans)
-        ramp = ramp % 256 # tvg values are only 8 bits
+        ramp = np.array(ramp%256,dtype='>%s'%self.format) # tvg values are only 8 bits
         tv = np.zeros(self.nchans, dtype='>%s'%self.format) 
         for stream in range(self.nstreams):
             tv += (ramp << (8*stream))
@@ -359,10 +367,10 @@ class Packetizer(Block):
         self.write_int('n_ants', nants)
 
     def use_gpu_packing(self):
-        self.write_int('ri_swap', 1)
+        self.write_int('stupid_gpu_packing', 1)
 
     def use_fpga_packing(self):
-        self.write_int('ri_swap', 0)
+        self.write_int('stupid_gpu_packing', 0)
 
     def set_dest_ips(self, ips):
         self.write('ips', struct.pack('>%dL' % len(ips), *ips))
@@ -380,10 +388,7 @@ class Packetizer(Block):
 class Eth(Block):
     def __init__(self, host, name, port=10000):
         super(Eth, self).__init__(host, name)
-        self.tx = self.host.gbes[name]
         self.port = port
-        self.ipaddr = (10 << 24) + (0 << 16) + (10 << 8) + 112
-        self.macaddr = 0x1122334455
 
     def set_arp_table(self, macs):
         """
@@ -393,24 +398,22 @@ class Eth(Block):
         IP XXX.XXX.XXX.0, and element N is the MAC
         address of the device with IP XXX.XXX.XXX.N
         """
-        self.tx.set_arp_table(list(macs))
-        #macs = list(macs)
-        #macs_pack = struct.pack('>%dQ' % (len(macs)), *macs)
-        #self.write('sw', macs_pack, offset=0x3000)
+        macs = list(macs)
+        macs_pack = struct.pack('>%dQ' % (len(macs)), *macs)
+        self.write('sw', macs_pack, offset=0x3000)
 
     def get_status(self):
-        stat = self.read_uint('sw_status')
-        self.tx.print_10gbe_core_details()
-        # rv = {}
-        # rv['rx_overrun'  ] =  (stat >> 0) & 1   
-        # rv['rx_bad_frame'] =  (stat >> 1) & 1
-        # rv['tx_of'       ] =  (stat >> 2) & 1   # Transmission FIFO overflow
-        # rv['tx_afull'    ] =  (stat >> 3) & 1   # Transmission FIFO almost full
-        # rv['tx_led'      ] =  (stat >> 4) & 1   # Transmission LED
-        # rv['rx_led'      ] =  (stat >> 5) & 1   # Receive LED
-        # rv['up'          ] =  (stat >> 6) & 1   # LED up
-        # rv['eof_cnt'     ] =  (stat >> 7) & (2**25-1)
-        # return rv
+        stat = self.read_uint('sw_txs_ss_status')
+        rv = {}
+        rv['rx_overrun'  ] =  (stat >> 0) & 1   
+        rv['rx_bad_frame'] =  (stat >> 1) & 1
+        rv['tx_of'       ] =  (stat >> 2) & 1   # Transmission FIFO overflow
+        rv['tx_afull'    ] =  (stat >> 3) & 1   # Transmission FIFO almost full
+        rv['tx_led'      ] =  (stat >> 4) & 1   # Transmission LED
+        rv['rx_led'      ] =  (stat >> 5) & 1   # Receive LED
+        rv['up'          ] =  (stat >> 6) & 1   # LED up
+        rv['eof_cnt'     ] =  (stat >> 7) & (2**25-1)
+        return rv
 
     def status_reset(self):
         self.change_reg_bits('ctrl', 0, 18)
@@ -432,23 +435,88 @@ class Eth(Block):
         self.change_reg_bits('ctrl', 1, 1)
 
     def initialize(self):
-        ## Set IP address of the SNAP
-        ## mac-location 0x00
-        ## ip-location 0x10
-        ## port-location 0x8
-        self.tx.setup(self.macaddr,self.ipaddr,self.port)
-        self.host.write(self.name, self.tx.mac.packed(), 0x00)
-        self.host.write(self.name,self.tx.ip_address.packed(),0x10)
-        value = (fpga.read_int(self.name, word_offset = 0x10)& 0xffff0000)
-        self.host.write_int(self.name,value,word_offset=0x10)
-        self.tx.fabric_enable()
-        #self.blindwrite('sw', struct.pack('>L', ipaddr), offset=0x10)
-        #self.set_port(self.port)
+        #Set ip address of the SNAP
+        ipaddr = (10 << 24) + (0 << 16) + (10 << 8) + 110
+        self.blindwrite('sw', struct.pack('>L', ipaddr), offset=0x10)
+        self.set_port(self.port)
                         
-    # def print_status(self):
-    #     rv = self.get_status()
-    #     for key in rv.keys():
-    #         print '%12s : %d'%(key,rv[key])
+    def print_status(self):
+        rv = self.get_status()
+        for key in rv.keys():
+            print '%12s : %d'%(key,rv[key])
+
+# class Eth(Block):
+#     def __init__(self, host, name):
+#         super(Eth, self).__init__(host, name)
+#         self.tx = self.host.gbes
+#         self.port = 10000
+#         self.ipaddr = (10 << 24) + (0 << 16) + (10 << 8) + 112
+#         self.macaddr = 0x1122334455
+
+#     def set_arp_table(self, macs):
+#         """
+#         Set the ARP table with a list of MAC addresses.
+#         The list, `macs`, is passed such that the zeroth
+#         element is the MAC address of the device with
+#         IP XXX.XXX.XXX.0, and element N is the MAC
+#         address of the device with IP XXX.XXX.XXX.N
+#         """
+#         self.tx.set_arp_table(list(macs))
+#         #macs = list(macs)
+#         #macs_pack = struct.pack('>%dQ' % (len(macs)), *macs)
+#         #self.write('sw', macs_pack, offset=0x3000)
+
+#     def get_status(self):
+#         stat = self.read_uint('sw_status')
+#         self.tx.print_10gbe_core_details()
+#         # rv = {}
+#         # rv['rx_overrun'  ] =  (stat >> 0) & 1   
+#         # rv['rx_bad_frame'] =  (stat >> 1) & 1
+#         # rv['tx_of'       ] =  (stat >> 2) & 1   # Transmission FIFO overflow
+#         # rv['tx_afull'    ] =  (stat >> 3) & 1   # Transmission FIFO almost full
+#         # rv['tx_led'      ] =  (stat >> 4) & 1   # Transmission LED
+#         # rv['rx_led'      ] =  (stat >> 5) & 1   # Receive LED
+#         # rv['up'          ] =  (stat >> 6) & 1   # LED up
+#         # rv['eof_cnt'     ] =  (stat >> 7) & (2**25-1)
+#         # return rv
+
+#     def status_reset(self):
+#         self.change_reg_bits('ctrl', 0, 18)
+#         self.change_reg_bits('ctrl', 1, 18)
+#         self.change_reg_bits('ctrl', 0, 18)
+
+#     def set_port(self, port):
+#         self.change_reg_bits('ctrl', port, 2, 16)
+
+#     def reset(self):
+#         # disable core
+#         self.change_reg_bits('ctrl', 0, 1)
+#         # toggle reset
+#         self.change_reg_bits('ctrl', 0, 0)
+#         self.change_reg_bits('ctrl', 1, 0)
+#         self.change_reg_bits('ctrl', 0, 0)
+
+#     def enable_tx(self):
+#         self.change_reg_bits('ctrl', 1, 1)
+
+#     def initialize(self):
+#         ## Set IP address of the SNAP
+#         ## mac-location 0x00
+#         ## ip-location 0x10
+#         ## port-location 0x8
+#         self.tx.setup(self.macaddr,self.ipaddr,self.port)
+#         self.host.write(self.name, self.tx.mac.packed(), 0x00)
+#         self.host.write(self.name,self.tx.ip_address.packed(),0x10)
+#         value = (fpga.read_int(self.name, word_offset = 0x10)& 0xffff0000)
+#         self.host.write_int(self.name,value,word_offset=0x10)
+#         self.tx.fabric_enable()
+#         #self.blindwrite('sw', struct.pack('>L', ipaddr), offset=0x10)
+#         #self.set_port(self.port)
+                        
+#     # def print_status(self):
+#     #     rv = self.get_status()
+#     #     for key in rv.keys():
+#     #         print '%12s : %d'%(key,rv[key])
 
 class RoachInput(Block):
     def __init__(self, host, name, nstreams=32):
