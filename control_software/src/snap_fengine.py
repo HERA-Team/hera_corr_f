@@ -8,9 +8,9 @@ logger = logging.getLogger(__name__)
 
 
 class SnapFengine(object):
-    def __init__(self, host,port):
+    def __init__(self, host):
         self.host = host
-        self.fpga = casperfpga.CasperFpga(host=host,port=port)
+        self.fpga = casperfpga.CasperFpga(host=host)
 
         # blocks
         self.synth       = Synth(self.fpga, 'lmx_ctrl')
@@ -30,7 +30,7 @@ class SnapFengine(object):
         # order they appear here
         self.blocks = [
             self.synth,
-            #self.adc,
+            self.adc,
             self.sync,
             self.noise,
             self.input,
@@ -45,4 +45,6 @@ class SnapFengine(object):
 
     def initialize(self):
         for block in self.blocks:
+            logger.info("Initializing block: %s" % block.name)
             block.initialize()
+
