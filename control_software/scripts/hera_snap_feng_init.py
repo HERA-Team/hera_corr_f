@@ -3,112 +3,133 @@
 import argparse
 from hera_corr_f import SnapFengine
 import numpy as np
-import struct, collections
-import argparse
+import struct
+import collections
+import time
 
 parser = argparse.ArgumentParser(description='Interact with a programmed SNAP board for testing and networking.',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('fpga',type=str,
-                    help= 'Name of the SNAP- looks up IP from the /etc/hosts file')
+parser.add_argument('hosts', metavar='hosts', type=str, nargs='+',
+                    help = 'Hostnames / IPs of the SNAPs')
+parser.add_argument('-s', dest='sync', action='store_true', default=False,
+                    help ='Use this flag to sync the F-engine(s) and Noise generators from PPS')
+parser.add_argument('-m', dest='mansync', action='store_true', default=False,
+                    help ='Use this flag to manually sync the F-engines with an asynchronous software trigger')
+parser.add_argument('-i', dest='initialize', action='store_true', default=False,
+                    help ='Use this flag to initialize the F-engine(s)')
+parser.add_argument('-t', dest='tvg', action='store_true', default=False,
+                    help ='Use this flag to switch to EQ TVG outputs')
+parser.add_argument('-n', dest='noise', action='store_true', default=False,
+                    help ='Use this flag to switch to Noise inputs')
+
 args = parser.parse_args()
 
-fengine = SnapFengine(host=args.fpga,port=69)
-fengine.initialize()
 
-## Noise Block
-seed = 23
-nstreams = 6
-for stream in range(nstreams): 
-    fengine.noise.set_seed(stream,seed)
+fengines = [SnapFengine(host) for host in args.hosts]
+for fengine in fengines:
+    if args.initialize:
+        fengine.initialize()
 
-## Input
-# fengine.input.use_noise()
+    ## Noise Block
+    seed = 23
+    for stream in range(fengine.noise.nstreams): 
+        fengine.noise.set_seed(stream, seed)
 
-## Sync
-fengine.sync.arm_sync()
+    if args.tvg:
+        fengine.eq_tvg.write_freq_ramp()
+        fengine.eq_tvg.tvg_enable()
 
-## Test Vector Generator
-fengine.eq_tvg.write_freq_ramp()
-fengine.eq_tvg.tvg_enable()
+    if args.noise:
+        fengine.input.use_noise()
 
-## Packetizer
+# Sync logic. Do global sync first, and then noise generators
+# wait for a PPS to pass then arm all the boards
+if args.sync:
+    print 'Sync-ing Fengines'
+    print 'Waiting for PPS at time %.2f' % time.time()
+    fengines[0].sync.wait_for_sync()
+    print 'Sync passed at time %.2f' % time.time()
+    before_sync = time.time()
+    for fengine in fengines:
+        fengine.sync.arm_sync()
+    after_sync = time.time()
+    print 'Syncing took %.2f seconds' % (after_sync - before_sync)
+    if after_sync - before_sync > 0.5:
+        print "WARNING!!!"
 
-map_ips_chans = collections.OrderedDict({'192.0.0.1':(0,12*16), '192.0.0.2':(13*16,(13+12)*16), '192.0.0.3':(25*16,(25+12)*16), '192.0.0.4':100*16})
-                                         #'192.0.0.5':(38*16,50*16),'192.0.0.6':(51*16,(51+12)*16),'192.0.0.7':(64*16,76*16),'192.0.0.8':80*16})
+if args.sync:
+    print 'Sync-ing Noise generators'
+    print 'Waiting for PPS at time %.2f' % time.time()
+    fengines[0].sync.wait_for_sync()
+    print 'Sync passed at time %.2f' % time.time()
+    before_sync = time.time()
+    for fengine in fengines:
+        fengine.sync.arm_noise()
+    after_sync = time.time()
+    print 'Syncing took %.2f seconds' % (after_sync - before_sync)
+    if after_sync - before_sync > 0.5:
+        print "WARNING!!!"
 
-## 96 udp pkts per spectrum per antenna. Of these, max 96/Nx get
-## sent to one X-engine.
+if args.mansync:
+    print 'Generating a software sync trigger'
+    for fengine in fengines:
+        fengine.sync.arm_sync()
+        fengine.sync.arm_noise()
+    for fengine in fengines:
+        fengine.sw_sync()
 
-# Full bandwidth per X-engine
-Nx = len(map_ips_chans.keys())
-Nchax = 1536/Nx
 
-Nchans = 0
-for ip,chan in map_ips_chans.iteritems():
-    if type(chan) == tuple:
-        Nchans+=chan[1]-chan[0]
-    else:
-        map_ips_chans[ip] = (chan, chan+Nchax)
-        Nchans+=Nchax
-        
-if Nchans <= 1536:
-    print("Assigned:: Number of channels: %d  Bandwidth: %.2f MHz"%(Nchans,Nchans*200/2048.))
-else:
-    exit("Error: You have assigned %d channels. Data rate larger than 10Gbps!")
-    
-reorder_map = np.zeros(Nchax)
-chans = np.zeros(Nchax/16)
-
-for i,chan in enumerate(map_ips_chans.values()):
-    if (chan[1]-chan[0]) < Nchax:
-        chan_order = np.append(np.arange(chan[0],chan[1],step=1),np.zeros(Nchax-(chan[1]-chan[0])))
-    else:
-        chan_order = np.arange(chan[0],chan[1],step=1)
-        
-    reorder_map = np.vstack((reorder_map,chan_order))
-    chans = np.vstack((chans,chan_order[::16]/16))
-
-reorder_map = reorder_map[1:].reshape((-1,),order='F')
-reorder_map = np.insert(reorder_map,np.arange(3,1537,step=3),0)
-
-chans = chans[1:].reshape((-1,),order='F')
-chans = np.insert(chans,np.arange(3,97,step=3),0)
-
-ips = []
-for key in map_ips_chans.keys():
-    idx = key.rsplit('.')
-    ips.append((int(idx[0])<<24) + (int(idx[1])<<16) + (int(idx[2])<<8) + (int(idx[3])))
-ips = ips*(Nchax/16)
-ips = np.insert(ips,np.arange(3,97,step=3),0)
-
+# Set the output ordering stuff
+# First set the antenna indices for each board. For now we just
+# assume 3 antennas per board, and increment in the order the
+# boards are presented as arguments to this script.
 nants = 3
-ants = np.arange(4)
+for fn, fengine in enumerate(fengines):
+    print 'Setting Antenna indices...'
+    fengine.packetizer.set_nants(nants)
+    fengine.packetizer.set_ant_headers(np.arange(nants+1) + nants*fn) # TODO something smarter to number antennas
 
-fengine.reorder.set_channel_order(reorder_map)
-fengine.packetizer.set_chan_headers(chans)
-fengine.packetizer.set_nants(nants)
-fengine.packetizer.set_dest_ips(ips)
-fengine.packetizer.set_ant_headers(ants)
+# output mappings
+# Now prepare to map the destinations of different frequency slots.
+# For now assume that we are going to send a contiguous chunk of 1536
+# channels to 32 X-engines. Generate the mapping of channels to
+# X-engine (but for now just make all the destinations the same.
 
-## Eth
-#0x0002c94f0660
-mac = [0x02020a0a0a85]*16
-fengine.eth.set_arp_table(mac)#Port 10000 by default
-fengine.eth.set_port(10000)
-fengine.eth.enable_tx()
+dest_mac = 0x0002c91f1151                               # simech1
+dest_ip  = (10<<24) + (0<<16) + (10<<8) + (123<<0)      # simech1
 
-## Start sending the sync pulse
-fengine.sync.sw_sync()
+chans_to_send = np.arange(256, 256+1536) # A contiguous block in the middle of the band
 
-def assign_chans(map_ips_chans):
-    '''Write the reorder map based on the input dictionary of channels to ip
-    addresses assignment. If only the start values are specified, the
-    full bandwidth per X-engine is assigned to it.
+n_xengs = 32
+chans_per_packet = 16 # Hardcoded in firmware
+chans_per_xeng = 1536 / 32 # 48
+packets_per_xeng = chans_per_xeng / chans_per_packet # 3
+
+xeng_ips = [dest_ip] * n_xengs
+xeng_macs = [dest_mac] * n_xengs
+
+chan_blocks = []
+for xn in range(n_xengs):
+    chan_blocks += [chans_to_send[xn*chans_per_xeng : (xn+1)*chans_per_xeng]]
+
+# Populate the F-engine output slots of which there are 96
+# Each slot is used to send 16 channels from all antennas to
+# an arbitrary destination.
+for fengine in fengines:
+    for pk in range(packets_per_xeng):
+        for xn in range(n_xengs):
+            slot = pk*n_xengs + xn
+            chans = chan_blocks[xn][pk*chans_per_packet : (pk+1)*chans_per_packet]
+            print 'Setting slot %d: IP: %d' % (slot, xeng_ips[xn]) , chans
+            fengine.packetizer.assign_slot(slot, chans, xeng_ips[xn], fengine.reorder)
     
-    :param map_ips_chans: OrderedDict, ip_addr: (start_chan,end_chan) or
-    ip_addr:start_chan
+# Finally set the SNAP ARP tables and enable transmission
 
-    :return: reorder_map packed binary data for the software reorder block
-    '''
+for fengine in fengines:
+    fengine.eth.set_port(10000)
+    for xn in range(n_xengs):
+        fengine.eth.add_arp_entry(xeng_ips[xn], xeng_macs[xn])
 
-    return "Implementing"
+for fengine in fengines:
+    pass
+    fengine.eth.enable_tx()
