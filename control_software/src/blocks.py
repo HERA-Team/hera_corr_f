@@ -11,9 +11,9 @@ class Block(object):
     def __init__(self, host, name):
         self.host = host
         self.name = name
-	if (name is None) or (name == ''):
-	    self.prefix = ''
-	else:
+        if (name is None) or (name == ''):
+            self.prefix = ''
+        else:
             self.prefix = name + '_'
     
     def print_status(self):
@@ -37,17 +37,17 @@ class Block(object):
         devs = self.host.listdev()
         return [x[len(self.prefix):] for x in devs if x.startswith(self.prefix)]
 
-    def read_int(self, reg, offset=0, **kwargs):
-        return self.host.read_int(self.prefix + reg, word_offset=offset, **kwargs)
+    def read_int(self, reg, word_offset=0, **kwargs):
+        return self.host.read_int(self.prefix + reg, word_offset=word_offset, **kwargs)
 
-    def write_int(self, reg, val, offset=0, **kwargs):
-        self.host.write_int(self.prefix + reg, val, word_offset=offset, **kwargs)
+    def write_int(self, reg, val, word_offset=0, **kwargs):
+        self.host.write_int(self.prefix + reg, val, word_offset=word_offset, **kwargs)
 
-    def read_uint(self, reg, offset=0, **kwargs):
-        return self.host.read_uint(self.prefix + reg, word_offset=offset, **kwargs)
+    def read_uint(self, reg, word_offset=0, **kwargs):
+        return self.host.read_uint(self.prefix + reg, word_offset=word_offset, **kwargs)
 
-    def write_uint(self, reg, val, offset=0, **kwargs):
-        self.host.write_int(self.prefix + reg, val, word_offset=offset, **kwargs)
+    def write_uint(self, reg, val, word_offset=0, **kwargs):
+        self.host.write_int(self.prefix + reg, val, word_offset=word_offset, **kwargs)
 
     def read(self, reg, nbytes, **kwargs):
         return self.host.read(self.prefix + reg, nbytes, **kwargs)
@@ -77,19 +77,22 @@ class Synth(casperfpga.synth.LMX2581):
         self.powerOn()
 
 class Adc(casperfpga.snapadc.SNAPADC):
-    def __init__(self, host, sample_rate=500, num_chans=2):
+    def __init__(self, host, sample_rate=500, num_chans=2, resolution=8):
         super(Adc, self).__init__(host)
+        self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
         self.interleave_mode = 4 >> num_chans
         self.clock_divide    = 1
         self.sample_rate     = sample_rate
+        self.resolution      = resolution
 
     def initialize(self):
         self.init(self.sample_rate, self.num_chans) # from the SNAPADC class
-        self.alignLineClock(mode='dual_pat')
-        self.alignFrameClock()
+        #self.alignLineClock(mode='dual_pat')
+        #self.alignFrameClock()
         ##If aligning complete, alignFrameClock should not output any warning
-        self.setInterleavingMode(self.interleave_mode, self.clock_divide)
+        self.selectADC()
+        self.adc.selectInput([1,1,3,3])
 
 class Sync(Block):
     def __init__(self, host, name):
@@ -125,11 +128,11 @@ class Sync(Block):
     
     def wait_for_sync(self):
         """
-	Block until a sync has been received.
-	"""
-	c = self.count()
-	while(self.count() == c):
-	    time.sleep(0.01)
+        Block until a sync has been received.
+        """
+        c = self.count()
+        while(self.count() == c):
+            time.sleep(0.05)
 
     def arm_sync(self):
         """
@@ -175,11 +178,11 @@ class NoiseGen(Block):
         if stream > self.nstreams:
             logger.error('Tried to set noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
             return
-	if seed > 255:
-	    logger.error('Seed value is an 8-bit integer. It cannot be %d' % seed)
-	    return
+        if seed > 255:
+            logger.error('Seed value is an 8-bit integer. It cannot be %d' % seed)
+            return
         regname = 'seed_%d' % (stream // 4)
-	self.change_reg_bits(regname, seed, 8 * (stream % 4), 8)
+        self.change_reg_bits(regname, seed, 8 * (stream % 4), 8)
 
     def get_seed(self, stream):
         """
@@ -321,7 +324,7 @@ class Eq(Block):
             self.set_coeffs(stream, np.ones(self.ncoeffs,dtype='>%s'%self.format))
 
 class EqTvg(Block):
-    def __init__(self, host, name, nstreams=6, nchans=2**11):
+    def __init__(self, host, name, nstreams=3, nchans=2**11):
         super(EqTvg, self).__init__(host, name)
         self.nstreams = nstreams
         self.nchans = nchans
@@ -335,10 +338,10 @@ class EqTvg(Block):
 
     def write_freq_ramp(self):
         ramp = np.arange(self.nchans)
-        ramp = np.array(ramp%256,dtype='>%s'%self.format) # tvg values are only 8 bits
+        ramp = np.array(ramp%16384,dtype='>%s'%self.format) # tvg values are only 16 bits
         tv = np.zeros(self.nchans, dtype='>%s'%self.format) 
         for stream in range(self.nstreams):
-            tv += (ramp << (8*stream))
+            tv += (ramp << (16*stream))
         self.write('tv', tv.tostring())
 
     def initialize(self):
@@ -351,6 +354,10 @@ class ChanReorder(Block):
         self.nchans = nchans
 
     def set_channel_order(self, order):
+        """
+        Re-order the channels to that they are
+        sent with the order in the specified map
+        """
         order = list(order)
         if len(order) != self.nchans:
             logger.Error("Tried to reorder channels, but map was the wrong length")
@@ -358,10 +365,14 @@ class ChanReorder(Block):
         order_str = struct.pack('>%dH' % self.nchans, *order)
         self.write('reorder1_map1', order_str)
 
+    def reindex_channel(self, actual_index, output_index):
+        self.write_int('reorder1_map1', actual_index, word_offset=output_index)
+        
+
 class Packetizer(Block):
     def __init__(self, host, name, n_interfaces=1):
         super(Packetizer, self).__init__(host, name)
-	self.n_interfaces = n_interfaces
+        self.n_interfaces = n_interfaces
 
     def set_nants(self, nants):
         self.write_int('n_ants', nants)
@@ -372,18 +383,55 @@ class Packetizer(Block):
     def use_fpga_packing(self):
         self.write_int('stupid_gpu_packing', 0)
 
-    def set_dest_ips(self, ips):
-        self.write('ips', struct.pack('>%dL' % len(ips), *ips))
+    def set_dest_ips(self, ips, slot_offset=0):
+        self.write('ips', struct.pack('>%dL' % len(ips), *ips), offset=4*slot_offset)
 
     def set_ant_headers(self, ants):
-        self.write('ants', struct.pack('>%dH' % len(ants), *ants))
+        self.write('ants', struct.pack('>%dL' % len(ants), *ants))
         
-    def set_chan_headers(self, chans):
-        self.write('chans', struct.pack('>%dH' % len(chans), *chans))
+    def set_chan_headers(self, chans, slot_offset=0):
+        self.write('chans', struct.pack('>%dL' % len(chans), *chans), offset=4*slot_offset)
 
     def initialize(self):
         self.set_dest_ips(np.zeros(1024))
-	self.use_fpga_packing()
+        self.use_fpga_packing()
+
+    def assign_slot(self, slot_num, chans, dest, reorder_block):
+        """
+        The F-engine generates 2048 channels, but can only
+        output 1536, in order to keep within the output data rate cap.
+        Each output packet contain 16 frequency channels for a single antenna.
+        There are thus effectively 96 output slots, each corresponding
+        to a block of 16 frequency channels. Each block can be filled with
+        16 arbitrary channels (they can repeat, if you want), and sent
+        to a particular IP address.
+        slot_num -- a value from 0 to 95 -- the slot you want to allocate
+        chans    -- an array of 16 channels, which you want to put in this slot's packet
+        dest     -- an IP integer that is the destination of this packet
+        reorder_block -- a ChanReorder block object, which allows the
+                         packetizer to manipulate the channel ordering of the design. Bit gross.
+        """
+        chans = np.array(chans, dtype='>L')
+        if slot_num > 95:
+            raise ValueError("Only 95 output slots can be specified")
+        if chans.shape[0] != 16:
+            raise ValueError("Each slot must contain 16 frequency channels")
+        # Since there are 2048 channels, and 16 channels per packet,
+        # there are really 128 slots, but every 4th one must be zero.
+        # The following map figures out where in the 128 slots one of the
+        # 96 valid slots should go.
+        slot128 = int(4*(slot_num//3) + slot_num%3)
+        # Set the frequency header of this slot to be the first specified channel
+        self.set_chan_headers(chans[0:1], slot_offset=slot128)
+        # Set the destination address of this slot to be the specified IP address
+        self.set_dest_ips([dest], slot_offset=slot128)
+        # set the channel orders
+        # The channels supplied need to emerge at indices slot128*16 : (slot128+1)*16
+        for cn, chan in enumerate(chans):
+            reorder_block.reindex_channel(chan, slot128*16 + cn)
+
+
+
         
 class Eth(Block):
     def __init__(self, host, name, port=10000):
@@ -401,6 +449,14 @@ class Eth(Block):
         macs = list(macs)
         macs_pack = struct.pack('>%dQ' % (len(macs)), *macs)
         self.write('sw', macs_pack, offset=0x3000)
+
+    def add_arp_entry(self, ip, mac):
+        """
+        Set a single arp entry.
+        """
+        mac_pack = struct.pack('>Q', mac)
+        ip_offset = ip % 256
+        self.write('sw', mac_pack, offset=0x3000 + ip_offset*8)
 
     def get_status(self):
         stat = self.read_uint('sw_txs_ss_status')
@@ -525,7 +581,7 @@ class RoachInput(Block):
         self.nregs     = nstreams // 8
         self.nstreams_per_reg = 8
         self.USE_ADC   = 0
-	# There are two separate noise streams we can switch in. TODO: figure out how (and why) to use these.
+    # There are two separate noise streams we can switch in. TODO: figure out how (and why) to use these.
         self.USE_NOISE = 1
         self.USE_ZERO  = 3
 
