@@ -8,11 +8,22 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Interact with a programmed SNAP board for testing and networking.',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('fpga',type=str,
-                    help= 'Name of the SNAP- looks up IP from the /etc/hosts file')
+parser.add_argument('hosts', metavar='hosts', type=str,
+                    help = 'Hostnames / IPs of the SNAPs')
+parser.add_argument('-s', dest='sync', action='store_true', default=False,
+                    help ='Use this flag to sync the F-engine(s) and Noise generators from PPS')
+parser.add_argument('-m', dest='mansync', action='store_true', default=False,
+                    help ='Use this flag to manually sync the F-engines with an asynchronous software trigger')
+parser.add_argument('-i', dest='initialize', action='store_true', default=False,
+                    help ='Use this flag to initialize the F-engine(s)')
+parser.add_argument('-t', dest='tvg', action='store_true', default=False,
+                    help ='Use this flag to switch to EQ TVG outputs')
+parser.add_argument('-n', dest='noise', action='store_true', default=False,
+                    help ='Use this flag to switch to Noise inputs')
+
 args = parser.parse_args()
 
-fengine = SnapFengine(host=args.fpga,port=69)
+fengine = SnapFengine(host=args.hosts,port=69)
 fengine.initialize()
 
 ## Noise Block
@@ -32,8 +43,7 @@ fengine.eq_tvg.write_freq_ramp()
 fengine.eq_tvg.tvg_enable()
 
 ## Packetizer
-
-map_ips_chans = collections.OrderedDict({'192.0.0.1':(0,12*16), '192.0.0.2':(13*16,(13+12)*16), '192.0.0.3':(25*16,(25+12)*16), '192.0.0.4':100*16})
+map_ips_chans = collections.OrderedDict({'10.0.10.123':(0,12*16), '0.0.0.0':(13*16,(13+12)*16), '0.0.0.0':(25*16,(25+12)*16), '0.0.0.0':100*16})
                                          #'192.0.0.5':(38*16,50*16),'192.0.0.6':(51*16,(51+12)*16),'192.0.0.7':(64*16,76*16),'192.0.0.8':80*16})
 
 ## 96 udp pkts per spectrum per antenna. Of these, max 96/Nx get
