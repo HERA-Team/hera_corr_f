@@ -480,14 +480,17 @@ class Eth(Block):
         self.change_reg_bits('ctrl', port, 2, 16)
 
     def reset(self):
-        # disable core
-        self.change_reg_bits('ctrl', 0, 1)
+        # stop traffic before reset
+        self.disable_tx()
         # toggle reset
         self.change_reg_bits('ctrl', 0, 0)
         self.change_reg_bits('ctrl', 1, 0)
         self.change_reg_bits('ctrl', 0, 0)
 
     def enable_tx(self):
+        self.change_reg_bits('ctrl', 1, 1)
+
+    def disable_tx(self):
         self.change_reg_bits('ctrl', 1, 1)
 
     def initialize(self):
