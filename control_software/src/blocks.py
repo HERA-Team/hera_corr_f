@@ -355,6 +355,7 @@ class Pfb(Block):
         
     def initialize(self):
         self.write_int('ctrl', 0)
+        self.set_fft_shift(0b110110110110)
         self.rst_stats()
 
 class Eq(Block):
@@ -383,7 +384,7 @@ class Eq(Block):
 
     def initialize(self):
         for stream in range(self.nstreams):
-            self.set_coeffs(stream, np.ones(self.ncoeffs,dtype='>%s'%self.format))
+            self.set_coeffs(stream, 100*np.ones(self.ncoeffs,dtype='>%s'%self.format))
 
 class EqTvg(Block):
     def __init__(self, host, name, nstreams=3, nchans=2**11):
@@ -571,6 +572,42 @@ class Eth(Block):
         for key in rv.keys():
             print '%12s : %d'%(key,rv[key])
 
+
+class Corr(Block):
+    def __init__(self, host, name, acc_len=2048*1e5):
+        super(Corr, self).__init__(host,name)
+        self.acc_len = acc_len
+        
+    def get_corr(self,antenna1,antenna2):
+        self.write_int('input_sel',(antenna1 + (antenna2 << 8)))
+        cnt = self.read_uint('acc_cnt')
+
+        while self.read_uint('acc_cnt') <= (cnt+1):
+            time.sleep(0.1)
+            
+        spec = np.array(struct.unpack('>4096L',self.read('dout',8*2048)))
+        
+        return (spec[0::2]+1j*spec[1::2])/self.acc_len
+    
+    def initialize(self):
+        self.write_int('acc_len',self.acc_len)
+
+    def plot_corr(self,antenna1,antenna2,show=True):
+        import matplotlib.pyplot as plt
+        spec = self.get_corr(antenna1,antenna2)
+        f,ax = plt.subplots(2,2)
+        ax[0][0].plot(spec.real)
+        ax[0][0].set_title('Real')
+        ax[0][1].plot(spec.imag)
+        ax[0][1].set_title('Imag')
+        ax[1][0].plot(np.angle(spec))
+        ax[1][0].set_title('Phase')
+        ax[1][1].plot(10*np.log10(np.abs(spec)))
+        ax[1][1].set_title('Power [dB]')
+
+        if show:
+            plt.show()
+            
 # class Eth(Block):
 #     def __init__(self, host, name):
 #         super(Eth, self).__init__(host, name)
