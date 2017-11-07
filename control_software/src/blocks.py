@@ -218,7 +218,7 @@ class Input(Block):
         if stream is None:
             v = 0
             for stream in range(self.nstreams):
-                v += self.USE_NOISE*(2<<stream)
+                v += self.USE_NOISE << (2 * stream)
             self.write_int('source_sel', v)
         else:
             raise NotImplementedError('Different input selects not supported yet!')
@@ -227,7 +227,7 @@ class Input(Block):
         if stream is None:
             v = 0
             for stream in range(self.nstreams):
-                v += self.USE_ADC*(2<<stream)
+                v += self.USE_ADC << (2 * stream)
             self.write_int('source_sel', v)
         else:
             raise NotImplementedError('Different input selects not supported yet!')
@@ -236,7 +236,7 @@ class Input(Block):
         if stream is None:
             v = 0
             for stream in range(self.nstreams):
-                v += self.USE_ZERO*(2<<stream)
+                v += self.USE_ZERO << (2 * stream)
             self.write_int('source_sel', v)
         else:
             raise NotImplementedError('Different input selects not supported yet!')
