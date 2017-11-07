@@ -305,10 +305,18 @@ class Input(Block):
                 print '%.3f'%ant[vn],
             print ''
 
-    def plot_histogram(self, input):
+    def plot_histogram(self, input, show=False):
         from matplotlib import pyplot as plt
         bins, d = self.get_input_histogram(input)
-        plt.hist(d, bins=bins)
+        #plt.hist(d, bins=bins)
+        plt.bar(bins-0.5, d, width=1)
+        if show:
+            plt.show()
+
+    def show_histogram_plot(self):
+        from matplotlib import pyplot as plt
+        plt.show()
+        
 
 class Delay(Block):
     def __init__(self, host, name, nstreams=6):
