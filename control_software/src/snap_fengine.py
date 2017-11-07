@@ -25,7 +25,8 @@ class SnapFengine(object):
         self.reorder     = ChanReorder(self.fpga, 'chan_reorder', nchans=2**11)
         self.packetizer  = Packetizer(self.fpga, 'packetizer')
         self.eth         = Eth(self.fpga, 'eth')
-
+        self.corr        = Corr(self.fpga,'corr')
+        
         # The order here can be important, blocks are initialized in the
         # order they appear here
         self.blocks = [
@@ -41,6 +42,7 @@ class SnapFengine(object):
             self.reorder,
             self.packetizer,
             self.eth,
+            self.corr,
         ]
 
     def initialize(self):
