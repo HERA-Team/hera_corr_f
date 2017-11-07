@@ -165,6 +165,8 @@ class Sync(Block):
 
     def initialize(self):
         self.write_int('arm', 0)
+        #self.change_period(2**16 * 9*7*6*5*3)
+        self.change_period(0)
 
 class NoiseGen(Block):
     def __init__(self, host, name, nstreams=6):
@@ -341,7 +343,7 @@ class EqTvg(Block):
         ramp = np.array(ramp%16384,dtype='>%s'%self.format) # tvg values are only 16 bits
         tv = np.zeros(self.nchans, dtype='>%s'%self.format) 
         for stream in range(self.nstreams):
-            tv += (ramp << (16*stream))
+            tv += ((ramp + (self.nstreams - stream - 1)*(self.nchans)) << (16*stream))
         self.write('tv', tv.tostring())
 
     def initialize(self):
@@ -362,11 +364,14 @@ class ChanReorder(Block):
         if len(order) != self.nchans:
             logger.Error("Tried to reorder channels, but map was the wrong length")
             return
-        order_str = struct.pack('>%dH' % self.nchans, *order)
+        order_str = struct.pack('>%dL' % self.nchans, *order)
         self.write('reorder1_map1', order_str)
 
     def reindex_channel(self, actual_index, output_index):
         self.write_int('reorder1_map1', actual_index, word_offset=output_index)
+
+    def initialize(self):
+        self.set_channel_order(np.arange(self.nchans))
         
 
 class Packetizer(Block):
@@ -393,7 +398,9 @@ class Packetizer(Block):
         self.write('chans', struct.pack('>%dL' % len(chans), *chans), offset=4*slot_offset)
 
     def initialize(self):
-        self.set_dest_ips(np.zeros(1024))
+        self.set_dest_ips(np.zeros(128))
+        self.set_ant_headers(np.zeros(512))
+        self.set_chan_headers(np.zeros(128))
         self.use_fpga_packing()
 
     def assign_slot(self, slot_num, chans, dest, reorder_block):
@@ -491,7 +498,7 @@ class Eth(Block):
         self.change_reg_bits('ctrl', 1, 1)
 
     def disable_tx(self):
-        self.change_reg_bits('ctrl', 1, 1)
+        self.change_reg_bits('ctrl', 0, 1)
 
     def initialize(self):
         #Set ip address of the SNAP
