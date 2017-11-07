@@ -362,8 +362,8 @@ class Eq(Block):
         super(Eq, self).__init__(host, name)
         self.nstreams = nstreams
         self.ncoeffs = ncoeffs
-        self.width = 18
-        self.bp = 7
+        self.width = 16
+        self.bp = 6
         self.format = 'H'#'L'
 
     def set_coeffs(self, stream, coeffs):
