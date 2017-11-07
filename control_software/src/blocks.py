@@ -242,21 +242,73 @@ class Input(Block):
             raise NotImplementedError('Different input selects not supported yet!')
 
     def get_stats(self):
+        """
+        Get the mean, RMS, and powers of
+        all 12 ADC cores.
+        returns: means, powers, rmss
+        """
         self.write_int('rms_enable', 1)
         time.sleep(0.01)
         self.write_int('rms_enable', 0)
         x = np.array(struct.unpack('>%dl' % (2*self.nstreams), self.read('rms_levels', self.nstreams * 8)))
         self.write_int('rms_enable', 1)
-        means = x[0::2]
-        sds   = x[1::2]
-        return {'means':means, 'sds':sds}
+        means    = x[0::2] / 2.**16
+        powers   = x[1::2] / 2.**16
+        rmss     = np.sqrt(powers)
+        return means, powers, rmss
 
     def initialize(self):
         self.use_adc()
         self.write_int('rms_enable', 1)
 
     def print_status(self):
-        print self.get_stats()
+        mean, power, rms = self.get_stats()
+        print 'mean:',
+        for i in mean: print '%3f'%i,
+        print ''
+        print 'power:',
+        for i in power: print '%3f'%i,
+        print ''
+        print 'rms:',
+        for i in rms: print '%3f'%i,
+        print ''
+
+    def get_histogram(self, input, sum_cores=True):
+        v = np.array(struct.unpack('>512H', self.read('bit_stats_histogram%d_output'%input, 512*2)))
+        a = v[0::2]
+        b = v[1::2]
+        a = np.roll(a, 128) # roll so that array counts -128, -127, ..., 0, ..., 126, 127
+        b = np.roll(b, 128) # roll so that array counts -128, -127, ..., 0, ..., 126, 127
+        vals = np.arange(-128,128)
+        if sum_cores:
+            return vals, a+b
+        else:
+            return val, a, b
+
+    def get_input_histogram(self, ant):
+        vals, a = self.get_histogram(ant*2, sum_cores=True)
+        vals, b = self.get_histogram(ant*2 + 1, sum_cores=True)
+        return vals, a+b
+
+    def get_all_histograms(self):
+        out = np.zeros([self.nstreams, 256])
+        for stream in range(self.nstreams/4):
+            x, out[stream,:] = self.get_input_histogram(stream)
+        return x, out
+
+    def print_histograms(self):
+        x, hist = self.get_all_histograms()
+        hist /= 1024.*1024
+        for vn, v in enumerate(x):
+            print '%5d:'%v,
+            for an, ant in enumerate(hist):
+                print '%.3f'%ant[vn],
+            print ''
+
+    def plot_histogram(self, input):
+        from matplotlib import pyplot as plt
+        bins, d = self.get_input_histogram(input)
+        plt.hist(d, bins=bins)
 
 class Delay(Block):
     def __init__(self, host, name, nstreams=6):
