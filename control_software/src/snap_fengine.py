@@ -21,7 +21,7 @@ class SnapFengine(object):
         self.delay       = Delay(self.fpga, 'delay', nstreams=6)
         self.pfb         = Pfb(self.fpga, 'pfb')
         self.eq          = Eq(self.fpga, 'eq', nstreams=6)
-        self.eq_tvg      = EqTvg(self.fpga, 'eqtvg', nstreams=6, nchans=2**11)
+        self.eq_tvg      = EqTvg(self.fpga, 'eqtvg', nstreams=4, nchans=2**11)
         self.reorder     = ChanReorder(self.fpga, 'chan_reorder', nchans=2**11)
         self.packetizer  = Packetizer(self.fpga, 'packetizer')
         self.eth         = Eth(self.fpga, 'eth')
