@@ -449,14 +449,16 @@ class Packetizer(Block):
     def use_fpga_packing(self):
         self.write_int('stupid_gpu_packing', 0)
 
-    def set_dest_ips(self, ips, slot_offset=0):
-        self.write('ips', struct.pack('>%dL' % len(ips), *ips), offset=4*slot_offset)
+    def set_dest_ips(self, ips, slot_offset=0, nants=3):
+        ips = np.repeat(np.array(ips), nants)
+        self.write('ips', struct.pack('>%dL' % ips.shape[0], *ips), offset=4*slot_offset*nants)
 
     def set_ant_headers(self, ants):
         self.write('ants', struct.pack('>%dL' % len(ants), *ants))
         
-    def set_chan_headers(self, chans, slot_offset=0):
-        self.write('chans', struct.pack('>%dL' % len(chans), *chans), offset=4*slot_offset)
+    def set_chan_headers(self, chans, slot_offset=0, nants=3):
+        chans = np.repeat(np.array(chans), nants)
+        self.write('chans', struct.pack('>%dL' % chans.shape[0], *chans), offset=4*slot_offset*nants)
 
     def initialize(self):
         self.set_dest_ips(np.zeros(128))
@@ -464,7 +466,7 @@ class Packetizer(Block):
         self.set_chan_headers(np.zeros(128))
         self.use_fpga_packing()
 
-    def assign_slot(self, slot_num, chans, dest, reorder_block):
+    def assign_slot(self, slot_num, chans, dest, reorder_block, nants=3):
         """
         The F-engine generates 2048 channels, but can only
         output 1536, in order to keep within the output data rate cap.
@@ -490,9 +492,9 @@ class Packetizer(Block):
         # 96 valid slots should go.
         slot128 = int(4*(slot_num//3) + slot_num%3)
         # Set the frequency header of this slot to be the first specified channel
-        self.set_chan_headers(chans[0:1], slot_offset=slot128)
+        self.set_chan_headers(chans[0:1], slot_offset=slot128, nants=nants)
         # Set the destination address of this slot to be the specified IP address
-        self.set_dest_ips([dest], slot_offset=slot128)
+        self.set_dest_ips([dest], slot_offset=slot128, nants=nants)
         # set the channel orders
         # The channels supplied need to emerge at indices slot128*16 : (slot128+1)*16
         for cn, chan in enumerate(chans):
