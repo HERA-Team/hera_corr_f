@@ -26,6 +26,7 @@ class SnapFengine(object):
         self.packetizer  = Packetizer(self.fpga, 'packetizer')
         self.eth         = Eth(self.fpga, 'eth')
         self.corr        = Corr(self.fpga,'corr')
+        self.phaseswitch = PhaseSwitch(self.fpga, 'phase_switch')
         
         # The order here can be important, blocks are initialized in the
         # order they appear here
@@ -43,6 +44,7 @@ class SnapFengine(object):
             self.packetizer,
             self.eth,
             self.corr,
+            self.phaseswitch,
         ]
 
     def initialize(self):
