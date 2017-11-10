@@ -918,3 +918,15 @@ class RoachEth(Block):
 
     def config_tge_core(self, core_num, mac, ip, port, arp_table):
         self.host.config_10gbe_core(self.name + '_%d_sw' % core_num, mac, ip, port, arp_table)
+
+class Pam(Block):
+    def __init__(self, host, name):
+        super(Pam, self).__init__(host, name)
+        import i2c
+        import i2c_gpio
+        self.i2c = i2c.I2C(host, name)
+        self.gpio = i2c_gpio.PCF8574(self.i2c, addr=0x21)
+
+    def initialize(self):
+        self.i2c.clockSpeed(10) # set i2c bus to 10 kHz
+
