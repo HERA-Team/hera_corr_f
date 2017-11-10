@@ -21,6 +21,8 @@ parser.add_argument('-t', dest='tvg', action='store_true', default=False,
                     help ='Use this flag to switch to EQ TVG outputs')
 parser.add_argument('-n', dest='noise', action='store_true', default=False,
                     help ='Use this flag to switch to Noise inputs')
+parser.add_argument('-e', dest='eth', action='store_true', default=False,
+                    help ='Use this flag to switch on the Ethernet outputs')
 
 args = parser.parse_args()
 
@@ -140,6 +142,11 @@ if args.mansync:
         fengine.sync.sw_sync()
         fengine.sync.sw_sync()
 
-for fengine in fengines:
-    pass
-    fengine.eth.enable_tx()
+if args.eth:
+    print 'Enabling Ethernet outputs...'
+    for fengine in fengines:
+        fengine.eth.enable_tx()
+else:
+    print '**NOT** enabling Ethernet outputs...'
+
+print 'Initialization complete'
