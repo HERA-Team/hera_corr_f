@@ -24,7 +24,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set IP_LifeCycle_Menu {2}
 	set IP_Logo {sysgen_icon_100.png}
 	set IP_Name {}
-	set IP_Revision {136304612}
+	set IP_Revision {141219353}
 	set IP_Socket_IP {0}
 	set IP_Socket_IP_Proj_Path {}
 	set IP_Vendor_Text {User_Company}
@@ -49,15 +49,13 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i4_vivado.coe}}
 		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i5_vivado.coe}}
 		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i6_vivado.coe}}
-		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i7_vivado.coe}}
 		{{fft_2048ch_6a_core_dist_mem_gen_v8_0_i0_vivado.coe}}
-		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i8_vivado.coe}}
 		{{fft_2048ch_6a_core_dist_mem_gen_v8_0_i1_vivado.coe}}
 		{{fft_2048ch_6a_core_dist_mem_gen_v8_0_i2_vivado.coe}}
 		{{fft_2048ch_6a_core_dist_mem_gen_v8_0_i3_vivado.coe}}
+		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i7_vivado.coe}}
+		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i8_vivado.coe}}
 		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i9_vivado.coe}}
-		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i10_vivado.coe}}
-		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i11_vivado.coe}}
 		{{fft_2048ch_6a_core_dist_mem_gen_v8_0_i4_vivado.coe}}
 		{{fft_2048ch_6a_core_dist_mem_gen_v8_0_i5_vivado.coe}}
 		{{fft_2048ch_6a_core_entity_declarations.vhd} -lib {xil_defaultlib}}
@@ -72,7 +70,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set SynthesisTool {Vivado}
 	set TargetDir {/home/jackh/herafengine/fft_2048ch_6a_core}
 	set TopLevelModule {fft_2048ch_6a_core}
-	set TopLevelSimulinkHandle 83238
+	set TopLevelSimulinkHandle 75555
 	set VHDLLib {xil_defaultlib}
 	set TopLevelPortInterface {}
 	dict set TopLevelPortInterface sync Name {sync}

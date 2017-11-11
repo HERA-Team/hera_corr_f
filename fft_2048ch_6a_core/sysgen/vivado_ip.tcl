@@ -63,34 +63,6 @@ set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12
 
 
 set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i1] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i1
-set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i1}
-lappend params_list CONFIG.ainit_value {0}
-lappend params_list CONFIG.ce {true}
-lappend params_list CONFIG.count_mode {UP}
-lappend params_list CONFIG.fb_latency {0}
-lappend params_list CONFIG.final_count_value {1}
-lappend params_list CONFIG.implementation {Fabric}
-lappend params_list CONFIG.increment_value {1}
-lappend params_list CONFIG.latency {1}
-lappend params_list CONFIG.load {false}
-lappend params_list CONFIG.output_width {10}
-lappend params_list CONFIG.restrict_count {false}
-lappend params_list CONFIG.sclr {false}
-lappend params_list CONFIG.sinit {true}
-lappend params_list CONFIG.sinit_value {0}
-lappend params_list CONFIG.sset {false}
-lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
-lappend params_list CONFIG.sync_threshold_output {false}
-lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
-
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i1]
-}
-
-
-set existingipslist [get_ips]
 if {[lsearch $existingipslist fft_2048ch_6a_core_blk_mem_gen_v8_3_i0] < 0} {
 create_ip -name blk_mem_gen -version 8.3 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_blk_mem_gen_v8_3_i0
 set params_list [list]
@@ -331,10 +303,10 @@ set_property -dict $params_list [get_ips fft_2048ch_6a_core_blk_mem_gen_v8_3_i2]
 
 
 set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i2] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i2
+if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i1] < 0} {
+create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i1
 set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i2}
+lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i1}
 lappend params_list CONFIG.ainit_value {0}
 lappend params_list CONFIG.ce {true}
 lappend params_list CONFIG.count_mode {DOWN}
@@ -354,7 +326,7 @@ lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
 lappend params_list CONFIG.sync_threshold_output {false}
 lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
 
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i2]
+set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i1]
 }
 
 
@@ -515,34 +487,6 @@ lappend params_list CONFIG.Sync_CE_Priority {Sync_Overrides_CE}
 lappend params_list CONFIG.Sync_Ctrl_Priority {Reset_Overrides_Set}
 
 set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_addsub_v12_0_i4]
-}
-
-
-set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i3] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i3
-set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i3}
-lappend params_list CONFIG.ainit_value {0}
-lappend params_list CONFIG.ce {true}
-lappend params_list CONFIG.count_mode {UP}
-lappend params_list CONFIG.fb_latency {0}
-lappend params_list CONFIG.final_count_value {1}
-lappend params_list CONFIG.implementation {Fabric}
-lappend params_list CONFIG.increment_value {1}
-lappend params_list CONFIG.latency {1}
-lappend params_list CONFIG.load {false}
-lappend params_list CONFIG.output_width {2}
-lappend params_list CONFIG.restrict_count {false}
-lappend params_list CONFIG.sclr {false}
-lappend params_list CONFIG.sinit {true}
-lappend params_list CONFIG.sinit_value {0}
-lappend params_list CONFIG.sset {false}
-lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
-lappend params_list CONFIG.sync_threshold_output {false}
-lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
-
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i3]
 }
 
 
@@ -729,10 +673,10 @@ set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_addsub_v12_0_i8]
 
 
 set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i4] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i4
+if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i2] < 0} {
+create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i2
 set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i4}
+lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i2}
 lappend params_list CONFIG.ainit_value {0}
 lappend params_list CONFIG.ce {true}
 lappend params_list CONFIG.count_mode {DOWN}
@@ -752,7 +696,7 @@ lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
 lappend params_list CONFIG.sync_threshold_output {false}
 lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
 
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i4]
+set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i2]
 }
 
 
@@ -803,84 +747,10 @@ set_property -dict $params_list [get_ips fft_2048ch_6a_core_blk_mem_gen_v8_3_i6]
 
 
 set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i5] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i5
+if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i3] < 0} {
+create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i3
 set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i5}
-lappend params_list CONFIG.ainit_value {0}
-lappend params_list CONFIG.ce {true}
-lappend params_list CONFIG.count_mode {UP}
-lappend params_list CONFIG.fb_latency {0}
-lappend params_list CONFIG.final_count_value {1}
-lappend params_list CONFIG.implementation {Fabric}
-lappend params_list CONFIG.increment_value {1}
-lappend params_list CONFIG.latency {1}
-lappend params_list CONFIG.load {false}
-lappend params_list CONFIG.output_width {9}
-lappend params_list CONFIG.restrict_count {false}
-lappend params_list CONFIG.sclr {false}
-lappend params_list CONFIG.sinit {true}
-lappend params_list CONFIG.sinit_value {0}
-lappend params_list CONFIG.sset {false}
-lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
-lappend params_list CONFIG.sync_threshold_output {false}
-lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
-
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i5]
-}
-
-
-set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_blk_mem_gen_v8_3_i7] < 0} {
-create_ip -name blk_mem_gen -version 8.3 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_blk_mem_gen_v8_3_i7
-set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_blk_mem_gen_v8_3_i7}
-lappend params_list CONFIG.algorithm {Fixed_Primitives}
-lappend params_list CONFIG.assume_synchronous_clk {false}
-lappend params_list CONFIG.byte_size {9}
-lappend params_list CONFIG.collision_warnings {ALL}
-lappend params_list CONFIG.disable_collision_warnings {false}
-lappend params_list CONFIG.ecc {false}
-lappend params_list CONFIG.enable_a {Use_ENA_Pin}
-lappend params_list CONFIG.enable_b {Always_Enabled}
-lappend params_list CONFIG.error_injection_type {Single_Bit_Error_Injection}
-lappend params_list CONFIG.fill_remaining_memory_locations {false}
-lappend params_list CONFIG.load_init_file {TRUE}
-lappend params_list CONFIG.memory_type {Single_Port_RAM}
-lappend params_list CONFIG.operating_mode_a {READ_FIRST}
-lappend params_list CONFIG.operating_mode_b {WRITE_FIRST}
-lappend params_list CONFIG.output_reset_value_a {0}
-lappend params_list CONFIG.output_reset_value_b {0}
-lappend params_list CONFIG.pipeline_stages {0}
-lappend params_list CONFIG.primitive {512x36}
-lappend params_list CONFIG.read_width_a {36}
-lappend params_list CONFIG.read_width_b {36}
-lappend params_list CONFIG.register_porta_output_of_memory_core {false}
-lappend params_list CONFIG.register_porta_output_of_memory_primitives {true}
-lappend params_list CONFIG.register_portb_output_of_memory_core {false}
-lappend params_list CONFIG.register_portb_output_of_memory_primitives {false}
-lappend params_list CONFIG.remaining_memory_locations {0}
-lappend params_list CONFIG.reset_type {SYNC}
-lappend params_list CONFIG.use_byte_write_enable {false}
-lappend params_list CONFIG.use_error_injection_pins {false}
-lappend params_list CONFIG.use_regcea_pin {false}
-lappend params_list CONFIG.use_regceb_pin {false}
-lappend params_list CONFIG.use_rsta_pin {false}
-lappend params_list CONFIG.use_rstb_pin {false}
-lappend params_list CONFIG.write_depth_a {512}
-lappend params_list CONFIG.write_width_a {36}
-lappend params_list CONFIG.write_width_b {36}
-lappend params_list CONFIG.coe_file {../fft_2048ch_6a_core_blk_mem_gen_v8_3_i7_vivado.coe}
-
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_blk_mem_gen_v8_3_i7]
-}
-
-
-set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i6] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i6
-set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i6}
+lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i3}
 lappend params_list CONFIG.ainit_value {0}
 lappend params_list CONFIG.ce {true}
 lappend params_list CONFIG.count_mode {DOWN}
@@ -900,35 +770,7 @@ lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
 lappend params_list CONFIG.sync_threshold_output {false}
 lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
 
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i6]
-}
-
-
-set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i7] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i7
-set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i7}
-lappend params_list CONFIG.ainit_value {0}
-lappend params_list CONFIG.ce {true}
-lappend params_list CONFIG.count_mode {UP}
-lappend params_list CONFIG.fb_latency {0}
-lappend params_list CONFIG.final_count_value {1}
-lappend params_list CONFIG.implementation {Fabric}
-lappend params_list CONFIG.increment_value {1}
-lappend params_list CONFIG.latency {1}
-lappend params_list CONFIG.load {false}
-lappend params_list CONFIG.output_width {8}
-lappend params_list CONFIG.restrict_count {false}
-lappend params_list CONFIG.sclr {false}
-lappend params_list CONFIG.sinit {true}
-lappend params_list CONFIG.sinit_value {0}
-lappend params_list CONFIG.sset {false}
-lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
-lappend params_list CONFIG.sync_threshold_output {false}
-lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
-
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i7]
+set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i3]
 }
 
 
@@ -963,56 +805,10 @@ set_property -dict $params_list [get_ips fft_2048ch_6a_core_dist_mem_gen_v8_0_i0
 
 
 set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_blk_mem_gen_v8_3_i8] < 0} {
-create_ip -name blk_mem_gen -version 8.3 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_blk_mem_gen_v8_3_i8
+if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i4] < 0} {
+create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i4
 set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_blk_mem_gen_v8_3_i8}
-lappend params_list CONFIG.algorithm {Fixed_Primitives}
-lappend params_list CONFIG.assume_synchronous_clk {false}
-lappend params_list CONFIG.byte_size {9}
-lappend params_list CONFIG.collision_warnings {ALL}
-lappend params_list CONFIG.disable_collision_warnings {false}
-lappend params_list CONFIG.ecc {false}
-lappend params_list CONFIG.enable_a {Use_ENA_Pin}
-lappend params_list CONFIG.enable_b {Always_Enabled}
-lappend params_list CONFIG.error_injection_type {Single_Bit_Error_Injection}
-lappend params_list CONFIG.fill_remaining_memory_locations {false}
-lappend params_list CONFIG.load_init_file {TRUE}
-lappend params_list CONFIG.memory_type {Single_Port_RAM}
-lappend params_list CONFIG.operating_mode_a {READ_FIRST}
-lappend params_list CONFIG.operating_mode_b {WRITE_FIRST}
-lappend params_list CONFIG.output_reset_value_a {0}
-lappend params_list CONFIG.output_reset_value_b {0}
-lappend params_list CONFIG.pipeline_stages {0}
-lappend params_list CONFIG.primitive {512x36}
-lappend params_list CONFIG.read_width_a {36}
-lappend params_list CONFIG.read_width_b {36}
-lappend params_list CONFIG.register_porta_output_of_memory_core {false}
-lappend params_list CONFIG.register_porta_output_of_memory_primitives {true}
-lappend params_list CONFIG.register_portb_output_of_memory_core {false}
-lappend params_list CONFIG.register_portb_output_of_memory_primitives {false}
-lappend params_list CONFIG.remaining_memory_locations {0}
-lappend params_list CONFIG.reset_type {SYNC}
-lappend params_list CONFIG.use_byte_write_enable {false}
-lappend params_list CONFIG.use_error_injection_pins {false}
-lappend params_list CONFIG.use_regcea_pin {false}
-lappend params_list CONFIG.use_regceb_pin {false}
-lappend params_list CONFIG.use_rsta_pin {false}
-lappend params_list CONFIG.use_rstb_pin {false}
-lappend params_list CONFIG.write_depth_a {256}
-lappend params_list CONFIG.write_width_a {36}
-lappend params_list CONFIG.write_width_b {36}
-lappend params_list CONFIG.coe_file {../fft_2048ch_6a_core_blk_mem_gen_v8_3_i8_vivado.coe}
-
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_blk_mem_gen_v8_3_i8]
-}
-
-
-set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i8] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i8
-set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i8}
+lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i4}
 lappend params_list CONFIG.ainit_value {0}
 lappend params_list CONFIG.ce {true}
 lappend params_list CONFIG.count_mode {DOWN}
@@ -1032,7 +828,7 @@ lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
 lappend params_list CONFIG.sync_threshold_output {false}
 lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
 
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i8]
+set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i4]
 }
 
 
@@ -1067,10 +863,10 @@ set_property -dict $params_list [get_ips fft_2048ch_6a_core_dist_mem_gen_v8_0_i1
 
 
 set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i9] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i9
+if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i5] < 0} {
+create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i5
 set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i9}
+lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i5}
 lappend params_list CONFIG.ainit_value {0}
 lappend params_list CONFIG.ce {true}
 lappend params_list CONFIG.count_mode {DOWN}
@@ -1090,35 +886,7 @@ lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
 lappend params_list CONFIG.sync_threshold_output {false}
 lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
 
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i9]
-}
-
-
-set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i10] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i10
-set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i10}
-lappend params_list CONFIG.ainit_value {0}
-lappend params_list CONFIG.ce {true}
-lappend params_list CONFIG.count_mode {UP}
-lappend params_list CONFIG.fb_latency {0}
-lappend params_list CONFIG.final_count_value {1}
-lappend params_list CONFIG.implementation {Fabric}
-lappend params_list CONFIG.increment_value {1}
-lappend params_list CONFIG.latency {1}
-lappend params_list CONFIG.load {false}
-lappend params_list CONFIG.output_width {7}
-lappend params_list CONFIG.restrict_count {false}
-lappend params_list CONFIG.sclr {false}
-lappend params_list CONFIG.sinit {true}
-lappend params_list CONFIG.sinit_value {0}
-lappend params_list CONFIG.sset {false}
-lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
-lappend params_list CONFIG.sync_threshold_output {false}
-lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
-
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i10]
+set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i5]
 }
 
 
@@ -1153,10 +921,10 @@ set_property -dict $params_list [get_ips fft_2048ch_6a_core_dist_mem_gen_v8_0_i2
 
 
 set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i11] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i11
+if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i6] < 0} {
+create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i6
 set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i11}
+lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i6}
 lappend params_list CONFIG.ainit_value {0}
 lappend params_list CONFIG.ce {true}
 lappend params_list CONFIG.count_mode {DOWN}
@@ -1176,35 +944,7 @@ lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
 lappend params_list CONFIG.sync_threshold_output {false}
 lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
 
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i11]
-}
-
-
-set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i12] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i12
-set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i12}
-lappend params_list CONFIG.ainit_value {0}
-lappend params_list CONFIG.ce {true}
-lappend params_list CONFIG.count_mode {UP}
-lappend params_list CONFIG.fb_latency {0}
-lappend params_list CONFIG.final_count_value {1}
-lappend params_list CONFIG.implementation {Fabric}
-lappend params_list CONFIG.increment_value {1}
-lappend params_list CONFIG.latency {1}
-lappend params_list CONFIG.load {false}
-lappend params_list CONFIG.output_width {6}
-lappend params_list CONFIG.restrict_count {false}
-lappend params_list CONFIG.sclr {false}
-lappend params_list CONFIG.sinit {true}
-lappend params_list CONFIG.sinit_value {0}
-lappend params_list CONFIG.sset {false}
-lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
-lappend params_list CONFIG.sync_threshold_output {false}
-lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
-
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i12]
+set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i6]
 }
 
 
@@ -1239,10 +979,10 @@ set_property -dict $params_list [get_ips fft_2048ch_6a_core_dist_mem_gen_v8_0_i3
 
 
 set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i13] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i13
+if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i7] < 0} {
+create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i7
 set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i13}
+lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i7}
 lappend params_list CONFIG.ainit_value {0}
 lappend params_list CONFIG.ce {true}
 lappend params_list CONFIG.count_mode {DOWN}
@@ -1262,24 +1002,70 @@ lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
 lappend params_list CONFIG.sync_threshold_output {false}
 lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
 
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i13]
+set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i7]
 }
 
 
 set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i14] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i14
+if {[lsearch $existingipslist fft_2048ch_6a_core_blk_mem_gen_v8_3_i7] < 0} {
+create_ip -name blk_mem_gen -version 8.3 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_blk_mem_gen_v8_3_i7
 set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i14}
+lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_blk_mem_gen_v8_3_i7}
+lappend params_list CONFIG.algorithm {Fixed_Primitives}
+lappend params_list CONFIG.assume_synchronous_clk {false}
+lappend params_list CONFIG.byte_size {9}
+lappend params_list CONFIG.collision_warnings {ALL}
+lappend params_list CONFIG.disable_collision_warnings {false}
+lappend params_list CONFIG.ecc {false}
+lappend params_list CONFIG.enable_a {Use_ENA_Pin}
+lappend params_list CONFIG.enable_b {Always_Enabled}
+lappend params_list CONFIG.error_injection_type {Single_Bit_Error_Injection}
+lappend params_list CONFIG.fill_remaining_memory_locations {false}
+lappend params_list CONFIG.load_init_file {TRUE}
+lappend params_list CONFIG.memory_type {Single_Port_ROM}
+lappend params_list CONFIG.operating_mode_a {WRITE_FIRST}
+lappend params_list CONFIG.operating_mode_b {WRITE_FIRST}
+lappend params_list CONFIG.output_reset_value_a {0}
+lappend params_list CONFIG.output_reset_value_b {0}
+lappend params_list CONFIG.pipeline_stages {0}
+lappend params_list CONFIG.primitive {512x36}
+lappend params_list CONFIG.read_width_a {36}
+lappend params_list CONFIG.read_width_b {36}
+lappend params_list CONFIG.register_porta_output_of_memory_core {false}
+lappend params_list CONFIG.register_porta_output_of_memory_primitives {true}
+lappend params_list CONFIG.register_portb_output_of_memory_core {false}
+lappend params_list CONFIG.register_portb_output_of_memory_primitives {false}
+lappend params_list CONFIG.remaining_memory_locations {0}
+lappend params_list CONFIG.reset_type {SYNC}
+lappend params_list CONFIG.use_byte_write_enable {false}
+lappend params_list CONFIG.use_error_injection_pins {false}
+lappend params_list CONFIG.use_regcea_pin {false}
+lappend params_list CONFIG.use_regceb_pin {false}
+lappend params_list CONFIG.use_rsta_pin {false}
+lappend params_list CONFIG.use_rstb_pin {false}
+lappend params_list CONFIG.write_depth_a {64}
+lappend params_list CONFIG.write_width_a {36}
+lappend params_list CONFIG.write_width_b {36}
+lappend params_list CONFIG.coe_file {../fft_2048ch_6a_core_blk_mem_gen_v8_3_i7_vivado.coe}
+
+set_property -dict $params_list [get_ips fft_2048ch_6a_core_blk_mem_gen_v8_3_i7]
+}
+
+
+set existingipslist [get_ips]
+if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i8] < 0} {
+create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i8
+set params_list [list]
+lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i8}
 lappend params_list CONFIG.ainit_value {0}
 lappend params_list CONFIG.ce {true}
-lappend params_list CONFIG.count_mode {UP}
+lappend params_list CONFIG.count_mode {DOWN}
 lappend params_list CONFIG.fb_latency {0}
 lappend params_list CONFIG.final_count_value {1}
 lappend params_list CONFIG.implementation {Fabric}
 lappend params_list CONFIG.increment_value {1}
 lappend params_list CONFIG.latency {1}
-lappend params_list CONFIG.load {false}
+lappend params_list CONFIG.load {true}
 lappend params_list CONFIG.output_width {5}
 lappend params_list CONFIG.restrict_count {false}
 lappend params_list CONFIG.sclr {false}
@@ -1290,7 +1076,81 @@ lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
 lappend params_list CONFIG.sync_threshold_output {false}
 lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
 
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i14]
+set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i8]
+}
+
+
+set existingipslist [get_ips]
+if {[lsearch $existingipslist fft_2048ch_6a_core_blk_mem_gen_v8_3_i8] < 0} {
+create_ip -name blk_mem_gen -version 8.3 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_blk_mem_gen_v8_3_i8
+set params_list [list]
+lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_blk_mem_gen_v8_3_i8}
+lappend params_list CONFIG.algorithm {Fixed_Primitives}
+lappend params_list CONFIG.assume_synchronous_clk {false}
+lappend params_list CONFIG.byte_size {9}
+lappend params_list CONFIG.collision_warnings {ALL}
+lappend params_list CONFIG.disable_collision_warnings {false}
+lappend params_list CONFIG.ecc {false}
+lappend params_list CONFIG.enable_a {Use_ENA_Pin}
+lappend params_list CONFIG.enable_b {Always_Enabled}
+lappend params_list CONFIG.error_injection_type {Single_Bit_Error_Injection}
+lappend params_list CONFIG.fill_remaining_memory_locations {false}
+lappend params_list CONFIG.load_init_file {TRUE}
+lappend params_list CONFIG.memory_type {Single_Port_ROM}
+lappend params_list CONFIG.operating_mode_a {WRITE_FIRST}
+lappend params_list CONFIG.operating_mode_b {WRITE_FIRST}
+lappend params_list CONFIG.output_reset_value_a {0}
+lappend params_list CONFIG.output_reset_value_b {0}
+lappend params_list CONFIG.pipeline_stages {0}
+lappend params_list CONFIG.primitive {512x36}
+lappend params_list CONFIG.read_width_a {36}
+lappend params_list CONFIG.read_width_b {36}
+lappend params_list CONFIG.register_porta_output_of_memory_core {false}
+lappend params_list CONFIG.register_porta_output_of_memory_primitives {true}
+lappend params_list CONFIG.register_portb_output_of_memory_core {false}
+lappend params_list CONFIG.register_portb_output_of_memory_primitives {false}
+lappend params_list CONFIG.remaining_memory_locations {0}
+lappend params_list CONFIG.reset_type {SYNC}
+lappend params_list CONFIG.use_byte_write_enable {false}
+lappend params_list CONFIG.use_error_injection_pins {false}
+lappend params_list CONFIG.use_regcea_pin {false}
+lappend params_list CONFIG.use_regceb_pin {false}
+lappend params_list CONFIG.use_rsta_pin {false}
+lappend params_list CONFIG.use_rstb_pin {false}
+lappend params_list CONFIG.write_depth_a {128}
+lappend params_list CONFIG.write_width_a {36}
+lappend params_list CONFIG.write_width_b {36}
+lappend params_list CONFIG.coe_file {../fft_2048ch_6a_core_blk_mem_gen_v8_3_i8_vivado.coe}
+
+set_property -dict $params_list [get_ips fft_2048ch_6a_core_blk_mem_gen_v8_3_i8]
+}
+
+
+set existingipslist [get_ips]
+if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i9] < 0} {
+create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i9
+set params_list [list]
+lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i9}
+lappend params_list CONFIG.ainit_value {0}
+lappend params_list CONFIG.ce {true}
+lappend params_list CONFIG.count_mode {DOWN}
+lappend params_list CONFIG.fb_latency {0}
+lappend params_list CONFIG.final_count_value {1}
+lappend params_list CONFIG.implementation {Fabric}
+lappend params_list CONFIG.increment_value {1}
+lappend params_list CONFIG.latency {1}
+lappend params_list CONFIG.load {true}
+lappend params_list CONFIG.output_width {4}
+lappend params_list CONFIG.restrict_count {false}
+lappend params_list CONFIG.sclr {false}
+lappend params_list CONFIG.sinit {true}
+lappend params_list CONFIG.sinit_value {0}
+lappend params_list CONFIG.sset {false}
+lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
+lappend params_list CONFIG.sync_threshold_output {false}
+lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
+
+set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i9]
 }
 
 
@@ -1331,7 +1191,7 @@ lappend params_list CONFIG.use_regcea_pin {false}
 lappend params_list CONFIG.use_regceb_pin {false}
 lappend params_list CONFIG.use_rsta_pin {false}
 lappend params_list CONFIG.use_rstb_pin {false}
-lappend params_list CONFIG.write_depth_a {64}
+lappend params_list CONFIG.write_depth_a {256}
 lappend params_list CONFIG.write_width_a {36}
 lappend params_list CONFIG.write_width_b {36}
 lappend params_list CONFIG.coe_file {../fft_2048ch_6a_core_blk_mem_gen_v8_3_i9_vivado.coe}
@@ -1341,214 +1201,10 @@ set_property -dict $params_list [get_ips fft_2048ch_6a_core_blk_mem_gen_v8_3_i9]
 
 
 set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i15] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i15
+if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i10] < 0} {
+create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i10
 set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i15}
-lappend params_list CONFIG.ainit_value {0}
-lappend params_list CONFIG.ce {true}
-lappend params_list CONFIG.count_mode {DOWN}
-lappend params_list CONFIG.fb_latency {0}
-lappend params_list CONFIG.final_count_value {1}
-lappend params_list CONFIG.implementation {Fabric}
-lappend params_list CONFIG.increment_value {1}
-lappend params_list CONFIG.latency {1}
-lappend params_list CONFIG.load {true}
-lappend params_list CONFIG.output_width {5}
-lappend params_list CONFIG.restrict_count {false}
-lappend params_list CONFIG.sclr {false}
-lappend params_list CONFIG.sinit {true}
-lappend params_list CONFIG.sinit_value {0}
-lappend params_list CONFIG.sset {false}
-lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
-lappend params_list CONFIG.sync_threshold_output {false}
-lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
-
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i15]
-}
-
-
-set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i16] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i16
-set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i16}
-lappend params_list CONFIG.ainit_value {0}
-lappend params_list CONFIG.ce {true}
-lappend params_list CONFIG.count_mode {UP}
-lappend params_list CONFIG.fb_latency {0}
-lappend params_list CONFIG.final_count_value {1}
-lappend params_list CONFIG.implementation {Fabric}
-lappend params_list CONFIG.increment_value {1}
-lappend params_list CONFIG.latency {1}
-lappend params_list CONFIG.load {false}
-lappend params_list CONFIG.output_width {4}
-lappend params_list CONFIG.restrict_count {false}
-lappend params_list CONFIG.sclr {false}
-lappend params_list CONFIG.sinit {true}
-lappend params_list CONFIG.sinit_value {0}
-lappend params_list CONFIG.sset {false}
-lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
-lappend params_list CONFIG.sync_threshold_output {false}
-lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
-
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i16]
-}
-
-
-set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_blk_mem_gen_v8_3_i10] < 0} {
-create_ip -name blk_mem_gen -version 8.3 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_blk_mem_gen_v8_3_i10
-set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_blk_mem_gen_v8_3_i10}
-lappend params_list CONFIG.algorithm {Fixed_Primitives}
-lappend params_list CONFIG.assume_synchronous_clk {false}
-lappend params_list CONFIG.byte_size {9}
-lappend params_list CONFIG.collision_warnings {ALL}
-lappend params_list CONFIG.disable_collision_warnings {false}
-lappend params_list CONFIG.ecc {false}
-lappend params_list CONFIG.enable_a {Use_ENA_Pin}
-lappend params_list CONFIG.enable_b {Always_Enabled}
-lappend params_list CONFIG.error_injection_type {Single_Bit_Error_Injection}
-lappend params_list CONFIG.fill_remaining_memory_locations {false}
-lappend params_list CONFIG.load_init_file {TRUE}
-lappend params_list CONFIG.memory_type {Single_Port_ROM}
-lappend params_list CONFIG.operating_mode_a {WRITE_FIRST}
-lappend params_list CONFIG.operating_mode_b {WRITE_FIRST}
-lappend params_list CONFIG.output_reset_value_a {0}
-lappend params_list CONFIG.output_reset_value_b {0}
-lappend params_list CONFIG.pipeline_stages {0}
-lappend params_list CONFIG.primitive {512x36}
-lappend params_list CONFIG.read_width_a {36}
-lappend params_list CONFIG.read_width_b {36}
-lappend params_list CONFIG.register_porta_output_of_memory_core {false}
-lappend params_list CONFIG.register_porta_output_of_memory_primitives {true}
-lappend params_list CONFIG.register_portb_output_of_memory_core {false}
-lappend params_list CONFIG.register_portb_output_of_memory_primitives {false}
-lappend params_list CONFIG.remaining_memory_locations {0}
-lappend params_list CONFIG.reset_type {SYNC}
-lappend params_list CONFIG.use_byte_write_enable {false}
-lappend params_list CONFIG.use_error_injection_pins {false}
-lappend params_list CONFIG.use_regcea_pin {false}
-lappend params_list CONFIG.use_regceb_pin {false}
-lappend params_list CONFIG.use_rsta_pin {false}
-lappend params_list CONFIG.use_rstb_pin {false}
-lappend params_list CONFIG.write_depth_a {128}
-lappend params_list CONFIG.write_width_a {36}
-lappend params_list CONFIG.write_width_b {36}
-lappend params_list CONFIG.coe_file {../fft_2048ch_6a_core_blk_mem_gen_v8_3_i10_vivado.coe}
-
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_blk_mem_gen_v8_3_i10]
-}
-
-
-set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i17] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i17
-set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i17}
-lappend params_list CONFIG.ainit_value {0}
-lappend params_list CONFIG.ce {true}
-lappend params_list CONFIG.count_mode {DOWN}
-lappend params_list CONFIG.fb_latency {0}
-lappend params_list CONFIG.final_count_value {1}
-lappend params_list CONFIG.implementation {Fabric}
-lappend params_list CONFIG.increment_value {1}
-lappend params_list CONFIG.latency {1}
-lappend params_list CONFIG.load {true}
-lappend params_list CONFIG.output_width {4}
-lappend params_list CONFIG.restrict_count {false}
-lappend params_list CONFIG.sclr {false}
-lappend params_list CONFIG.sinit {true}
-lappend params_list CONFIG.sinit_value {0}
-lappend params_list CONFIG.sset {false}
-lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
-lappend params_list CONFIG.sync_threshold_output {false}
-lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
-
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i17]
-}
-
-
-set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i18] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i18
-set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i18}
-lappend params_list CONFIG.ainit_value {0}
-lappend params_list CONFIG.ce {true}
-lappend params_list CONFIG.count_mode {UP}
-lappend params_list CONFIG.fb_latency {0}
-lappend params_list CONFIG.final_count_value {1}
-lappend params_list CONFIG.implementation {Fabric}
-lappend params_list CONFIG.increment_value {1}
-lappend params_list CONFIG.latency {1}
-lappend params_list CONFIG.load {false}
-lappend params_list CONFIG.output_width {3}
-lappend params_list CONFIG.restrict_count {false}
-lappend params_list CONFIG.sclr {false}
-lappend params_list CONFIG.sinit {true}
-lappend params_list CONFIG.sinit_value {0}
-lappend params_list CONFIG.sset {false}
-lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
-lappend params_list CONFIG.sync_threshold_output {false}
-lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
-
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i18]
-}
-
-
-set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_blk_mem_gen_v8_3_i11] < 0} {
-create_ip -name blk_mem_gen -version 8.3 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_blk_mem_gen_v8_3_i11
-set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_blk_mem_gen_v8_3_i11}
-lappend params_list CONFIG.algorithm {Fixed_Primitives}
-lappend params_list CONFIG.assume_synchronous_clk {false}
-lappend params_list CONFIG.byte_size {9}
-lappend params_list CONFIG.collision_warnings {ALL}
-lappend params_list CONFIG.disable_collision_warnings {false}
-lappend params_list CONFIG.ecc {false}
-lappend params_list CONFIG.enable_a {Use_ENA_Pin}
-lappend params_list CONFIG.enable_b {Always_Enabled}
-lappend params_list CONFIG.error_injection_type {Single_Bit_Error_Injection}
-lappend params_list CONFIG.fill_remaining_memory_locations {false}
-lappend params_list CONFIG.load_init_file {TRUE}
-lappend params_list CONFIG.memory_type {Single_Port_ROM}
-lappend params_list CONFIG.operating_mode_a {WRITE_FIRST}
-lappend params_list CONFIG.operating_mode_b {WRITE_FIRST}
-lappend params_list CONFIG.output_reset_value_a {0}
-lappend params_list CONFIG.output_reset_value_b {0}
-lappend params_list CONFIG.pipeline_stages {0}
-lappend params_list CONFIG.primitive {512x36}
-lappend params_list CONFIG.read_width_a {36}
-lappend params_list CONFIG.read_width_b {36}
-lappend params_list CONFIG.register_porta_output_of_memory_core {false}
-lappend params_list CONFIG.register_porta_output_of_memory_primitives {true}
-lappend params_list CONFIG.register_portb_output_of_memory_core {false}
-lappend params_list CONFIG.register_portb_output_of_memory_primitives {false}
-lappend params_list CONFIG.remaining_memory_locations {0}
-lappend params_list CONFIG.reset_type {SYNC}
-lappend params_list CONFIG.use_byte_write_enable {false}
-lappend params_list CONFIG.use_error_injection_pins {false}
-lappend params_list CONFIG.use_regcea_pin {false}
-lappend params_list CONFIG.use_regceb_pin {false}
-lappend params_list CONFIG.use_rsta_pin {false}
-lappend params_list CONFIG.use_rstb_pin {false}
-lappend params_list CONFIG.write_depth_a {256}
-lappend params_list CONFIG.write_width_a {36}
-lappend params_list CONFIG.write_width_b {36}
-lappend params_list CONFIG.coe_file {../fft_2048ch_6a_core_blk_mem_gen_v8_3_i11_vivado.coe}
-
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_blk_mem_gen_v8_3_i11]
-}
-
-
-set existingipslist [get_ips]
-if {[lsearch $existingipslist fft_2048ch_6a_core_c_counter_binary_v12_0_i19] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name fft_2048ch_6a_core_c_counter_binary_v12_0_i19
-set params_list [list]
-lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i19}
+lappend params_list CONFIG.Component_Name {fft_2048ch_6a_core_c_counter_binary_v12_0_i10}
 lappend params_list CONFIG.ainit_value {0}
 lappend params_list CONFIG.ce {true}
 lappend params_list CONFIG.count_mode {DOWN}
@@ -1568,7 +1224,7 @@ lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
 lappend params_list CONFIG.sync_threshold_output {false}
 lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
 
-set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i19]
+set_property -dict $params_list [get_ips fft_2048ch_6a_core_c_counter_binary_v12_0_i10]
 }
 
 

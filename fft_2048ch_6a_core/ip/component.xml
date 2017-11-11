@@ -947,14 +947,6 @@
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i10/fft_2048ch_6a_core_blk_mem_gen_v8_3_i10.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i11/fft_2048ch_6a_core_blk_mem_gen_v8_3_i11.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
         <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i2/fft_2048ch_6a_core_blk_mem_gen_v8_3_i2.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
@@ -1032,42 +1024,6 @@
       </spirit:file>
       <spirit:file>
         <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i10/fft_2048ch_6a_core_c_counter_binary_v12_0_i10.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i11/fft_2048ch_6a_core_c_counter_binary_v12_0_i11.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i12/fft_2048ch_6a_core_c_counter_binary_v12_0_i12.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i13/fft_2048ch_6a_core_c_counter_binary_v12_0_i13.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i14/fft_2048ch_6a_core_c_counter_binary_v12_0_i14.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i15/fft_2048ch_6a_core_c_counter_binary_v12_0_i15.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i16/fft_2048ch_6a_core_c_counter_binary_v12_0_i16.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i17/fft_2048ch_6a_core_c_counter_binary_v12_0_i17.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i18/fft_2048ch_6a_core_c_counter_binary_v12_0_i18.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i19/fft_2048ch_6a_core_c_counter_binary_v12_0_i19.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
@@ -1159,15 +1115,7 @@
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i7_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
         <spirit:name>fft_2048ch_6a_core_dist_mem_gen_v8_0_i0_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i8_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
@@ -1183,15 +1131,15 @@
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
+        <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i7_vivado.coe</spirit:name>
+        <spirit:userFileType>coe</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i8_vivado.coe</spirit:name>
+        <spirit:userFileType>coe</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
         <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i9_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i10_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i11_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
@@ -1250,7 +1198,7 @@
       <spirit:file>
         <spirit:name>hdl/fft_2048ch_6a_core.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_dcf832f8</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_ecda285e</spirit:userFileType>
         <spirit:logicalName>xil_defaultlib</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
@@ -1262,14 +1210,6 @@
       </spirit:file>
       <spirit:file>
         <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i1/fft_2048ch_6a_core_blk_mem_gen_v8_3_i1.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i10/fft_2048ch_6a_core_blk_mem_gen_v8_3_i10.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i11/fft_2048ch_6a_core_blk_mem_gen_v8_3_i11.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
@@ -1350,42 +1290,6 @@
       </spirit:file>
       <spirit:file>
         <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i10/fft_2048ch_6a_core_c_counter_binary_v12_0_i10.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i11/fft_2048ch_6a_core_c_counter_binary_v12_0_i11.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i12/fft_2048ch_6a_core_c_counter_binary_v12_0_i12.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i13/fft_2048ch_6a_core_c_counter_binary_v12_0_i13.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i14/fft_2048ch_6a_core_c_counter_binary_v12_0_i14.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i15/fft_2048ch_6a_core_c_counter_binary_v12_0_i15.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i16/fft_2048ch_6a_core_c_counter_binary_v12_0_i16.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i17/fft_2048ch_6a_core_c_counter_binary_v12_0_i17.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i18/fft_2048ch_6a_core_c_counter_binary_v12_0_i18.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_c_counter_binary_v12_0_i19/fft_2048ch_6a_core_c_counter_binary_v12_0_i19.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
@@ -1473,15 +1377,7 @@
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i7_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
         <spirit:name>fft_2048ch_6a_core_dist_mem_gen_v8_0_i0_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i8_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
@@ -1497,15 +1393,15 @@
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
+        <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i7_vivado.coe</spirit:name>
+        <spirit:userFileType>coe</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i8_vivado.coe</spirit:name>
+        <spirit:userFileType>coe</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
         <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i9_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i10_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_2048ch_6a_core_blk_mem_gen_v8_3_i11_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
@@ -1612,8 +1508,8 @@
       </xilinx:taxonomies>
       <xilinx:displayName>fft_2048ch_6a_core</xilinx:displayName>
       <xilinx:definitionSource>sysgen</xilinx:definitionSource>
-      <xilinx:coreRevision>136304612</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2017-09-14T21:25:28Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>141219353</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2017-11-10T19:37:38Z</xilinx:coreCreationDateTime>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2016.4</xilinx:xilinxVersion>

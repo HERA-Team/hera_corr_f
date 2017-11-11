@@ -6,7 +6,7 @@
 <Project Version="7" Minor="17" Path="/home/jackh/herafengine/fft_2048ch_6a_core/ip_catalog/fft_2048ch_6a_core.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
-    <Option Name="Id" Val="a3686037fd9a4c7781f1978458766d0a"/>
+    <Option Name="Id" Val="481d27d15bfb45a2aa18499ef7c453d9"/>
     <Option Name="Part" Val="xc7k160tffg676-2"/>
     <Option Name="CompiledLibDir" Val="$PCACHEDIR/compile_simlib"/>
     <Option Name="CompiledLibDirXSim" Val=""/>
@@ -68,7 +68,7 @@
       <File Path="$PSRCDIR/sources_1/imports/hdl/fft_2048ch_6a_core_bd_wrapper.vhd">
         <FileInfo>
           <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/bd/fft_2048ch_6a_core_bd/hdl/fft_2048ch_6a_core_bd_wrapper.vhd"/>
-          <Attr Name="ImportTime" Val="1505424329"/>
+          <Attr Name="ImportTime" Val="1510342659"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -85,7 +85,7 @@
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="ImportPath" Val="$PPRDIR/../sysgen/fft_2048ch_6a_core_mod.vhd"/>
-          <Attr Name="ImportTime" Val="1505424329"/>
+          <Attr Name="ImportTime" Val="1510342659"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -100,7 +100,7 @@
       <File Path="$PSRCDIR/constrs_1/imports/sysgen/fft_2048ch_6a_core_clock.xdc">
         <FileInfo>
           <Attr Name="ImportPath" Val="$PPRDIR/../sysgen/fft_2048ch_6a_core_clock.xdc"/>
-          <Attr Name="ImportTime" Val="1505424240"/>
+          <Attr Name="ImportTime" Val="1510342583"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>

@@ -1,7 +1,7 @@
 --Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
 --Tool Version: Vivado v.2016.4 (lin64) Build 1733598 Wed Dec 14 22:35:42 MST 2016
---Date        : Thu Sep 14 14:25:29 2017
+--Date        : Fri Nov 10 11:37:39 2017
 --Host        : acme1 running 64-bit Ubuntu 16.04.2 LTS
 --Command     : generate_target fft_2048ch_6a_core_bd_wrapper.bd
 --Design      : fft_2048ch_6a_core_bd_wrapper

@@ -884,7 +884,7 @@
   <spirit:vendorExtensions>
     <xilinx:coreExtensions>
       <xilinx:displayName>fft_2048ch_6a_core</xilinx:displayName>
-      <xilinx:coreRevision>136304612</xilinx:coreRevision>
+      <xilinx:coreRevision>141219353</xilinx:coreRevision>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
       <xilinx:xilinxVersion>2016.4</xilinx:xilinxVersion>
