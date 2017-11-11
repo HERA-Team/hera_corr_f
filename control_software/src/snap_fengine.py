@@ -25,7 +25,7 @@ class SnapFengine(object):
         self.reorder     = ChanReorder(self.fpga, 'chan_reorder', nchans=2**11)
         self.packetizer  = Packetizer(self.fpga, 'packetizer')
         self.eth         = Eth(self.fpga, 'eth')
-        self.corr        = Corr(self.fpga,'corr')
+        self.corr        = Corr(self.fpga,'corr_0')
         self.phaseswitch = PhaseSwitch(self.fpga, 'phase_switch')
         self.pam         = Pam(self.fpga, 'i2c_ant0')
         
