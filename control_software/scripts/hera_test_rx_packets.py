@@ -93,7 +93,11 @@ if args.stats:
         print 'ANT %3d: %d' % (xn, x)
     print 'Packet count by channel: from headers (from data)'
     for xn, x in enumerate(chan_counter):
-        print 'CHAN %4d: %d (%d)' % (xn, x, data_chan_counter[xn])
+        a0 = data_chan_counter[xn]
+        a1 = data_chan_counter[xn+2048]
+        a2 = data_chan_counter[xn+4096]
+        tot = a0+a1+a2
+        print 'CHAN %4d: %d (ANT0:%d, ANT1:%d, ANT2:%d TOTAL:%d)' % (xn, x, a0, a1, a2, tot)
 
 print '#######################'
 print 'Grabbed %d packets' % n
