@@ -1,5 +1,5 @@
-#! /usr/bin/env python
-
+## Each SNAP masquerades as 30 SNAP boards (90 antennas) and sends 
+## a single channel of data to 1 Xeng. 
 import argparse
 from hera_corr_f import SnapFengine
 import numpy as np
@@ -23,7 +23,8 @@ parser.add_argument('-n', dest='noise', action='store_true', default=False,
                     help ='Use this flag to switch to Noise inputs')
 parser.add_argument('-e', dest='eth', action='store_true', default=False,
                     help ='Use this flag to switch on the Ethernet outputs')
-
+parser.add_argument('-ants',dest='nants',type=int, default=90,
+                    help='Set the number of antennas you want this SNAP to act like')
 args = parser.parse_args()
 
 
@@ -45,18 +46,17 @@ for fengine in fengines:
             fengine.noise.set_seed(stream, seed)
         fengine.input.use_noise()
 
-
 # Set the output ordering stuff
 # First set the antenna indices for each board. For now we just
 # assume 3 antennas per board, and increment in the order the
 # boards are presented as arguments to this script.
-nants = 3
+
 for fn, fengine in enumerate(fengines):
-    print 'Setting Antenna indices...'
+    print 'Setting Antenna indices for fengine: %d ....'%fn
     fengine.packetizer.initialize()
     fengine.reorder.initialize()
-    fengine.packetizer.set_nants(nants)
-    fengine.packetizer.set_ant_headers(np.arange(nants+1) + nants*fn) # TODO something smarter to number antennas
+    fengine.packetizer.set_nants(args.nants)
+    fengine.packetizer.set_ant_headers(np.arange(args.nants) + args.nants*fn) #nants needs to be multiple of 4?
 
 # output mappings
 # Now prepare to map the destinations of different frequency slots.
@@ -67,10 +67,11 @@ for fn, fengine in enumerate(fengines):
 dest_mac = 0x0002c91f1151                               # simech1
 dest_ip  = (10<<24) + (0<<16) + (10<<8) + (27<<0)      # simech1
 
-chans_to_send = np.arange(256, 256+1536) # A contiguous block in the middle of the band
+n_xengs = 1
 
-n_xengs = 32
 chans_per_packet = 16 # Hardcoded in firmware
+chans_to_send = np.arange(256, 256+chans_per_packet) # 1 block in the middle of the band
+
 chans_per_xeng = 1536 / 32 # 48
 packets_per_xeng = chans_per_xeng / chans_per_packet # 3
 
@@ -78,22 +79,11 @@ xeng_ips = [dest_ip] * n_xengs
 xeng_macs = [dest_mac] * n_xengs
 
 
-chan_blocks = []
-for xn in range(n_xengs):
-    chan_blocks += [chans_to_send[xn*chans_per_xeng : (xn+1)*chans_per_xeng]]
-
-# Populate the F-engine output slots of which there are 96
-# Each slot is used to send 16 channels from all antennas to
-# an arbitrary destination.
+# Set all the slots to same chan range.
 n_slots_to_send = 96
 for fengine in fengines:
-    for pk in range(packets_per_xeng):
-        for xn in range(n_xengs):
-            slot = pk*n_xengs + xn
-            if slot < n_slots_to_send:
-                chans = chan_blocks[xn][pk*chans_per_packet : (pk+1)*chans_per_packet]
-                print 'Setting slot %d: IP: %d' % (slot, xeng_ips[xn]) , chans
-                fengine.packetizer.assign_slot(slot, chans, xeng_ips[xn], fengine.reorder)
+    for slot in range(n_slots_to_send):
+        fengine.packetizer.assign_slot(slot,np.arange(16)+256,dest_ip,fengine.reorder)
     
 # Finally set the SNAP ARP tables and enable transmission
 
