@@ -52,7 +52,7 @@ if args.single_packet:
     
 
 n = 0
-ant_counter = np.zeros(20)
+ant_counter = np.zeros(350)
 chan_counter = np.zeros(2048)
 data_chan_counter = np.zeros(2048*3)
 err_count = 0
@@ -76,7 +76,7 @@ while(True):
                     err_count += 1
         if args.errors or args.ordererrors:
             for i in range(16):
-                exp_val = ant*2048 + chan
+                exp_val = (ant%3)*2048 + chan
                 if not np.all(data[32*i:32*(i+1)] == exp_val+i):
                     print 'ERROR: payload and headers (ant: %d, chan: %d) did not match!' % (ant, chan)
                     print data[32*i:32*(i+1)]
@@ -92,8 +92,8 @@ if args.stats:
     for xn, x in enumerate(ant_counter):
         print 'ANT %3d: %d' % (xn, x)
     print 'Packet count by channel: from headers (from data)'
-    for xn, x in enumerate(chan_counter):
-        print 'CHAN %4d: %d (%d)' % (xn, x, data_chan_counter[xn])
+    for xn, x in enumerate(chan_counter[240:280]):
+        print 'CHAN %4d: %d (%d)' % (xn+240, x, data_chan_counter[xn+240])
 
 print '#######################'
 print 'Grabbed %d packets' % n
