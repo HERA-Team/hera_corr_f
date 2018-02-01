@@ -55,7 +55,6 @@ for fn, fengine in enumerate(fengines):
     print 'Setting Antenna indices...'
     fengine.packetizer.initialize()
     fengine.reorder.initialize()
-    fengine.packetizer.set_nants(nants)
     fengine.packetizer.set_ant_headers(np.arange(nants+1) + nants*fn) # TODO something smarter to number antennas
 
 # output mappings
@@ -65,7 +64,7 @@ for fn, fengine in enumerate(fengines):
 # X-engine (but for now just make all the destinations the same.
 
 dest_mac = 0x0002c91f1151                               # simech1
-dest_ip  = (10<<24) + (0<<16) + (10<<8) + (27<<0)      # simech1
+dest_ip  = (10<<24) + (0<<16) + (10<<8) + (123<<0)      # simech1
 
 chans_to_send = np.arange(256, 256+1536) # A contiguous block in the middle of the band
 
