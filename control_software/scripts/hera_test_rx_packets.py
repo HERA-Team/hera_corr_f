@@ -30,7 +30,9 @@ parser.add_argument('--c', dest='chanerrors', action='store_true', default=False
                     help = 'Print channel errors (Blocks of 16 channels not right)')
 parser.add_argument('--o', dest='ordererrors', action='store_true', default=False,
                     help = 'Print payload vs header errors')
-
+parser.add_argument('--dt',dest='timeorder',action='store_true',default=False,
+                    help= 'Check that time increments by 1 after all channels & antennas '\
+                           'are received. WORKS ONLY IF ALL PACKETS ARE CAPTURED.')
 
 args = parser.parse_args()
 
@@ -38,6 +40,29 @@ BUFSIZE = 2048
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('0.0.0.0', args.port))
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024*1024*128)
+
+if args.timeorder:
+    payload, addr = sock.recvfrom(BUFSIZE)
+    ti, chani, anti, datai  =  decode_packet(payload)
+    errorctr = 0; n=0
+    while(True):
+        try:
+            payload, addr = sock.recvfrom(BUFSIZE)
+            time, chan, ant, data = decode_packet(payload)
+            if (ant == anti) and (chan == chani):
+                if (time-ti !=32):
+                    print "ERROR: TIME not incrementing by 1"
+                    print "ANT: %d CHAN: %d TIME: %d"%(ant,chan,time)
+                    errorctr += 1
+                else: ti = time;
+            n += 1
+        except KeyboardInterrupt:
+            print '#######################'
+            print 'Grabbed %d packets' % n
+            print 'Errors: %d' % errorctr
+            print '#######################'
+            break
+    exit()          
 
 if args.single_packet:
     payload, addr = sock.recvfrom(BUFSIZE)
@@ -52,7 +77,7 @@ if args.single_packet:
     
 
 n = 0
-ant_counter = np.zeros(350)
+ant_counter = np.zeros(96)
 chan_counter = np.zeros(2048)
 data_chan_counter = np.zeros(2048*3)
 err_count = 0
@@ -76,7 +101,7 @@ while(True):
                     err_count += 1
         if args.errors or args.ordererrors:
             for i in range(16):
-                exp_val = (ant%3)*2048 + chan
+                exp_val = ((ant%3) << 11) + chan
                 if not np.all(data[32*i:32*(i+1)] == exp_val+i):
                     print 'ERROR: payload and headers (ant: %d, chan: %d) did not match!' % (ant, chan)
                     print data[32*i:32*(i+1)]
@@ -92,8 +117,7 @@ if args.stats:
     for xn, x in enumerate(ant_counter):
         print 'ANT %3d: %d' % (xn, x)
     print 'Packet count by channel: from headers (from data)'
-    for xn, x in enumerate(chan_counter[240:270]):
-        xn = xn+240
+    for xn, x in enumerate(chan_counter):
         a0 = data_chan_counter[xn]
         a1 = data_chan_counter[xn+2048]
         a2 = data_chan_counter[xn+4096]
