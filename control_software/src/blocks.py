@@ -78,8 +78,9 @@ class Synth(casperfpga.synth.LMX2581):
         self.powerOn()
 
 class Adc(casperfpga.snapadc.SNAPADC):
-    def __init__(self, host, sample_rate=500, num_chans=2, resolution=8):
+    def __init__(self, host, sample_rate=500, num_chans=2, resolution=8,ref=10):
         super(Adc, self).__init__(host)
+        casperfpga.snapadc.SNAPADC.__init__(self,host,ref=ref)
         self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
         self.interleave_mode = 4 >> num_chans
@@ -526,23 +527,22 @@ class Packetizer(Block):
         super(Packetizer, self).__init__(host, name)
         self.n_interfaces = n_interfaces
 
-    def set_nants(self, nants):
-        self.write_int('n_ants', nants)
-
     def use_gpu_packing(self):
         self.write_int('stupid_gpu_packing', 1)
 
     def use_fpga_packing(self):
         self.write_int('stupid_gpu_packing', 0)
 
-    def set_dest_ips(self, ips, slot_offset=0, nants=3):
+    def set_dest_ips(self, ips, slot_offset=0,nants=3):
+        # works only if nants=3. Else every 4th slot is non-zero.
         ips = np.repeat(np.array(ips), nants)
         self.write('ips', struct.pack('>%dL' % ips.shape[0], *ips), offset=4*slot_offset*nants)
 
-    def set_ant_headers(self, ants):
-        self.write('ants', struct.pack('>%dL' % len(ants), *ants))
+    def set_ant_headers(self, ants=range(3), slot_offset=0): 
+        self.write('ants', struct.pack('>%dL' % len(ants), *ants), offset=4*slot_offset*len(ants))
         
-    def set_chan_headers(self, chans, slot_offset=0, nants=3):
+    def set_chan_headers(self, chans, slot_offset=0,nants=3):
+        #below works only if nants=3. Otherwise every 4th chan is not zero.
         chans = np.repeat(np.array(chans), nants)
         self.write('chans', struct.pack('>%dL' % chans.shape[0], *chans), offset=4*slot_offset*nants)
 
@@ -552,7 +552,7 @@ class Packetizer(Block):
         self.set_chan_headers(np.zeros(128))
         self.use_fpga_packing()
 
-    def assign_slot(self, slot_num, chans, dest, reorder_block, nants=3):
+    def assign_slot(self, slot_num, chans, dest, reorder_block, ants=[0,1,2]):
         """
         The F-engine generates 2048 channels, but can only
         output 1536, in order to keep within the output data rate cap.
@@ -566,21 +566,31 @@ class Packetizer(Block):
         dest     -- an IP integer that is the destination of this packet
         reorder_block -- a ChanReorder block object, which allows the
                          packetizer to manipulate the channel ordering of the design. Bit gross.
+        ants     -- an array of 3 antennas whose channels the slot contains.
+
+        1 slot => 16 channels, 3 antennas (3 pkts)
         """
         chans = np.array(chans, dtype='>L')
         if slot_num > 95:
             raise ValueError("Only 95 output slots can be specified")
         if chans.shape[0] != 16:
             raise ValueError("Each slot must contain 16 frequency channels")
+
         # Since there are 2048 channels, and 16 channels per packet,
         # there are really 128 slots, but every 4th one must be zero.
         # The following map figures out where in the 128 slots one of the
         # 96 valid slots should go.
         slot128 = int(4*(slot_num//3) + slot_num%3)
+
         # Set the frequency header of this slot to be the first specified channel
-        self.set_chan_headers(chans[0:1], slot_offset=slot128, nants=nants)
+        self.set_chan_headers(chans[0:1], slot_offset=slot128)
+
+        # Set the antenna header of this slot (every slot represents 3 antennas
+        self.set_ant_headers(ants=ants, slot_offset=slot128)
+
         # Set the destination address of this slot to be the specified IP address
-        self.set_dest_ips([dest], slot_offset=slot128, nants=nants)
+        self.set_dest_ips([dest], slot_offset=slot128)
+
         # set the channel orders
         # The channels supplied need to emerge at indices slot128*16 : (slot128+1)*16
         for cn, chan in enumerate(chans):
