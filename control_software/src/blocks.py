@@ -1,6 +1,7 @@
 import logging
 import numpy as np
 import struct
+import socket
 import time
 import casperfpga
 import casperfpga.snapadc
@@ -10,7 +11,7 @@ logger = logging.getLogger(__name__)
 # Block Classes
 class Block(object):
     def __init__(self, host, name):
-        self.host = host
+        self.host = host #casperfpga object
         self.name = name
         if (name is None) or (name == ''):
             self.prefix = ''
@@ -661,8 +662,8 @@ class Eth(Block):
 
     def initialize(self):
         #Set ip address of the SNAP
-        ipaddr = (10 << 24) + (0 << 16) + (10 << 8) + 110
-        self.blindwrite('sw', struct.pack('>L', ipaddr), offset=0x10)
+        ipaddr = socket.inet_aton(socket.gethostbyname(self.host.host))
+        self.blindwrite('sw', ipaddr, offset=0x10)
         self.set_port(self.port)
                         
     def print_status(self):

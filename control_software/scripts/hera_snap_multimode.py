@@ -68,8 +68,10 @@ ant_blocks = np.arange(args.nants).reshape(-1,3)
 num_ant_slots = ant_blocks.shape[0] 
 
 # output mappings
-dest_mac = 0x0002c91f1151                              # simech1
-dest_ip  = (10<<24) + (0<<16) + (10<<8) + (27<<0)      # simech1
+dest_mac = 0x02020a0a0046                               # hera-gpu0
+dest_ip = (10<<24) + (0<<16) + (10<<8) + (12<<0)        # hera-gpu0
+#dest_mac = 0x0002c91f1151                              # simech1
+#dest_ip  = (10<<24) + (0<<16) + (10<<8) + (27<<0)      # simech1
 
 # Setting all the the destinations to the same IP for now.
 xeng_ips = [dest_ip] * n_xengs
@@ -97,7 +99,7 @@ for fn,fengine in enumerate(fengines):
 # Finally set the SNAP ARP tables and enable transmission
 
 for fengine in fengines:
-    fengine.eth.set_port(10000)
+    fengine.eth.set_port(8511)
     for xn in range(n_xengs):
         fengine.eth.add_arp_entry(xeng_ips[xn], xeng_macs[xn])
 
