@@ -14,6 +14,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set FPGAClockPeriod 5
 	set GenerateTestBench 0
 	set HDLLanguage {vhdl}
+	set IPOOCCacheRootPath {/home/jackh/.Xilinx/Sysgen/SysgenVivado/lnx64.o/ip}
 	set IP_Auto_Infer {1}
 	set IP_Categories_Text {System_Generator_for_DSP}
 	set IP_Common_Repos {0}
@@ -24,6 +25,8 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set IP_Logo {sysgen_icon_100.png}
 	set IP_Name {}
 	set IP_Revision {0}
+	set IP_Socket_IP {0}
+	set IP_Socket_IP_Proj_Path {}
 	set IP_Vendor_Text {User_Company}
 	set IP_Version_Text {1.0}
 	set ImplStrategyName {Vivado Implementation Defaults}
@@ -34,19 +37,20 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 		{{synth_reg.vhd} -lib {xil_defaultlib}}
 		{{synth_reg_w_init.vhd} -lib {xil_defaultlib}}
 		{{srl17e.vhd} -lib {xil_defaultlib}}
+		{{srl33e.vhd} -lib {xil_defaultlib}}
 		{{synth_reg_reg.vhd} -lib {xil_defaultlib}}
 		{{single_reg_w_init.vhd} -lib {xil_defaultlib}}
 		{{xlclockdriver_rd.vhd} -lib {xil_defaultlib}}
 		{{vivado_ip.tcl}}
-		{{pfb_fir_2048ch_core_blk_mem_gen_v8_2_0_vivado.coe}}
-		{{pfb_fir_2048ch_core_blk_mem_gen_v8_2_1_vivado.coe}}
-		{{pfb_fir_2048ch_core_blk_mem_gen_v8_2_2_vivado.coe}}
-		{{pfb_fir_2048ch_core_blk_mem_gen_v8_2_3_vivado.coe}}
-		{{pfb_fir_2048ch_core_blk_mem_gen_v8_2_4_vivado.coe}}
-		{{pfb_fir_2048ch_core_blk_mem_gen_v8_2_5_vivado.coe}}
-		{{pfb_fir_2048ch_core_blk_mem_gen_v8_2_6_vivado.coe}}
-		{{pfb_fir_2048ch_core_blk_mem_gen_v8_2_7_vivado.coe}}
-		{{pfb_fir_2048ch_core_blk_mem_gen_v8_2_8_vivado.coe}}
+		{{pfb_fir_2048ch_core_blk_mem_gen_v8_3_i0_vivado.coe}}
+		{{pfb_fir_2048ch_core_blk_mem_gen_v8_3_i1_vivado.coe}}
+		{{pfb_fir_2048ch_core_blk_mem_gen_v8_3_i2_vivado.coe}}
+		{{pfb_fir_2048ch_core_blk_mem_gen_v8_3_i3_vivado.coe}}
+		{{pfb_fir_2048ch_core_blk_mem_gen_v8_3_i4_vivado.coe}}
+		{{pfb_fir_2048ch_core_blk_mem_gen_v8_3_i5_vivado.coe}}
+		{{pfb_fir_2048ch_core_blk_mem_gen_v8_3_i6_vivado.coe}}
+		{{pfb_fir_2048ch_core_blk_mem_gen_v8_3_i7_vivado.coe}}
+		{{pfb_fir_2048ch_core_blk_mem_gen_v8_3_i8_vivado.coe}}
 		{{pfb_fir_2048ch_core_entity_declarations.vhd} -lib {xil_defaultlib}}
 		{{pfb_fir_2048ch_core.vhd} -lib {xil_defaultlib}}
 		{{pfb_fir_2048ch_core_clock.xdc}}
@@ -57,9 +61,9 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set SimulationTime {255.00000000 ns}
 	set SynthStrategyName {Vivado Synthesis Defaults}
 	set SynthesisTool {Vivado}
-	set TargetDir {/home/jackh/github/herafengine/pfb_fir_2048ch_core}
+	set TargetDir {/home/jackh/herafengine/pfb_fir_2048ch_core}
 	set TopLevelModule {pfb_fir_2048ch_core}
-	set TopLevelSimulinkHandle 73772
+	set TopLevelSimulinkHandle 205522
 	set VHDLLib {xil_defaultlib}
 	set TopLevelPortInterface {}
 	dict set TopLevelPortInterface sync Name {sync}
@@ -72,6 +76,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface sync Direction in
 	dict set TopLevelPortInterface sync Period 1
 	dict set TopLevelPortInterface sync Interface 0
+	dict set TopLevelPortInterface sync InterfaceName {}
 	dict set TopLevelPortInterface sync InterfaceString {DATA}
 	dict set TopLevelPortInterface sync ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface sync Locs {}
@@ -86,6 +91,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol3_in1 Direction in
 	dict set TopLevelPortInterface pol3_in1 Period 1
 	dict set TopLevelPortInterface pol3_in1 Interface 0
+	dict set TopLevelPortInterface pol3_in1 InterfaceName {}
 	dict set TopLevelPortInterface pol3_in1 InterfaceString {DATA}
 	dict set TopLevelPortInterface pol3_in1 ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface pol3_in1 Locs {}
@@ -100,6 +106,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol3_in0 Direction in
 	dict set TopLevelPortInterface pol3_in0 Period 1
 	dict set TopLevelPortInterface pol3_in0 Interface 0
+	dict set TopLevelPortInterface pol3_in0 InterfaceName {}
 	dict set TopLevelPortInterface pol3_in0 InterfaceString {DATA}
 	dict set TopLevelPortInterface pol3_in0 ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface pol3_in0 Locs {}
@@ -114,6 +121,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol2_in1 Direction in
 	dict set TopLevelPortInterface pol2_in1 Period 1
 	dict set TopLevelPortInterface pol2_in1 Interface 0
+	dict set TopLevelPortInterface pol2_in1 InterfaceName {}
 	dict set TopLevelPortInterface pol2_in1 InterfaceString {DATA}
 	dict set TopLevelPortInterface pol2_in1 ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface pol2_in1 Locs {}
@@ -128,6 +136,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol2_in0 Direction in
 	dict set TopLevelPortInterface pol2_in0 Period 1
 	dict set TopLevelPortInterface pol2_in0 Interface 0
+	dict set TopLevelPortInterface pol2_in0 InterfaceName {}
 	dict set TopLevelPortInterface pol2_in0 InterfaceString {DATA}
 	dict set TopLevelPortInterface pol2_in0 ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface pol2_in0 Locs {}
@@ -142,6 +151,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol1_in1 Direction in
 	dict set TopLevelPortInterface pol1_in1 Period 1
 	dict set TopLevelPortInterface pol1_in1 Interface 0
+	dict set TopLevelPortInterface pol1_in1 InterfaceName {}
 	dict set TopLevelPortInterface pol1_in1 InterfaceString {DATA}
 	dict set TopLevelPortInterface pol1_in1 ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface pol1_in1 Locs {}
@@ -156,6 +166,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol1_in0 Direction in
 	dict set TopLevelPortInterface pol1_in0 Period 1
 	dict set TopLevelPortInterface pol1_in0 Interface 0
+	dict set TopLevelPortInterface pol1_in0 InterfaceName {}
 	dict set TopLevelPortInterface pol1_in0 InterfaceString {DATA}
 	dict set TopLevelPortInterface pol1_in0 ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface pol1_in0 Locs {}
@@ -170,6 +181,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol0_in1 Direction in
 	dict set TopLevelPortInterface pol0_in1 Period 1
 	dict set TopLevelPortInterface pol0_in1 Interface 0
+	dict set TopLevelPortInterface pol0_in1 InterfaceName {}
 	dict set TopLevelPortInterface pol0_in1 InterfaceString {DATA}
 	dict set TopLevelPortInterface pol0_in1 ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface pol0_in1 Locs {}
@@ -184,6 +196,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol0_in0 Direction in
 	dict set TopLevelPortInterface pol0_in0 Period 1
 	dict set TopLevelPortInterface pol0_in0 Interface 0
+	dict set TopLevelPortInterface pol0_in0 InterfaceName {}
 	dict set TopLevelPortInterface pol0_in0 InterfaceString {DATA}
 	dict set TopLevelPortInterface pol0_in0 ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface pol0_in0 Locs {}
@@ -198,6 +211,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol0_out0 Direction out
 	dict set TopLevelPortInterface pol0_out0 Period 1
 	dict set TopLevelPortInterface pol0_out0 Interface 0
+	dict set TopLevelPortInterface pol0_out0 InterfaceName {}
 	dict set TopLevelPortInterface pol0_out0 InterfaceString {DATA}
 	dict set TopLevelPortInterface pol0_out0 ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface pol0_out0 Locs {}
@@ -212,6 +226,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol0_out1 Direction out
 	dict set TopLevelPortInterface pol0_out1 Period 1
 	dict set TopLevelPortInterface pol0_out1 Interface 0
+	dict set TopLevelPortInterface pol0_out1 InterfaceName {}
 	dict set TopLevelPortInterface pol0_out1 InterfaceString {DATA}
 	dict set TopLevelPortInterface pol0_out1 ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface pol0_out1 Locs {}
@@ -226,6 +241,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol1_out0 Direction out
 	dict set TopLevelPortInterface pol1_out0 Period 1
 	dict set TopLevelPortInterface pol1_out0 Interface 0
+	dict set TopLevelPortInterface pol1_out0 InterfaceName {}
 	dict set TopLevelPortInterface pol1_out0 InterfaceString {DATA}
 	dict set TopLevelPortInterface pol1_out0 ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface pol1_out0 Locs {}
@@ -240,6 +256,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol1_out1 Direction out
 	dict set TopLevelPortInterface pol1_out1 Period 1
 	dict set TopLevelPortInterface pol1_out1 Interface 0
+	dict set TopLevelPortInterface pol1_out1 InterfaceName {}
 	dict set TopLevelPortInterface pol1_out1 InterfaceString {DATA}
 	dict set TopLevelPortInterface pol1_out1 ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface pol1_out1 Locs {}
@@ -254,6 +271,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol2_out0 Direction out
 	dict set TopLevelPortInterface pol2_out0 Period 1
 	dict set TopLevelPortInterface pol2_out0 Interface 0
+	dict set TopLevelPortInterface pol2_out0 InterfaceName {}
 	dict set TopLevelPortInterface pol2_out0 InterfaceString {DATA}
 	dict set TopLevelPortInterface pol2_out0 ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface pol2_out0 Locs {}
@@ -268,6 +286,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol2_out1 Direction out
 	dict set TopLevelPortInterface pol2_out1 Period 1
 	dict set TopLevelPortInterface pol2_out1 Interface 0
+	dict set TopLevelPortInterface pol2_out1 InterfaceName {}
 	dict set TopLevelPortInterface pol2_out1 InterfaceString {DATA}
 	dict set TopLevelPortInterface pol2_out1 ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface pol2_out1 Locs {}
@@ -282,6 +301,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol3_out0 Direction out
 	dict set TopLevelPortInterface pol3_out0 Period 1
 	dict set TopLevelPortInterface pol3_out0 Interface 0
+	dict set TopLevelPortInterface pol3_out0 InterfaceName {}
 	dict set TopLevelPortInterface pol3_out0 InterfaceString {DATA}
 	dict set TopLevelPortInterface pol3_out0 ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface pol3_out0 Locs {}
@@ -296,6 +316,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol3_out1 Direction out
 	dict set TopLevelPortInterface pol3_out1 Period 1
 	dict set TopLevelPortInterface pol3_out1 Interface 0
+	dict set TopLevelPortInterface pol3_out1 InterfaceName {}
 	dict set TopLevelPortInterface pol3_out1 InterfaceString {DATA}
 	dict set TopLevelPortInterface pol3_out1 ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface pol3_out1 Locs {}
@@ -310,6 +331,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface sync_out Direction out
 	dict set TopLevelPortInterface sync_out Period 1
 	dict set TopLevelPortInterface sync_out Interface 0
+	dict set TopLevelPortInterface sync_out InterfaceName {}
 	dict set TopLevelPortInterface sync_out InterfaceString {DATA}
 	dict set TopLevelPortInterface sync_out ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface sync_out Locs {}
@@ -323,6 +345,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface clk Direction in
 	dict set TopLevelPortInterface clk Period 1
 	dict set TopLevelPortInterface clk Interface 6
+	dict set TopLevelPortInterface clk InterfaceName {}
 	dict set TopLevelPortInterface clk InterfaceString {CLOCK}
 	dict set TopLevelPortInterface clk ClockDomain {pfb_fir_2048ch_core}
 	dict set TopLevelPortInterface clk Locs {}

@@ -11,11 +11,11 @@ entity pfb_fir_2048ch_core_c_to_ri_x9 is
   );
 end pfb_fir_2048ch_core_c_to_ri_x9;
 architecture structural of pfb_fir_2048ch_core_c_to_ri_x9 is 
-  signal force_re_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice_re_y_net : std_logic_vector( 18-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal concat_y_net : std_logic_vector( 36-1 downto 0 );
   signal slice_im_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice_re_y_net : std_logic_vector( 18-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -73,10 +73,10 @@ entity pfb_fir_2048ch_core_c_to_ri1 is
 end pfb_fir_2048ch_core_c_to_ri1;
 architecture structural of pfb_fir_2048ch_core_c_to_ri1 is 
   signal force_re_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
   signal slice_im_y_net : std_logic_vector( 18-1 downto 0 );
   signal slice_re_y_net : std_logic_vector( 18-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -133,11 +133,11 @@ entity pfb_fir_2048ch_core_c_to_ri2 is
   );
 end pfb_fir_2048ch_core_c_to_ri2;
 architecture structural of pfb_fir_2048ch_core_c_to_ri2 is 
-  signal force_re_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
   signal slice_im_y_net : std_logic_vector( 18-1 downto 0 );
   signal slice_re_y_net : std_logic_vector( 18-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 18-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -194,11 +194,11 @@ entity pfb_fir_2048ch_core_c_to_ri3 is
   );
 end pfb_fir_2048ch_core_c_to_ri3;
 architecture structural of pfb_fir_2048ch_core_c_to_ri3 is 
-  signal force_re_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
-  signal slice_im_y_net : std_logic_vector( 18-1 downto 0 );
   signal slice_re_y_net : std_logic_vector( 18-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice_im_y_net : std_logic_vector( 18-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -259,27 +259,27 @@ entity pfb_fir_2048ch_core_pol1_in1_coeffs is
   );
 end pfb_fir_2048ch_core_pol1_in1_coeffs;
 architecture structural of pfb_fir_2048ch_core_pol1_in1_coeffs is 
+  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal fan_delay1_q_net : std_logic_vector( 13-1 downto 0 );
+  signal fan_delay3_q_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal rom1_data_net : std_logic_vector( 18-1 downto 0 );
-  signal delay1_q_net : std_logic_vector( 16-1 downto 0 );
-  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
-  signal register_q_net : std_logic_vector( 72-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 16-1 downto 0 );
+  signal rom3_data_net : std_logic_vector( 18-1 downto 0 );
+  signal fan_delay2_q_net : std_logic_vector( 13-1 downto 0 );
   signal slice_y_net : std_logic_vector( 1-1 downto 0 );
   signal clk_net : std_logic;
   signal ce_net : std_logic;
-  signal concat_y_net_x0 : std_logic_vector( 72-1 downto 0 );
+  signal rom4_data_net : std_logic_vector( 18-1 downto 0 );
+  signal fan_delay4_q_net : std_logic_vector( 13-1 downto 0 );
+  signal rom2_data_net : std_logic_vector( 18-1 downto 0 );
+  signal register_q_net : std_logic_vector( 72-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 16-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
-  signal fan_delay1_q_net : std_logic_vector( 11-1 downto 0 );
-  signal rom2_data_net : std_logic_vector( 18-1 downto 0 );
-  signal fan_delay2_q_net : std_logic_vector( 11-1 downto 0 );
-  signal rom3_data_net : std_logic_vector( 18-1 downto 0 );
-  signal fan_delay3_q_net : std_logic_vector( 11-1 downto 0 );
-  signal rom4_data_net : std_logic_vector( 18-1 downto 0 );
-  signal fan_delay4_q_net : std_logic_vector( 11-1 downto 0 );
+  signal concat_y_net_x0 : std_logic_vector( 72-1 downto 0 );
+  signal delay1_q_net : std_logic_vector( 16-1 downto 0 );
+  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
 begin
   dout <= delay1_q_net;
   sync_out <= delay_q_net;
@@ -301,9 +301,9 @@ begin
   );
   counter : entity xil_defaultlib.pfb_fir_2048ch_core_xlcounter_free 
   generic map (
-    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_i0",
     op_arith => xlUnsigned,
-    op_width => 11
+    op_width => 13
   )
   port map (
     en => "1",
@@ -345,9 +345,9 @@ begin
   );
   rom1 : entity xil_defaultlib.pfb_fir_2048ch_core_xlsprom 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 18,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_0",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i0",
     latency => 2
   )
   port map (
@@ -360,9 +360,9 @@ begin
   );
   rom2 : entity xil_defaultlib.pfb_fir_2048ch_core_xlsprom 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 18,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_1",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i1",
     latency => 2
   )
   port map (
@@ -375,9 +375,9 @@ begin
   );
   rom3 : entity xil_defaultlib.pfb_fir_2048ch_core_xlsprom 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 18,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_2",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i2",
     latency => 2
   )
   port map (
@@ -390,9 +390,9 @@ begin
   );
   rom4 : entity xil_defaultlib.pfb_fir_2048ch_core_xlsprom 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 18,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_3",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i3",
     latency => 2
   )
   port map (
@@ -448,7 +448,7 @@ begin
     input_port => rom4_data_net,
     output_port => reinterpret4_output_port_net
   );
-  fan_delay1 : entity xil_defaultlib.sysgen_delay_15d7dfdf75 
+  fan_delay1 : entity xil_defaultlib.sysgen_delay_23489be6aa 
   port map (
     clk => '0',
     ce => '0',
@@ -456,7 +456,7 @@ begin
     d => counter_op_net,
     q => fan_delay1_q_net
   );
-  fan_delay2 : entity xil_defaultlib.sysgen_delay_15d7dfdf75 
+  fan_delay2 : entity xil_defaultlib.sysgen_delay_23489be6aa 
   port map (
     clk => '0',
     ce => '0',
@@ -464,7 +464,7 @@ begin
     d => counter_op_net,
     q => fan_delay2_q_net
   );
-  fan_delay3 : entity xil_defaultlib.sysgen_delay_15d7dfdf75 
+  fan_delay3 : entity xil_defaultlib.sysgen_delay_23489be6aa 
   port map (
     clk => '0',
     ce => '0',
@@ -472,7 +472,7 @@ begin
     d => counter_op_net,
     q => fan_delay3_q_net
   );
-  fan_delay4 : entity xil_defaultlib.sysgen_delay_15d7dfdf75 
+  fan_delay4 : entity xil_defaultlib.sysgen_delay_23489be6aa 
   port map (
     clk => '0',
     ce => '0',
@@ -495,10 +495,10 @@ entity pfb_fir_2048ch_core_c_to_ri_x8 is
 end pfb_fir_2048ch_core_c_to_ri_x8;
 architecture structural of pfb_fir_2048ch_core_c_to_ri_x8 is 
   signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal delay1_q_net : std_logic_vector( 16-1 downto 0 );
   signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
+  signal delay1_q_net : std_logic_vector( 16-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -556,12 +556,12 @@ entity pfb_fir_2048ch_core_delay_bram_x6 is
   );
 end pfb_fir_2048ch_core_delay_bram_x6;
 architecture structural of pfb_fir_2048ch_core_delay_bram_x6 is 
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
+  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
+  signal ce_net : std_logic;
   signal delay1_q_net : std_logic_vector( 16-1 downto 0 );
   signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
 begin
   dout <= ram_data_out_net;
   delay1_q_net <= din;
@@ -574,20 +574,8 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.pfb_fir_2048ch_core_xlcounter_limit 
-  generic map (
-    cnt_15_0 => 2044,
-    cnt_31_16 => 0,
-    cnt_47_32 => 0,
-    cnt_63_48 => 0,
-    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_0",
-    count_limited => 1,
-    op_arith => xlUnsigned,
-    op_width => 11
-  )
+  counter : entity xil_defaultlib.sysgen_counter_8efc7f6f97 
   port map (
-    en => "1",
-    rst => "0",
     clr => '0',
     clk => clk_net,
     ce => ce_net,
@@ -595,9 +583,9 @@ begin
   );
   ram : entity xil_defaultlib.pfb_fir_2048ch_core_xlspram 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 16,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_4",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i4",
     latency => 2
   )
   port map (
@@ -625,10 +613,10 @@ entity pfb_fir_2048ch_core_ri_to_c_x12 is
 end pfb_fir_2048ch_core_ri_to_c_x12;
 architecture structural of pfb_fir_2048ch_core_ri_to_c_x12 is 
   signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal concat_y_net : std_logic_vector( 52-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
   signal mult_p_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
 begin
   c <= concat_y_net;
   mult1_p_net <= re;
@@ -673,38 +661,38 @@ entity pfb_fir_2048ch_core_sync_delay_x1 is
   );
 end pfb_fir_2048ch_core_sync_delay_x1;
 architecture structural of pfb_fir_2048ch_core_sync_delay_x1 is 
-  signal mux_y_net : std_logic_vector( 1-1 downto 0 );
-  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal constant_op_net : std_logic_vector( 12-1 downto 0 );
-  signal constant1_op_net : std_logic_vector( 12-1 downto 0 );
-  signal constant2_op_net : std_logic_vector( 12-1 downto 0 );
-  signal constant3_op_net : std_logic_vector( 1-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 12-1 downto 0 );
-  signal logical_y_net : std_logic_vector( 1-1 downto 0 );
-  signal relational1_op_net : std_logic_vector( 1-1 downto 0 );
   signal relational_op_net : std_logic_vector( 1-1 downto 0 );
+  signal constant_op_net : std_logic_vector( 14-1 downto 0 );
+  signal relational1_op_net : std_logic_vector( 1-1 downto 0 );
+  signal constant2_op_net : std_logic_vector( 14-1 downto 0 );
+  signal constant3_op_net : std_logic_vector( 1-1 downto 0 );
+  signal logical_y_net : std_logic_vector( 1-1 downto 0 );
+  signal clk_net : std_logic;
+  signal constant1_op_net : std_logic_vector( 14-1 downto 0 );
+  signal ce_net : std_logic;
+  signal counter_op_net : std_logic_vector( 14-1 downto 0 );
+  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
+  signal mux_y_net : std_logic_vector( 1-1 downto 0 );
 begin
   out_x0 <= mux_y_net;
   delay_q_net <= in_x0;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  constant_x0 : entity xil_defaultlib.sysgen_constant_137e3f8e80 
+  constant_x0 : entity xil_defaultlib.sysgen_constant_a478885a93 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     op => constant_op_net
   );
-  constant1 : entity xil_defaultlib.sysgen_constant_58808ed3e6 
+  constant1 : entity xil_defaultlib.sysgen_constant_b6a4db1460 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     op => constant1_op_net
   );
-  constant2 : entity xil_defaultlib.sysgen_constant_ba44aa7728 
+  constant2 : entity xil_defaultlib.sysgen_constant_4fbda804f4 
   port map (
     clk => '0',
     ce => '0',
@@ -720,9 +708,9 @@ begin
   );
   counter : entity xil_defaultlib.pfb_fir_2048ch_core_xlcounter_free 
   generic map (
-    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_1",
+    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_i1",
     op_arith => xlUnsigned,
-    op_width => 12
+    op_width => 14
   )
   port map (
     rst => "0",
@@ -753,7 +741,7 @@ begin
     d1 => relational_op_net,
     y => mux_y_net
   );
-  relational : entity xil_defaultlib.sysgen_relational_679dc9d58f 
+  relational : entity xil_defaultlib.sysgen_relational_3ce5a50478 
   port map (
     clk => '0',
     ce => '0',
@@ -762,7 +750,7 @@ begin
     b => counter_op_net,
     op => relational_op_net
   );
-  relational1 : entity xil_defaultlib.sysgen_relational_ac52a4661d 
+  relational1 : entity xil_defaultlib.sysgen_relational_b70e9bbf6e 
   port map (
     clk => '0',
     ce => '0',
@@ -791,21 +779,21 @@ entity pfb_fir_2048ch_core_pol1_in1_first_tap is
   );
 end pfb_fir_2048ch_core_pol1_in1_first_tap;
 architecture structural of pfb_fir_2048ch_core_pol1_in1_first_tap is 
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal mux_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 54-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
-  signal delay1_q_net : std_logic_vector( 16-1 downto 0 );
-  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
-  signal register_q_net : std_logic_vector( 72-1 downto 0 );
-  signal clk_net : std_logic;
   signal ce_net : std_logic;
+  signal delay1_q_net : std_logic_vector( 16-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 54-1 downto 0 );
+  signal slice_y_net : std_logic_vector( 18-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
+  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
   signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal register_q_net : std_logic_vector( 72-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal clk_net : std_logic;
   signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
   signal mult_p_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice_y_net : std_logic_vector( 18-1 downto 0 );
+  signal mux_y_net : std_logic_vector( 1-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
 begin
   dout <= ram_data_out_net;
   sync_out <= mux_y_net;
@@ -904,11 +892,11 @@ entity pfb_fir_2048ch_core_c_to_ri_x6 is
   );
 end pfb_fir_2048ch_core_c_to_ri_x6;
 architecture structural of pfb_fir_2048ch_core_c_to_ri_x6 is 
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
   signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -957,7 +945,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_adder_tree1_x0 is
+entity pfb_fir_2048ch_core_adder_tree1_x1 is
   port (
     sync : in std_logic_vector( 1-1 downto 0 );
     din1 : in std_logic_vector( 26-1 downto 0 );
@@ -969,18 +957,18 @@ entity pfb_fir_2048ch_core_adder_tree1_x0 is
     sync_out : out std_logic_vector( 1-1 downto 0 );
     dout : out std_logic_vector( 26-1 downto 0 )
   );
-end pfb_fir_2048ch_core_adder_tree1_x0;
-architecture structural of pfb_fir_2048ch_core_adder_tree1_x0 is 
+end pfb_fir_2048ch_core_adder_tree1_x1;
+architecture structural of pfb_fir_2048ch_core_adder_tree1_x1 is 
+  signal clk_net : std_logic;
+  signal reint0_1_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal sync_delay_q_net : std_logic_vector( 1-1 downto 0 );
   signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
-  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
-  signal reint0_1_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reint1_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint2_1_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reint3_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
+  signal reint2_1_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal addr1_s_net : std_logic_vector( 26-1 downto 0 );
+  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
+  signal ce_net : std_logic;
   signal addr2_s_net : std_logic_vector( 26-1 downto 0 );
 begin
   sync_out <= sync_delay_q_net;
@@ -1003,7 +991,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -1034,7 +1022,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -1065,7 +1053,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -1099,7 +1087,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_adder_tree2_x1 is
+entity pfb_fir_2048ch_core_adder_tree2_x0 is
   port (
     sync : in std_logic_vector( 1-1 downto 0 );
     din1 : in std_logic_vector( 26-1 downto 0 );
@@ -1110,18 +1098,18 @@ entity pfb_fir_2048ch_core_adder_tree2_x1 is
     ce_1 : in std_logic;
     dout : out std_logic_vector( 26-1 downto 0 )
   );
-end pfb_fir_2048ch_core_adder_tree2_x1;
-architecture structural of pfb_fir_2048ch_core_adder_tree2_x1 is 
+end pfb_fir_2048ch_core_adder_tree2_x0;
+architecture structural of pfb_fir_2048ch_core_adder_tree2_x0 is 
+  signal addr2_s_net : std_logic_vector( 26-1 downto 0 );
+  signal reint0_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal ce_net : std_logic;
+  signal reint1_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr1_s_net : std_logic_vector( 26-1 downto 0 );
+  signal reint2_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal clk_net : std_logic;
+  signal reint3_2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
   signal delay_q_net : std_logic_vector( 1-1 downto 0 );
-  signal reint0_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint1_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint2_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint3_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal addr1_s_net : std_logic_vector( 26-1 downto 0 );
-  signal addr2_s_net : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= addr3_s_net;
   delay_q_net <= sync;
@@ -1142,7 +1130,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -1173,7 +1161,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -1204,7 +1192,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -1238,11 +1226,11 @@ entity pfb_fir_2048ch_core_ri_to_c_x9 is
   );
 end pfb_fir_2048ch_core_ri_to_c_x9;
 architecture structural of pfb_fir_2048ch_core_ri_to_c_x9 is 
-  signal force_re_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
   signal convert1_dout_net : std_logic_vector( 18-1 downto 0 );
   signal convert2_dout_net : std_logic_vector( 18-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
 begin
   c <= concat_y_net;
   convert1_dout_net <= re;
@@ -1289,35 +1277,35 @@ entity pfb_fir_2048ch_core_pfb_add_tree_x0 is
   );
 end pfb_fir_2048ch_core_pfb_add_tree_x0;
 architecture structural of pfb_fir_2048ch_core_pfb_add_tree_x0 is 
-  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
-  signal delay1_q_net : std_logic_vector( 1-1 downto 0 );
-  signal concat_y_net_x0 : std_logic_vector( 208-1 downto 0 );
-  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal sync_delay_q_net : std_logic_vector( 1-1 downto 0 );
+  signal reint3_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reint2_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reint0_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal slice0_1_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice2_2_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice0_2_y_net : std_logic_vector( 26-1 downto 0 );
   signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
   signal reint0_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint1_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint2_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint3_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal addr3_s_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal reint0_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint1_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint2_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint3_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal convert1_dout_net : std_logic_vector( 18-1 downto 0 );
-  signal convert2_dout_net : std_logic_vector( 18-1 downto 0 );
-  signal slice0_1_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice0_2_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice1_1_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice1_2_y_net : std_logic_vector( 26-1 downto 0 );
+  signal clk_net : std_logic;
   signal slice2_1_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice2_2_y_net : std_logic_vector( 26-1 downto 0 );
+  signal delay1_q_net : std_logic_vector( 1-1 downto 0 );
+  signal concat_y_net_x0 : std_logic_vector( 208-1 downto 0 );
+  signal ce_net : std_logic;
   signal slice3_1_y_net : std_logic_vector( 26-1 downto 0 );
   signal slice3_2_y_net : std_logic_vector( 26-1 downto 0 );
-  signal scale1_op_net : std_logic_vector( 26-1 downto 0 );
+  signal slice1_1_y_net : std_logic_vector( 26-1 downto 0 );
+  signal reint2_1_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal scale2_op_net : std_logic_vector( 26-1 downto 0 );
+  signal reint1_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal sync_delay_q_net : std_logic_vector( 1-1 downto 0 );
+  signal slice1_2_y_net : std_logic_vector( 26-1 downto 0 );
+  signal scale1_op_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
+  signal reint1_1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal convert1_dout_net : std_logic_vector( 18-1 downto 0 );
+  signal convert2_dout_net : std_logic_vector( 18-1 downto 0 );
+  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
+  signal reint3_1_output_port_net : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= concat_y_net;
   sync_out <= delay1_q_net;
@@ -1325,7 +1313,7 @@ begin
   delay_q_net <= sync;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  adder_tree1 : entity xil_defaultlib.pfb_fir_2048ch_core_adder_tree1_x0 
+  adder_tree1 : entity xil_defaultlib.pfb_fir_2048ch_core_adder_tree1_x1 
   port map (
     sync => delay_q_net,
     din1 => reint0_1_output_port_net,
@@ -1337,7 +1325,7 @@ begin
     sync_out => sync_delay_q_net,
     dout => addr3_s_net
   );
-  adder_tree2 : entity xil_defaultlib.pfb_fir_2048ch_core_adder_tree2_x1 
+  adder_tree2 : entity xil_defaultlib.pfb_fir_2048ch_core_adder_tree2_x0 
   port map (
     sync => delay_q_net,
     din1 => reint0_2_output_port_net,
@@ -1593,11 +1581,11 @@ entity pfb_fir_2048ch_core_ri_to_c_x10 is
   );
 end pfb_fir_2048ch_core_ri_to_c_x10;
 architecture structural of pfb_fir_2048ch_core_ri_to_c_x10 is 
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
 begin
   c <= concat_y_net;
   mult1_p_net <= re;
@@ -1646,22 +1634,22 @@ entity pfb_fir_2048ch_core_pol1_in1_last_tap is
   );
 end pfb_fir_2048ch_core_pol1_in1_last_tap;
 architecture structural of pfb_fir_2048ch_core_pol1_in1_last_tap is 
-  signal concat_y_net_x0 : std_logic_vector( 36-1 downto 0 );
-  signal delay1_q_net : std_logic_vector( 1-1 downto 0 );
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal mux_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
-  signal concat_y_net_x2 : std_logic_vector( 156-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 208-1 downto 0 );
-  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
-  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mux_y_net : std_logic_vector( 1-1 downto 0 );
+  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
+  signal concat_y_net_x2 : std_logic_vector( 156-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 208-1 downto 0 );
+  signal concat_y_net_x0 : std_logic_vector( 36-1 downto 0 );
+  signal ce_net : std_logic;
+  signal clk_net : std_logic;
+  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
+  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
+  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
+  signal delay1_q_net : std_logic_vector( 1-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
 begin
   dout <= concat_y_net_x0;
   sync_out <= delay1_q_net;
@@ -1756,11 +1744,11 @@ entity pfb_fir_2048ch_core_c_to_ri_x5 is
   );
 end pfb_fir_2048ch_core_c_to_ri_x5;
 architecture structural of pfb_fir_2048ch_core_c_to_ri_x5 is 
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
   signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -1818,12 +1806,12 @@ entity pfb_fir_2048ch_core_delay_bram_x4 is
   );
 end pfb_fir_2048ch_core_delay_bram_x4;
 architecture structural of pfb_fir_2048ch_core_delay_bram_x4 is 
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
   signal clk_net : std_logic;
   signal ce_net : std_logic;
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
+  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
 begin
   dout <= ram_data_out_net;
   ram_data_out_net_x0 <= din;
@@ -1836,20 +1824,8 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.pfb_fir_2048ch_core_xlcounter_limit 
-  generic map (
-    cnt_15_0 => 2044,
-    cnt_31_16 => 0,
-    cnt_47_32 => 0,
-    cnt_63_48 => 0,
-    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_0",
-    count_limited => 1,
-    op_arith => xlUnsigned,
-    op_width => 11
-  )
+  counter : entity xil_defaultlib.sysgen_counter_8efc7f6f97 
   port map (
-    en => "1",
-    rst => "0",
     clr => '0',
     clk => clk_net,
     ce => ce_net,
@@ -1857,9 +1833,9 @@ begin
   );
   ram : entity xil_defaultlib.pfb_fir_2048ch_core_xlspram 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 16,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_4",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i4",
     latency => 2
   )
   port map (
@@ -1886,11 +1862,11 @@ entity pfb_fir_2048ch_core_ri_to_c_x8 is
   );
 end pfb_fir_2048ch_core_ri_to_c_x8;
 architecture structural of pfb_fir_2048ch_core_ri_to_c_x8 is 
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
   signal mult_p_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
 begin
   c <= concat_y_net;
   mult1_p_net <= re;
@@ -1935,38 +1911,38 @@ entity pfb_fir_2048ch_core_sync_delay is
   );
 end pfb_fir_2048ch_core_sync_delay;
 architecture structural of pfb_fir_2048ch_core_sync_delay is 
-  signal mux_y_net_x0 : std_logic_vector( 1-1 downto 0 );
-  signal mux_y_net : std_logic_vector( 1-1 downto 0 );
+  signal constant2_op_net : std_logic_vector( 14-1 downto 0 );
+  signal constant3_op_net : std_logic_vector( 1-1 downto 0 );
+  signal relational1_op_net : std_logic_vector( 1-1 downto 0 );
   signal clk_net : std_logic;
   signal ce_net : std_logic;
-  signal constant_op_net : std_logic_vector( 12-1 downto 0 );
-  signal constant1_op_net : std_logic_vector( 12-1 downto 0 );
-  signal constant2_op_net : std_logic_vector( 12-1 downto 0 );
-  signal constant3_op_net : std_logic_vector( 1-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 12-1 downto 0 );
+  signal constant_op_net : std_logic_vector( 14-1 downto 0 );
   signal logical_y_net : std_logic_vector( 1-1 downto 0 );
-  signal relational1_op_net : std_logic_vector( 1-1 downto 0 );
   signal relational_op_net : std_logic_vector( 1-1 downto 0 );
+  signal constant1_op_net : std_logic_vector( 14-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 14-1 downto 0 );
+  signal mux_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal mux_y_net : std_logic_vector( 1-1 downto 0 );
 begin
   out_x0 <= mux_y_net_x0;
   mux_y_net <= in_x0;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  constant_x0 : entity xil_defaultlib.sysgen_constant_137e3f8e80 
+  constant_x0 : entity xil_defaultlib.sysgen_constant_a478885a93 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     op => constant_op_net
   );
-  constant1 : entity xil_defaultlib.sysgen_constant_58808ed3e6 
+  constant1 : entity xil_defaultlib.sysgen_constant_b6a4db1460 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     op => constant1_op_net
   );
-  constant2 : entity xil_defaultlib.sysgen_constant_ba44aa7728 
+  constant2 : entity xil_defaultlib.sysgen_constant_4fbda804f4 
   port map (
     clk => '0',
     ce => '0',
@@ -1982,9 +1958,9 @@ begin
   );
   counter : entity xil_defaultlib.pfb_fir_2048ch_core_xlcounter_free 
   generic map (
-    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_1",
+    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_i1",
     op_arith => xlUnsigned,
-    op_width => 12
+    op_width => 14
   )
   port map (
     rst => "0",
@@ -2015,7 +1991,7 @@ begin
     d1 => relational_op_net,
     y => mux_y_net_x0
   );
-  relational : entity xil_defaultlib.sysgen_relational_679dc9d58f 
+  relational : entity xil_defaultlib.sysgen_relational_3ce5a50478 
   port map (
     clk => '0',
     ce => '0',
@@ -2024,7 +2000,7 @@ begin
     b => counter_op_net,
     op => relational_op_net
   );
-  relational1 : entity xil_defaultlib.sysgen_relational_ac52a4661d 
+  relational1 : entity xil_defaultlib.sysgen_relational_b70e9bbf6e 
   port map (
     clk => '0',
     ce => '0',
@@ -2054,23 +2030,23 @@ entity pfb_fir_2048ch_core_pol1_in1_tap2 is
   );
 end pfb_fir_2048ch_core_pol1_in1_tap2;
 architecture structural of pfb_fir_2048ch_core_pol1_in1_tap2 is 
-  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
-  signal mux_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice1_y_net_x0 : std_logic_vector( 36-1 downto 0 );
-  signal concat_y_net_x0 : std_logic_vector( 104-1 downto 0 );
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal mux_y_net_x0 : std_logic_vector( 1-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 54-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
+  signal slice_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice1_y_net_x0 : std_logic_vector( 36-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
   signal mult_p_net : std_logic_vector( 26-1 downto 0 );
+  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal mux_y_net : std_logic_vector( 1-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice_y_net : std_logic_vector( 18-1 downto 0 );
+  signal ce_net : std_logic;
+  signal slice1_y_net : std_logic_vector( 54-1 downto 0 );
+  signal concat_y_net_x0 : std_logic_vector( 104-1 downto 0 );
+  signal mux_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
+  signal clk_net : std_logic;
 begin
   dout <= ram_data_out_net_x0;
   sync_out <= mux_y_net;
@@ -2180,10 +2156,10 @@ entity pfb_fir_2048ch_core_c_to_ri_x7 is
 end pfb_fir_2048ch_core_c_to_ri_x7;
 architecture structural of pfb_fir_2048ch_core_c_to_ri_x7 is 
   signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -2241,12 +2217,12 @@ entity pfb_fir_2048ch_core_delay_bram_x5 is
   );
 end pfb_fir_2048ch_core_delay_bram_x5;
 architecture structural of pfb_fir_2048ch_core_delay_bram_x5 is 
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
   signal clk_net : std_logic;
+  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal ce_net : std_logic;
   signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
 begin
   dout <= ram_data_out_net;
   ram_data_out_net_x0 <= din;
@@ -2259,20 +2235,8 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.pfb_fir_2048ch_core_xlcounter_limit 
-  generic map (
-    cnt_15_0 => 2044,
-    cnt_31_16 => 0,
-    cnt_47_32 => 0,
-    cnt_63_48 => 0,
-    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_0",
-    count_limited => 1,
-    op_arith => xlUnsigned,
-    op_width => 11
-  )
+  counter : entity xil_defaultlib.sysgen_counter_8efc7f6f97 
   port map (
-    en => "1",
-    rst => "0",
     clr => '0',
     clk => clk_net,
     ce => ce_net,
@@ -2280,9 +2244,9 @@ begin
   );
   ram : entity xil_defaultlib.pfb_fir_2048ch_core_xlspram 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 16,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_4",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i4",
     latency => 2
   )
   port map (
@@ -2309,11 +2273,11 @@ entity pfb_fir_2048ch_core_ri_to_c_x11 is
   );
 end pfb_fir_2048ch_core_ri_to_c_x11;
 architecture structural of pfb_fir_2048ch_core_ri_to_c_x11 is 
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
   signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
   signal mult_p_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
 begin
   c <= concat_y_net;
   mult1_p_net <= re;
@@ -2358,38 +2322,38 @@ entity pfb_fir_2048ch_core_sync_delay_x0 is
   );
 end pfb_fir_2048ch_core_sync_delay_x0;
 architecture structural of pfb_fir_2048ch_core_sync_delay_x0 is 
+  signal constant_op_net : std_logic_vector( 14-1 downto 0 );
   signal mux_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal constant2_op_net : std_logic_vector( 14-1 downto 0 );
   signal mux_y_net : std_logic_vector( 1-1 downto 0 );
-  signal clk_net : std_logic;
+  signal constant1_op_net : std_logic_vector( 14-1 downto 0 );
   signal ce_net : std_logic;
-  signal constant_op_net : std_logic_vector( 12-1 downto 0 );
-  signal constant1_op_net : std_logic_vector( 12-1 downto 0 );
-  signal constant2_op_net : std_logic_vector( 12-1 downto 0 );
-  signal constant3_op_net : std_logic_vector( 1-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 12-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 14-1 downto 0 );
   signal logical_y_net : std_logic_vector( 1-1 downto 0 );
-  signal relational1_op_net : std_logic_vector( 1-1 downto 0 );
+  signal constant3_op_net : std_logic_vector( 1-1 downto 0 );
   signal relational_op_net : std_logic_vector( 1-1 downto 0 );
+  signal relational1_op_net : std_logic_vector( 1-1 downto 0 );
+  signal clk_net : std_logic;
 begin
   out_x0 <= mux_y_net_x0;
   mux_y_net <= in_x0;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  constant_x0 : entity xil_defaultlib.sysgen_constant_137e3f8e80 
+  constant_x0 : entity xil_defaultlib.sysgen_constant_a478885a93 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     op => constant_op_net
   );
-  constant1 : entity xil_defaultlib.sysgen_constant_58808ed3e6 
+  constant1 : entity xil_defaultlib.sysgen_constant_b6a4db1460 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     op => constant1_op_net
   );
-  constant2 : entity xil_defaultlib.sysgen_constant_ba44aa7728 
+  constant2 : entity xil_defaultlib.sysgen_constant_4fbda804f4 
   port map (
     clk => '0',
     ce => '0',
@@ -2405,9 +2369,9 @@ begin
   );
   counter : entity xil_defaultlib.pfb_fir_2048ch_core_xlcounter_free 
   generic map (
-    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_1",
+    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_i1",
     op_arith => xlUnsigned,
-    op_width => 12
+    op_width => 14
   )
   port map (
     rst => "0",
@@ -2438,7 +2402,7 @@ begin
     d1 => relational_op_net,
     y => mux_y_net_x0
   );
-  relational : entity xil_defaultlib.sysgen_relational_679dc9d58f 
+  relational : entity xil_defaultlib.sysgen_relational_3ce5a50478 
   port map (
     clk => '0',
     ce => '0',
@@ -2447,7 +2411,7 @@ begin
     b => counter_op_net,
     op => relational_op_net
   );
-  relational1 : entity xil_defaultlib.sysgen_relational_ac52a4661d 
+  relational1 : entity xil_defaultlib.sysgen_relational_b70e9bbf6e 
   port map (
     clk => '0',
     ce => '0',
@@ -2477,23 +2441,23 @@ entity pfb_fir_2048ch_core_pol1_in1_tap3 is
   );
 end pfb_fir_2048ch_core_pol1_in1_tap3;
 architecture structural of pfb_fir_2048ch_core_pol1_in1_tap3 is 
-  signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice_y_net : std_logic_vector( 18-1 downto 0 );
-  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
+  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 104-1 downto 0 );
   signal mux_y_net : std_logic_vector( 1-1 downto 0 );
   signal slice1_y_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal ce_net : std_logic;
   signal concat_y_net_x0 : std_logic_vector( 156-1 downto 0 );
   signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal mux_y_net_x0 : std_logic_vector( 1-1 downto 0 );
   signal slice1_y_net : std_logic_vector( 36-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 104-1 downto 0 );
+  signal slice_y_net : std_logic_vector( 18-1 downto 0 );
   signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= ram_data_out_net_x0;
   sync_out <= mux_y_net;
@@ -2605,26 +2569,26 @@ entity pfb_fir_2048ch_core_pol1_in2_coeffs is
   );
 end pfb_fir_2048ch_core_pol1_in2_coeffs;
 architecture structural of pfb_fir_2048ch_core_pol1_in2_coeffs is 
-  signal delay1_q_net : std_logic_vector( 16-1 downto 0 );
-  signal register_q_net : std_logic_vector( 72-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 16-1 downto 0 );
-  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
   signal concat_y_net_x0 : std_logic_vector( 72-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
-  signal rom1_data_net : std_logic_vector( 18-1 downto 0 );
-  signal fan_delay1_q_net : std_logic_vector( 11-1 downto 0 );
-  signal rom2_data_net : std_logic_vector( 18-1 downto 0 );
-  signal fan_delay2_q_net : std_logic_vector( 11-1 downto 0 );
-  signal rom3_data_net : std_logic_vector( 18-1 downto 0 );
-  signal fan_delay3_q_net : std_logic_vector( 11-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
+  signal fan_delay4_q_net : std_logic_vector( 13-1 downto 0 );
   signal rom4_data_net : std_logic_vector( 18-1 downto 0 );
-  signal fan_delay4_q_net : std_logic_vector( 11-1 downto 0 );
+  signal fan_delay2_q_net : std_logic_vector( 13-1 downto 0 );
+  signal fan_delay1_q_net : std_logic_vector( 13-1 downto 0 );
+  signal rom1_data_net : std_logic_vector( 18-1 downto 0 );
+  signal rom2_data_net : std_logic_vector( 18-1 downto 0 );
+  signal delay1_q_net : std_logic_vector( 16-1 downto 0 );
+  signal fan_delay3_q_net : std_logic_vector( 13-1 downto 0 );
+  signal rom3_data_net : std_logic_vector( 18-1 downto 0 );
+  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
+  signal clk_net : std_logic;
+  signal concat_y_net : std_logic_vector( 16-1 downto 0 );
+  signal register_q_net : std_logic_vector( 72-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal ce_net : std_logic;
 begin
   dout <= delay1_q_net;
   coeff <= register_q_net;
@@ -2645,9 +2609,9 @@ begin
   );
   counter : entity xil_defaultlib.pfb_fir_2048ch_core_xlcounter_free 
   generic map (
-    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_i0",
     op_arith => xlUnsigned,
-    op_width => 11
+    op_width => 13
   )
   port map (
     en => "1",
@@ -2674,9 +2638,9 @@ begin
   );
   rom1 : entity xil_defaultlib.pfb_fir_2048ch_core_xlsprom 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 18,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_5",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i5",
     latency => 2
   )
   port map (
@@ -2689,9 +2653,9 @@ begin
   );
   rom2 : entity xil_defaultlib.pfb_fir_2048ch_core_xlsprom 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 18,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_6",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i6",
     latency => 2
   )
   port map (
@@ -2704,9 +2668,9 @@ begin
   );
   rom3 : entity xil_defaultlib.pfb_fir_2048ch_core_xlsprom 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 18,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_7",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i7",
     latency => 2
   )
   port map (
@@ -2719,9 +2683,9 @@ begin
   );
   rom4 : entity xil_defaultlib.pfb_fir_2048ch_core_xlsprom 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 18,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_8",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i8",
     latency => 2
   )
   port map (
@@ -2777,7 +2741,7 @@ begin
     input_port => rom4_data_net,
     output_port => reinterpret4_output_port_net
   );
-  fan_delay1 : entity xil_defaultlib.sysgen_delay_15d7dfdf75 
+  fan_delay1 : entity xil_defaultlib.sysgen_delay_23489be6aa 
   port map (
     clk => '0',
     ce => '0',
@@ -2785,7 +2749,7 @@ begin
     d => counter_op_net,
     q => fan_delay1_q_net
   );
-  fan_delay2 : entity xil_defaultlib.sysgen_delay_15d7dfdf75 
+  fan_delay2 : entity xil_defaultlib.sysgen_delay_23489be6aa 
   port map (
     clk => '0',
     ce => '0',
@@ -2793,7 +2757,7 @@ begin
     d => counter_op_net,
     q => fan_delay2_q_net
   );
-  fan_delay3 : entity xil_defaultlib.sysgen_delay_15d7dfdf75 
+  fan_delay3 : entity xil_defaultlib.sysgen_delay_23489be6aa 
   port map (
     clk => '0',
     ce => '0',
@@ -2801,7 +2765,7 @@ begin
     d => counter_op_net,
     q => fan_delay3_q_net
   );
-  fan_delay4 : entity xil_defaultlib.sysgen_delay_15d7dfdf75 
+  fan_delay4 : entity xil_defaultlib.sysgen_delay_23489be6aa 
   port map (
     clk => '0',
     ce => '0',
@@ -2823,8 +2787,8 @@ entity pfb_fir_2048ch_core_c_to_ri_x15 is
   );
 end pfb_fir_2048ch_core_c_to_ri_x15;
 architecture structural of pfb_fir_2048ch_core_c_to_ri_x15 is 
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 16-1 downto 0 );
   signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
   signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
@@ -2887,10 +2851,10 @@ end pfb_fir_2048ch_core_delay_bram_x10;
 architecture structural of pfb_fir_2048ch_core_delay_bram_x10 is 
   signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 16-1 downto 0 );
-  signal clk_net : std_logic;
   signal ce_net : std_logic;
+  signal clk_net : std_logic;
   signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
 begin
   dout <= ram_data_out_net;
   delay1_q_net <= din;
@@ -2903,20 +2867,8 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.pfb_fir_2048ch_core_xlcounter_limit 
-  generic map (
-    cnt_15_0 => 2044,
-    cnt_31_16 => 0,
-    cnt_47_32 => 0,
-    cnt_63_48 => 0,
-    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_0",
-    count_limited => 1,
-    op_arith => xlUnsigned,
-    op_width => 11
-  )
+  counter : entity xil_defaultlib.sysgen_counter_8efc7f6f97 
   port map (
-    en => "1",
-    rst => "0",
     clr => '0',
     clk => clk_net,
     ce => ce_net,
@@ -2924,9 +2876,9 @@ begin
   );
   ram : entity xil_defaultlib.pfb_fir_2048ch_core_xlspram 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 16,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_4",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i4",
     latency => 2
   )
   port map (
@@ -2953,11 +2905,11 @@ entity pfb_fir_2048ch_core_ri_to_c_x19 is
   );
 end pfb_fir_2048ch_core_ri_to_c_x19;
 architecture structural of pfb_fir_2048ch_core_ri_to_c_x19 is 
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
   signal mult_p_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
 begin
   c <= concat_y_net;
   mult1_p_net <= re;
@@ -3006,20 +2958,20 @@ entity pfb_fir_2048ch_core_pol1_in2_first_tap is
   );
 end pfb_fir_2048ch_core_pol1_in2_first_tap;
 architecture structural of pfb_fir_2048ch_core_pol1_in2_first_tap is 
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 54-1 downto 0 );
+  signal clk_net : std_logic;
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal register_q_net : std_logic_vector( 72-1 downto 0 );
+  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal ce_net : std_logic;
   signal concat_y_net : std_logic_vector( 52-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 16-1 downto 0 );
-  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
-  signal register_q_net : std_logic_vector( 72-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal slice_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 54-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
 begin
   dout <= ram_data_out_net;
   coeff_out <= slice1_y_net;
@@ -3110,11 +3062,11 @@ entity pfb_fir_2048ch_core_c_to_ri_x14 is
   );
 end pfb_fir_2048ch_core_c_to_ri_x14;
 architecture structural of pfb_fir_2048ch_core_c_to_ri_x14 is 
+  signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
   signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -3175,15 +3127,15 @@ entity pfb_fir_2048ch_core_adder_tree1_x2 is
   );
 end pfb_fir_2048ch_core_adder_tree1_x2;
 architecture structural of pfb_fir_2048ch_core_adder_tree1_x2 is 
+  signal reint2_1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr2_s_net : std_logic_vector( 26-1 downto 0 );
   signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
   signal reint0_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint1_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint2_1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal ce_net : std_logic;
   signal reint3_1_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal clk_net : std_logic;
-  signal ce_net : std_logic;
   signal addr1_s_net : std_logic_vector( 26-1 downto 0 );
-  signal addr2_s_net : std_logic_vector( 26-1 downto 0 );
+  signal reint1_1_output_port_net : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= addr3_s_net;
   reint0_1_output_port_net <= din1;
@@ -3203,7 +3155,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -3234,7 +3186,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -3265,7 +3217,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -3303,15 +3255,15 @@ entity pfb_fir_2048ch_core_adder_tree2_x2 is
   );
 end pfb_fir_2048ch_core_adder_tree2_x2;
 architecture structural of pfb_fir_2048ch_core_adder_tree2_x2 is 
-  signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
-  signal reint0_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr2_s_net : std_logic_vector( 26-1 downto 0 );
+  signal addr1_s_net : std_logic_vector( 26-1 downto 0 );
   signal reint1_2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reint2_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reint0_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
   signal reint3_2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal clk_net : std_logic;
   signal ce_net : std_logic;
-  signal addr1_s_net : std_logic_vector( 26-1 downto 0 );
-  signal addr2_s_net : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= addr3_s_net;
   reint0_2_output_port_net <= din1;
@@ -3331,7 +3283,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -3362,7 +3314,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -3393,7 +3345,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -3427,11 +3379,11 @@ entity pfb_fir_2048ch_core_ri_to_c_x18 is
   );
 end pfb_fir_2048ch_core_ri_to_c_x18;
 architecture structural of pfb_fir_2048ch_core_ri_to_c_x18 is 
-  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
   signal convert1_dout_net : std_logic_vector( 18-1 downto 0 );
   signal convert2_dout_net : std_logic_vector( 18-1 downto 0 );
   signal force_re_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
 begin
   c <= concat_y_net;
   convert1_dout_net <= re;
@@ -3476,32 +3428,32 @@ entity pfb_fir_2048ch_core_pfb_add_tree_x2 is
   );
 end pfb_fir_2048ch_core_pfb_add_tree_x2;
 architecture structural of pfb_fir_2048ch_core_pfb_add_tree_x2 is 
-  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
-  signal concat_y_net_x0 : std_logic_vector( 208-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
-  signal reint0_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint1_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint2_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint3_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal addr3_s_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal reint0_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint1_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint2_2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reint3_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal convert1_dout_net : std_logic_vector( 18-1 downto 0 );
-  signal convert2_dout_net : std_logic_vector( 18-1 downto 0 );
-  signal slice0_1_y_net : std_logic_vector( 26-1 downto 0 );
+  signal reint2_2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal slice0_2_y_net : std_logic_vector( 26-1 downto 0 );
   signal slice1_1_y_net : std_logic_vector( 26-1 downto 0 );
+  signal clk_net : std_logic;
   signal slice1_2_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice2_1_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice2_2_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice3_1_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice3_2_y_net : std_logic_vector( 26-1 downto 0 );
+  signal ce_net : std_logic;
   signal scale1_op_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net_x0 : std_logic_vector( 208-1 downto 0 );
+  signal slice2_1_y_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
   signal scale2_op_net : std_logic_vector( 26-1 downto 0 );
+  signal slice2_2_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice3_2_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice3_1_y_net : std_logic_vector( 26-1 downto 0 );
+  signal convert2_dout_net : std_logic_vector( 18-1 downto 0 );
+  signal slice0_1_y_net : std_logic_vector( 26-1 downto 0 );
+  signal reint1_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
+  signal convert1_dout_net : std_logic_vector( 18-1 downto 0 );
+  signal reint3_1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reint0_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reint2_1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reint1_1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reint0_1_output_port_net : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= concat_y_net;
   concat_y_net_x0 <= din;
@@ -3757,10 +3709,10 @@ entity pfb_fir_2048ch_core_ri_to_c_x17 is
   );
 end pfb_fir_2048ch_core_ri_to_c_x17;
 architecture structural of pfb_fir_2048ch_core_ri_to_c_x17 is 
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
   signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
+  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
 begin
   c <= concat_y_net;
@@ -3808,18 +3760,18 @@ entity pfb_fir_2048ch_core_pol1_in2_last_tap is
   );
 end pfb_fir_2048ch_core_pol1_in2_last_tap;
 architecture structural of pfb_fir_2048ch_core_pol1_in2_last_tap is 
-  signal concat_y_net_x0 : std_logic_vector( 36-1 downto 0 );
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
-  signal concat_y_net_x2 : std_logic_vector( 156-1 downto 0 );
+  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
   signal clk_net : std_logic;
   signal ce_net : std_logic;
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 208-1 downto 0 );
-  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
   signal mult_p_net : std_logic_vector( 26-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
+  signal concat_y_net_x0 : std_logic_vector( 36-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 208-1 downto 0 );
+  signal concat_y_net_x2 : std_logic_vector( 156-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
 begin
   dout <= concat_y_net_x0;
@@ -3958,12 +3910,12 @@ entity pfb_fir_2048ch_core_delay_bram_x9 is
   );
 end pfb_fir_2048ch_core_delay_bram_x9;
 architecture structural of pfb_fir_2048ch_core_delay_bram_x9 is 
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
+  signal clk_net : std_logic;
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
+  signal ce_net : std_logic;
 begin
   dout <= ram_data_out_net;
   ram_data_out_net_x0 <= din;
@@ -3976,20 +3928,8 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.pfb_fir_2048ch_core_xlcounter_limit 
-  generic map (
-    cnt_15_0 => 2044,
-    cnt_31_16 => 0,
-    cnt_47_32 => 0,
-    cnt_63_48 => 0,
-    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_0",
-    count_limited => 1,
-    op_arith => xlUnsigned,
-    op_width => 11
-  )
+  counter : entity xil_defaultlib.sysgen_counter_8efc7f6f97 
   port map (
-    en => "1",
-    rst => "0",
     clr => '0',
     clk => clk_net,
     ce => ce_net,
@@ -3997,9 +3937,9 @@ begin
   );
   ram : entity xil_defaultlib.pfb_fir_2048ch_core_xlspram 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 16,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_4",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i4",
     latency => 2
   )
   port map (
@@ -4026,11 +3966,11 @@ entity pfb_fir_2048ch_core_ri_to_c_x16 is
   );
 end pfb_fir_2048ch_core_ri_to_c_x16;
 architecture structural of pfb_fir_2048ch_core_ri_to_c_x16 is 
+  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal concat_y_net : std_logic_vector( 52-1 downto 0 );
   signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
 begin
   c <= concat_y_net;
   mult1_p_net <= re;
@@ -4079,21 +4019,21 @@ entity pfb_fir_2048ch_core_pol1_in2_tap2 is
   );
 end pfb_fir_2048ch_core_pol1_in2_tap2;
 architecture structural of pfb_fir_2048ch_core_pol1_in2_tap2 is 
-  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net_x0 : std_logic_vector( 36-1 downto 0 );
   signal concat_y_net_x0 : std_logic_vector( 104-1 downto 0 );
+  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
   signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal slice1_y_net : std_logic_vector( 54-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
   signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal slice_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice1_y_net_x0 : std_logic_vector( 36-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
   signal mult_p_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice_y_net : std_logic_vector( 18-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal ce_net : std_logic;
 begin
   dout <= ram_data_out_net_x0;
   coeff_out <= slice1_y_net_x0;
@@ -4193,11 +4133,11 @@ entity pfb_fir_2048ch_core_c_to_ri_x12 is
   );
 end pfb_fir_2048ch_core_c_to_ri_x12;
 architecture structural of pfb_fir_2048ch_core_c_to_ri_x12 is 
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
   signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -4257,10 +4197,10 @@ end pfb_fir_2048ch_core_delay_bram_x8;
 architecture structural of pfb_fir_2048ch_core_delay_bram_x8 is 
   signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
-  signal clk_net : std_logic;
   signal ce_net : std_logic;
   signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
+  signal clk_net : std_logic;
 begin
   dout <= ram_data_out_net;
   ram_data_out_net_x0 <= din;
@@ -4273,20 +4213,8 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.pfb_fir_2048ch_core_xlcounter_limit 
-  generic map (
-    cnt_15_0 => 2044,
-    cnt_31_16 => 0,
-    cnt_47_32 => 0,
-    cnt_63_48 => 0,
-    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_0",
-    count_limited => 1,
-    op_arith => xlUnsigned,
-    op_width => 11
-  )
+  counter : entity xil_defaultlib.sysgen_counter_8efc7f6f97 
   port map (
-    en => "1",
-    rst => "0",
     clr => '0',
     clk => clk_net,
     ce => ce_net,
@@ -4294,9 +4222,9 @@ begin
   );
   ram : entity xil_defaultlib.pfb_fir_2048ch_core_xlspram 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 16,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_4",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i4",
     latency => 2
   )
   port map (
@@ -4315,19 +4243,19 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_ri_to_c_x15 is
+entity pfb_fir_2048ch_core_ri_to_c_x14 is
   port (
     re : in std_logic_vector( 26-1 downto 0 );
     im : in std_logic_vector( 26-1 downto 0 );
     c : out std_logic_vector( 52-1 downto 0 )
   );
-end pfb_fir_2048ch_core_ri_to_c_x15;
-architecture structural of pfb_fir_2048ch_core_ri_to_c_x15 is 
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
+end pfb_fir_2048ch_core_ri_to_c_x14;
+architecture structural of pfb_fir_2048ch_core_ri_to_c_x14 is 
   signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
+  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
 begin
   c <= concat_y_net;
   mult1_p_net <= re;
@@ -4376,21 +4304,21 @@ entity pfb_fir_2048ch_core_pol1_in2_tap3 is
   );
 end pfb_fir_2048ch_core_pol1_in2_tap3;
 architecture structural of pfb_fir_2048ch_core_pol1_in2_tap3 is 
-  signal slice_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net_x0 : std_logic_vector( 18-1 downto 0 );
   signal concat_y_net_x0 : std_logic_vector( 156-1 downto 0 );
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal slice1_y_net : std_logic_vector( 36-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal concat_y_net : std_logic_vector( 104-1 downto 0 );
-  signal clk_net : std_logic;
   signal ce_net : std_logic;
+  signal clk_net : std_logic;
+  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
   signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
   signal mult_p_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice_y_net : std_logic_vector( 18-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
+  signal slice1_y_net_x0 : std_logic_vector( 18-1 downto 0 );
 begin
   dout <= ram_data_out_net_x0;
   coeff_out <= slice1_y_net_x0;
@@ -4413,7 +4341,7 @@ begin
     ce_1 => ce_net,
     dout => ram_data_out_net_x0
   );
-  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x15 
+  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x14 
   port map (
     re => mult1_p_net,
     im => mult_p_net,
@@ -4491,10 +4419,10 @@ entity pfb_fir_2048ch_core_c_to_ri_x11 is
 end pfb_fir_2048ch_core_c_to_ri_x11;
 architecture structural of pfb_fir_2048ch_core_c_to_ri_x11 is 
   signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal pol2_in1_delay_q_net : std_logic_vector( 16-1 downto 0 );
   signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
   signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -4552,12 +4480,12 @@ entity pfb_fir_2048ch_core_delay_bram_x7 is
   );
 end pfb_fir_2048ch_core_delay_bram_x7;
 architecture structural of pfb_fir_2048ch_core_delay_bram_x7 is 
+  signal clk_net : std_logic;
   signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal pol2_in1_delay_q_net : std_logic_vector( 16-1 downto 0 );
-  signal clk_net : std_logic;
   signal ce_net : std_logic;
   signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
 begin
   dout <= ram_data_out_net;
   pol2_in1_delay_q_net <= din;
@@ -4570,20 +4498,8 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.pfb_fir_2048ch_core_xlcounter_limit 
-  generic map (
-    cnt_15_0 => 2044,
-    cnt_31_16 => 0,
-    cnt_47_32 => 0,
-    cnt_63_48 => 0,
-    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_0",
-    count_limited => 1,
-    op_arith => xlUnsigned,
-    op_width => 11
-  )
+  counter : entity xil_defaultlib.sysgen_counter_8efc7f6f97 
   port map (
-    en => "1",
-    rst => "0",
     clr => '0',
     clk => clk_net,
     ce => ce_net,
@@ -4591,9 +4507,9 @@ begin
   );
   ram : entity xil_defaultlib.pfb_fir_2048ch_core_xlspram 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 16,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_4",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i4",
     latency => 2
   )
   port map (
@@ -4612,18 +4528,18 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_ri_to_c_x14 is
+entity pfb_fir_2048ch_core_ri_to_c_x13 is
   port (
     re : in std_logic_vector( 26-1 downto 0 );
     im : in std_logic_vector( 26-1 downto 0 );
     c : out std_logic_vector( 52-1 downto 0 )
   );
-end pfb_fir_2048ch_core_ri_to_c_x14;
-architecture structural of pfb_fir_2048ch_core_ri_to_c_x14 is 
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
+end pfb_fir_2048ch_core_ri_to_c_x13;
+architecture structural of pfb_fir_2048ch_core_ri_to_c_x13 is 
   signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
+  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
 begin
   c <= concat_y_net;
@@ -4674,19 +4590,19 @@ entity pfb_fir_2048ch_core_pol2_in1_first_tap is
 end pfb_fir_2048ch_core_pol2_in1_first_tap;
 architecture structural of pfb_fir_2048ch_core_pol2_in1_first_tap is 
   signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
+  signal pol2_in1_delay_q_net : std_logic_vector( 16-1 downto 0 );
+  signal register_q_net : std_logic_vector( 72-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
   signal slice1_y_net : std_logic_vector( 54-1 downto 0 );
   signal concat_y_net : std_logic_vector( 52-1 downto 0 );
-  signal pol2_in1_delay_q_net : std_logic_vector( 16-1 downto 0 );
-  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
-  signal register_q_net : std_logic_vector( 72-1 downto 0 );
+  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
   signal clk_net : std_logic;
   signal ce_net : std_logic;
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal slice_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= ram_data_out_net;
   coeff_out <= slice1_y_net;
@@ -4709,7 +4625,7 @@ begin
     ce_1 => ce_net,
     dout => ram_data_out_net
   );
-  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x14 
+  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x13 
   port map (
     re => mult1_p_net,
     im => mult_p_net,
@@ -4777,11 +4693,11 @@ entity pfb_fir_2048ch_core_c_to_ri_x10 is
   );
 end pfb_fir_2048ch_core_c_to_ri_x10;
 architecture structural of pfb_fir_2048ch_core_c_to_ri_x10 is 
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
   signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -4830,7 +4746,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_adder_tree1_x1 is
+entity pfb_fir_2048ch_core_adder_tree1_x0 is
   port (
     din1 : in std_logic_vector( 26-1 downto 0 );
     din2 : in std_logic_vector( 26-1 downto 0 );
@@ -4840,17 +4756,17 @@ entity pfb_fir_2048ch_core_adder_tree1_x1 is
     ce_1 : in std_logic;
     dout : out std_logic_vector( 26-1 downto 0 )
   );
-end pfb_fir_2048ch_core_adder_tree1_x1;
-architecture structural of pfb_fir_2048ch_core_adder_tree1_x1 is 
+end pfb_fir_2048ch_core_adder_tree1_x0;
+architecture structural of pfb_fir_2048ch_core_adder_tree1_x0 is 
   signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
-  signal reint0_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint1_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint2_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint3_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal addr1_s_net : std_logic_vector( 26-1 downto 0 );
   signal addr2_s_net : std_logic_vector( 26-1 downto 0 );
+  signal reint0_1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reint2_1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal clk_net : std_logic;
+  signal reint3_1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr1_s_net : std_logic_vector( 26-1 downto 0 );
+  signal ce_net : std_logic;
+  signal reint1_1_output_port_net : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= addr3_s_net;
   reint0_1_output_port_net <= din1;
@@ -4870,7 +4786,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -4901,7 +4817,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -4932,7 +4848,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -4958,7 +4874,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_adder_tree2_x0 is
+entity pfb_fir_2048ch_core_adder_tree2_x1 is
   port (
     din1 : in std_logic_vector( 26-1 downto 0 );
     din2 : in std_logic_vector( 26-1 downto 0 );
@@ -4968,17 +4884,17 @@ entity pfb_fir_2048ch_core_adder_tree2_x0 is
     ce_1 : in std_logic;
     dout : out std_logic_vector( 26-1 downto 0 )
   );
-end pfb_fir_2048ch_core_adder_tree2_x0;
-architecture structural of pfb_fir_2048ch_core_adder_tree2_x0 is 
-  signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
+end pfb_fir_2048ch_core_adder_tree2_x1;
+architecture structural of pfb_fir_2048ch_core_adder_tree2_x1 is 
+  signal ce_net : std_logic;
   signal reint0_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint1_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
+  signal addr2_s_net : std_logic_vector( 26-1 downto 0 );
   signal reint2_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reint1_2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reint3_2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal clk_net : std_logic;
-  signal ce_net : std_logic;
   signal addr1_s_net : std_logic_vector( 26-1 downto 0 );
-  signal addr2_s_net : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= addr3_s_net;
   reint0_2_output_port_net <= din1;
@@ -4998,7 +4914,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -5029,7 +4945,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -5060,7 +4976,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -5086,19 +5002,19 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_ri_to_c_x13 is
+entity pfb_fir_2048ch_core_ri_to_c_x15 is
   port (
     re : in std_logic_vector( 18-1 downto 0 );
     im : in std_logic_vector( 18-1 downto 0 );
     c : out std_logic_vector( 36-1 downto 0 )
   );
-end pfb_fir_2048ch_core_ri_to_c_x13;
-architecture structural of pfb_fir_2048ch_core_ri_to_c_x13 is 
-  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
+end pfb_fir_2048ch_core_ri_to_c_x15;
+architecture structural of pfb_fir_2048ch_core_ri_to_c_x15 is 
   signal convert1_dout_net : std_logic_vector( 18-1 downto 0 );
   signal convert2_dout_net : std_logic_vector( 18-1 downto 0 );
-  signal force_re_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 18-1 downto 0 );
 begin
   c <= concat_y_net;
   convert1_dout_net <= re;
@@ -5144,37 +5060,37 @@ entity pfb_fir_2048ch_core_pfb_add_tree_x1 is
 end pfb_fir_2048ch_core_pfb_add_tree_x1;
 architecture structural of pfb_fir_2048ch_core_pfb_add_tree_x1 is 
   signal concat_y_net : std_logic_vector( 36-1 downto 0 );
-  signal concat_y_net_x0 : std_logic_vector( 208-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
-  signal reint0_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint1_1_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reint2_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint3_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal addr3_s_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net_x0 : std_logic_vector( 208-1 downto 0 );
+  signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
+  signal ce_net : std_logic;
+  signal clk_net : std_logic;
   signal reint0_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reint3_1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reint1_1_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reint1_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint2_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint3_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal convert1_dout_net : std_logic_vector( 18-1 downto 0 );
-  signal convert2_dout_net : std_logic_vector( 18-1 downto 0 );
-  signal slice0_1_y_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reint0_1_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal slice0_2_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice1_1_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice1_2_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice2_1_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice2_2_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice3_1_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice3_2_y_net : std_logic_vector( 26-1 downto 0 );
+  signal convert2_dout_net : std_logic_vector( 18-1 downto 0 );
+  signal reint3_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reint2_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal convert1_dout_net : std_logic_vector( 18-1 downto 0 );
+  signal slice0_1_y_net : std_logic_vector( 26-1 downto 0 );
   signal scale1_op_net : std_logic_vector( 26-1 downto 0 );
+  signal slice1_1_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice3_2_y_net : std_logic_vector( 26-1 downto 0 );
   signal scale2_op_net : std_logic_vector( 26-1 downto 0 );
+  signal slice2_1_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice3_1_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice2_2_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice1_2_y_net : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= concat_y_net;
   concat_y_net_x0 <= din;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  adder_tree1 : entity xil_defaultlib.pfb_fir_2048ch_core_adder_tree1_x1 
+  adder_tree1 : entity xil_defaultlib.pfb_fir_2048ch_core_adder_tree1_x0 
   port map (
     din1 => reint0_1_output_port_net,
     din2 => reint1_1_output_port_net,
@@ -5184,7 +5100,7 @@ begin
     ce_1 => ce_net,
     dout => addr3_s_net
   );
-  adder_tree2 : entity xil_defaultlib.pfb_fir_2048ch_core_adder_tree2_x0 
+  adder_tree2 : entity xil_defaultlib.pfb_fir_2048ch_core_adder_tree2_x1 
   port map (
     din1 => reint0_2_output_port_net,
     din2 => reint1_2_output_port_net,
@@ -5194,7 +5110,7 @@ begin
     ce_1 => ce_net,
     dout => addr3_s_net_x0
   );
-  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x13 
+  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x15 
   port map (
     re => convert1_dout_net,
     im => convert2_dout_net,
@@ -5416,19 +5332,19 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_ri_to_c_x4 is
+entity pfb_fir_2048ch_core_ri_to_c_x7 is
   port (
     re : in std_logic_vector( 26-1 downto 0 );
     im : in std_logic_vector( 26-1 downto 0 );
     c : out std_logic_vector( 52-1 downto 0 )
   );
-end pfb_fir_2048ch_core_ri_to_c_x4;
-architecture structural of pfb_fir_2048ch_core_ri_to_c_x4 is 
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
+end pfb_fir_2048ch_core_ri_to_c_x7;
+architecture structural of pfb_fir_2048ch_core_ri_to_c_x7 is 
   signal mult_p_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
 begin
   c <= concat_y_net;
   mult1_p_net <= re;
@@ -5475,19 +5391,19 @@ entity pfb_fir_2048ch_core_pol2_in1_last_tap is
   );
 end pfb_fir_2048ch_core_pol2_in1_last_tap;
 architecture structural of pfb_fir_2048ch_core_pol2_in1_last_tap is 
-  signal concat_y_net_x0 : std_logic_vector( 36-1 downto 0 );
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
-  signal concat_y_net_x2 : std_logic_vector( 156-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
   signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 208-1 downto 0 );
-  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concat_y_net_x2 : std_logic_vector( 156-1 downto 0 );
+  signal concat_y_net_x0 : std_logic_vector( 36-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
+  signal ce_net : std_logic;
+  signal concat_y_net : std_logic_vector( 208-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
+  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
+  signal clk_net : std_logic;
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
 begin
   dout <= concat_y_net_x0;
   ram_data_out_net <= din;
@@ -5508,7 +5424,7 @@ begin
     ce_1 => ce_net,
     dout => concat_y_net_x0
   );
-  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x4 
+  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x7 
   port map (
     re => mult1_p_net,
     im => mult_p_net,
@@ -5555,19 +5471,19 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_c_to_ri_x2 is
+entity pfb_fir_2048ch_core_c_to_ri_x4 is
   port (
     c : in std_logic_vector( 16-1 downto 0 );
     re : out std_logic_vector( 8-1 downto 0 );
     im : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_2048ch_core_c_to_ri_x2;
-architecture structural of pfb_fir_2048ch_core_c_to_ri_x2 is 
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+end pfb_fir_2048ch_core_c_to_ri_x4;
+architecture structural of pfb_fir_2048ch_core_c_to_ri_x4 is 
   signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
   signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -5616,21 +5532,21 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_delay_bram_x1 is
+entity pfb_fir_2048ch_core_delay_bram_x3 is
   port (
     din : in std_logic_vector( 16-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 16-1 downto 0 )
   );
-end pfb_fir_2048ch_core_delay_bram_x1;
-architecture structural of pfb_fir_2048ch_core_delay_bram_x1 is 
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
+end pfb_fir_2048ch_core_delay_bram_x3;
+architecture structural of pfb_fir_2048ch_core_delay_bram_x3 is 
   signal clk_net : std_logic;
-  signal ce_net : std_logic;
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
   signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
+  signal ce_net : std_logic;
+  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
 begin
   dout <= ram_data_out_net;
   ram_data_out_net_x0 <= din;
@@ -5643,20 +5559,8 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.pfb_fir_2048ch_core_xlcounter_limit 
-  generic map (
-    cnt_15_0 => 2044,
-    cnt_31_16 => 0,
-    cnt_47_32 => 0,
-    cnt_63_48 => 0,
-    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_0",
-    count_limited => 1,
-    op_arith => xlUnsigned,
-    op_width => 11
-  )
+  counter : entity xil_defaultlib.sysgen_counter_8efc7f6f97 
   port map (
-    en => "1",
-    rst => "0",
     clr => '0',
     clk => clk_net,
     ce => ce_net,
@@ -5664,9 +5568,9 @@ begin
   );
   ram : entity xil_defaultlib.pfb_fir_2048ch_core_xlspram 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 16,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_4",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i4",
     latency => 2
   )
   port map (
@@ -5685,19 +5589,19 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_ri_to_c_x3 is
+entity pfb_fir_2048ch_core_ri_to_c_x6 is
   port (
     re : in std_logic_vector( 26-1 downto 0 );
     im : in std_logic_vector( 26-1 downto 0 );
     c : out std_logic_vector( 52-1 downto 0 )
   );
-end pfb_fir_2048ch_core_ri_to_c_x3;
-architecture structural of pfb_fir_2048ch_core_ri_to_c_x3 is 
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
+end pfb_fir_2048ch_core_ri_to_c_x6;
+architecture structural of pfb_fir_2048ch_core_ri_to_c_x6 is 
   signal mult_p_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
 begin
   c <= concat_y_net;
   mult1_p_net <= re;
@@ -5746,21 +5650,21 @@ entity pfb_fir_2048ch_core_pol2_in1_tap2 is
   );
 end pfb_fir_2048ch_core_pol2_in1_tap2;
 architecture structural of pfb_fir_2048ch_core_pol2_in1_tap2 is 
-  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net_x0 : std_logic_vector( 36-1 downto 0 );
-  signal concat_y_net_x0 : std_logic_vector( 104-1 downto 0 );
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 54-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
   signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
+  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
+  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
+  signal concat_y_net_x0 : std_logic_vector( 104-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal clk_net : std_logic;
+  signal slice1_y_net : std_logic_vector( 54-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
   signal slice_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice1_y_net_x0 : std_logic_vector( 36-1 downto 0 );
+  signal ce_net : std_logic;
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
 begin
   dout <= ram_data_out_net_x0;
   coeff_out <= slice1_y_net_x0;
@@ -5770,20 +5674,20 @@ begin
   concat_y_net <= taps;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  c_to_ri : entity xil_defaultlib.pfb_fir_2048ch_core_c_to_ri_x2 
+  c_to_ri : entity xil_defaultlib.pfb_fir_2048ch_core_c_to_ri_x4 
   port map (
     c => ram_data_out_net,
     re => force_re_output_port_net,
     im => force_im_output_port_net
   );
-  delay_bram : entity xil_defaultlib.pfb_fir_2048ch_core_delay_bram_x1 
+  delay_bram : entity xil_defaultlib.pfb_fir_2048ch_core_delay_bram_x3 
   port map (
     din => ram_data_out_net,
     clk_1 => clk_net,
     ce_1 => ce_net,
     dout => ram_data_out_net_x0
   );
-  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x3 
+  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x6 
   port map (
     re => mult1_p_net,
     im => mult_p_net,
@@ -5852,19 +5756,19 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_c_to_ri_x1 is
+entity pfb_fir_2048ch_core_c_to_ri_x3 is
   port (
     c : in std_logic_vector( 16-1 downto 0 );
     re : out std_logic_vector( 8-1 downto 0 );
     im : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_2048ch_core_c_to_ri_x1;
-architecture structural of pfb_fir_2048ch_core_c_to_ri_x1 is 
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+end pfb_fir_2048ch_core_c_to_ri_x3;
+architecture structural of pfb_fir_2048ch_core_c_to_ri_x3 is 
+  signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -5913,21 +5817,21 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_delay_bram_x0 is
+entity pfb_fir_2048ch_core_delay_bram_x2 is
   port (
     din : in std_logic_vector( 16-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 16-1 downto 0 )
   );
-end pfb_fir_2048ch_core_delay_bram_x0;
-architecture structural of pfb_fir_2048ch_core_delay_bram_x0 is 
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
+end pfb_fir_2048ch_core_delay_bram_x2;
+architecture structural of pfb_fir_2048ch_core_delay_bram_x2 is 
   signal clk_net : std_logic;
-  signal ce_net : std_logic;
   signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
+  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
+  signal ce_net : std_logic;
 begin
   dout <= ram_data_out_net;
   ram_data_out_net_x0 <= din;
@@ -5940,20 +5844,8 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.pfb_fir_2048ch_core_xlcounter_limit 
-  generic map (
-    cnt_15_0 => 2044,
-    cnt_31_16 => 0,
-    cnt_47_32 => 0,
-    cnt_63_48 => 0,
-    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_0",
-    count_limited => 1,
-    op_arith => xlUnsigned,
-    op_width => 11
-  )
+  counter : entity xil_defaultlib.sysgen_counter_8efc7f6f97 
   port map (
-    en => "1",
-    rst => "0",
     clr => '0',
     clk => clk_net,
     ce => ce_net,
@@ -5961,9 +5853,9 @@ begin
   );
   ram : entity xil_defaultlib.pfb_fir_2048ch_core_xlspram 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 16,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_4",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i4",
     latency => 2
   )
   port map (
@@ -5982,19 +5874,19 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_ri_to_c_x2 is
+entity pfb_fir_2048ch_core_ri_to_c_x5 is
   port (
     re : in std_logic_vector( 26-1 downto 0 );
     im : in std_logic_vector( 26-1 downto 0 );
     c : out std_logic_vector( 52-1 downto 0 )
   );
-end pfb_fir_2048ch_core_ri_to_c_x2;
-architecture structural of pfb_fir_2048ch_core_ri_to_c_x2 is 
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
+end pfb_fir_2048ch_core_ri_to_c_x5;
+architecture structural of pfb_fir_2048ch_core_ri_to_c_x5 is 
   signal mult_p_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
 begin
   c <= concat_y_net;
   mult1_p_net <= re;
@@ -6043,21 +5935,21 @@ entity pfb_fir_2048ch_core_pol2_in1_tap3 is
   );
 end pfb_fir_2048ch_core_pol2_in1_tap3;
 architecture structural of pfb_fir_2048ch_core_pol2_in1_tap3 is 
-  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal concat_y_net_x0 : std_logic_vector( 156-1 downto 0 );
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 36-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 104-1 downto 0 );
-  signal clk_net : std_logic;
   signal ce_net : std_logic;
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
+  signal concat_y_net_x0 : std_logic_vector( 156-1 downto 0 );
   signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 104-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal slice_y_net : std_logic_vector( 18-1 downto 0 );
+  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 36-1 downto 0 );
+  signal slice1_y_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal clk_net : std_logic;
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
+  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= ram_data_out_net_x0;
   coeff_out <= slice1_y_net_x0;
@@ -6067,20 +5959,20 @@ begin
   concat_y_net <= taps;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  c_to_ri : entity xil_defaultlib.pfb_fir_2048ch_core_c_to_ri_x1 
+  c_to_ri : entity xil_defaultlib.pfb_fir_2048ch_core_c_to_ri_x3 
   port map (
     c => ram_data_out_net,
     re => force_re_output_port_net,
     im => force_im_output_port_net
   );
-  delay_bram : entity xil_defaultlib.pfb_fir_2048ch_core_delay_bram_x0 
+  delay_bram : entity xil_defaultlib.pfb_fir_2048ch_core_delay_bram_x2 
   port map (
     din => ram_data_out_net,
     clk_1 => clk_net,
     ce_1 => ce_net,
     dout => ram_data_out_net_x0
   );
-  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x2 
+  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x5 
   port map (
     re => mult1_p_net,
     im => mult_p_net,
@@ -6149,19 +6041,19 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_c_to_ri_x0 is
+entity pfb_fir_2048ch_core_c_to_ri_x2 is
   port (
     c : in std_logic_vector( 16-1 downto 0 );
     re : out std_logic_vector( 8-1 downto 0 );
     im : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_2048ch_core_c_to_ri_x0;
-architecture structural of pfb_fir_2048ch_core_c_to_ri_x0 is 
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal pol2_in2_delay_q_net : std_logic_vector( 16-1 downto 0 );
-  signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
+end pfb_fir_2048ch_core_c_to_ri_x2;
+architecture structural of pfb_fir_2048ch_core_c_to_ri_x2 is 
   signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal pol2_in2_delay_q_net : std_logic_vector( 16-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -6210,21 +6102,21 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_delay_bram is
+entity pfb_fir_2048ch_core_delay_bram_x1 is
   port (
     din : in std_logic_vector( 16-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 16-1 downto 0 )
   );
-end pfb_fir_2048ch_core_delay_bram;
-architecture structural of pfb_fir_2048ch_core_delay_bram is 
+end pfb_fir_2048ch_core_delay_bram_x1;
+architecture structural of pfb_fir_2048ch_core_delay_bram_x1 is 
   signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal pol2_in2_delay_q_net : std_logic_vector( 16-1 downto 0 );
-  signal clk_net : std_logic;
   signal ce_net : std_logic;
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
+  signal clk_net : std_logic;
   signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
+  signal pol2_in2_delay_q_net : std_logic_vector( 16-1 downto 0 );
 begin
   dout <= ram_data_out_net;
   pol2_in2_delay_q_net <= din;
@@ -6237,20 +6129,8 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.pfb_fir_2048ch_core_xlcounter_limit 
-  generic map (
-    cnt_15_0 => 2044,
-    cnt_31_16 => 0,
-    cnt_47_32 => 0,
-    cnt_63_48 => 0,
-    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_0",
-    count_limited => 1,
-    op_arith => xlUnsigned,
-    op_width => 11
-  )
+  counter : entity xil_defaultlib.sysgen_counter_8efc7f6f97 
   port map (
-    en => "1",
-    rst => "0",
     clr => '0',
     clk => clk_net,
     ce => ce_net,
@@ -6258,9 +6138,9 @@ begin
   );
   ram : entity xil_defaultlib.pfb_fir_2048ch_core_xlspram 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 16,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_4",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i4",
     latency => 2
   )
   port map (
@@ -6279,19 +6159,19 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_ri_to_c_x0 is
+entity pfb_fir_2048ch_core_ri_to_c_x1 is
   port (
     re : in std_logic_vector( 26-1 downto 0 );
     im : in std_logic_vector( 26-1 downto 0 );
     c : out std_logic_vector( 52-1 downto 0 )
   );
-end pfb_fir_2048ch_core_ri_to_c_x0;
-architecture structural of pfb_fir_2048ch_core_ri_to_c_x0 is 
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
+end pfb_fir_2048ch_core_ri_to_c_x1;
+architecture structural of pfb_fir_2048ch_core_ri_to_c_x1 is 
   signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
 begin
   c <= concat_y_net;
   mult1_p_net <= re;
@@ -6340,20 +6220,20 @@ entity pfb_fir_2048ch_core_pol2_in2_first_tap is
   );
 end pfb_fir_2048ch_core_pol2_in2_first_tap;
 architecture structural of pfb_fir_2048ch_core_pol2_in2_first_tap is 
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 54-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
+  signal slice_y_net : std_logic_vector( 18-1 downto 0 );
   signal concat_y_net : std_logic_vector( 52-1 downto 0 );
-  signal pol2_in2_delay_q_net : std_logic_vector( 16-1 downto 0 );
-  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
-  signal register_q_net : std_logic_vector( 72-1 downto 0 );
-  signal clk_net : std_logic;
+  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
   signal ce_net : std_logic;
   signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal pol2_in2_delay_q_net : std_logic_vector( 16-1 downto 0 );
+  signal delay_q_net : std_logic_vector( 1-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 54-1 downto 0 );
+  signal register_q_net : std_logic_vector( 72-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
+  signal clk_net : std_logic;
   signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice_y_net : std_logic_vector( 18-1 downto 0 );
 begin
   dout <= ram_data_out_net;
   coeff_out <= slice1_y_net;
@@ -6363,20 +6243,20 @@ begin
   register_q_net <= coeffs;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  c_to_ri : entity xil_defaultlib.pfb_fir_2048ch_core_c_to_ri_x0 
+  c_to_ri : entity xil_defaultlib.pfb_fir_2048ch_core_c_to_ri_x2 
   port map (
     c => pol2_in2_delay_q_net,
     re => force_re_output_port_net,
     im => force_im_output_port_net
   );
-  delay_bram : entity xil_defaultlib.pfb_fir_2048ch_core_delay_bram 
+  delay_bram : entity xil_defaultlib.pfb_fir_2048ch_core_delay_bram_x1 
   port map (
     din => pol2_in2_delay_q_net,
     clk_1 => clk_net,
     ce_1 => ce_net,
     dout => ram_data_out_net
   );
-  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x0 
+  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x1 
   port map (
     re => mult1_p_net,
     im => mult_p_net,
@@ -6444,11 +6324,11 @@ entity pfb_fir_2048ch_core_c_to_ri is
   );
 end pfb_fir_2048ch_core_c_to_ri;
 architecture structural of pfb_fir_2048ch_core_c_to_ri is 
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
   signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -6509,14 +6389,14 @@ entity pfb_fir_2048ch_core_adder_tree1 is
   );
 end pfb_fir_2048ch_core_adder_tree1;
 architecture structural of pfb_fir_2048ch_core_adder_tree1 is 
-  signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
   signal reint0_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint1_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint2_1_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reint3_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal clk_net : std_logic;
   signal ce_net : std_logic;
+  signal clk_net : std_logic;
+  signal reint2_1_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal addr1_s_net : std_logic_vector( 26-1 downto 0 );
+  signal reint1_1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
   signal addr2_s_net : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= addr3_s_net;
@@ -6537,7 +6417,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -6568,7 +6448,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -6599,7 +6479,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -6637,15 +6517,15 @@ entity pfb_fir_2048ch_core_adder_tree2 is
   );
 end pfb_fir_2048ch_core_adder_tree2;
 architecture structural of pfb_fir_2048ch_core_adder_tree2 is 
-  signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
-  signal reint0_2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reint1_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint2_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint3_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
   signal addr1_s_net : std_logic_vector( 26-1 downto 0 );
+  signal reint3_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reint0_2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal addr2_s_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
+  signal ce_net : std_logic;
+  signal reint2_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal clk_net : std_logic;
 begin
   dout <= addr3_s_net;
   reint0_2_output_port_net <= din1;
@@ -6665,7 +6545,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -6696,7 +6576,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -6727,7 +6607,7 @@ begin
     c_has_c_out => 0,
     c_latency => 1,
     c_output_width => 27,
-    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_0",
+    core_name0 => "pfb_fir_2048ch_core_c_addsub_v12_0_i0",
     extra_registers => 1,
     full_s_arith => 2,
     full_s_width => 27,
@@ -6763,9 +6643,9 @@ end pfb_fir_2048ch_core_ri_to_c;
 architecture structural of pfb_fir_2048ch_core_ri_to_c is 
   signal concat_y_net : std_logic_vector( 36-1 downto 0 );
   signal convert1_dout_net : std_logic_vector( 18-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal convert2_dout_net : std_logic_vector( 18-1 downto 0 );
   signal force_re_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 18-1 downto 0 );
 begin
   c <= concat_y_net;
   convert1_dout_net <= re;
@@ -6810,32 +6690,32 @@ entity pfb_fir_2048ch_core_pfb_add_tree is
   );
 end pfb_fir_2048ch_core_pfb_add_tree;
 architecture structural of pfb_fir_2048ch_core_pfb_add_tree is 
-  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
-  signal concat_y_net_x0 : std_logic_vector( 208-1 downto 0 );
   signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
-  signal reint0_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint1_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint2_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint3_1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal addr3_s_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal reint0_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint1_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reint2_2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reint3_2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal convert1_dout_net : std_logic_vector( 18-1 downto 0 );
-  signal convert2_dout_net : std_logic_vector( 18-1 downto 0 );
-  signal slice0_1_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice0_2_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice1_1_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice1_2_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice2_1_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice2_2_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice3_1_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice3_2_y_net : std_logic_vector( 26-1 downto 0 );
   signal scale1_op_net : std_logic_vector( 26-1 downto 0 );
+  signal convert2_dout_net : std_logic_vector( 18-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 36-1 downto 0 );
+  signal reint2_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net_x0 : std_logic_vector( 208-1 downto 0 );
+  signal slice0_1_y_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal slice3_2_y_net : std_logic_vector( 26-1 downto 0 );
+  signal reint1_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal slice1_2_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice2_2_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice1_1_y_net : std_logic_vector( 26-1 downto 0 );
+  signal reint0_1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
+  signal reint1_1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal slice3_1_y_net : std_logic_vector( 26-1 downto 0 );
   signal scale2_op_net : std_logic_vector( 26-1 downto 0 );
+  signal reint0_2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal convert1_dout_net : std_logic_vector( 18-1 downto 0 );
+  signal slice0_2_y_net : std_logic_vector( 26-1 downto 0 );
+  signal reint3_1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reint2_1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal ce_net : std_logic;
+  signal slice2_1_y_net : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= concat_y_net;
   concat_y_net_x0 <= din;
@@ -7083,19 +6963,19 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_ri_to_c_x1 is
+entity pfb_fir_2048ch_core_ri_to_c_x0 is
   port (
     re : in std_logic_vector( 26-1 downto 0 );
     im : in std_logic_vector( 26-1 downto 0 );
     c : out std_logic_vector( 52-1 downto 0 )
   );
-end pfb_fir_2048ch_core_ri_to_c_x1;
-architecture structural of pfb_fir_2048ch_core_ri_to_c_x1 is 
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
+end pfb_fir_2048ch_core_ri_to_c_x0;
+architecture structural of pfb_fir_2048ch_core_ri_to_c_x0 is 
   signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
+  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
 begin
   c <= concat_y_net;
   mult1_p_net <= re;
@@ -7142,19 +7022,19 @@ entity pfb_fir_2048ch_core_pol2_in2_last_tap is
   );
 end pfb_fir_2048ch_core_pol2_in2_last_tap;
 architecture structural of pfb_fir_2048ch_core_pol2_in2_last_tap is 
+  signal clk_net : std_logic;
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 208-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal ce_net : std_logic;
+  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
   signal concat_y_net_x0 : std_logic_vector( 36-1 downto 0 );
   signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
   signal concat_y_net_x2 : std_logic_vector( 156-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 208-1 downto 0 );
-  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
   signal mult_p_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
 begin
   dout <= concat_y_net_x0;
   ram_data_out_net <= din;
@@ -7175,7 +7055,7 @@ begin
     ce_1 => ce_net,
     dout => concat_y_net_x0
   );
-  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x1 
+  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x0 
   port map (
     re => mult1_p_net,
     im => mult_p_net,
@@ -7222,19 +7102,19 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_c_to_ri_x4 is
+entity pfb_fir_2048ch_core_c_to_ri_x0 is
   port (
     c : in std_logic_vector( 16-1 downto 0 );
     re : out std_logic_vector( 8-1 downto 0 );
     im : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_2048ch_core_c_to_ri_x4;
-architecture structural of pfb_fir_2048ch_core_c_to_ri_x4 is 
+end pfb_fir_2048ch_core_c_to_ri_x0;
+architecture structural of pfb_fir_2048ch_core_c_to_ri_x0 is 
   signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
   signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -7283,21 +7163,21 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_delay_bram_x3 is
+entity pfb_fir_2048ch_core_delay_bram is
   port (
     din : in std_logic_vector( 16-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 16-1 downto 0 )
   );
-end pfb_fir_2048ch_core_delay_bram_x3;
-architecture structural of pfb_fir_2048ch_core_delay_bram_x3 is 
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
+end pfb_fir_2048ch_core_delay_bram;
+architecture structural of pfb_fir_2048ch_core_delay_bram is 
+  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
   signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
   signal clk_net : std_logic;
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
   signal ce_net : std_logic;
-  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
 begin
   dout <= ram_data_out_net;
   ram_data_out_net_x0 <= din;
@@ -7310,20 +7190,8 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.pfb_fir_2048ch_core_xlcounter_limit 
-  generic map (
-    cnt_15_0 => 2044,
-    cnt_31_16 => 0,
-    cnt_47_32 => 0,
-    cnt_63_48 => 0,
-    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_0",
-    count_limited => 1,
-    op_arith => xlUnsigned,
-    op_width => 11
-  )
+  counter : entity xil_defaultlib.sysgen_counter_8efc7f6f97 
   port map (
-    en => "1",
-    rst => "0",
     clr => '0',
     clk => clk_net,
     ce => ce_net,
@@ -7331,9 +7199,9 @@ begin
   );
   ram : entity xil_defaultlib.pfb_fir_2048ch_core_xlspram 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 16,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_4",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i4",
     latency => 2
   )
   port map (
@@ -7352,19 +7220,19 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_ri_to_c_x7 is
+entity pfb_fir_2048ch_core_ri_to_c_x2 is
   port (
     re : in std_logic_vector( 26-1 downto 0 );
     im : in std_logic_vector( 26-1 downto 0 );
     c : out std_logic_vector( 52-1 downto 0 )
   );
-end pfb_fir_2048ch_core_ri_to_c_x7;
-architecture structural of pfb_fir_2048ch_core_ri_to_c_x7 is 
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
+end pfb_fir_2048ch_core_ri_to_c_x2;
+architecture structural of pfb_fir_2048ch_core_ri_to_c_x2 is 
   signal mult_p_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
 begin
   c <= concat_y_net;
   mult1_p_net <= re;
@@ -7413,21 +7281,21 @@ entity pfb_fir_2048ch_core_pol2_in2_tap2 is
   );
 end pfb_fir_2048ch_core_pol2_in2_tap2;
 architecture structural of pfb_fir_2048ch_core_pol2_in2_tap2 is 
-  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net_x0 : std_logic_vector( 36-1 downto 0 );
   signal concat_y_net_x0 : std_logic_vector( 104-1 downto 0 );
   signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 54-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
   signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
   signal mult_p_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
+  signal slice1_y_net_x0 : std_logic_vector( 36-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
+  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 54-1 downto 0 );
+  signal clk_net : std_logic;
+  signal ce_net : std_logic;
   signal slice_y_net : std_logic_vector( 18-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= ram_data_out_net_x0;
   coeff_out <= slice1_y_net_x0;
@@ -7437,20 +7305,20 @@ begin
   concat_y_net <= taps;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  c_to_ri : entity xil_defaultlib.pfb_fir_2048ch_core_c_to_ri_x4 
+  c_to_ri : entity xil_defaultlib.pfb_fir_2048ch_core_c_to_ri_x0 
   port map (
     c => ram_data_out_net,
     re => force_re_output_port_net,
     im => force_im_output_port_net
   );
-  delay_bram : entity xil_defaultlib.pfb_fir_2048ch_core_delay_bram_x3 
+  delay_bram : entity xil_defaultlib.pfb_fir_2048ch_core_delay_bram 
   port map (
     din => ram_data_out_net,
     clk_1 => clk_net,
     ce_1 => ce_net,
     dout => ram_data_out_net_x0
   );
-  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x7 
+  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x2 
   port map (
     re => mult1_p_net,
     im => mult_p_net,
@@ -7519,19 +7387,19 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_c_to_ri_x3 is
+entity pfb_fir_2048ch_core_c_to_ri_x1 is
   port (
     c : in std_logic_vector( 16-1 downto 0 );
     re : out std_logic_vector( 8-1 downto 0 );
     im : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_2048ch_core_c_to_ri_x3;
-architecture structural of pfb_fir_2048ch_core_c_to_ri_x3 is 
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+end pfb_fir_2048ch_core_c_to_ri_x1;
+architecture structural of pfb_fir_2048ch_core_c_to_ri_x1 is 
   signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal slice_im_y_net : std_logic_vector( 8-1 downto 0 );
   signal slice_re_y_net : std_logic_vector( 8-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
 begin
   re <= force_re_output_port_net;
   im <= force_im_output_port_net;
@@ -7580,21 +7448,21 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_delay_bram_x2 is
+entity pfb_fir_2048ch_core_delay_bram_x0 is
   port (
     din : in std_logic_vector( 16-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 16-1 downto 0 )
   );
-end pfb_fir_2048ch_core_delay_bram_x2;
-architecture structural of pfb_fir_2048ch_core_delay_bram_x2 is 
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
-  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
-  signal clk_net : std_logic;
+end pfb_fir_2048ch_core_delay_bram_x0;
+architecture structural of pfb_fir_2048ch_core_delay_bram_x0 is 
   signal ce_net : std_logic;
+  signal clk_net : std_logic;
   signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
+  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
 begin
   dout <= ram_data_out_net;
   ram_data_out_net_x0 <= din;
@@ -7607,20 +7475,8 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.pfb_fir_2048ch_core_xlcounter_limit 
-  generic map (
-    cnt_15_0 => 2044,
-    cnt_31_16 => 0,
-    cnt_47_32 => 0,
-    cnt_63_48 => 0,
-    core_name0 => "pfb_fir_2048ch_core_c_counter_binary_v12_0_0",
-    count_limited => 1,
-    op_arith => xlUnsigned,
-    op_width => 11
-  )
+  counter : entity xil_defaultlib.sysgen_counter_8efc7f6f97 
   port map (
-    en => "1",
-    rst => "0",
     clr => '0',
     clk => clk_net,
     ce => ce_net,
@@ -7628,9 +7484,9 @@ begin
   );
   ram : entity xil_defaultlib.pfb_fir_2048ch_core_xlspram 
   generic map (
-    c_address_width => 11,
+    c_address_width => 13,
     c_width => 16,
-    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_2_4",
+    core_name0 => "pfb_fir_2048ch_core_blk_mem_gen_v8_3_i4",
     latency => 2
   )
   port map (
@@ -7649,19 +7505,19 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_ri_to_c_x6 is
+entity pfb_fir_2048ch_core_ri_to_c_x3 is
   port (
     re : in std_logic_vector( 26-1 downto 0 );
     im : in std_logic_vector( 26-1 downto 0 );
     c : out std_logic_vector( 52-1 downto 0 )
   );
-end pfb_fir_2048ch_core_ri_to_c_x6;
-architecture structural of pfb_fir_2048ch_core_ri_to_c_x6 is 
-  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
+end pfb_fir_2048ch_core_ri_to_c_x3;
+architecture structural of pfb_fir_2048ch_core_ri_to_c_x3 is 
+  signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
   signal mult_p_net : std_logic_vector( 26-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 52-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
 begin
   c <= concat_y_net;
   mult1_p_net <= re;
@@ -7710,20 +7566,20 @@ entity pfb_fir_2048ch_core_pol2_in2_tap3 is
   );
 end pfb_fir_2048ch_core_pol2_in2_tap3;
 architecture structural of pfb_fir_2048ch_core_pol2_in2_tap3 is 
-  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal concat_y_net_x0 : std_logic_vector( 156-1 downto 0 );
-  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal slice1_y_net : std_logic_vector( 36-1 downto 0 );
   signal concat_y_net : std_logic_vector( 104-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
+  signal ce_net : std_logic;
+  signal clk_net : std_logic;
   signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concat_y_net_x0 : std_logic_vector( 156-1 downto 0 );
+  signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
+  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
+  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
+  signal slice1_y_net_x0 : std_logic_vector( 18-1 downto 0 );
   signal slice_y_net : std_logic_vector( 18-1 downto 0 );
 begin
   dout <= ram_data_out_net_x0;
@@ -7734,20 +7590,20 @@ begin
   concat_y_net <= taps;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  c_to_ri : entity xil_defaultlib.pfb_fir_2048ch_core_c_to_ri_x3 
+  c_to_ri : entity xil_defaultlib.pfb_fir_2048ch_core_c_to_ri_x1 
   port map (
     c => ram_data_out_net,
     re => force_re_output_port_net,
     im => force_im_output_port_net
   );
-  delay_bram : entity xil_defaultlib.pfb_fir_2048ch_core_delay_bram_x2 
+  delay_bram : entity xil_defaultlib.pfb_fir_2048ch_core_delay_bram_x0 
   port map (
     din => ram_data_out_net,
     clk_1 => clk_net,
     ce_1 => ce_net,
     dout => ram_data_out_net_x0
   );
-  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x6 
+  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x3 
   port map (
     re => mult1_p_net,
     im => mult_p_net,
@@ -7833,64 +7689,64 @@ entity pfb_fir_2048ch_core_pfb_fir is
   );
 end pfb_fir_2048ch_core_pfb_fir;
 architecture structural of pfb_fir_2048ch_core_pfb_fir is 
+  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
+  signal concat_y_net_x15 : std_logic_vector( 36-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 1-1 downto 0 );
   signal concat_y_net_x0 : std_logic_vector( 36-1 downto 0 );
-  signal concat_y_net_x15 : std_logic_vector( 36-1 downto 0 );
-  signal concat_y_net_x8 : std_logic_vector( 36-1 downto 0 );
-  signal concat_y_net_x12 : std_logic_vector( 36-1 downto 0 );
-  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 36-1 downto 0 );
   signal concat_y_net_x4 : std_logic_vector( 16-1 downto 0 );
   signal concat_y_net_x6 : std_logic_vector( 16-1 downto 0 );
   signal concat_y_net_x5 : std_logic_vector( 16-1 downto 0 );
   signal concat_y_net_x7 : std_logic_vector( 16-1 downto 0 );
+  signal delay1_q_net_x1 : std_logic_vector( 16-1 downto 0 );
   signal clk_net : std_logic;
   signal ce_net : std_logic;
-  signal delay1_q_net_x1 : std_logic_vector( 16-1 downto 0 );
-  signal delay_q_net_x0 : std_logic_vector( 1-1 downto 0 );
-  signal register_q_net : std_logic_vector( 72-1 downto 0 );
   signal ram_data_out_net : std_logic_vector( 16-1 downto 0 );
   signal mux_y_net_x0 : std_logic_vector( 1-1 downto 0 );
-  signal slice1_y_net_x1 : std_logic_vector( 54-1 downto 0 );
-  signal concat_y_net_x1 : std_logic_vector( 52-1 downto 0 );
-  signal ram_data_out_net_x1 : std_logic_vector( 16-1 downto 0 );
-  signal mux_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice1_y_net_x0 : std_logic_vector( 18-1 downto 0 );
   signal concat_y_net_x2 : std_logic_vector( 156-1 downto 0 );
-  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
-  signal mux_y_net_x1 : std_logic_vector( 1-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 36-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 104-1 downto 0 );
+  signal concat_y_net_x12 : std_logic_vector( 36-1 downto 0 );
+  signal slice1_y_net_x1 : std_logic_vector( 54-1 downto 0 );
+  signal concat_y_net_x17 : std_logic_vector( 156-1 downto 0 );
+  signal concat_y_net_x3 : std_logic_vector( 156-1 downto 0 );
+  signal concat_y_net_x13 : std_logic_vector( 104-1 downto 0 );
+  signal ram_data_out_net_x6 : std_logic_vector( 16-1 downto 0 );
+  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
+  signal concat_y_net_x8 : std_logic_vector( 36-1 downto 0 );
+  signal ram_data_out_net_x5 : std_logic_vector( 16-1 downto 0 );
+  signal concat_y_net_x11 : std_logic_vector( 52-1 downto 0 );
+  signal slice1_y_net_x10 : std_logic_vector( 54-1 downto 0 );
+  signal slice1_y_net_x4 : std_logic_vector( 18-1 downto 0 );
+  signal pol2_in2_delay_q_net : std_logic_vector( 16-1 downto 0 );
+  signal pol2_in1_delay_q_net : std_logic_vector( 16-1 downto 0 );
+  signal delay_q_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice1_y_net_x5 : std_logic_vector( 54-1 downto 0 );
+  signal concat_y_net_x9 : std_logic_vector( 104-1 downto 0 );
+  signal ram_data_out_net_x2 : std_logic_vector( 16-1 downto 0 );
+  signal slice1_y_net_x7 : std_logic_vector( 54-1 downto 0 );
+  signal ram_data_out_net_x1 : std_logic_vector( 16-1 downto 0 );
+  signal ram_data_out_net_x8 : std_logic_vector( 16-1 downto 0 );
   signal delay1_q_net_x0 : std_logic_vector( 16-1 downto 0 );
+  signal ram_data_out_net_x10 : std_logic_vector( 16-1 downto 0 );
+  signal ram_data_out_net_x4 : std_logic_vector( 16-1 downto 0 );
+  signal slice1_y_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal ram_data_out_net_x0 : std_logic_vector( 16-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 104-1 downto 0 );
+  signal slice1_y_net_x3 : std_logic_vector( 36-1 downto 0 );
+  signal mux_y_net : std_logic_vector( 1-1 downto 0 );
+  signal concat_y_net_x16 : std_logic_vector( 104-1 downto 0 );
+  signal slice1_y_net_x2 : std_logic_vector( 18-1 downto 0 );
   signal register_q_net_x0 : std_logic_vector( 72-1 downto 0 );
   signal ram_data_out_net_x7 : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net_x7 : std_logic_vector( 54-1 downto 0 );
-  signal concat_y_net_x14 : std_logic_vector( 52-1 downto 0 );
-  signal ram_data_out_net_x9 : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net_x9 : std_logic_vector( 18-1 downto 0 );
-  signal concat_y_net_x17 : std_logic_vector( 156-1 downto 0 );
-  signal ram_data_out_net_x8 : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net_x8 : std_logic_vector( 36-1 downto 0 );
-  signal concat_y_net_x16 : std_logic_vector( 104-1 downto 0 );
-  signal ram_data_out_net_x10 : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net_x10 : std_logic_vector( 54-1 downto 0 );
-  signal concat_y_net_x18 : std_logic_vector( 52-1 downto 0 );
-  signal pol2_in1_delay_q_net : std_logic_vector( 16-1 downto 0 );
-  signal ram_data_out_net_x4 : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net_x4 : std_logic_vector( 18-1 downto 0 );
   signal concat_y_net_x10 : std_logic_vector( 156-1 downto 0 );
+  signal register_q_net : std_logic_vector( 72-1 downto 0 );
   signal ram_data_out_net_x3 : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net_x3 : std_logic_vector( 36-1 downto 0 );
-  signal concat_y_net_x9 : std_logic_vector( 104-1 downto 0 );
-  signal ram_data_out_net_x5 : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net_x5 : std_logic_vector( 54-1 downto 0 );
-  signal concat_y_net_x11 : std_logic_vector( 52-1 downto 0 );
-  signal pol2_in2_delay_q_net : std_logic_vector( 16-1 downto 0 );
-  signal ram_data_out_net_x2 : std_logic_vector( 16-1 downto 0 );
-  signal slice1_y_net_x2 : std_logic_vector( 18-1 downto 0 );
-  signal concat_y_net_x3 : std_logic_vector( 156-1 downto 0 );
-  signal ram_data_out_net_x6 : std_logic_vector( 16-1 downto 0 );
+  signal ram_data_out_net_x9 : std_logic_vector( 16-1 downto 0 );
+  signal concat_y_net_x14 : std_logic_vector( 52-1 downto 0 );
   signal slice1_y_net_x6 : std_logic_vector( 36-1 downto 0 );
-  signal concat_y_net_x13 : std_logic_vector( 104-1 downto 0 );
+  signal slice1_y_net_x9 : std_logic_vector( 18-1 downto 0 );
+  signal mux_y_net_x1 : std_logic_vector( 1-1 downto 0 );
+  signal slice1_y_net_x8 : std_logic_vector( 36-1 downto 0 );
+  signal concat_y_net_x18 : std_logic_vector( 52-1 downto 0 );
 begin
   sync_out <= delay1_q_net;
   pol1_out1 <= concat_y_net_x0;
@@ -8134,19 +7990,19 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_core_ri_to_c_x5 is
+entity pfb_fir_2048ch_core_ri_to_c_x4 is
   port (
     re : in std_logic_vector( 8-1 downto 0 );
     im : in std_logic_vector( 8-1 downto 0 );
     c : out std_logic_vector( 16-1 downto 0 )
   );
-end pfb_fir_2048ch_core_ri_to_c_x5;
-architecture structural of pfb_fir_2048ch_core_ri_to_c_x5 is 
-  signal concat_y_net : std_logic_vector( 16-1 downto 0 );
+end pfb_fir_2048ch_core_ri_to_c_x4;
+architecture structural of pfb_fir_2048ch_core_ri_to_c_x4 is 
   signal pol0_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal pol1_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal pol1_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 16-1 downto 0 );
 begin
   c <= concat_y_net;
   pol0_in0_net <= re;
@@ -8190,11 +8046,11 @@ entity pfb_fir_2048ch_core_ri_to_c1 is
   );
 end pfb_fir_2048ch_core_ri_to_c1;
 architecture structural of pfb_fir_2048ch_core_ri_to_c1 is 
-  signal concat_y_net : std_logic_vector( 16-1 downto 0 );
-  signal pol2_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal pol3_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal pol3_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal pol2_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 16-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
 begin
   c <= concat_y_net;
   pol2_in0_net <= re;
@@ -8238,11 +8094,11 @@ entity pfb_fir_2048ch_core_ri_to_c2 is
   );
 end pfb_fir_2048ch_core_ri_to_c2;
 architecture structural of pfb_fir_2048ch_core_ri_to_c2 is 
-  signal concat_y_net : std_logic_vector( 16-1 downto 0 );
-  signal pol0_in1_net : std_logic_vector( 8-1 downto 0 );
   signal pol1_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal pol0_in1_net : std_logic_vector( 8-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 16-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
 begin
   c <= concat_y_net;
   pol0_in1_net <= re;
@@ -8286,9 +8142,9 @@ entity pfb_fir_2048ch_core_ri_to_c3 is
   );
 end pfb_fir_2048ch_core_ri_to_c3;
 architecture structural of pfb_fir_2048ch_core_ri_to_c3 is 
+  signal pol3_in1_net : std_logic_vector( 8-1 downto 0 );
   signal concat_y_net : std_logic_vector( 16-1 downto 0 );
   signal pol2_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal pol3_in1_net : std_logic_vector( 8-1 downto 0 );
   signal force_re_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal force_im_output_port_net : std_logic_vector( 8-1 downto 0 );
 begin
@@ -8351,35 +8207,35 @@ entity pfb_fir_2048ch_core_struct is
   );
 end pfb_fir_2048ch_core_struct;
 architecture structural of pfb_fir_2048ch_core_struct is 
-  signal pol0_in0_net : std_logic_vector( 8-1 downto 0 );
   signal pol0_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal force_re_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal force_re_output_port_net_x2 : std_logic_vector( 18-1 downto 0 );
-  signal pol1_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal pol1_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal force_im_output_port_net_x1 : std_logic_vector( 18-1 downto 0 );
-  signal pol2_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal pol2_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal force_re_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal force_re_output_port_net_x1 : std_logic_vector( 18-1 downto 0 );
-  signal pol3_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal pol3_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal force_im_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal force_im_output_port_net_x2 : std_logic_vector( 18-1 downto 0 );
-  signal sync_net : std_logic_vector( 32-1 downto 0 );
-  signal delay1_q_net : std_logic_vector( 1-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal concat_y_net_x6 : std_logic_vector( 36-1 downto 0 );
-  signal concat_y_net_x4 : std_logic_vector( 36-1 downto 0 );
-  signal concat_y_net_x5 : std_logic_vector( 36-1 downto 0 );
-  signal concat_y_net_x3 : std_logic_vector( 36-1 downto 0 );
-  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 16-1 downto 0 );
+  signal pol0_in0_net : std_logic_vector( 8-1 downto 0 );
   signal concat_y_net_x1 : std_logic_vector( 16-1 downto 0 );
+  signal concat_y_net_x5 : std_logic_vector( 36-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 16-1 downto 0 );
+  signal concat_y_net_x3 : std_logic_vector( 36-1 downto 0 );
+  signal force_re_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal clk_net : std_logic;
+  signal pol1_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal pol3_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal force_im_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
   signal concat_y_net_x0 : std_logic_vector( 16-1 downto 0 );
+  signal force_im_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal sync_net : std_logic_vector( 32-1 downto 0 );
+  signal pol2_in1_net : std_logic_vector( 8-1 downto 0 );
   signal concat_y_net_x2 : std_logic_vector( 16-1 downto 0 );
+  signal concat_y_net_x6 : std_logic_vector( 36-1 downto 0 );
+  signal pol2_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal ce_net : std_logic;
+  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
+  signal force_im_output_port_net_x2 : std_logic_vector( 18-1 downto 0 );
+  signal force_re_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concat_y_net_x4 : std_logic_vector( 36-1 downto 0 );
+  signal force_re_output_port_net_x2 : std_logic_vector( 18-1 downto 0 );
+  signal pol3_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal force_im_output_port_net_x1 : std_logic_vector( 18-1 downto 0 );
+  signal force_re_output_port_net_x1 : std_logic_vector( 18-1 downto 0 );
+  signal pol1_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal delay1_q_net : std_logic_vector( 1-1 downto 0 );
 begin
   pol0_in0_net <= pol0_in0;
   pol0_in1_net <= pol0_in1;
@@ -8440,7 +8296,7 @@ begin
     pol2_out1 => concat_y_net_x4,
     pol2_out2 => concat_y_net_x3
   );
-  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x5 
+  ri_to_c : entity xil_defaultlib.pfb_fir_2048ch_core_ri_to_c_x4 
   port map (
     re => pol0_in0_net,
     im => pol1_in0_net,
@@ -8535,9 +8391,9 @@ entity pfb_fir_2048ch_core is
 end pfb_fir_2048ch_core;
 architecture structural of pfb_fir_2048ch_core is 
   attribute core_generation_info : string;
-  attribute core_generation_info of structural : architecture is "pfb_fir_2048ch_core,sysgen_core_2014_4,{,compilation=IP Catalog,block_icon_display=Default,family=kintex7,part=xc7k160t,speed=-2,package=ffg676,synthesis_language=vhdl,hdl_library=xil_defaultlib,synthesis_strategy=Vivado Synthesis Defaults,implementation_strategy=Vivado Implementation Defaults,clock_loc=,testbench=0,interface_doc=0,ce_clr=0,clock_period=5,system_simulink_period=1,simulation_time=10,addsub=24,concat=38,constant=60,convert=8,counter=26,delay=30,logical=12,mult=32,mux=12,register=2,reinterpret=144,relational=24,scale=8,slice=97,spram=12,sprom=8,}";
-  signal clk_1_net : std_logic;
+  attribute core_generation_info of structural : architecture is "pfb_fir_2048ch_core,sysgen_core_2016_1,{,compilation=IP Catalog,block_icon_display=Default,family=kintex7,part=xc7k160t,speed=-2,package=ffg676,synthesis_language=vhdl,hdl_library=xil_defaultlib,synthesis_strategy=Vivado Synthesis Defaults,implementation_strategy=Vivado Implementation Defaults,testbench=0,interface_doc=0,ce_clr=0,clock_period=5,system_simulink_period=1,waveform_viewer=0,axilite_interface=0,ip_catalog_plugin=0,hwcosim_burst_mode=0,simulation_time=10,addsub=24,concat=38,constant=60,convert=8,counter=26,delay=30,logical=12,mult=32,mux=12,register=2,reinterpret=144,relational=24,scale=8,slice=97,spram=12,sprom=8,}";
   signal ce_1_net : std_logic;
+  signal clk_1_net : std_logic;
 begin
   pfb_fir_2048ch_core_default_clock_driver : entity xil_defaultlib.pfb_fir_2048ch_core_default_clock_driver 
   port map (

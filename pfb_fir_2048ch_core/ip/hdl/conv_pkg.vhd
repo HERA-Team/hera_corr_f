@@ -244,8 +244,6 @@ package conv_pkg is
     function makeZeroBinStr (width : integer) return STRING;
 
 
-    function and_reduce(inp: std_logic_vector) return std_logic;
-
     ---------------------------------------------------------------------------
     -- Debugging functions
     ---------------------------------------------------------------------------
@@ -414,23 +412,6 @@ package body conv_pkg is
         result(width-2 downto 0) := zeros;
         return result;
     end;
-
-    function and_reduce(inp: std_logic_vector) return std_logic
-    is
-        variable result: std_logic;
-        constant width : integer := inp'length;
-        variable vec : std_logic_vector(width-1 downto 0);
-    begin
-        vec := inp;
-        result := vec(0);
-        if width > 1 then
-            for i in 1 to width-1 loop
-                result := result and vec(i);
-            end loop;
-        end if;
-        return result;
-    end;
-
 
     -- Check if all the bits are the same
     function all_same(inp: std_logic_vector) return boolean

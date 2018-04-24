@@ -1,8 +1,8 @@
---Copyright 1986-2014 Xilinx, Inc. All Rights Reserved.
+--Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
---Tool Version: Vivado v.2014.4 (lin64) Build 1071353 Tue Nov 18 16:47:07 MST 2014
---Date        : Fri Aug 21 15:22:09 2015
---Host        : simech1 running 64-bit Ubuntu 12.04.4 LTS
+--Tool Version: Vivado v.2016.1 (lin64) Build 1538259 Fri Apr  8 15:45:23 MDT 2016
+--Date        : Fri Feb  9 14:50:01 2018
+--Host        : acme1 running 64-bit Ubuntu 16.04.2 LTS
 --Command     : generate_target pfb_fir_2048ch_2i_core_bd.bd
 --Design      : pfb_fir_2048ch_2i_core_bd
 --Purpose     : IP block netlist
@@ -25,6 +25,10 @@ entity pfb_fir_2048ch_2i_core_bd is
     sync : in STD_LOGIC_VECTOR ( 31 downto 0 );
     sync_out : out STD_LOGIC_VECTOR ( 0 to 0 )
   );
+  attribute CORE_GENERATION_INFO : string;
+  attribute CORE_GENERATION_INFO of pfb_fir_2048ch_2i_core_bd : entity is "pfb_fir_2048ch_2i_core_bd,IP_Integrator,{x_ipVendor=xilinx.com,x_ipLibrary=BlockDiagram,x_ipName=pfb_fir_2048ch_2i_core_bd,x_ipVersion=1.00.a,x_ipLanguage=VHDL,numBlks=1,numReposBlks=1,numNonXlnxBlks=1,numHierBlks=0,maxHierDepth=0,numSysgenBlks=1,numHlsBlks=0,numHdlrefBlks=0,numPkgbdBlks=0,bdsource=SYSGEN,synth_mode=Global}";
+  attribute HW_HANDOFF : string;
+  attribute HW_HANDOFF of pfb_fir_2048ch_2i_core_bd : entity is "pfb_fir_2048ch_2i_core_bd.hwdef";
 end pfb_fir_2048ch_2i_core_bd;
 
 architecture STRUCTURE of pfb_fir_2048ch_2i_core_bd is
@@ -67,7 +71,7 @@ begin
   sync_1(31 downto 0) <= sync(31 downto 0);
   sync_out(0) <= pfb_fir_2048ch_2i_core_1_sync_out(0);
 pfb_fir_2048ch_2i_core_1: component pfb_fir_2048ch_2i_core_bd_pfb_fir_2048ch_2i_core_1_0
-    port map (
+     port map (
       clk => clk_1,
       pol0_in0(7 downto 0) => pol0_in0_1(7 downto 0),
       pol0_in1(7 downto 0) => pol0_in1_1(7 downto 0),

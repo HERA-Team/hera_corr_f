@@ -1,10 +1,12 @@
 #-----------------------------------------------------------
-# Vivado v2014.4 (64-bit)
-# SW Build 1071353 on Tue Nov 18 16:47:07 MST 2014
-# IP Build 1070531 on Tue Nov 18 01:10:18 MST 2014
-# Start of session at: Fri Aug 21 16:45:51 2015
-# Process ID: 28705
-# Log file: /home/jackh/github/herafengine/pfb_fir_2048ch_core/vivado.log
-# Journal file: /home/jackh/github/herafengine/pfb_fir_2048ch_core/vivado.jou
+# Vivado v2016.1 (64-bit)
+# SW Build 1538259 on Fri Apr  8 15:45:23 MDT 2016
+# IP Build 1537824 on Fri Apr  8 04:28:57 MDT 2016
+# Start of session at: Fri Feb  9 14:52:16 2018
+# Process ID: 22091
+# Current directory: /home/jackh/herafengine/pfb_fir_2048ch_core
+# Command line: vivado -mode batch -source ProjectGeneration.tcl -notrace
+# Log file: /home/jackh/herafengine/pfb_fir_2048ch_core/vivado.log
+# Journal file: /home/jackh/herafengine/pfb_fir_2048ch_core/vivado.jou
 #-----------------------------------------------------------
 source ProjectGeneration.tcl -notrace

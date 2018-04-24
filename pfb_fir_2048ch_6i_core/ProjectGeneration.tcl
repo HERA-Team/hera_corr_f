@@ -24,7 +24,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set IP_LifeCycle_Menu {2}
 	set IP_Logo {sysgen_icon_100.png}
 	set IP_Name {}
-	set IP_Revision {136204387}
+	set IP_Revision {0}
 	set IP_Socket_IP {0}
 	set IP_Socket_IP_Proj_Path {}
 	set IP_Vendor_Text {User_Company}
@@ -47,6 +47,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 		{{pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i2_vivado.coe}}
 		{{pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i3_vivado.coe}}
 		{{pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4_vivado.coe}}
+		{{pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i5_vivado.coe}}
+		{{pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i6_vivado.coe}}
+		{{pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i7_vivado.coe}}
+		{{pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8_vivado.coe}}
 		{{pfb_fir_2048ch_6i_core_entity_declarations.vhd} -lib {xil_defaultlib}}
 		{{pfb_fir_2048ch_6i_core.vhd} -lib {xil_defaultlib}}
 		{{pfb_fir_2048ch_6i_core_clock.xdc}}
@@ -59,9 +63,24 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set SynthesisTool {Vivado}
 	set TargetDir {/home/jackh/herafengine/pfb_fir_2048ch_6i_core}
 	set TopLevelModule {pfb_fir_2048ch_6i_core}
-	set TopLevelSimulinkHandle 83238
+	set TopLevelSimulinkHandle 205522
 	set VHDLLib {xil_defaultlib}
 	set TopLevelPortInterface {}
+	dict set TopLevelPortInterface sync Name {sync}
+	dict set TopLevelPortInterface sync Type UFix_32_0
+	dict set TopLevelPortInterface sync ArithmeticType xlUnsigned
+	dict set TopLevelPortInterface sync BinaryPoint 0
+	dict set TopLevelPortInterface sync Width 32
+	dict set TopLevelPortInterface sync DatFile {pfb_fir_2048ch_6i_core_sync.dat}
+	dict set TopLevelPortInterface sync IconText {sync}
+	dict set TopLevelPortInterface sync Direction in
+	dict set TopLevelPortInterface sync Period 1
+	dict set TopLevelPortInterface sync Interface 0
+	dict set TopLevelPortInterface sync InterfaceName {}
+	dict set TopLevelPortInterface sync InterfaceString {DATA}
+	dict set TopLevelPortInterface sync ClockDomain {pfb_fir_2048ch_6i_core}
+	dict set TopLevelPortInterface sync Locs {}
+	dict set TopLevelPortInterface sync IOStandard {}
 	dict set TopLevelPortInterface pol5_in1 Name {pol5_in1}
 	dict set TopLevelPortInterface pol5_in1 Type Fix_8_7
 	dict set TopLevelPortInterface pol5_in1 ArithmeticType xlSigned
@@ -197,36 +216,6 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol1_in1 ClockDomain {pfb_fir_2048ch_6i_core}
 	dict set TopLevelPortInterface pol1_in1 Locs {}
 	dict set TopLevelPortInterface pol1_in1 IOStandard {}
-	dict set TopLevelPortInterface pol0_in1 Name {pol0_in1}
-	dict set TopLevelPortInterface pol0_in1 Type Fix_8_7
-	dict set TopLevelPortInterface pol0_in1 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol0_in1 BinaryPoint 7
-	dict set TopLevelPortInterface pol0_in1 Width 8
-	dict set TopLevelPortInterface pol0_in1 DatFile {pfb_fir_2048ch_6i_core_pol0_in1.dat}
-	dict set TopLevelPortInterface pol0_in1 IconText {pol0_in1}
-	dict set TopLevelPortInterface pol0_in1 Direction in
-	dict set TopLevelPortInterface pol0_in1 Period 1
-	dict set TopLevelPortInterface pol0_in1 Interface 0
-	dict set TopLevelPortInterface pol0_in1 InterfaceName {}
-	dict set TopLevelPortInterface pol0_in1 InterfaceString {DATA}
-	dict set TopLevelPortInterface pol0_in1 ClockDomain {pfb_fir_2048ch_6i_core}
-	dict set TopLevelPortInterface pol0_in1 Locs {}
-	dict set TopLevelPortInterface pol0_in1 IOStandard {}
-	dict set TopLevelPortInterface sync Name {sync}
-	dict set TopLevelPortInterface sync Type UFix_32_0
-	dict set TopLevelPortInterface sync ArithmeticType xlUnsigned
-	dict set TopLevelPortInterface sync BinaryPoint 0
-	dict set TopLevelPortInterface sync Width 32
-	dict set TopLevelPortInterface sync DatFile {pfb_fir_2048ch_6i_core_sync.dat}
-	dict set TopLevelPortInterface sync IconText {sync}
-	dict set TopLevelPortInterface sync Direction in
-	dict set TopLevelPortInterface sync Period 1
-	dict set TopLevelPortInterface sync Interface 0
-	dict set TopLevelPortInterface sync InterfaceName {}
-	dict set TopLevelPortInterface sync InterfaceString {DATA}
-	dict set TopLevelPortInterface sync ClockDomain {pfb_fir_2048ch_6i_core}
-	dict set TopLevelPortInterface sync Locs {}
-	dict set TopLevelPortInterface sync IOStandard {}
 	dict set TopLevelPortInterface pol1_in0 Name {pol1_in0}
 	dict set TopLevelPortInterface pol1_in0 Type Fix_8_7
 	dict set TopLevelPortInterface pol1_in0 ArithmeticType xlSigned
@@ -242,6 +231,21 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol1_in0 ClockDomain {pfb_fir_2048ch_6i_core}
 	dict set TopLevelPortInterface pol1_in0 Locs {}
 	dict set TopLevelPortInterface pol1_in0 IOStandard {}
+	dict set TopLevelPortInterface pol0_in1 Name {pol0_in1}
+	dict set TopLevelPortInterface pol0_in1 Type Fix_8_7
+	dict set TopLevelPortInterface pol0_in1 ArithmeticType xlSigned
+	dict set TopLevelPortInterface pol0_in1 BinaryPoint 7
+	dict set TopLevelPortInterface pol0_in1 Width 8
+	dict set TopLevelPortInterface pol0_in1 DatFile {pfb_fir_2048ch_6i_core_pol0_in1.dat}
+	dict set TopLevelPortInterface pol0_in1 IconText {pol0_in1}
+	dict set TopLevelPortInterface pol0_in1 Direction in
+	dict set TopLevelPortInterface pol0_in1 Period 1
+	dict set TopLevelPortInterface pol0_in1 Interface 0
+	dict set TopLevelPortInterface pol0_in1 InterfaceName {}
+	dict set TopLevelPortInterface pol0_in1 InterfaceString {DATA}
+	dict set TopLevelPortInterface pol0_in1 ClockDomain {pfb_fir_2048ch_6i_core}
+	dict set TopLevelPortInterface pol0_in1 Locs {}
+	dict set TopLevelPortInterface pol0_in1 IOStandard {}
 	dict set TopLevelPortInterface pol0_in0 Name {pol0_in0}
 	dict set TopLevelPortInterface pol0_in0 Type Fix_8_7
 	dict set TopLevelPortInterface pol0_in0 ArithmeticType xlSigned
@@ -287,21 +291,6 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol0_out1 ClockDomain {pfb_fir_2048ch_6i_core}
 	dict set TopLevelPortInterface pol0_out1 Locs {}
 	dict set TopLevelPortInterface pol0_out1 IOStandard {}
-	dict set TopLevelPortInterface sync_out Name {sync_out}
-	dict set TopLevelPortInterface sync_out Type Bool
-	dict set TopLevelPortInterface sync_out ArithmeticType xlUnsigned
-	dict set TopLevelPortInterface sync_out BinaryPoint 0
-	dict set TopLevelPortInterface sync_out Width 1
-	dict set TopLevelPortInterface sync_out DatFile {pfb_fir_2048ch_6i_core_sync_out.dat}
-	dict set TopLevelPortInterface sync_out IconText {sync_out}
-	dict set TopLevelPortInterface sync_out Direction out
-	dict set TopLevelPortInterface sync_out Period 1
-	dict set TopLevelPortInterface sync_out Interface 0
-	dict set TopLevelPortInterface sync_out InterfaceName {}
-	dict set TopLevelPortInterface sync_out InterfaceString {DATA}
-	dict set TopLevelPortInterface sync_out ClockDomain {pfb_fir_2048ch_6i_core}
-	dict set TopLevelPortInterface sync_out Locs {}
-	dict set TopLevelPortInterface sync_out IOStandard {}
 	dict set TopLevelPortInterface pol1_out0 Name {pol1_out0}
 	dict set TopLevelPortInterface pol1_out0 Type Fix_18_17
 	dict set TopLevelPortInterface pol1_out0 ArithmeticType xlSigned
@@ -452,6 +441,21 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol5_out1 ClockDomain {pfb_fir_2048ch_6i_core}
 	dict set TopLevelPortInterface pol5_out1 Locs {}
 	dict set TopLevelPortInterface pol5_out1 IOStandard {}
+	dict set TopLevelPortInterface sync_out Name {sync_out}
+	dict set TopLevelPortInterface sync_out Type Bool
+	dict set TopLevelPortInterface sync_out ArithmeticType xlUnsigned
+	dict set TopLevelPortInterface sync_out BinaryPoint 0
+	dict set TopLevelPortInterface sync_out Width 1
+	dict set TopLevelPortInterface sync_out DatFile {pfb_fir_2048ch_6i_core_sync_out.dat}
+	dict set TopLevelPortInterface sync_out IconText {sync_out}
+	dict set TopLevelPortInterface sync_out Direction out
+	dict set TopLevelPortInterface sync_out Period 1
+	dict set TopLevelPortInterface sync_out Interface 0
+	dict set TopLevelPortInterface sync_out InterfaceName {}
+	dict set TopLevelPortInterface sync_out InterfaceString {DATA}
+	dict set TopLevelPortInterface sync_out ClockDomain {pfb_fir_2048ch_6i_core}
+	dict set TopLevelPortInterface sync_out Locs {}
+	dict set TopLevelPortInterface sync_out IOStandard {}
 	dict set TopLevelPortInterface clk Name {clk}
 	dict set TopLevelPortInterface clk Type -
 	dict set TopLevelPortInterface clk ArithmeticType xlUnsigned

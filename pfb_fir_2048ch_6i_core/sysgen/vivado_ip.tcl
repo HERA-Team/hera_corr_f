@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------
-# System Generator version 2016.4 IP Tcl source file.
+# System Generator version 2016.1 IP Tcl source file.
 #
 # Copyright(C) 2013 by Xilinx, Inc.  All rights reserved.  This
 # text/file contains proprietary, confidential information of Xilinx,
@@ -82,7 +82,7 @@ lappend params_list CONFIG.implementation {Fabric}
 lappend params_list CONFIG.increment_value {1}
 lappend params_list CONFIG.latency {1}
 lappend params_list CONFIG.load {false}
-lappend params_list CONFIG.output_width {11}
+lappend params_list CONFIG.output_width {13}
 lappend params_list CONFIG.restrict_count {false}
 lappend params_list CONFIG.sclr {false}
 lappend params_list CONFIG.sinit {true}
@@ -119,8 +119,8 @@ lappend params_list CONFIG.output_reset_value_a {0}
 lappend params_list CONFIG.output_reset_value_b {0}
 lappend params_list CONFIG.pipeline_stages {0}
 lappend params_list CONFIG.primitive {8kx2}
-lappend params_list CONFIG.read_width_a {18}
-lappend params_list CONFIG.read_width_b {18}
+lappend params_list CONFIG.read_width_a {9}
+lappend params_list CONFIG.read_width_b {9}
 lappend params_list CONFIG.register_porta_output_of_memory_core {false}
 lappend params_list CONFIG.register_porta_output_of_memory_primitives {true}
 lappend params_list CONFIG.register_portb_output_of_memory_core {false}
@@ -133,9 +133,9 @@ lappend params_list CONFIG.use_regcea_pin {false}
 lappend params_list CONFIG.use_regceb_pin {false}
 lappend params_list CONFIG.use_rsta_pin {false}
 lappend params_list CONFIG.use_rstb_pin {false}
-lappend params_list CONFIG.write_depth_a {2048}
-lappend params_list CONFIG.write_width_a {18}
-lappend params_list CONFIG.write_width_b {18}
+lappend params_list CONFIG.write_depth_a {8192}
+lappend params_list CONFIG.write_width_a {9}
+lappend params_list CONFIG.write_width_b {9}
 lappend params_list CONFIG.coe_file {../pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i0_vivado.coe}
 
 set_property -dict $params_list [get_ips pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i0]
@@ -165,8 +165,8 @@ lappend params_list CONFIG.output_reset_value_a {0}
 lappend params_list CONFIG.output_reset_value_b {0}
 lappend params_list CONFIG.pipeline_stages {0}
 lappend params_list CONFIG.primitive {8kx2}
-lappend params_list CONFIG.read_width_a {18}
-lappend params_list CONFIG.read_width_b {18}
+lappend params_list CONFIG.read_width_a {9}
+lappend params_list CONFIG.read_width_b {9}
 lappend params_list CONFIG.register_porta_output_of_memory_core {false}
 lappend params_list CONFIG.register_porta_output_of_memory_primitives {true}
 lappend params_list CONFIG.register_portb_output_of_memory_core {false}
@@ -179,9 +179,9 @@ lappend params_list CONFIG.use_regcea_pin {false}
 lappend params_list CONFIG.use_regceb_pin {false}
 lappend params_list CONFIG.use_rsta_pin {false}
 lappend params_list CONFIG.use_rstb_pin {false}
-lappend params_list CONFIG.write_depth_a {2048}
-lappend params_list CONFIG.write_width_a {18}
-lappend params_list CONFIG.write_width_b {18}
+lappend params_list CONFIG.write_depth_a {8192}
+lappend params_list CONFIG.write_width_a {9}
+lappend params_list CONFIG.write_width_b {9}
 lappend params_list CONFIG.coe_file {../pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i1_vivado.coe}
 
 set_property -dict $params_list [get_ips pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i1]
@@ -211,8 +211,8 @@ lappend params_list CONFIG.output_reset_value_a {0}
 lappend params_list CONFIG.output_reset_value_b {0}
 lappend params_list CONFIG.pipeline_stages {0}
 lappend params_list CONFIG.primitive {8kx2}
-lappend params_list CONFIG.read_width_a {18}
-lappend params_list CONFIG.read_width_b {18}
+lappend params_list CONFIG.read_width_a {9}
+lappend params_list CONFIG.read_width_b {9}
 lappend params_list CONFIG.register_porta_output_of_memory_core {false}
 lappend params_list CONFIG.register_porta_output_of_memory_primitives {true}
 lappend params_list CONFIG.register_portb_output_of_memory_core {false}
@@ -225,9 +225,9 @@ lappend params_list CONFIG.use_regcea_pin {false}
 lappend params_list CONFIG.use_regceb_pin {false}
 lappend params_list CONFIG.use_rsta_pin {false}
 lappend params_list CONFIG.use_rstb_pin {false}
-lappend params_list CONFIG.write_depth_a {2048}
-lappend params_list CONFIG.write_width_a {18}
-lappend params_list CONFIG.write_width_b {18}
+lappend params_list CONFIG.write_depth_a {8192}
+lappend params_list CONFIG.write_width_a {9}
+lappend params_list CONFIG.write_width_b {9}
 lappend params_list CONFIG.coe_file {../pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i2_vivado.coe}
 
 set_property -dict $params_list [get_ips pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i2]
@@ -257,8 +257,8 @@ lappend params_list CONFIG.output_reset_value_a {0}
 lappend params_list CONFIG.output_reset_value_b {0}
 lappend params_list CONFIG.pipeline_stages {0}
 lappend params_list CONFIG.primitive {8kx2}
-lappend params_list CONFIG.read_width_a {18}
-lappend params_list CONFIG.read_width_b {18}
+lappend params_list CONFIG.read_width_a {9}
+lappend params_list CONFIG.read_width_b {9}
 lappend params_list CONFIG.register_porta_output_of_memory_core {false}
 lappend params_list CONFIG.register_porta_output_of_memory_primitives {true}
 lappend params_list CONFIG.register_portb_output_of_memory_core {false}
@@ -271,40 +271,12 @@ lappend params_list CONFIG.use_regcea_pin {false}
 lappend params_list CONFIG.use_regceb_pin {false}
 lappend params_list CONFIG.use_rsta_pin {false}
 lappend params_list CONFIG.use_rstb_pin {false}
-lappend params_list CONFIG.write_depth_a {2048}
-lappend params_list CONFIG.write_width_a {18}
-lappend params_list CONFIG.write_width_b {18}
+lappend params_list CONFIG.write_depth_a {8192}
+lappend params_list CONFIG.write_width_a {9}
+lappend params_list CONFIG.write_width_b {9}
 lappend params_list CONFIG.coe_file {../pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i3_vivado.coe}
 
 set_property -dict $params_list [get_ips pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i3]
-}
-
-
-set existingipslist [get_ips]
-if {[lsearch $existingipslist pfb_fir_2048ch_6i_core_c_counter_binary_v12_0_i1] < 0} {
-create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name pfb_fir_2048ch_6i_core_c_counter_binary_v12_0_i1
-set params_list [list]
-lappend params_list CONFIG.Component_Name {pfb_fir_2048ch_6i_core_c_counter_binary_v12_0_i1}
-lappend params_list CONFIG.ainit_value {0}
-lappend params_list CONFIG.ce {true}
-lappend params_list CONFIG.count_mode {DOWN}
-lappend params_list CONFIG.fb_latency {0}
-lappend params_list CONFIG.final_count_value {1}
-lappend params_list CONFIG.implementation {Fabric}
-lappend params_list CONFIG.increment_value {1}
-lappend params_list CONFIG.latency {1}
-lappend params_list CONFIG.load {true}
-lappend params_list CONFIG.output_width {13}
-lappend params_list CONFIG.restrict_count {false}
-lappend params_list CONFIG.sclr {false}
-lappend params_list CONFIG.sinit {true}
-lappend params_list CONFIG.sinit_value {0}
-lappend params_list CONFIG.sset {false}
-lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
-lappend params_list CONFIG.sync_threshold_output {false}
-lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
-
-set_property -dict $params_list [get_ips pfb_fir_2048ch_6i_core_c_counter_binary_v12_0_i1]
 }
 
 
@@ -331,8 +303,8 @@ lappend params_list CONFIG.output_reset_value_a {0}
 lappend params_list CONFIG.output_reset_value_b {0}
 lappend params_list CONFIG.pipeline_stages {0}
 lappend params_list CONFIG.primitive {8kx2}
-lappend params_list CONFIG.read_width_a {18}
-lappend params_list CONFIG.read_width_b {18}
+lappend params_list CONFIG.read_width_a {9}
+lappend params_list CONFIG.read_width_b {9}
 lappend params_list CONFIG.register_porta_output_of_memory_core {false}
 lappend params_list CONFIG.register_porta_output_of_memory_primitives {true}
 lappend params_list CONFIG.register_portb_output_of_memory_core {false}
@@ -345,12 +317,224 @@ lappend params_list CONFIG.use_regcea_pin {false}
 lappend params_list CONFIG.use_regceb_pin {false}
 lappend params_list CONFIG.use_rsta_pin {false}
 lappend params_list CONFIG.use_rstb_pin {false}
-lappend params_list CONFIG.write_depth_a {2048}
-lappend params_list CONFIG.write_width_a {18}
-lappend params_list CONFIG.write_width_b {18}
+lappend params_list CONFIG.write_depth_a {8192}
+lappend params_list CONFIG.write_width_a {9}
+lappend params_list CONFIG.write_width_b {9}
 lappend params_list CONFIG.coe_file {../pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4_vivado.coe}
 
 set_property -dict $params_list [get_ips pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4]
+}
+
+
+set existingipslist [get_ips]
+if {[lsearch $existingipslist pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i5] < 0} {
+create_ip -name blk_mem_gen -version 8.3 -vendor xilinx.com -library ip -module_name pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i5
+set params_list [list]
+lappend params_list CONFIG.Component_Name {pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i5}
+lappend params_list CONFIG.algorithm {Minimum_Area}
+lappend params_list CONFIG.assume_synchronous_clk {true}
+lappend params_list CONFIG.byte_size {9}
+lappend params_list CONFIG.collision_warnings {ALL}
+lappend params_list CONFIG.disable_collision_warnings {false}
+lappend params_list CONFIG.ecc {false}
+lappend params_list CONFIG.enable_a {Use_ENA_Pin}
+lappend params_list CONFIG.enable_b {Use_ENB_Pin}
+lappend params_list CONFIG.error_injection_type {Single_Bit_Error_Injection}
+lappend params_list CONFIG.fill_remaining_memory_locations {false}
+lappend params_list CONFIG.load_init_file {TRUE}
+lappend params_list CONFIG.memory_type {True_Dual_Port_RAM}
+lappend params_list CONFIG.operating_mode_a {READ_FIRST}
+lappend params_list CONFIG.operating_mode_b {READ_FIRST}
+lappend params_list CONFIG.output_reset_value_a {0}
+lappend params_list CONFIG.output_reset_value_b {0}
+lappend params_list CONFIG.pipeline_stages {0}
+lappend params_list CONFIG.primitive {8kx2}
+lappend params_list CONFIG.read_width_a {9}
+lappend params_list CONFIG.read_width_b {9}
+lappend params_list CONFIG.register_porta_output_of_memory_core {false}
+lappend params_list CONFIG.register_porta_output_of_memory_primitives {true}
+lappend params_list CONFIG.register_portb_output_of_memory_core {false}
+lappend params_list CONFIG.register_portb_output_of_memory_primitives {true}
+lappend params_list CONFIG.remaining_memory_locations {0}
+lappend params_list CONFIG.reset_type {SYNC}
+lappend params_list CONFIG.use_byte_write_enable {false}
+lappend params_list CONFIG.use_error_injection_pins {false}
+lappend params_list CONFIG.use_regcea_pin {false}
+lappend params_list CONFIG.use_regceb_pin {false}
+lappend params_list CONFIG.use_rsta_pin {false}
+lappend params_list CONFIG.use_rstb_pin {false}
+lappend params_list CONFIG.write_depth_a {8192}
+lappend params_list CONFIG.write_width_a {9}
+lappend params_list CONFIG.write_width_b {9}
+lappend params_list CONFIG.coe_file {../pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i5_vivado.coe}
+
+set_property -dict $params_list [get_ips pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i5]
+}
+
+
+set existingipslist [get_ips]
+if {[lsearch $existingipslist pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i6] < 0} {
+create_ip -name blk_mem_gen -version 8.3 -vendor xilinx.com -library ip -module_name pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i6
+set params_list [list]
+lappend params_list CONFIG.Component_Name {pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i6}
+lappend params_list CONFIG.algorithm {Minimum_Area}
+lappend params_list CONFIG.assume_synchronous_clk {true}
+lappend params_list CONFIG.byte_size {9}
+lappend params_list CONFIG.collision_warnings {ALL}
+lappend params_list CONFIG.disable_collision_warnings {false}
+lappend params_list CONFIG.ecc {false}
+lappend params_list CONFIG.enable_a {Use_ENA_Pin}
+lappend params_list CONFIG.enable_b {Use_ENB_Pin}
+lappend params_list CONFIG.error_injection_type {Single_Bit_Error_Injection}
+lappend params_list CONFIG.fill_remaining_memory_locations {false}
+lappend params_list CONFIG.load_init_file {TRUE}
+lappend params_list CONFIG.memory_type {True_Dual_Port_RAM}
+lappend params_list CONFIG.operating_mode_a {READ_FIRST}
+lappend params_list CONFIG.operating_mode_b {READ_FIRST}
+lappend params_list CONFIG.output_reset_value_a {0}
+lappend params_list CONFIG.output_reset_value_b {0}
+lappend params_list CONFIG.pipeline_stages {0}
+lappend params_list CONFIG.primitive {8kx2}
+lappend params_list CONFIG.read_width_a {9}
+lappend params_list CONFIG.read_width_b {9}
+lappend params_list CONFIG.register_porta_output_of_memory_core {false}
+lappend params_list CONFIG.register_porta_output_of_memory_primitives {true}
+lappend params_list CONFIG.register_portb_output_of_memory_core {false}
+lappend params_list CONFIG.register_portb_output_of_memory_primitives {true}
+lappend params_list CONFIG.remaining_memory_locations {0}
+lappend params_list CONFIG.reset_type {SYNC}
+lappend params_list CONFIG.use_byte_write_enable {false}
+lappend params_list CONFIG.use_error_injection_pins {false}
+lappend params_list CONFIG.use_regcea_pin {false}
+lappend params_list CONFIG.use_regceb_pin {false}
+lappend params_list CONFIG.use_rsta_pin {false}
+lappend params_list CONFIG.use_rstb_pin {false}
+lappend params_list CONFIG.write_depth_a {8192}
+lappend params_list CONFIG.write_width_a {9}
+lappend params_list CONFIG.write_width_b {9}
+lappend params_list CONFIG.coe_file {../pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i6_vivado.coe}
+
+set_property -dict $params_list [get_ips pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i6]
+}
+
+
+set existingipslist [get_ips]
+if {[lsearch $existingipslist pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i7] < 0} {
+create_ip -name blk_mem_gen -version 8.3 -vendor xilinx.com -library ip -module_name pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i7
+set params_list [list]
+lappend params_list CONFIG.Component_Name {pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i7}
+lappend params_list CONFIG.algorithm {Minimum_Area}
+lappend params_list CONFIG.assume_synchronous_clk {true}
+lappend params_list CONFIG.byte_size {9}
+lappend params_list CONFIG.collision_warnings {ALL}
+lappend params_list CONFIG.disable_collision_warnings {false}
+lappend params_list CONFIG.ecc {false}
+lappend params_list CONFIG.enable_a {Use_ENA_Pin}
+lappend params_list CONFIG.enable_b {Use_ENB_Pin}
+lappend params_list CONFIG.error_injection_type {Single_Bit_Error_Injection}
+lappend params_list CONFIG.fill_remaining_memory_locations {false}
+lappend params_list CONFIG.load_init_file {TRUE}
+lappend params_list CONFIG.memory_type {True_Dual_Port_RAM}
+lappend params_list CONFIG.operating_mode_a {READ_FIRST}
+lappend params_list CONFIG.operating_mode_b {READ_FIRST}
+lappend params_list CONFIG.output_reset_value_a {0}
+lappend params_list CONFIG.output_reset_value_b {0}
+lappend params_list CONFIG.pipeline_stages {0}
+lappend params_list CONFIG.primitive {8kx2}
+lappend params_list CONFIG.read_width_a {9}
+lappend params_list CONFIG.read_width_b {9}
+lappend params_list CONFIG.register_porta_output_of_memory_core {false}
+lappend params_list CONFIG.register_porta_output_of_memory_primitives {true}
+lappend params_list CONFIG.register_portb_output_of_memory_core {false}
+lappend params_list CONFIG.register_portb_output_of_memory_primitives {true}
+lappend params_list CONFIG.remaining_memory_locations {0}
+lappend params_list CONFIG.reset_type {SYNC}
+lappend params_list CONFIG.use_byte_write_enable {false}
+lappend params_list CONFIG.use_error_injection_pins {false}
+lappend params_list CONFIG.use_regcea_pin {false}
+lappend params_list CONFIG.use_regceb_pin {false}
+lappend params_list CONFIG.use_rsta_pin {false}
+lappend params_list CONFIG.use_rstb_pin {false}
+lappend params_list CONFIG.write_depth_a {8192}
+lappend params_list CONFIG.write_width_a {9}
+lappend params_list CONFIG.write_width_b {9}
+lappend params_list CONFIG.coe_file {../pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i7_vivado.coe}
+
+set_property -dict $params_list [get_ips pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i7]
+}
+
+
+set existingipslist [get_ips]
+if {[lsearch $existingipslist pfb_fir_2048ch_6i_core_c_counter_binary_v12_0_i1] < 0} {
+create_ip -name c_counter_binary -version 12.0 -vendor xilinx.com -library ip -module_name pfb_fir_2048ch_6i_core_c_counter_binary_v12_0_i1
+set params_list [list]
+lappend params_list CONFIG.Component_Name {pfb_fir_2048ch_6i_core_c_counter_binary_v12_0_i1}
+lappend params_list CONFIG.ainit_value {0}
+lappend params_list CONFIG.ce {true}
+lappend params_list CONFIG.count_mode {DOWN}
+lappend params_list CONFIG.fb_latency {0}
+lappend params_list CONFIG.final_count_value {1}
+lappend params_list CONFIG.implementation {Fabric}
+lappend params_list CONFIG.increment_value {1}
+lappend params_list CONFIG.latency {1}
+lappend params_list CONFIG.load {true}
+lappend params_list CONFIG.output_width {15}
+lappend params_list CONFIG.restrict_count {false}
+lappend params_list CONFIG.sclr {false}
+lappend params_list CONFIG.sinit {true}
+lappend params_list CONFIG.sinit_value {0}
+lappend params_list CONFIG.sset {false}
+lappend params_list CONFIG.sync_ce_priority {Sync_Overrides_CE}
+lappend params_list CONFIG.sync_threshold_output {false}
+lappend params_list CONFIG.syncctrlpriority {Reset_Overrides_Set}
+
+set_property -dict $params_list [get_ips pfb_fir_2048ch_6i_core_c_counter_binary_v12_0_i1]
+}
+
+
+set existingipslist [get_ips]
+if {[lsearch $existingipslist pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8] < 0} {
+create_ip -name blk_mem_gen -version 8.3 -vendor xilinx.com -library ip -module_name pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8
+set params_list [list]
+lappend params_list CONFIG.Component_Name {pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8}
+lappend params_list CONFIG.algorithm {Minimum_Area}
+lappend params_list CONFIG.assume_synchronous_clk {true}
+lappend params_list CONFIG.byte_size {9}
+lappend params_list CONFIG.collision_warnings {ALL}
+lappend params_list CONFIG.disable_collision_warnings {false}
+lappend params_list CONFIG.ecc {false}
+lappend params_list CONFIG.enable_a {Use_ENA_Pin}
+lappend params_list CONFIG.enable_b {Use_ENB_Pin}
+lappend params_list CONFIG.error_injection_type {Single_Bit_Error_Injection}
+lappend params_list CONFIG.fill_remaining_memory_locations {false}
+lappend params_list CONFIG.load_init_file {TRUE}
+lappend params_list CONFIG.memory_type {True_Dual_Port_RAM}
+lappend params_list CONFIG.operating_mode_a {READ_FIRST}
+lappend params_list CONFIG.operating_mode_b {READ_FIRST}
+lappend params_list CONFIG.output_reset_value_a {0}
+lappend params_list CONFIG.output_reset_value_b {0}
+lappend params_list CONFIG.pipeline_stages {0}
+lappend params_list CONFIG.primitive {8kx2}
+lappend params_list CONFIG.read_width_a {9}
+lappend params_list CONFIG.read_width_b {9}
+lappend params_list CONFIG.register_porta_output_of_memory_core {false}
+lappend params_list CONFIG.register_porta_output_of_memory_primitives {true}
+lappend params_list CONFIG.register_portb_output_of_memory_core {false}
+lappend params_list CONFIG.register_portb_output_of_memory_primitives {true}
+lappend params_list CONFIG.remaining_memory_locations {0}
+lappend params_list CONFIG.reset_type {SYNC}
+lappend params_list CONFIG.use_byte_write_enable {false}
+lappend params_list CONFIG.use_error_injection_pins {false}
+lappend params_list CONFIG.use_regcea_pin {false}
+lappend params_list CONFIG.use_regceb_pin {false}
+lappend params_list CONFIG.use_rsta_pin {false}
+lappend params_list CONFIG.use_rstb_pin {false}
+lappend params_list CONFIG.write_depth_a {8192}
+lappend params_list CONFIG.write_width_a {9}
+lappend params_list CONFIG.write_width_b {9}
+lappend params_list CONFIG.coe_file {../pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8_vivado.coe}
+
+set_property -dict $params_list [get_ips pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8]
 }
 
 

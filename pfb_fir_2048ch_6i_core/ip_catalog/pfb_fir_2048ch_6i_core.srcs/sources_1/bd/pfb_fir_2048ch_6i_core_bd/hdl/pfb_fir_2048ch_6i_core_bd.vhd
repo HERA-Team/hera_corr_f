@@ -1,7 +1,7 @@
 --Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
---Tool Version: Vivado v.2016.4 (lin64) Build 1733598 Wed Dec 14 22:35:42 MST 2016
---Date        : Wed Sep 13 10:33:53 2017
+--Tool Version: Vivado v.2016.1 (lin64) Build 1538259 Fri Apr  8 15:45:23 MDT 2016
+--Date        : Fri Feb  9 14:47:42 2018
 --Host        : acme1 running 64-bit Ubuntu 16.04.2 LTS
 --Command     : generate_target pfb_fir_2048ch_6i_core_bd.bd
 --Design      : pfb_fir_2048ch_6i_core_bd
@@ -42,7 +42,7 @@ entity pfb_fir_2048ch_6i_core_bd is
     sync_out : out STD_LOGIC_VECTOR ( 0 to 0 )
   );
   attribute CORE_GENERATION_INFO : string;
-  attribute CORE_GENERATION_INFO of pfb_fir_2048ch_6i_core_bd : entity is "pfb_fir_2048ch_6i_core_bd,IP_Integrator,{x_ipVendor=xilinx.com,x_ipLibrary=BlockDiagram,x_ipName=pfb_fir_2048ch_6i_core_bd,x_ipVersion=1.00.a,x_ipLanguage=VHDL,numBlks=1,numReposBlks=1,numNonXlnxBlks=1,numHierBlks=0,maxHierDepth=0,numSysgenBlks=1,numHlsBlks=0,numHdlrefBlks=0,numPkgbdBlks=0,bdsource=SYSGEN,synth_mode=OOC_per_IP}";
+  attribute CORE_GENERATION_INFO of pfb_fir_2048ch_6i_core_bd : entity is "pfb_fir_2048ch_6i_core_bd,IP_Integrator,{x_ipVendor=xilinx.com,x_ipLibrary=BlockDiagram,x_ipName=pfb_fir_2048ch_6i_core_bd,x_ipVersion=1.00.a,x_ipLanguage=VHDL,numBlks=1,numReposBlks=1,numNonXlnxBlks=1,numHierBlks=0,maxHierDepth=0,numSysgenBlks=1,numHlsBlks=0,numHdlrefBlks=0,numPkgbdBlks=0,bdsource=SYSGEN,synth_mode=Global}";
   attribute HW_HANDOFF : string;
   attribute HW_HANDOFF of pfb_fir_2048ch_6i_core_bd : entity is "pfb_fir_2048ch_6i_core_bd.hwdef";
 end pfb_fir_2048ch_6i_core_bd;
@@ -51,9 +51,8 @@ architecture STRUCTURE of pfb_fir_2048ch_6i_core_bd is
   component pfb_fir_2048ch_6i_core_bd_pfb_fir_2048ch_6i_core_1_0 is
   port (
     pol0_in0 : in STD_LOGIC_VECTOR ( 7 downto 0 );
-    pol1_in0 : in STD_LOGIC_VECTOR ( 7 downto 0 );
-    sync : in STD_LOGIC_VECTOR ( 31 downto 0 );
     pol0_in1 : in STD_LOGIC_VECTOR ( 7 downto 0 );
+    pol1_in0 : in STD_LOGIC_VECTOR ( 7 downto 0 );
     pol1_in1 : in STD_LOGIC_VECTOR ( 7 downto 0 );
     pol2_in0 : in STD_LOGIC_VECTOR ( 7 downto 0 );
     pol2_in1 : in STD_LOGIC_VECTOR ( 7 downto 0 );
@@ -63,10 +62,10 @@ architecture STRUCTURE of pfb_fir_2048ch_6i_core_bd is
     pol4_in1 : in STD_LOGIC_VECTOR ( 7 downto 0 );
     pol5_in0 : in STD_LOGIC_VECTOR ( 7 downto 0 );
     pol5_in1 : in STD_LOGIC_VECTOR ( 7 downto 0 );
+    sync : in STD_LOGIC_VECTOR ( 31 downto 0 );
     clk : in STD_LOGIC;
     pol0_out0 : out STD_LOGIC_VECTOR ( 17 downto 0 );
     pol0_out1 : out STD_LOGIC_VECTOR ( 17 downto 0 );
-    sync_out : out STD_LOGIC_VECTOR ( 0 to 0 );
     pol1_out0 : out STD_LOGIC_VECTOR ( 17 downto 0 );
     pol1_out1 : out STD_LOGIC_VECTOR ( 17 downto 0 );
     pol2_out0 : out STD_LOGIC_VECTOR ( 17 downto 0 );
@@ -76,7 +75,8 @@ architecture STRUCTURE of pfb_fir_2048ch_6i_core_bd is
     pol4_out0 : out STD_LOGIC_VECTOR ( 17 downto 0 );
     pol4_out1 : out STD_LOGIC_VECTOR ( 17 downto 0 );
     pol5_out0 : out STD_LOGIC_VECTOR ( 17 downto 0 );
-    pol5_out1 : out STD_LOGIC_VECTOR ( 17 downto 0 )
+    pol5_out1 : out STD_LOGIC_VECTOR ( 17 downto 0 );
+    sync_out : out STD_LOGIC_VECTOR ( 0 to 0 )
   );
   end component pfb_fir_2048ch_6i_core_bd_pfb_fir_2048ch_6i_core_1_0;
   signal clk_1 : STD_LOGIC;
