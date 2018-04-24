@@ -27,7 +27,7 @@ entity pfb_fir_2048ch_core_stub is
 end pfb_fir_2048ch_core_stub;
 architecture structural of pfb_fir_2048ch_core_stub is 
 begin
-  sysgen_dut : entity xil_defaultlib.pfb_fir_2048ch_core 
+  sysgen_dut : entity xil_defaultlib.pfb_fir_2048ch_core_0 
   port map (
     pol0_in0 => pol0_in0,
     pol0_in1 => pol0_in1,

@@ -1409,7 +1409,6 @@ namespace eval ::xilinx::dsp::planaheadworker {
    # Sets the synthesis settings for vivado.
    #-------------------------------------------------------------------------
    proc dsp_set_vivado_synthesis_settings {} {
-      set_property XPM_LIBRARIES {XPM_CDC XPM_MEMORY} [current_project]
       set paramvalueSynthStrategyName [ dsp_get_param_value_in_driver_tcl_namespace SynthStrategyName ]
       if { [string length ${paramvalueSynthStrategyName}] > 0 } {
          set_property strategy ${paramvalueSynthStrategyName} [get_runs synth_1]
@@ -1540,7 +1539,7 @@ namespace eval ::xilinx::dsp::planaheadworker {
          set vhdl_lib [ dsp_get_vhdllib ]
          dsp_setvhdllib $vhdl_lib
       }
-  		dsp_setipooccache
+    dsp_setipooccache    
    }
 
    #-------------------------------------------------------------------------
@@ -1582,22 +1581,9 @@ namespace eval ::xilinx::dsp::planaheadworker {
    }
 
   #-------------------------------------------------------------------------
-  # Set Remote IP cache if specified from Model Setting.
   # Set IPOOC cache if requested. Also creates the cache root path if it does not exixt
   #-------------------------------------------------------------------------
   proc dsp_setipooccache {} {
-    set enableIPCaching [ dsp_get_param_value_in_driver_tcl_namespace EnableIPCaching ]
-    if {$enableIPCaching == 1} {
-      set ipCachePath [ dsp_get_param_value_in_driver_tcl_namespace IPCachePath ]
-      if { $ipCachePath ne "" } {
-        if {[file isdirectory $ipCachePath] == 0} {
-          file mkdir $ipCachePath
-        } 
-      } 
-    	config_ip_cache -import_from_project -use_cache_location "$ipCachePath"
-		update_ip_catalog    
-    }
-
     set enableIPOOCCaching [ dsp_get_param_value_in_driver_tcl_namespace EnableIPOOCCaching ]
     if {$enableIPOOCCaching == 1} {
       set ipOOCCacheRootPath [ dsp_get_param_value_in_driver_tcl_namespace IPOOCCacheRootPath ]
@@ -1606,7 +1592,7 @@ namespace eval ::xilinx::dsp::planaheadworker {
           file mkdir $ipOOCCacheRootPath
         } 
       } 
-      config_ip_cache -use_cache_location "$ipOOCCacheRootPath"
+      check_ip_cache -use_cache_location "$ipOOCCacheRootPath"
     }
   }
 
@@ -4918,7 +4904,7 @@ proc dsp_is_processor_interfaces_available_on_ip {} {
                    puts $outFile "                     'HDL_File' => 'UNFOUND',"
                    puts $outFile "                     'Line_Num' => 'Line_000',"
                    puts $outFile "                     'HDL_Files' => '',"
-                   puts $outFile "                     'Line_Numbers' => 'Line_000',"
+                   puts $outFile "                     'Line_Numbers' => '',"
                    puts $outFile "                     'Block_Path' => '',"
                    puts $outFile "                     'Hier_Name' => '$hier_cell',"
                    puts $outFile "                     'Ref_Name' => '$ref_name',"
@@ -5018,7 +5004,7 @@ proc dsp_is_processor_interfaces_available_on_ip {} {
                                puts $outFile "                     'HDL_File' => 'UNFOUND',"
                                puts $outFile "                     'Line_Num' => 'Line_000',"
                                puts $outFile "                     'HDL_Files' => '',"
-                               puts $outFile "                     'Line_Numbers' => 'Line_000',"
+                               puts $outFile "                     'Line_Numbers' => '',"
                                puts $outFile "                     'Block_Path' => '',"
                                puts $outFile "                     'Hier_Name' => '$hier_cell',"
                                puts $outFile "                     'Ref_Name' => '$ref_name',"
@@ -5078,7 +5064,7 @@ proc dsp_is_processor_interfaces_available_on_ip {} {
                            puts $outFile "                     'HDL_File' => 'UNFOUND',"
                            puts $outFile "                     'Line_Num' => 'Line_000',"
                            puts $outFile "                     'HDL_Files' => '',"
-                           puts $outFile "                     'Line_Numbers' => 'Line_000',"
+                           puts $outFile "                     'Line_Numbers' => '',"
                            puts $outFile "                     'Block_Path' => '',"
                            puts $outFile "                     'Hier_Name' => '$hier_cell',"
                            puts $outFile "                     'Ref_Name' => '$ref_name',"
@@ -5188,18 +5174,22 @@ proc dsp_is_processor_interfaces_available_on_ip {} {
                        # New properties FILE_NAMES and LINE_NUMBERS were added in 2015.3 to provide this information.
                        list fileNames ""
                        list lineNumberStrings ""
-                       set fileLines [ ::get_property LINE_NUMBERS $parentCell ]
-                       if { [ llength $fileLines ] > 0 } {
+                       if { [ llength [ get_property FILE_NAMES $parentCell ] ] > 0 } {
+                           set filePaths [ ::get_property FILE_NAMES $parentCell ]
+                           set fileLines [ ::get_property LINE_NUMBERS $parentCell ]
                            ### DEBUG
+                           # puts "filePaths : $filePaths"
                            # puts "fileLines : $fileLines"
-                           set numLines [llength $fileLines]
-                           for {set i 0} {$i < $numLines} {set i [expr {$i + 1}]} {
-                               set lNum [lindex $fileLines $i]
-                               ### DEBUG
-                               # puts "lineNum  : $lNum"
-                               lappend fileNames $matchedNetlistFile
-                               set lNumStr "Line_${lNum}"
-                               lappend lineNumberStrings $lNumStr
+                           if { [ llength $filePaths ] > 0 } {
+                               foreach fPath $filePaths lNum $fileLines {
+                                   ### DEBUG
+                                   # puts "filePath : $fPath"
+                                   # puts "lineNum  : $lNum"
+                                   set fName [ file tail $fPath ]
+                                   lappend fileNames $fName
+                                   set lNumStr "Line_${lNum}"
+                                   lappend lineNumberStrings $lNumStr
+                               }
                            }
                        }
                        ### DEBUG
@@ -5422,20 +5412,11 @@ proc dsp_is_processor_interfaces_available_on_ip {} {
            set hdl_language "vhdl"
        }
 
-       set proj_part [::get_property PART $curr_proj]
-       set block_RAMs [::get_property BLOCK_RAMS $proj_part]
-       set DSPs [::get_property DSP $proj_part]
-       set Registers [::get_property FLIPFLOPS $proj_part]
-       set LUT_Elements [::get_property LUT_ELEMENTS $proj_part]
-       # Ultra RAMs are added in UltraScale+ devices
-       # the ULTRA_RAMS propery will not be present for other 
-       # device parts from 7/8 series/UltraScale families
-       set Ultra_RAMs ""
-       set uram_property "ULTRA_RAMS"
-       set part_properties [list_property $proj_part]
-       if { [lsearch $part_properties $uram_property] } {
-          set Ultra_RAMs [::get_property ULTRA_RAMS $proj_part]
-       }
+       set proj_part [get_property PART $curr_proj]
+       set block_RAMs [get_property BLOCK_RAMS $proj_part]
+       set DSPs [get_property DSP $proj_part]
+       set Registers [get_property FLIPFLOPS $proj_part]
+       set LUT_Elements [get_property LUT_ELEMENTS $proj_part]
 
        set outFile [ open ${res_util_data_file} w ]
        puts $outFile "\# Vivado resource utilization data is represented in anytable format"
@@ -5452,9 +5433,6 @@ proc dsp_is_processor_interfaces_available_on_ip {} {
        puts $outFile "   \],"
        puts $outFile "   'Device_Resources' => \["
        puts $outFile "     { "
-       if { $Ultra_RAMs > 0 } {
-           puts $outFile "        'URAMs' => '${Ultra_RAMs}',"
-       }
        puts $outFile "        'BRAMs' => '${block_RAMs}',"
        puts $outFile "        'DSPs' => '${DSPs}',"
        puts $outFile "        'Registers' => '${Registers}',"
@@ -5478,12 +5456,12 @@ proc dsp_is_processor_interfaces_available_on_ip {} {
            # name of ${top_name}_struct instance
            set cell_list [ get_cells $wrapper_top_instance/*]
            foreach cl $cell_list {
-               set is_prim [ ::get_property IS_PRIMITIVE $cl ]
+               set is_prim [ get_property IS_PRIMITIVE $cl ]
                if { $is_prim == 1 } {
                    continue
                }
                ### DEBUG
-               # set cell_name [ ::get_property NAME $cl ]
+               # set cell_name [ get_property NAME $cl ]
                # puts "DEBUG: Cell Name: $cell_name"
                set top_struct_instance [ dsp_find_top_struct_instance $cl $hdlNetlistFile $expected_top_instance ]
                if { [llength $top_struct_instance] > 0 } {
@@ -5507,13 +5485,13 @@ proc dsp_is_processor_interfaces_available_on_ip {} {
                # name of ${top_name}_struct instance
                set cell_list [ get_cells $wrapper_top_instance/*]
                foreach cl $cell_list {
-                   set is_prim [ ::get_property IS_PRIMITIVE $cl ]
+                   set is_prim [ get_property IS_PRIMITIVE $cl ]
                    if { $is_prim == 1 } {
                        continue
                    }
 
                     ### DEBUG
-                   set cell_name [ ::get_property NAME $cl ]
+                   set cell_name [ get_property NAME $cl ]
                    # puts "DEBUG: design wrapper cell name: $cell_name"
                    set top_struct_instance [ dsp_find_top_struct_instance $cl $hdlNetlistFile $expected_top_instance ]
                    if { [llength $top_struct_instance] > 0 } {
@@ -5529,13 +5507,13 @@ proc dsp_is_processor_interfaces_available_on_ip {} {
                set wrapper_RU_data [dict create "cell_name" $design_wrapper_name]
                set cell_list [ get_cells $wrapper_top_instance/*]
                foreach cl $cell_list {
-                   set is_prim [ ::get_property IS_PRIMITIVE $cl ]
+                   set is_prim [ get_property IS_PRIMITIVE $cl ]
                    if { $is_prim == 1 } {
                        continue
                    }
 
                     ### DEBUG
-                   set cell_name [ ::get_property NAME $cl ]
+                   set cell_name [ get_property NAME $cl ]
                    # puts "DEBUG: design wrapper cell name: $cell_name"
                    # puts "DEBUG: getting resource utilization for design wrapper cell name : $cell_name"
                    set cell_RU_data [ dsp_get_resource_utilization_data $cl $hdlNetlistFile $outFile $design_top_instance $logic_level ]
@@ -5558,8 +5536,8 @@ proc dsp_is_processor_interfaces_available_on_ip {} {
                            } else {
                                dict set wrapper_RU_data $id $val
                            }
-                           ### DEBUG
-                           # puts "Primitive: $id Value: $val"
+                               ### DEBUG
+                               # puts "Primitive: $id Value: $val"
                        }
                    }
                }
@@ -5688,18 +5666,18 @@ proc dsp_is_processor_interfaces_available_on_ip {} {
    proc dsp_get_resource_utilization_data {cellName hdlNetlistFile outFile designTopInstance logicLevel} {
        # set count 0
        set cell_RU_data [ dict create "cell_name" $cellName ]
-       set is_prim [ ::get_property IS_PRIMITIVE $cellName ]
+       set is_prim [ get_property IS_PRIMITIVE $cellName ]
        if { $is_prim == 1 } {
-           set ref_name [ ::get_property REF_NAME $cellName ]
+           set ref_name [ get_property REF_NAME $cellName ]
            # Ground (GND), and Power Supply (VCC) type of primitives
-           # are not mapped to LUTs, BRAMs, URAMs, Registers or DSPs
+           # are not mapped to LUTs, BRAMs, Registers or DSPs
            if { [string equal $ref_name "GND"] == 0 &&
                 [string equal $ref_name "VCC"] == 0 } {
 
                # CARRY4 and CARRY8 are also not mapped to the primitive types of
                # our interest but still will be printed in the output file just
                # to preserve the information
-               set prim_count [ ::get_property PRIMITIVE_COUNT $cellName ]
+               set prim_count [ get_property PRIMITIVE_COUNT $cellName ]
                ### DEBUG
                # puts "Primitive Name: $ref_name, Count: $prim_count"
                dict set cell_RU_data $ref_name $prim_count
@@ -5728,12 +5706,6 @@ proc dsp_is_processor_interfaces_available_on_ip {} {
                }
                if { [ string match "RAMB36*" $ref_name ] || [string match "FIFO36*" $ref_name] } {
                    dict set cell_RU_data "Total_BRAMs" $prim_count
-               }
-               # Ultra RAMs are added for UltraScale+ device families
-               # This primitive resource is reported separately from BRAMs (Block RAMS + FIFO)
-               # resource in Vivado resource utilization report
-               if { [ string match "URAM*" $ref_name ] } {
-                   dict set cell_RU_data "Total_URAMs" $prim_count
                }
            }
        } else {

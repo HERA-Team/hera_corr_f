@@ -3,7 +3,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_bussify is
+entity pfb_fir_2048ch_6i_core_bussify_x6 is
   port (
     in1 : in std_logic_vector( 18-1 downto 0 );
     in2 : in std_logic_vector( 18-1 downto 0 );
@@ -19,33 +19,33 @@ entity pfb_fir_2048ch_6i_core_bussify is
     in12 : in std_logic_vector( 18-1 downto 0 );
     bus_out : out std_logic_vector( 216-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_bussify;
-architecture structural of pfb_fir_2048ch_6i_core_bussify is 
+end pfb_fir_2048ch_6i_core_bussify_x6;
+architecture structural of pfb_fir_2048ch_6i_core_bussify_x6 is 
   signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret9_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret10_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal adder_s_net_x8 : std_logic_vector( 18-1 downto 0 );
-  signal adder_s_net_x4 : std_logic_vector( 18-1 downto 0 );
-  signal adder_s_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal adder_s_net_x3 : std_logic_vector( 18-1 downto 0 );
-  signal adder_s_net_x2 : std_logic_vector( 18-1 downto 0 );
-  signal adder_s_net_x10 : std_logic_vector( 18-1 downto 0 );
-  signal adder_s_net_x7 : std_logic_vector( 18-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 216-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal adder_s_net_x6 : std_logic_vector( 18-1 downto 0 );
   signal adder_s_net_x1 : std_logic_vector( 18-1 downto 0 );
   signal adder_s_net_x9 : std_logic_vector( 18-1 downto 0 );
-  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
-  signal adder_s_net_x6 : std_logic_vector( 18-1 downto 0 );
+  signal adder_s_net_x10 : std_logic_vector( 18-1 downto 0 );
+  signal adder_s_net_x3 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal adder_s_net_x4 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 216-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal adder_s_net_x2 : std_logic_vector( 18-1 downto 0 );
   signal adder_s_net_x5 : std_logic_vector( 18-1 downto 0 );
+  signal adder_s_net_x8 : std_logic_vector( 18-1 downto 0 );
+  signal adder_s_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal adder_s_net_x7 : std_logic_vector( 18-1 downto 0 );
+  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   adder_s_net_x10 <= in1;
@@ -86,6 +86,30 @@ begin
     clr => '0',
     input_port => adder_s_net_x10,
     output_port => reinterpret1_output_port_net
+  );
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_86149e1cd3 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => adder_s_net_x0,
+    output_port => reinterpret10_output_port_net
+  );
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_86149e1cd3 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => adder_s_net_x8,
+    output_port => reinterpret11_output_port_net
+  );
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_86149e1cd3 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => adder_s_net_x7,
+    output_port => reinterpret12_output_port_net
   );
   reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_86149e1cd3 
   port map (
@@ -151,30 +175,6 @@ begin
     input_port => adder_s_net,
     output_port => reinterpret9_output_port_net
   );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_86149e1cd3 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => adder_s_net_x0,
-    output_port => reinterpret10_output_port_net
-  );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_86149e1cd3 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => adder_s_net_x8,
-    output_port => reinterpret11_output_port_net
-  );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_86149e1cd3 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => adder_s_net_x7,
-    output_port => reinterpret12_output_port_net
-  );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/bus_convert/conv1
 library IEEE;
@@ -191,17 +191,17 @@ entity pfb_fir_2048ch_6i_core_conv1 is
 end pfb_fir_2048ch_6i_core_conv1;
 architecture structural of pfb_fir_2048ch_6i_core_conv1 is 
   signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal bit_y_net : std_logic_vector( 1-1 downto 0 );
-  signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 29-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal tweak_op_y_net : std_logic_vector( 1-1 downto 0 );
+  signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
   signal clk_net : std_logic;
   signal ce_net : std_logic;
-  signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
-  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret12_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 29-1 downto 0 );
+  signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
+  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal bit_y_net : std_logic_vector( 1-1 downto 0 );
+  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
 begin
   out_x0 <= adder_s_net;
   reinterpret12_output_port_net <= in_x0;
@@ -320,18 +320,18 @@ entity pfb_fir_2048ch_6i_core_conv10 is
   );
 end pfb_fir_2048ch_6i_core_conv10;
 architecture structural of pfb_fir_2048ch_6i_core_conv10 is 
+  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
   signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
   signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
   signal bit_y_net : std_logic_vector( 1-1 downto 0 );
+  signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
+  signal clk_net : std_logic;
+  signal reinterpret3_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
+  signal ce_net : std_logic;
   signal concat_y_net : std_logic_vector( 29-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal tweak_op_y_net : std_logic_vector( 1-1 downto 0 );
-  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal clk_net : std_logic;
-  signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
-  signal ce_net : std_logic;
 begin
   out_x0 <= adder_s_net;
   reinterpret3_output_port_net <= in_x0;
@@ -450,18 +450,18 @@ entity pfb_fir_2048ch_6i_core_conv11 is
   );
 end pfb_fir_2048ch_6i_core_conv11;
 architecture structural of pfb_fir_2048ch_6i_core_conv11 is 
-  signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
-  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal bit_y_net : std_logic_vector( 1-1 downto 0 );
+  signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
   signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 29-1 downto 0 );
+  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal ce_net : std_logic;
+  signal clk_net : std_logic;
+  signal reinterpret2_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
   signal constant_op_net : std_logic_vector( 1-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 29-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal tweak_op_y_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
 begin
   out_x0 <= adder_s_net;
   reinterpret2_output_port_net <= in_x0;
@@ -580,18 +580,18 @@ entity pfb_fir_2048ch_6i_core_conv12 is
   );
 end pfb_fir_2048ch_6i_core_conv12;
 architecture structural of pfb_fir_2048ch_6i_core_conv12 is 
+  signal tweak_op_y_net : std_logic_vector( 1-1 downto 0 );
+  signal clk_net : std_logic;
+  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
   signal concat_y_net : std_logic_vector( 29-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal tweak_op_y_net : std_logic_vector( 1-1 downto 0 );
-  signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
-  signal bit_y_net : std_logic_vector( 1-1 downto 0 );
-  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
+  signal bit_y_net : std_logic_vector( 1-1 downto 0 );
+  signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
   signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
+  signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
+  signal ce_net : std_logic;
 begin
   out_x0 <= adder_s_net;
   reinterpret1_output_port_net <= in_x0;
@@ -710,18 +710,18 @@ entity pfb_fir_2048ch_6i_core_conv2 is
   );
 end pfb_fir_2048ch_6i_core_conv2;
 architecture structural of pfb_fir_2048ch_6i_core_conv2 is 
-  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
+  signal bit_y_net : std_logic_vector( 1-1 downto 0 );
   signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
+  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
+  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal tweak_op_y_net : std_logic_vector( 1-1 downto 0 );
   signal concat_y_net : std_logic_vector( 29-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal tweak_op_y_net : std_logic_vector( 1-1 downto 0 );
-  signal ce_net : std_logic;
-  signal reinterpret11_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal clk_net : std_logic;
   signal adder_s_net : std_logic_vector( 18-1 downto 0 );
-  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal bit_y_net : std_logic_vector( 1-1 downto 0 );
+  signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
+  signal ce_net : std_logic;
+  signal clk_net : std_logic;
+  signal reinterpret11_output_port_net : std_logic_vector( 28-1 downto 0 );
 begin
   out_x0 <= adder_s_net;
   reinterpret11_output_port_net <= in_x0;
@@ -840,18 +840,18 @@ entity pfb_fir_2048ch_6i_core_conv3 is
   );
 end pfb_fir_2048ch_6i_core_conv3;
 architecture structural of pfb_fir_2048ch_6i_core_conv3 is 
-  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
-  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
+  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
+  signal ce_net : std_logic;
+  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal bit_y_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal tweak_op_y_net : std_logic_vector( 1-1 downto 0 );
   signal concat_y_net : std_logic_vector( 29-1 downto 0 );
-  signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
+  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
 begin
   out_x0 <= adder_s_net;
   reinterpret10_output_port_net <= in_x0;
@@ -970,18 +970,18 @@ entity pfb_fir_2048ch_6i_core_conv4 is
   );
 end pfb_fir_2048ch_6i_core_conv4;
 architecture structural of pfb_fir_2048ch_6i_core_conv4 is 
-  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
-  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
+  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
   signal concat_y_net : std_logic_vector( 29-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal tweak_op_y_net : std_logic_vector( 1-1 downto 0 );
   signal clk_net : std_logic;
-  signal ce_net : std_logic;
+  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
   signal bit_y_net : std_logic_vector( 1-1 downto 0 );
+  signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
+  signal ce_net : std_logic;
 begin
   out_x0 <= adder_s_net;
   reinterpret9_output_port_net <= in_x0;
@@ -1101,16 +1101,16 @@ entity pfb_fir_2048ch_6i_core_conv5 is
 end pfb_fir_2048ch_6i_core_conv5;
 architecture structural of pfb_fir_2048ch_6i_core_conv5 is 
   signal adder_s_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal clk_net : std_logic;
+  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal bit_y_net : std_logic_vector( 1-1 downto 0 );
-  signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
-  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
+  signal clk_net : std_logic;
+  signal reinterpret8_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal concat_y_net : std_logic_vector( 29-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal tweak_op_y_net : std_logic_vector( 1-1 downto 0 );
   signal ce_net : std_logic;
-  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
+  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
   signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
 begin
   out_x0 <= adder_s_net;
@@ -1230,18 +1230,18 @@ entity pfb_fir_2048ch_6i_core_conv6 is
   );
 end pfb_fir_2048ch_6i_core_conv6;
 architecture structural of pfb_fir_2048ch_6i_core_conv6 is 
-  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
   signal ce_net : std_logic;
   signal adder_s_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal clk_net : std_logic;
-  signal bit_y_net : std_logic_vector( 1-1 downto 0 );
-  signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
-  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
   signal concat_y_net : std_logic_vector( 29-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal tweak_op_y_net : std_logic_vector( 1-1 downto 0 );
   signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
+  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
+  signal bit_y_net : std_logic_vector( 1-1 downto 0 );
 begin
   out_x0 <= adder_s_net;
   reinterpret7_output_port_net <= in_x0;
@@ -1360,17 +1360,17 @@ entity pfb_fir_2048ch_6i_core_conv7 is
   );
 end pfb_fir_2048ch_6i_core_conv7;
 architecture structural of pfb_fir_2048ch_6i_core_conv7 is 
-  signal reinterpret6_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal tweak_op_y_net : std_logic_vector( 1-1 downto 0 );
-  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 29-1 downto 0 );
   signal adder_s_net : std_logic_vector( 18-1 downto 0 );
   signal bit_y_net : std_logic_vector( 1-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 29-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal tweak_op_y_net : std_logic_vector( 1-1 downto 0 );
+  signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
+  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal ce_net : std_logic;
+  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
+  signal clk_net : std_logic;
+  signal reinterpret6_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
 begin
   out_x0 <= adder_s_net;
@@ -1490,18 +1490,18 @@ entity pfb_fir_2048ch_6i_core_conv8 is
   );
 end pfb_fir_2048ch_6i_core_conv8;
 architecture structural of pfb_fir_2048ch_6i_core_conv8 is 
-  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
-  signal bit_y_net : std_logic_vector( 1-1 downto 0 );
   signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
+  signal bit_y_net : std_logic_vector( 1-1 downto 0 );
+  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
   signal concat_y_net : std_logic_vector( 29-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal tweak_op_y_net : std_logic_vector( 1-1 downto 0 );
-  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
-  signal clk_net : std_logic;
   signal ce_net : std_logic;
+  signal clk_net : std_logic;
+  signal reinterpret5_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
+  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
 begin
   out_x0 <= adder_s_net;
   reinterpret5_output_port_net <= in_x0;
@@ -1620,18 +1620,18 @@ entity pfb_fir_2048ch_6i_core_conv9 is
   );
 end pfb_fir_2048ch_6i_core_conv9;
 architecture structural of pfb_fir_2048ch_6i_core_conv9 is 
-  signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
-  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
+  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
   signal concat_y_net : std_logic_vector( 29-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal tweak_op_y_net : std_logic_vector( 1-1 downto 0 );
-  signal constant_op_net : std_logic_vector( 1-1 downto 0 );
+  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal clk_net : std_logic;
   signal ce_net : std_logic;
-  signal force1_output_port_net : std_logic_vector( 29-1 downto 0 );
-  signal force2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal bit_y_net : std_logic_vector( 1-1 downto 0 );
+  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
+  signal almost_half_op_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 28-1 downto 0 );
 begin
   out_x0 <= adder_s_net;
   reinterpret4_output_port_net <= in_x0;
@@ -1741,7 +1741,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_debus is
+entity pfb_fir_2048ch_6i_core_debus_x0 is
   port (
     bus_in : in std_logic_vector( 336-1 downto 0 );
     msb_out12 : out std_logic_vector( 28-1 downto 0 );
@@ -1757,33 +1757,33 @@ entity pfb_fir_2048ch_6i_core_debus is
     out2 : out std_logic_vector( 28-1 downto 0 );
     lsb_out1 : out std_logic_vector( 28-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_debus;
-architecture structural of pfb_fir_2048ch_6i_core_debus is 
-  signal reinterpret9_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 28-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 28-1 downto 0 );
-  signal slice8_y_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 336-1 downto 0 );
-  signal slice12_y_net : std_logic_vector( 28-1 downto 0 );
-  signal slice5_y_net : std_logic_vector( 28-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 28-1 downto 0 );
+end pfb_fir_2048ch_6i_core_debus_x0;
+architecture structural of pfb_fir_2048ch_6i_core_debus_x0 is 
+  signal reinterpret5_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal slice11_y_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret11_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret10_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret7_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret6_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 336-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 28-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 28-1 downto 0 );
+  signal slice10_y_net : std_logic_vector( 28-1 downto 0 );
+  signal slice9_y_net : std_logic_vector( 28-1 downto 0 );
+  signal slice11_y_net : std_logic_vector( 28-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 28-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 28-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 28-1 downto 0 );
+  signal slice12_y_net : std_logic_vector( 28-1 downto 0 );
   signal slice7_y_net : std_logic_vector( 28-1 downto 0 );
   signal slice3_y_net : std_logic_vector( 28-1 downto 0 );
-  signal slice9_y_net : std_logic_vector( 28-1 downto 0 );
-  signal slice10_y_net : std_logic_vector( 28-1 downto 0 );
-  signal slice6_y_net : std_logic_vector( 28-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 28-1 downto 0 );
 begin
   msb_out12 <= reinterpret12_output_port_net;
   out11 <= reinterpret11_output_port_net;
@@ -1806,6 +1806,30 @@ begin
     input_port => slice1_y_net,
     output_port => reinterpret1_output_port_net
   );
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice10_y_net,
+    output_port => reinterpret10_output_port_net
+  );
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice11_y_net,
+    output_port => reinterpret11_output_port_net
+  );
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice12_y_net,
+    output_port => reinterpret12_output_port_net
+  );
   reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
   port map (
     clk => '0',
@@ -1813,6 +1837,62 @@ begin
     clr => '0',
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice3_y_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice4_y_net,
+    output_port => reinterpret4_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice9_y_net,
+    output_port => reinterpret9_output_port_net
   );
   slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -1825,35 +1905,16 @@ begin
     x => concatenate_y_net,
     y => slice1_y_net
   );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 28,
-    new_msb => 55,
+    new_lsb => 252,
+    new_msb => 279,
     x_width => 336,
     y_width => 28
   )
   port map (
     x => concatenate_y_net,
-    y => slice2_y_net
-  );
-  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 308,
-    new_msb => 335,
-    x_width => 336,
-    y_width => 28
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice12_y_net
-  );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice12_y_net,
-    output_port => reinterpret12_output_port_net
+    y => slice10_y_net
   );
   slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -1866,146 +1927,27 @@ begin
     x => concatenate_y_net,
     y => slice11_y_net
   );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice11_y_net,
-    output_port => reinterpret11_output_port_net
-  );
-  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 252,
-    new_msb => 279,
+    new_lsb => 308,
+    new_msb => 335,
     x_width => 336,
     y_width => 28
   )
   port map (
     x => concatenate_y_net,
-    y => slice10_y_net
+    y => slice12_y_net
   );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice10_y_net,
-    output_port => reinterpret10_output_port_net
-  );
-  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 224,
-    new_msb => 251,
+    new_lsb => 28,
+    new_msb => 55,
     x_width => 336,
     y_width => 28
   )
   port map (
     x => concatenate_y_net,
-    y => slice9_y_net
-  );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice9_y_net,
-    output_port => reinterpret9_output_port_net
-  );
-  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 196,
-    new_msb => 223,
-    x_width => 336,
-    y_width => 28
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice8_y_net
-  );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice8_y_net,
-    output_port => reinterpret8_output_port_net
-  );
-  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 168,
-    new_msb => 195,
-    x_width => 336,
-    y_width => 28
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice7_y_net
-  );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice7_y_net,
-    output_port => reinterpret7_output_port_net
-  );
-  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 140,
-    new_msb => 167,
-    x_width => 336,
-    y_width => 28
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice6_y_net
-  );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice6_y_net,
-    output_port => reinterpret6_output_port_net
-  );
-  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 112,
-    new_msb => 139,
-    x_width => 336,
-    y_width => 28
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice5_y_net
-  );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice5_y_net,
-    output_port => reinterpret5_output_port_net
-  );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 84,
-    new_msb => 111,
-    x_width => 336,
-    y_width => 28
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice4_y_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice4_y_net,
-    output_port => reinterpret4_output_port_net
+    y => slice2_y_net
   );
   slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -2018,13 +1960,71 @@ begin
     x => concatenate_y_net,
     y => slice3_y_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 84,
+    new_msb => 111,
+    x_width => 336,
+    y_width => 28
+  )
   port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice3_y_net,
-    output_port => reinterpret3_output_port_net
+    x => concatenate_y_net,
+    y => slice4_y_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 112,
+    new_msb => 139,
+    x_width => 336,
+    y_width => 28
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice5_y_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 140,
+    new_msb => 167,
+    x_width => 336,
+    y_width => 28
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice6_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 168,
+    new_msb => 195,
+    x_width => 336,
+    y_width => 28
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice7_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 196,
+    new_msb => 223,
+    x_width => 336,
+    y_width => 28
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice8_y_net
+  );
+  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 224,
+    new_msb => 251,
+    x_width => 336,
+    y_width => 28
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice9_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/bus_convert
@@ -2041,40 +2041,40 @@ entity pfb_fir_2048ch_6i_core_bus_convert is
   );
 end pfb_fir_2048ch_6i_core_bus_convert;
 architecture structural of pfb_fir_2048ch_6i_core_bus_convert is 
-  signal reinterpret9_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal adder_s_net_x6 : std_logic_vector( 18-1 downto 0 );
+  signal adder_s_net_x7 : std_logic_vector( 18-1 downto 0 );
+  signal adder_s_net_x8 : std_logic_vector( 18-1 downto 0 );
   signal reinterpret6_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 216-1 downto 0 );
-  signal concatenate_y_net_x0 : std_logic_vector( 336-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
   signal adder_s_net_x9 : std_logic_vector( 18-1 downto 0 );
   signal adder_s_net_x10 : std_logic_vector( 18-1 downto 0 );
   signal adder_s_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal adder_s_net_x1 : std_logic_vector( 18-1 downto 0 );
-  signal adder_s_net_x2 : std_logic_vector( 18-1 downto 0 );
+  signal adder_s_net_x3 : std_logic_vector( 18-1 downto 0 );
+  signal adder_s_net_x4 : std_logic_vector( 18-1 downto 0 );
+  signal adder_s_net_x5 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 216-1 downto 0 );
+  signal clk_net : std_logic;
+  signal ce_net : std_logic;
   signal reinterpret3_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret2_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret11_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret10_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal adder_s_net : std_logic_vector( 18-1 downto 0 );
+  signal adder_s_net_x1 : std_logic_vector( 18-1 downto 0 );
+  signal adder_s_net_x2 : std_logic_vector( 18-1 downto 0 );
   signal reinterpret12_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal adder_s_net_x3 : std_logic_vector( 18-1 downto 0 );
-  signal adder_s_net_x4 : std_logic_vector( 18-1 downto 0 );
-  signal adder_s_net_x5 : std_logic_vector( 18-1 downto 0 );
-  signal adder_s_net_x6 : std_logic_vector( 18-1 downto 0 );
-  signal adder_s_net_x7 : std_logic_vector( 18-1 downto 0 );
-  signal adder_s_net_x8 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal concatenate_y_net_x0 : std_logic_vector( 336-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 28-1 downto 0 );
 begin
   dout <= concatenate_y_net;
   concatenate_y_net_x0 <= din;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify 
+  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x6 
   port map (
     in1 => adder_s_net,
     in2 => adder_s_net_x3,
@@ -2174,7 +2174,7 @@ begin
     ce_1 => ce_net,
     out_x0 => adder_s_net_x10
   );
-  debus : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus 
+  debus : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_x0 
   port map (
     bus_in => concatenate_y_net_x0,
     msb_out12 => reinterpret12_output_port_net,
@@ -2214,31 +2214,31 @@ entity pfb_fir_2048ch_6i_core_bus_create is
   );
 end pfb_fir_2048ch_6i_core_bus_create;
 architecture structural of pfb_fir_2048ch_6i_core_bus_create is 
-  signal reinterpret10_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal pol2_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal pol3_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal pol4_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal pol4_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal pol5_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal pol0_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal pol1_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 96-1 downto 0 );
-  signal pol0_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal pol1_in0_net : std_logic_vector( 8-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal reinterpret4_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal reinterpret5_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal pol3_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal pol2_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal pol1_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal pol4_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal pol2_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 96-1 downto 0 );
+  signal pol0_in0_net : std_logic_vector( 8-1 downto 0 );
   signal reinterpret6_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal reinterpret7_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal reinterpret8_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal pol5_in1_net : std_logic_vector( 8-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal pol1_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal pol2_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal pol5_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal pol0_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal pol4_in0_net : std_logic_vector( 8-1 downto 0 );
   signal pol3_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal pol5_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 8-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   pol0_in0_net <= in1;
@@ -2279,6 +2279,30 @@ begin
     clr => '0',
     input_port => pol0_in0_net,
     output_port => reinterpret1_output_port_net
+  );
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_62cec8617c 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => pol3_in1_net,
+    output_port => reinterpret10_output_port_net
+  );
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_62cec8617c 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => pol4_in1_net,
+    output_port => reinterpret11_output_port_net
+  );
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_62cec8617c 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => pol5_in1_net,
+    output_port => reinterpret12_output_port_net
   );
   reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_62cec8617c 
   port map (
@@ -2344,30 +2368,6 @@ begin
     input_port => pol2_in1_net,
     output_port => reinterpret9_output_port_net
   );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_62cec8617c 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => pol3_in1_net,
-    output_port => reinterpret10_output_port_net
-  );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_62cec8617c 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => pol4_in1_net,
-    output_port => reinterpret11_output_port_net
-  );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_62cec8617c 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => pol5_in1_net,
-    output_port => reinterpret12_output_port_net
-  );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/bus_expand
 library IEEE;
@@ -2392,31 +2392,31 @@ entity pfb_fir_2048ch_6i_core_bus_expand is
   );
 end pfb_fir_2048ch_6i_core_bus_expand;
 architecture structural of pfb_fir_2048ch_6i_core_bus_expand is 
-  signal slice2_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 18-1 downto 0 );
   signal slice12_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice6_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice7_y_net : std_logic_vector( 18-1 downto 0 );
   signal slice8_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 216-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal slice3_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 18-1 downto 0 );
   signal slice9_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 18-1 downto 0 );
   signal slice5_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice10_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal slice11_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice10_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 216-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
 begin
   msb_out12 <= reinterpret12_output_port_net;
   out11 <= reinterpret11_output_port_net;
@@ -2439,6 +2439,30 @@ begin
     input_port => slice1_y_net,
     output_port => reinterpret1_output_port_net
   );
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice10_y_net,
+    output_port => reinterpret10_output_port_net
+  );
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice11_y_net,
+    output_port => reinterpret11_output_port_net
+  );
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice12_y_net,
+    output_port => reinterpret12_output_port_net
+  );
   reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
   port map (
     clk => '0',
@@ -2446,6 +2470,62 @@ begin
     clr => '0',
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice3_y_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice4_y_net,
+    output_port => reinterpret4_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice9_y_net,
+    output_port => reinterpret9_output_port_net
   );
   slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -2458,35 +2538,16 @@ begin
     x => concatenate_y_net,
     y => slice1_y_net
   );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 18,
-    new_msb => 35,
+    new_lsb => 162,
+    new_msb => 179,
     x_width => 216,
     y_width => 18
   )
   port map (
     x => concatenate_y_net,
-    y => slice2_y_net
-  );
-  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 198,
-    new_msb => 215,
-    x_width => 216,
-    y_width => 18
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice12_y_net
-  );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice12_y_net,
-    output_port => reinterpret12_output_port_net
+    y => slice10_y_net
   );
   slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -2499,146 +2560,27 @@ begin
     x => concatenate_y_net,
     y => slice11_y_net
   );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice11_y_net,
-    output_port => reinterpret11_output_port_net
-  );
-  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 162,
-    new_msb => 179,
+    new_lsb => 198,
+    new_msb => 215,
     x_width => 216,
     y_width => 18
   )
   port map (
     x => concatenate_y_net,
-    y => slice10_y_net
+    y => slice12_y_net
   );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice10_y_net,
-    output_port => reinterpret10_output_port_net
-  );
-  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 144,
-    new_msb => 161,
+    new_lsb => 18,
+    new_msb => 35,
     x_width => 216,
     y_width => 18
   )
   port map (
     x => concatenate_y_net,
-    y => slice9_y_net
-  );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice9_y_net,
-    output_port => reinterpret9_output_port_net
-  );
-  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 126,
-    new_msb => 143,
-    x_width => 216,
-    y_width => 18
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice8_y_net
-  );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice8_y_net,
-    output_port => reinterpret8_output_port_net
-  );
-  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 108,
-    new_msb => 125,
-    x_width => 216,
-    y_width => 18
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice7_y_net
-  );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice7_y_net,
-    output_port => reinterpret7_output_port_net
-  );
-  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 90,
-    new_msb => 107,
-    x_width => 216,
-    y_width => 18
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice6_y_net
-  );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice6_y_net,
-    output_port => reinterpret6_output_port_net
-  );
-  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 72,
-    new_msb => 89,
-    x_width => 216,
-    y_width => 18
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice5_y_net
-  );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice5_y_net,
-    output_port => reinterpret5_output_port_net
-  );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 54,
-    new_msb => 71,
-    x_width => 216,
-    y_width => 18
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice4_y_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice4_y_net,
-    output_port => reinterpret4_output_port_net
+    y => slice2_y_net
   );
   slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -2651,13 +2593,71 @@ begin
     x => concatenate_y_net,
     y => slice3_y_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 54,
+    new_msb => 71,
+    x_width => 216,
+    y_width => 18
+  )
   port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice3_y_net,
-    output_port => reinterpret3_output_port_net
+    x => concatenate_y_net,
+    y => slice4_y_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 72,
+    new_msb => 89,
+    x_width => 216,
+    y_width => 18
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice5_y_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 90,
+    new_msb => 107,
+    x_width => 216,
+    y_width => 18
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice6_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 108,
+    new_msb => 125,
+    x_width => 216,
+    y_width => 18
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice7_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 126,
+    new_msb => 143,
+    x_width => 216,
+    y_width => 18
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice8_y_net
+  );
+  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 144,
+    new_msb => 161,
+    x_width => 216,
+    y_width => 18
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice9_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/bus_scale/bussify
@@ -2665,7 +2665,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_bussify_x0 is
+entity pfb_fir_2048ch_6i_core_bussify_x5 is
   port (
     in1 : in std_logic_vector( 28-1 downto 0 );
     in2 : in std_logic_vector( 28-1 downto 0 );
@@ -2681,33 +2681,33 @@ entity pfb_fir_2048ch_6i_core_bussify_x0 is
     in12 : in std_logic_vector( 28-1 downto 0 );
     bus_out : out std_logic_vector( 336-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_bussify_x0;
-architecture structural of pfb_fir_2048ch_6i_core_bussify_x0 is 
-  signal scale11_op_net : std_logic_vector( 28-1 downto 0 );
+end pfb_fir_2048ch_6i_core_bussify_x5;
+architecture structural of pfb_fir_2048ch_6i_core_bussify_x5 is 
+  signal reinterpret1_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal scale12_op_net : std_logic_vector( 28-1 downto 0 );
+  signal scale10_op_net : std_logic_vector( 28-1 downto 0 );
+  signal scale11_op_net : std_logic_vector( 28-1 downto 0 );
   signal scale8_op_net : std_logic_vector( 28-1 downto 0 );
   signal scale9_op_net : std_logic_vector( 28-1 downto 0 );
-  signal scale10_op_net : std_logic_vector( 28-1 downto 0 );
-  signal scale5_op_net : std_logic_vector( 28-1 downto 0 );
   signal scale6_op_net : std_logic_vector( 28-1 downto 0 );
   signal scale7_op_net : std_logic_vector( 28-1 downto 0 );
-  signal scale3_op_net : std_logic_vector( 28-1 downto 0 );
   signal scale4_op_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal scale5_op_net : std_logic_vector( 28-1 downto 0 );
+  signal scale3_op_net : std_logic_vector( 28-1 downto 0 );
+  signal scale2_op_net : std_logic_vector( 28-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 336-1 downto 0 );
+  signal scale1_op_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret2_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret4_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret5_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret6_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret7_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 336-1 downto 0 );
-  signal scale1_op_net : std_logic_vector( 28-1 downto 0 );
-  signal scale2_op_net : std_logic_vector( 28-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   scale1_op_net <= in1;
@@ -2748,6 +2748,30 @@ begin
     clr => '0',
     input_port => scale1_op_net,
     output_port => reinterpret1_output_port_net
+  );
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_410f9ade60 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => scale10_op_net,
+    output_port => reinterpret10_output_port_net
+  );
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_410f9ade60 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => scale11_op_net,
+    output_port => reinterpret11_output_port_net
+  );
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_410f9ade60 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => scale12_op_net,
+    output_port => reinterpret12_output_port_net
   );
   reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_410f9ade60 
   port map (
@@ -2813,37 +2837,13 @@ begin
     input_port => scale9_op_net,
     output_port => reinterpret9_output_port_net
   );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_410f9ade60 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => scale10_op_net,
-    output_port => reinterpret10_output_port_net
-  );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_410f9ade60 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => scale11_op_net,
-    output_port => reinterpret11_output_port_net
-  );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_410f9ade60 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => scale12_op_net,
-    output_port => reinterpret12_output_port_net
-  );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/bus_scale/debus
 library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_debus_x0 is
+entity pfb_fir_2048ch_6i_core_debus is
   port (
     bus_in : in std_logic_vector( 336-1 downto 0 );
     msb_out12 : out std_logic_vector( 28-1 downto 0 );
@@ -2859,33 +2859,33 @@ entity pfb_fir_2048ch_6i_core_debus_x0 is
     out2 : out std_logic_vector( 28-1 downto 0 );
     lsb_out1 : out std_logic_vector( 28-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_debus_x0;
-architecture structural of pfb_fir_2048ch_6i_core_debus_x0 is 
-  signal slice6_y_net : std_logic_vector( 28-1 downto 0 );
+end pfb_fir_2048ch_6i_core_debus;
+architecture structural of pfb_fir_2048ch_6i_core_debus is 
   signal slice7_y_net : std_logic_vector( 28-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 28-1 downto 0 );
   signal slice8_y_net : std_logic_vector( 28-1 downto 0 );
-  signal slice5_y_net : std_logic_vector( 28-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal slice11_y_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 336-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret10_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret8_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal slice12_y_net : std_logic_vector( 28-1 downto 0 );
-  signal slice9_y_net : std_logic_vector( 28-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 28-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 28-1 downto 0 );
-  signal slice10_y_net : std_logic_vector( 28-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 336-1 downto 0 );
   signal reinterpret2_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal slice10_y_net : std_logic_vector( 28-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 28-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 28-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 28-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 28-1 downto 0 );
+  signal slice12_y_net : std_logic_vector( 28-1 downto 0 );
+  signal slice11_y_net : std_logic_vector( 28-1 downto 0 );
+  signal slice9_y_net : std_logic_vector( 28-1 downto 0 );
 begin
   msb_out12 <= reinterpret12_output_port_net;
   out11 <= reinterpret11_output_port_net;
@@ -2908,6 +2908,30 @@ begin
     input_port => slice1_y_net,
     output_port => reinterpret1_output_port_net
   );
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice10_y_net,
+    output_port => reinterpret10_output_port_net
+  );
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice11_y_net,
+    output_port => reinterpret11_output_port_net
+  );
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice12_y_net,
+    output_port => reinterpret12_output_port_net
+  );
   reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
   port map (
     clk => '0',
@@ -2915,6 +2939,62 @@ begin
     clr => '0',
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice3_y_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice4_y_net,
+    output_port => reinterpret4_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice9_y_net,
+    output_port => reinterpret9_output_port_net
   );
   slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -2927,35 +3007,16 @@ begin
     x => concatenate_y_net,
     y => slice1_y_net
   );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 28,
-    new_msb => 55,
+    new_lsb => 252,
+    new_msb => 279,
     x_width => 336,
     y_width => 28
   )
   port map (
     x => concatenate_y_net,
-    y => slice2_y_net
-  );
-  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 308,
-    new_msb => 335,
-    x_width => 336,
-    y_width => 28
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice12_y_net
-  );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice12_y_net,
-    output_port => reinterpret12_output_port_net
+    y => slice10_y_net
   );
   slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -2968,146 +3029,27 @@ begin
     x => concatenate_y_net,
     y => slice11_y_net
   );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice11_y_net,
-    output_port => reinterpret11_output_port_net
-  );
-  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 252,
-    new_msb => 279,
+    new_lsb => 308,
+    new_msb => 335,
     x_width => 336,
     y_width => 28
   )
   port map (
     x => concatenate_y_net,
-    y => slice10_y_net
+    y => slice12_y_net
   );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice10_y_net,
-    output_port => reinterpret10_output_port_net
-  );
-  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 224,
-    new_msb => 251,
+    new_lsb => 28,
+    new_msb => 55,
     x_width => 336,
     y_width => 28
   )
   port map (
     x => concatenate_y_net,
-    y => slice9_y_net
-  );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice9_y_net,
-    output_port => reinterpret9_output_port_net
-  );
-  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 196,
-    new_msb => 223,
-    x_width => 336,
-    y_width => 28
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice8_y_net
-  );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice8_y_net,
-    output_port => reinterpret8_output_port_net
-  );
-  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 168,
-    new_msb => 195,
-    x_width => 336,
-    y_width => 28
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice7_y_net
-  );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice7_y_net,
-    output_port => reinterpret7_output_port_net
-  );
-  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 140,
-    new_msb => 167,
-    x_width => 336,
-    y_width => 28
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice6_y_net
-  );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice6_y_net,
-    output_port => reinterpret6_output_port_net
-  );
-  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 112,
-    new_msb => 139,
-    x_width => 336,
-    y_width => 28
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice5_y_net
-  );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice5_y_net,
-    output_port => reinterpret5_output_port_net
-  );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 84,
-    new_msb => 111,
-    x_width => 336,
-    y_width => 28
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice4_y_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice4_y_net,
-    output_port => reinterpret4_output_port_net
+    y => slice2_y_net
   );
   slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -3120,13 +3062,71 @@ begin
     x => concatenate_y_net,
     y => slice3_y_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_5074401322 
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 84,
+    new_msb => 111,
+    x_width => 336,
+    y_width => 28
+  )
   port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice3_y_net,
-    output_port => reinterpret3_output_port_net
+    x => concatenate_y_net,
+    y => slice4_y_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 112,
+    new_msb => 139,
+    x_width => 336,
+    y_width => 28
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice5_y_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 140,
+    new_msb => 167,
+    x_width => 336,
+    y_width => 28
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice6_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 168,
+    new_msb => 195,
+    x_width => 336,
+    y_width => 28
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice7_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 196,
+    new_msb => 223,
+    x_width => 336,
+    y_width => 28
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice8_y_net
+  );
+  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 224,
+    new_msb => 251,
+    x_width => 336,
+    y_width => 28
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice9_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/bus_scale
@@ -3141,36 +3141,36 @@ entity pfb_fir_2048ch_6i_core_bus_scale is
   );
 end pfb_fir_2048ch_6i_core_bus_scale;
 architecture structural of pfb_fir_2048ch_6i_core_bus_scale is 
-  signal reinterpret10_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal concatenate_y_net_x0 : std_logic_vector( 336-1 downto 0 );
   signal concatenate_y_net : std_logic_vector( 336-1 downto 0 );
-  signal scale1_op_net : std_logic_vector( 28-1 downto 0 );
-  signal scale2_op_net : std_logic_vector( 28-1 downto 0 );
+  signal concatenate_y_net_x0 : std_logic_vector( 336-1 downto 0 );
   signal scale3_op_net : std_logic_vector( 28-1 downto 0 );
   signal scale4_op_net : std_logic_vector( 28-1 downto 0 );
   signal scale5_op_net : std_logic_vector( 28-1 downto 0 );
-  signal scale6_op_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal scale7_op_net : std_logic_vector( 28-1 downto 0 );
-  signal scale8_op_net : std_logic_vector( 28-1 downto 0 );
+  signal scale2_op_net : std_logic_vector( 28-1 downto 0 );
+  signal scale1_op_net : std_logic_vector( 28-1 downto 0 );
   signal scale9_op_net : std_logic_vector( 28-1 downto 0 );
   signal scale10_op_net : std_logic_vector( 28-1 downto 0 );
   signal scale11_op_net : std_logic_vector( 28-1 downto 0 );
   signal scale12_op_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret12_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret11_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal scale6_op_net : std_logic_vector( 28-1 downto 0 );
+  signal scale7_op_net : std_logic_vector( 28-1 downto 0 );
+  signal scale8_op_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 28-1 downto 0 );
 begin
   dout <= concatenate_y_net_x0;
   concatenate_y_net <= din;
-  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x0 
+  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x5 
   port map (
     in1 => scale1_op_net,
     in2 => scale2_op_net,
@@ -3186,7 +3186,7 @@ begin
     in12 => scale12_op_net,
     bus_out => concatenate_y_net_x0
   );
-  debus : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_x0 
+  debus : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus 
   port map (
     bus_in => concatenate_y_net,
     msb_out12 => reinterpret12_output_port_net,
@@ -3209,6 +3209,30 @@ begin
     clr => '0',
     ip => reinterpret12_output_port_net,
     op => scale1_op_net
+  );
+  scale10 : entity xil_defaultlib.sysgen_scale_66260cee9b 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    ip => reinterpret3_output_port_net,
+    op => scale10_op_net
+  );
+  scale11 : entity xil_defaultlib.sysgen_scale_66260cee9b 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    ip => reinterpret2_output_port_net,
+    op => scale11_op_net
+  );
+  scale12 : entity xil_defaultlib.sysgen_scale_66260cee9b 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    ip => reinterpret1_output_port_net,
+    op => scale12_op_net
   );
   scale2 : entity xil_defaultlib.sysgen_scale_66260cee9b 
   port map (
@@ -3274,30 +3298,6 @@ begin
     ip => reinterpret4_output_port_net,
     op => scale9_op_net
   );
-  scale10 : entity xil_defaultlib.sysgen_scale_66260cee9b 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    ip => reinterpret3_output_port_net,
-    op => scale10_op_net
-  );
-  scale11 : entity xil_defaultlib.sysgen_scale_66260cee9b 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    ip => reinterpret2_output_port_net,
-    op => scale11_op_net
-  );
-  scale12 : entity xil_defaultlib.sysgen_scale_66260cee9b 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    ip => reinterpret1_output_port_net,
-    op => scale12_op_net
-  );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/coeff_munge/join
 library IEEE;
@@ -3318,63 +3318,63 @@ entity pfb_fir_2048ch_6i_core_join is
   );
 end pfb_fir_2048ch_6i_core_join;
 architecture structural of pfb_fir_2048ch_6i_core_join is 
-  signal reinterpret7_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret47_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 864-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret6_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret5_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret8_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret16_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret30_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret19_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret18_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret28_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret43_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret25_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret17_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret32_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret26_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret33_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret31_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret15_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret29_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret45_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret13_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret27_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret22_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret23_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret46_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret24_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret40_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret2_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret34_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret35_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret41_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret36_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret37_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret38_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret39_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret1_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret2_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret3_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret14_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret31_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret15_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret16_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret40_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret41_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret42_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret32_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret17_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret18_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret19_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret13_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 864-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret4_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret34_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret35_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret36_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret14_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret21_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret6_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret5_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret8_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret7_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret26_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret27_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret28_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret29_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret30_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret33_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret43_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret44_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret20_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret42_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret45_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret46_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret47_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret48_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret20_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret21_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret22_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret23_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret24_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret25_output_port_net : std_logic_vector( 18-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   reinterpret2_output_port_net <= in1;
@@ -3385,61 +3385,68 @@ begin
   reinterpret5_output_port_net_x0 <= in31;
   reinterpret8_output_port_net_x0 <= in37;
   reinterpret7_output_port_net_x0 <= in43;
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  concatenate : entity xil_defaultlib.sysgen_concat_b9d8b28706 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    in0 => reinterpret1_output_port_net_x0,
+    in1 => reinterpret2_output_port_net_x0,
+    in2 => reinterpret3_output_port_net_x0,
+    in3 => reinterpret4_output_port_net,
+    in4 => reinterpret5_output_port_net,
+    in5 => reinterpret6_output_port_net,
+    in6 => reinterpret7_output_port_net,
+    in7 => reinterpret8_output_port_net,
+    in8 => reinterpret9_output_port_net,
+    in9 => reinterpret10_output_port_net,
+    in10 => reinterpret11_output_port_net,
+    in11 => reinterpret12_output_port_net,
+    in12 => reinterpret13_output_port_net,
+    in13 => reinterpret14_output_port_net,
+    in14 => reinterpret15_output_port_net,
+    in15 => reinterpret16_output_port_net,
+    in16 => reinterpret17_output_port_net,
+    in17 => reinterpret18_output_port_net,
+    in18 => reinterpret19_output_port_net,
+    in19 => reinterpret20_output_port_net,
+    in20 => reinterpret21_output_port_net,
+    in21 => reinterpret22_output_port_net,
+    in22 => reinterpret23_output_port_net,
+    in23 => reinterpret24_output_port_net,
+    in24 => reinterpret25_output_port_net,
+    in25 => reinterpret26_output_port_net,
+    in26 => reinterpret27_output_port_net,
+    in27 => reinterpret28_output_port_net,
+    in28 => reinterpret29_output_port_net,
+    in29 => reinterpret30_output_port_net,
+    in30 => reinterpret31_output_port_net,
+    in31 => reinterpret32_output_port_net,
+    in32 => reinterpret33_output_port_net,
+    in33 => reinterpret34_output_port_net,
+    in34 => reinterpret35_output_port_net,
+    in35 => reinterpret36_output_port_net,
+    in36 => reinterpret37_output_port_net,
+    in37 => reinterpret38_output_port_net,
+    in38 => reinterpret39_output_port_net,
+    in39 => reinterpret40_output_port_net,
+    in40 => reinterpret41_output_port_net,
+    in41 => reinterpret42_output_port_net,
+    in42 => reinterpret43_output_port_net,
+    in43 => reinterpret44_output_port_net,
+    in44 => reinterpret45_output_port_net,
+    in45 => reinterpret46_output_port_net,
+    in46 => reinterpret47_output_port_net,
+    in47 => reinterpret48_output_port_net,
+    y => concatenate_y_net
+  );
+  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => reinterpret2_output_port_net,
-    output_port => reinterpret3_output_port_net_x0
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => reinterpret2_output_port_net,
-    output_port => reinterpret4_output_port_net
-  );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => reinterpret2_output_port_net,
-    output_port => reinterpret5_output_port_net
-  );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => reinterpret2_output_port_net,
-    output_port => reinterpret6_output_port_net
-  );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => reinterpret1_output_port_net,
-    output_port => reinterpret7_output_port_net
-  );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => reinterpret1_output_port_net,
-    output_port => reinterpret8_output_port_net
-  );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => reinterpret1_output_port_net,
-    output_port => reinterpret9_output_port_net
+    output_port => reinterpret1_output_port_net_x0
   );
   reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
   port map (
@@ -3521,6 +3528,14 @@ begin
     input_port => reinterpret3_output_port_net,
     output_port => reinterpret19_output_port_net
   );
+  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => reinterpret2_output_port_net,
+    output_port => reinterpret2_output_port_net_x0
+  );
   reinterpret20 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
   port map (
     clk => '0',
@@ -3600,6 +3615,14 @@ begin
     clr => '0',
     input_port => reinterpret6_output_port_net_x0,
     output_port => reinterpret29_output_port_net
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => reinterpret2_output_port_net,
+    output_port => reinterpret3_output_port_net_x0
   );
   reinterpret30 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
   port map (
@@ -3681,6 +3704,14 @@ begin
     input_port => reinterpret8_output_port_net_x0,
     output_port => reinterpret39_output_port_net
   );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => reinterpret2_output_port_net,
+    output_port => reinterpret4_output_port_net
+  );
   reinterpret40 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
   port map (
     clk => '0',
@@ -3753,76 +3784,45 @@ begin
     input_port => reinterpret7_output_port_net_x0,
     output_port => reinterpret48_output_port_net
   );
-  concatenate : entity xil_defaultlib.sysgen_concat_b9d8b28706 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    in0 => reinterpret1_output_port_net_x0,
-    in1 => reinterpret2_output_port_net_x0,
-    in2 => reinterpret3_output_port_net_x0,
-    in3 => reinterpret4_output_port_net,
-    in4 => reinterpret5_output_port_net,
-    in5 => reinterpret6_output_port_net,
-    in6 => reinterpret7_output_port_net,
-    in7 => reinterpret8_output_port_net,
-    in8 => reinterpret9_output_port_net,
-    in9 => reinterpret10_output_port_net,
-    in10 => reinterpret11_output_port_net,
-    in11 => reinterpret12_output_port_net,
-    in12 => reinterpret13_output_port_net,
-    in13 => reinterpret14_output_port_net,
-    in14 => reinterpret15_output_port_net,
-    in15 => reinterpret16_output_port_net,
-    in16 => reinterpret17_output_port_net,
-    in17 => reinterpret18_output_port_net,
-    in18 => reinterpret19_output_port_net,
-    in19 => reinterpret20_output_port_net,
-    in20 => reinterpret21_output_port_net,
-    in21 => reinterpret22_output_port_net,
-    in22 => reinterpret23_output_port_net,
-    in23 => reinterpret24_output_port_net,
-    in24 => reinterpret25_output_port_net,
-    in25 => reinterpret26_output_port_net,
-    in26 => reinterpret27_output_port_net,
-    in27 => reinterpret28_output_port_net,
-    in28 => reinterpret29_output_port_net,
-    in29 => reinterpret30_output_port_net,
-    in30 => reinterpret31_output_port_net,
-    in31 => reinterpret32_output_port_net,
-    in32 => reinterpret33_output_port_net,
-    in33 => reinterpret34_output_port_net,
-    in34 => reinterpret35_output_port_net,
-    in35 => reinterpret36_output_port_net,
-    in36 => reinterpret37_output_port_net,
-    in37 => reinterpret38_output_port_net,
-    in38 => reinterpret39_output_port_net,
-    in39 => reinterpret40_output_port_net,
-    in40 => reinterpret41_output_port_net,
-    in41 => reinterpret42_output_port_net,
-    in42 => reinterpret43_output_port_net,
-    in43 => reinterpret44_output_port_net,
-    in44 => reinterpret45_output_port_net,
-    in45 => reinterpret46_output_port_net,
-    in46 => reinterpret47_output_port_net,
-    in47 => reinterpret48_output_port_net,
-    y => concatenate_y_net
-  );
-  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => reinterpret2_output_port_net,
-    output_port => reinterpret1_output_port_net_x0
+    output_port => reinterpret5_output_port_net
   );
-  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => reinterpret2_output_port_net,
-    output_port => reinterpret2_output_port_net_x0
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => reinterpret1_output_port_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => reinterpret1_output_port_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => reinterpret1_output_port_net,
+    output_port => reinterpret9_output_port_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/coeff_munge/split
@@ -3830,7 +3830,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_split is
+entity pfb_fir_2048ch_6i_core_split_x0 is
   port (
     bus_in : in std_logic_vector( 144-1 downto 0 );
     msb_out8 : out std_logic_vector( 18-1 downto 0 );
@@ -3842,25 +3842,25 @@ entity pfb_fir_2048ch_6i_core_split is
     out2 : out std_logic_vector( 18-1 downto 0 );
     lsb_out1 : out std_logic_vector( 18-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_split;
-architecture structural of pfb_fir_2048ch_6i_core_split is 
+end pfb_fir_2048ch_6i_core_split_x0;
+architecture structural of pfb_fir_2048ch_6i_core_split_x0 is 
+  signal slice5_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret8_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret_output_port_net : std_logic_vector( 144-1 downto 0 );
-  signal slice8_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice6_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 144-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice5_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice7_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 18-1 downto 0 );
 begin
   msb_out8 <= reinterpret8_output_port_net;
   out7 <= reinterpret7_output_port_net;
@@ -3887,6 +3887,54 @@ begin
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net
   );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice3_y_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice4_y_net,
+    output_port => reinterpret4_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
   slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
     new_lsb => 0,
@@ -3909,81 +3957,16 @@ begin
     x => reinterpret_output_port_net,
     y => slice2_y_net
   );
-  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 126,
-    new_msb => 143,
+    new_lsb => 36,
+    new_msb => 53,
     x_width => 144,
     y_width => 18
   )
   port map (
     x => reinterpret_output_port_net,
-    y => slice8_y_net
-  );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice8_y_net,
-    output_port => reinterpret8_output_port_net
-  );
-  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 108,
-    new_msb => 125,
-    x_width => 144,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret_output_port_net,
-    y => slice7_y_net
-  );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice7_y_net,
-    output_port => reinterpret7_output_port_net
-  );
-  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 90,
-    new_msb => 107,
-    x_width => 144,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret_output_port_net,
-    y => slice6_y_net
-  );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice6_y_net,
-    output_port => reinterpret6_output_port_net
-  );
-  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 72,
-    new_msb => 89,
-    x_width => 144,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret_output_port_net,
-    y => slice5_y_net
-  );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice5_y_net,
-    output_port => reinterpret5_output_port_net
+    y => slice3_y_net
   );
   slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -3996,32 +3979,49 @@ begin
     x => reinterpret_output_port_net,
     y => slice4_y_net
   );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice4_y_net,
-    output_port => reinterpret4_output_port_net
-  );
-  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 36,
-    new_msb => 53,
+    new_lsb => 72,
+    new_msb => 89,
     x_width => 144,
     y_width => 18
   )
   port map (
     x => reinterpret_output_port_net,
-    y => slice3_y_net
+    y => slice5_y_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 90,
+    new_msb => 107,
+    x_width => 144,
+    y_width => 18
+  )
   port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice3_y_net,
-    output_port => reinterpret3_output_port_net
+    x => reinterpret_output_port_net,
+    y => slice6_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 108,
+    new_msb => 125,
+    x_width => 144,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret_output_port_net,
+    y => slice7_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 126,
+    new_msb => 143,
+    x_width => 144,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret_output_port_net,
+    y => slice8_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/coeff_munge
@@ -4037,10 +4037,6 @@ entity pfb_fir_2048ch_6i_core_coeff_munge is
 end pfb_fir_2048ch_6i_core_coeff_munge;
 architecture structural of pfb_fir_2048ch_6i_core_coeff_munge is 
   signal concat_y_net : std_logic_vector( 144-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 864-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
@@ -4048,6 +4044,10 @@ architecture structural of pfb_fir_2048ch_6i_core_coeff_munge is
   signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 144-1 downto 0 );
   signal reinterpret_out_output_port_net : std_logic_vector( 864-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 864-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
 begin
   dout <= reinterpret_out_output_port_net;
   concat_y_net <= din;
@@ -4063,7 +4063,7 @@ begin
     in43 => reinterpret7_output_port_net,
     bus_out => concatenate_y_net
   );
-  split : entity xil_defaultlib.pfb_fir_2048ch_6i_core_split 
+  split : entity xil_defaultlib.pfb_fir_2048ch_6i_core_split_x0 
   port map (
     bus_in => reinterpret_output_port_net,
     msb_out8 => reinterpret8_output_port_net,
@@ -4075,14 +4075,6 @@ begin
     out2 => reinterpret2_output_port_net,
     lsb_out1 => reinterpret1_output_port_net
   );
-  reinterpret_out : entity xil_defaultlib.sysgen_reinterpret_297af65901 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => concatenate_y_net,
-    output_port => reinterpret_out_output_port_net
-  );
   reinterpret : entity xil_defaultlib.sysgen_reinterpret_4089a1490a 
   port map (
     clk => '0',
@@ -4090,6 +4082,14 @@ begin
     clr => '0',
     input_port => concat_y_net,
     output_port => reinterpret_output_port_net
+  );
+  reinterpret_out : entity xil_defaultlib.sysgen_reinterpret_297af65901 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => concatenate_y_net,
+    output_port => reinterpret_out_output_port_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/a_expand
@@ -4107,15 +4107,15 @@ entity pfb_fir_2048ch_6i_core_a_expand is
   );
 end pfb_fir_2048ch_6i_core_a_expand;
 architecture structural of pfb_fir_2048ch_6i_core_a_expand is 
-  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal concatenate_y_net : std_logic_vector( 72-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 18-1 downto 0 );
 begin
   msb_out4 <= reinterpret4_output_port_net;
   out3 <= reinterpret3_output_port_net;
@@ -4138,6 +4138,22 @@ begin
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net
   );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice3_y_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice4_y_net,
+    output_port => reinterpret4_output_port_net
+  );
   slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
     new_lsb => 0,
@@ -4160,25 +4176,6 @@ begin
     x => concatenate_y_net,
     y => slice2_y_net
   );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 54,
-    new_msb => 71,
-    x_width => 72,
-    y_width => 18
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice4_y_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice4_y_net,
-    output_port => reinterpret4_output_port_net
-  );
   slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
     new_lsb => 36,
@@ -4190,13 +4187,16 @@ begin
     x => concatenate_y_net,
     y => slice3_y_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 54,
+    new_msb => 71,
+    x_width => 72,
+    y_width => 18
+  )
   port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice3_y_net,
-    output_port => reinterpret3_output_port_net
+    x => concatenate_y_net,
+    y => slice4_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/b_expand
@@ -4214,15 +4214,15 @@ entity pfb_fir_2048ch_6i_core_b_expand is
   );
 end pfb_fir_2048ch_6i_core_b_expand;
 architecture structural of pfb_fir_2048ch_6i_core_b_expand is 
+  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
   signal slice3_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal slice2_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret_out_output_port_net : std_logic_vector( 72-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 18-1 downto 0 );
 begin
   msb_out4 <= reinterpret4_output_port_net;
   out3 <= reinterpret3_output_port_net;
@@ -4245,6 +4245,22 @@ begin
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net
   );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice3_y_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice4_y_net,
+    output_port => reinterpret4_output_port_net
+  );
   slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
     new_lsb => 0,
@@ -4267,25 +4283,6 @@ begin
     x => reinterpret_out_output_port_net,
     y => slice2_y_net
   );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 54,
-    new_msb => 71,
-    x_width => 72,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret_out_output_port_net,
-    y => slice4_y_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice4_y_net,
-    output_port => reinterpret4_output_port_net
-  );
   slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
     new_lsb => 36,
@@ -4297,13 +4294,16 @@ begin
     x => reinterpret_out_output_port_net,
     y => slice3_y_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 54,
+    new_msb => 71,
+    x_width => 72,
+    y_width => 18
+  )
   port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice3_y_net,
-    output_port => reinterpret3_output_port_net
+    x => reinterpret_out_output_port_net,
+    y => slice4_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/munge/join
@@ -4321,15 +4321,15 @@ entity pfb_fir_2048ch_6i_core_join_x0 is
   );
 end pfb_fir_2048ch_6i_core_join_x0;
 architecture structural of pfb_fir_2048ch_6i_core_join_x0 is 
-  signal reinterpret1_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret2_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret4_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 72-1 downto 0 );
   signal reinterpret3_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
   signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 72-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret1_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret2_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   reinterpret2_output_port_net <= in1;
@@ -4385,7 +4385,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_split_x0 is
+entity pfb_fir_2048ch_6i_core_split is
   port (
     bus_in : in std_logic_vector( 72-1 downto 0 );
     msb_out4 : out std_logic_vector( 18-1 downto 0 );
@@ -4393,17 +4393,17 @@ entity pfb_fir_2048ch_6i_core_split_x0 is
     out2 : out std_logic_vector( 18-1 downto 0 );
     lsb_out1 : out std_logic_vector( 18-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_split_x0;
-architecture structural of pfb_fir_2048ch_6i_core_split_x0 is 
+end pfb_fir_2048ch_6i_core_split;
+architecture structural of pfb_fir_2048ch_6i_core_split is 
   signal slice2_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 18-1 downto 0 );
   signal slice4_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret_output_port_net : std_logic_vector( 72-1 downto 0 );
   signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret_output_port_net : std_logic_vector( 72-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 18-1 downto 0 );
 begin
   msb_out4 <= reinterpret4_output_port_net;
   out3 <= reinterpret3_output_port_net;
@@ -4426,6 +4426,22 @@ begin
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net
   );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice3_y_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice4_y_net,
+    output_port => reinterpret4_output_port_net
+  );
   slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
     new_lsb => 0,
@@ -4448,25 +4464,6 @@ begin
     x => reinterpret_output_port_net,
     y => slice2_y_net
   );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 54,
-    new_msb => 71,
-    x_width => 72,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret_output_port_net,
-    y => slice4_y_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice4_y_net,
-    output_port => reinterpret4_output_port_net
-  );
   slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
     new_lsb => 36,
@@ -4478,13 +4475,16 @@ begin
     x => reinterpret_output_port_net,
     y => slice3_y_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 54,
+    new_msb => 71,
+    x_width => 72,
+    y_width => 18
+  )
   port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice3_y_net,
-    output_port => reinterpret3_output_port_net
+    x => reinterpret_output_port_net,
+    y => slice4_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/munge
@@ -4499,14 +4499,14 @@ entity pfb_fir_2048ch_6i_core_munge is
   );
 end pfb_fir_2048ch_6i_core_munge;
 architecture structural of pfb_fir_2048ch_6i_core_munge is 
-  signal reinterpret_out_output_port_net : std_logic_vector( 72-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 72-1 downto 0 );
-  signal concatenate_y_net_x0 : std_logic_vector( 72-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret_output_port_net : std_logic_vector( 72-1 downto 0 );
+  signal concatenate_y_net_x0 : std_logic_vector( 72-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 72-1 downto 0 );
+  signal reinterpret_out_output_port_net : std_logic_vector( 72-1 downto 0 );
 begin
   dout <= reinterpret_out_output_port_net;
   concatenate_y_net <= din;
@@ -4518,21 +4518,13 @@ begin
     in4 => reinterpret3_output_port_net,
     bus_out => concatenate_y_net_x0
   );
-  split : entity xil_defaultlib.pfb_fir_2048ch_6i_core_split_x0 
+  split : entity xil_defaultlib.pfb_fir_2048ch_6i_core_split 
   port map (
     bus_in => reinterpret_output_port_net,
     msb_out4 => reinterpret4_output_port_net,
     out3 => reinterpret3_output_port_net,
     out2 => reinterpret2_output_port_net,
     lsb_out1 => reinterpret1_output_port_net
-  );
-  reinterpret_out : entity xil_defaultlib.sysgen_reinterpret_120e7ae35a 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => concatenate_y_net_x0,
-    output_port => reinterpret_out_output_port_net
   );
   reinterpret : entity xil_defaultlib.sysgen_reinterpret_120e7ae35a 
   port map (
@@ -4542,38 +4534,62 @@ begin
     input_port => concatenate_y_net,
     output_port => reinterpret_output_port_net
   );
+  reinterpret_out : entity xil_defaultlib.sysgen_reinterpret_120e7ae35a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => concatenate_y_net_x0,
+    output_port => reinterpret_out_output_port_net
+  );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/rom/A_bussify
 library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_a_bussify is
+entity pfb_fir_2048ch_6i_core_a_bussify_x0 is
   port (
-    in1 : in std_logic_vector( 18-1 downto 0 );
-    in2 : in std_logic_vector( 18-1 downto 0 );
-    in3 : in std_logic_vector( 18-1 downto 0 );
-    in4 : in std_logic_vector( 18-1 downto 0 );
+    in1 : in std_logic_vector( 9-1 downto 0 );
+    in2 : in std_logic_vector( 9-1 downto 0 );
+    in3 : in std_logic_vector( 9-1 downto 0 );
+    in4 : in std_logic_vector( 9-1 downto 0 );
+    in5 : in std_logic_vector( 9-1 downto 0 );
+    in6 : in std_logic_vector( 9-1 downto 0 );
+    in7 : in std_logic_vector( 9-1 downto 0 );
+    in8 : in std_logic_vector( 9-1 downto 0 );
     bus_out : out std_logic_vector( 72-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_a_bussify;
-architecture structural of pfb_fir_2048ch_6i_core_a_bussify is 
-  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal bram2_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram3_douta_net : std_logic_vector( 18-1 downto 0 );
+end pfb_fir_2048ch_6i_core_a_bussify_x0;
+architecture structural of pfb_fir_2048ch_6i_core_a_bussify_x0 is 
+  signal reinterpret7_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal bram7_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram6_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram5_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram4_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram3_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram2_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram1_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram0_douta_net : std_logic_vector( 9-1 downto 0 );
   signal concatenate_y_net : std_logic_vector( 72-1 downto 0 );
-  signal bram0_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram1_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   bram0_douta_net <= in1;
   bram1_douta_net <= in2;
   bram2_douta_net <= in3;
   bram3_douta_net <= in4;
-  concatenate : entity xil_defaultlib.sysgen_concat_efb87bb46c 
+  bram4_douta_net <= in5;
+  bram5_douta_net <= in6;
+  bram6_douta_net <= in7;
+  bram7_douta_net <= in8;
+  concatenate : entity xil_defaultlib.sysgen_concat_438f186dcc 
   port map (
     clk => '0',
     ce => '0',
@@ -4582,9 +4598,13 @@ begin
     in1 => reinterpret2_output_port_net,
     in2 => reinterpret3_output_port_net,
     in3 => reinterpret4_output_port_net,
+    in4 => reinterpret5_output_port_net,
+    in5 => reinterpret6_output_port_net,
+    in6 => reinterpret7_output_port_net,
+    in7 => reinterpret8_output_port_net,
     y => concatenate_y_net
   );
-  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -4592,7 +4612,7 @@ begin
     input_port => bram0_douta_net,
     output_port => reinterpret1_output_port_net
   );
-  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -4600,7 +4620,7 @@ begin
     input_port => bram1_douta_net,
     output_port => reinterpret2_output_port_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -4608,13 +4628,45 @@ begin
     input_port => bram2_douta_net,
     output_port => reinterpret3_output_port_net
   );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => bram3_douta_net,
     output_port => reinterpret4_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram4_douta_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram5_douta_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram6_douta_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram7_douta_net,
+    output_port => reinterpret8_output_port_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/rom/B_bussify
@@ -4624,30 +4676,46 @@ library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
 entity pfb_fir_2048ch_6i_core_b_bussify is
   port (
-    in1 : in std_logic_vector( 18-1 downto 0 );
-    in2 : in std_logic_vector( 18-1 downto 0 );
-    in3 : in std_logic_vector( 18-1 downto 0 );
-    in4 : in std_logic_vector( 18-1 downto 0 );
+    in1 : in std_logic_vector( 9-1 downto 0 );
+    in2 : in std_logic_vector( 9-1 downto 0 );
+    in3 : in std_logic_vector( 9-1 downto 0 );
+    in4 : in std_logic_vector( 9-1 downto 0 );
+    in5 : in std_logic_vector( 9-1 downto 0 );
+    in6 : in std_logic_vector( 9-1 downto 0 );
+    in7 : in std_logic_vector( 9-1 downto 0 );
+    in8 : in std_logic_vector( 9-1 downto 0 );
     bus_out : out std_logic_vector( 72-1 downto 0 )
   );
 end pfb_fir_2048ch_6i_core_b_bussify;
 architecture structural of pfb_fir_2048ch_6i_core_b_bussify is 
-  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal concatenate_y_net : std_logic_vector( 72-1 downto 0 );
-  signal bram0_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal bram1_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal bram2_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal bram3_doutb_net : std_logic_vector( 18-1 downto 0 );
+  signal bram0_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram2_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal bram4_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal bram1_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram5_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram7_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram6_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram3_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 9-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   bram0_doutb_net <= in1;
   bram1_doutb_net <= in2;
   bram2_doutb_net <= in3;
   bram3_doutb_net <= in4;
-  concatenate : entity xil_defaultlib.sysgen_concat_efb87bb46c 
+  bram4_doutb_net <= in5;
+  bram5_doutb_net <= in6;
+  bram6_doutb_net <= in7;
+  bram7_doutb_net <= in8;
+  concatenate : entity xil_defaultlib.sysgen_concat_438f186dcc 
   port map (
     clk => '0',
     ce => '0',
@@ -4656,9 +4724,13 @@ begin
     in1 => reinterpret2_output_port_net,
     in2 => reinterpret3_output_port_net,
     in3 => reinterpret4_output_port_net,
+    in4 => reinterpret5_output_port_net,
+    in5 => reinterpret6_output_port_net,
+    in6 => reinterpret7_output_port_net,
+    in7 => reinterpret8_output_port_net,
     y => concatenate_y_net
   );
-  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -4666,7 +4738,7 @@ begin
     input_port => bram0_doutb_net,
     output_port => reinterpret1_output_port_net
   );
-  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -4674,7 +4746,7 @@ begin
     input_port => bram1_doutb_net,
     output_port => reinterpret2_output_port_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -4682,13 +4754,45 @@ begin
     input_port => bram2_doutb_net,
     output_port => reinterpret3_output_port_net
   );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => bram3_doutb_net,
     output_port => reinterpret4_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram4_doutb_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram5_doutb_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram6_doutb_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram7_doutb_net,
+    output_port => reinterpret8_output_port_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/rom/debus_addra
@@ -4698,30 +4802,46 @@ library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
 entity pfb_fir_2048ch_6i_core_debus_addra_x0 is
   port (
-    bus_in : in std_logic_vector( 44-1 downto 0 );
-    msb_out4 : out std_logic_vector( 11-1 downto 0 );
-    out3 : out std_logic_vector( 11-1 downto 0 );
-    out2 : out std_logic_vector( 11-1 downto 0 );
-    lsb_out1 : out std_logic_vector( 11-1 downto 0 )
+    bus_in : in std_logic_vector( 104-1 downto 0 );
+    msb_out8 : out std_logic_vector( 13-1 downto 0 );
+    out7 : out std_logic_vector( 13-1 downto 0 );
+    out6 : out std_logic_vector( 13-1 downto 0 );
+    out5 : out std_logic_vector( 13-1 downto 0 );
+    out4 : out std_logic_vector( 13-1 downto 0 );
+    out3 : out std_logic_vector( 13-1 downto 0 );
+    out2 : out std_logic_vector( 13-1 downto 0 );
+    lsb_out1 : out std_logic_vector( 13-1 downto 0 )
   );
 end pfb_fir_2048ch_6i_core_debus_addra_x0;
 architecture structural of pfb_fir_2048ch_6i_core_debus_addra_x0 is 
-  signal slice3_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 44-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 13-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 104-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 13-1 downto 0 );
 begin
-  msb_out4 <= reinterpret4_output_port_net;
+  msb_out8 <= reinterpret8_output_port_net;
+  out7 <= reinterpret7_output_port_net;
+  out6 <= reinterpret6_output_port_net;
+  out5 <= reinterpret5_output_port_net;
+  out4 <= reinterpret4_output_port_net;
   out3 <= reinterpret3_output_port_net;
   out2 <= reinterpret2_output_port_net;
   lsb_out1 <= reinterpret1_output_port_net;
   concatenate_y_net <= bus_in;
-  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -4729,7 +4849,7 @@ begin
     input_port => slice1_y_net,
     output_port => reinterpret1_output_port_net
   );
-  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -4737,51 +4857,7 @@ begin
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net
   );
-  slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 0,
-    new_msb => 10,
-    x_width => 44,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice1_y_net
-  );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 11,
-    new_msb => 21,
-    x_width => 44,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice2_y_net
-  );
-  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 22,
-    new_msb => 32,
-    x_width => 44,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice3_y_net
-  );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 33,
-    new_msb => 43,
-    x_width => 44,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice4_y_net
-  );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -4789,13 +4865,133 @@ begin
     input_port => slice3_y_net,
     output_port => reinterpret3_output_port_net
   );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => slice4_y_net,
     output_port => reinterpret4_output_port_net
+  );
+  slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 0,
+    new_msb => 12,
+    x_width => 104,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice1_y_net
+  );
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 13,
+    new_msb => 25,
+    x_width => 104,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice2_y_net
+  );
+  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 26,
+    new_msb => 38,
+    x_width => 104,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice3_y_net
+  );
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 39,
+    new_msb => 51,
+    x_width => 104,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice4_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 91,
+    new_msb => 103,
+    x_width => 104,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice8_y_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 78,
+    new_msb => 90,
+    x_width => 104,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice7_y_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 65,
+    new_msb => 77,
+    x_width => 104,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice6_y_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 52,
+    new_msb => 64,
+    x_width => 104,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice5_y_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/rom/debus_addrb
@@ -4803,32 +4999,48 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_debus_addrb is
+entity pfb_fir_2048ch_6i_core_debus_addrb_x0 is
   port (
-    bus_in : in std_logic_vector( 44-1 downto 0 );
-    msb_out4 : out std_logic_vector( 11-1 downto 0 );
-    out3 : out std_logic_vector( 11-1 downto 0 );
-    out2 : out std_logic_vector( 11-1 downto 0 );
-    lsb_out1 : out std_logic_vector( 11-1 downto 0 )
+    bus_in : in std_logic_vector( 104-1 downto 0 );
+    msb_out8 : out std_logic_vector( 13-1 downto 0 );
+    out7 : out std_logic_vector( 13-1 downto 0 );
+    out6 : out std_logic_vector( 13-1 downto 0 );
+    out5 : out std_logic_vector( 13-1 downto 0 );
+    out4 : out std_logic_vector( 13-1 downto 0 );
+    out3 : out std_logic_vector( 13-1 downto 0 );
+    out2 : out std_logic_vector( 13-1 downto 0 );
+    lsb_out1 : out std_logic_vector( 13-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_debus_addrb;
-architecture structural of pfb_fir_2048ch_6i_core_debus_addrb is 
-  signal reinterpret4_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 11-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 44-1 downto 0 );
+end pfb_fir_2048ch_6i_core_debus_addrb_x0;
+architecture structural of pfb_fir_2048ch_6i_core_debus_addrb_x0 is 
+  signal reinterpret8_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 104-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 13-1 downto 0 );
 begin
-  msb_out4 <= reinterpret4_output_port_net;
+  msb_out8 <= reinterpret8_output_port_net;
+  out7 <= reinterpret7_output_port_net;
+  out6 <= reinterpret6_output_port_net;
+  out5 <= reinterpret5_output_port_net;
+  out4 <= reinterpret4_output_port_net;
   out3 <= reinterpret3_output_port_net;
   out2 <= reinterpret2_output_port_net;
   lsb_out1 <= reinterpret1_output_port_net;
   concatenate_y_net <= bus_in;
-  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -4836,7 +5048,7 @@ begin
     input_port => slice1_y_net,
     output_port => reinterpret1_output_port_net
   );
-  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -4844,51 +5056,7 @@ begin
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net
   );
-  slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 0,
-    new_msb => 10,
-    x_width => 44,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice1_y_net
-  );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 11,
-    new_msb => 21,
-    x_width => 44,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice2_y_net
-  );
-  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 22,
-    new_msb => 32,
-    x_width => 44,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice3_y_net
-  );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 33,
-    new_msb => 43,
-    x_width => 44,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice4_y_net
-  );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -4896,13 +5064,133 @@ begin
     input_port => slice3_y_net,
     output_port => reinterpret3_output_port_net
   );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => slice4_y_net,
     output_port => reinterpret4_output_port_net
+  );
+  slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 0,
+    new_msb => 12,
+    x_width => 104,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice1_y_net
+  );
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 13,
+    new_msb => 25,
+    x_width => 104,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice2_y_net
+  );
+  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 26,
+    new_msb => 38,
+    x_width => 104,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice3_y_net
+  );
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 39,
+    new_msb => 51,
+    x_width => 104,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice4_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 91,
+    new_msb => 103,
+    x_width => 104,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice8_y_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 78,
+    new_msb => 90,
+    x_width => 104,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice7_y_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 65,
+    new_msb => 77,
+    x_width => 104,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice6_y_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 52,
+    new_msb => 64,
+    x_width => 104,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice5_y_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/rom/debus_dina
@@ -4913,29 +5201,45 @@ use xil_defaultlib.conv_pkg.all;
 entity pfb_fir_2048ch_6i_core_debus_dina_x0 is
   port (
     bus_in : in std_logic_vector( 72-1 downto 0 );
-    msb_out4 : out std_logic_vector( 18-1 downto 0 );
-    out3 : out std_logic_vector( 18-1 downto 0 );
-    out2 : out std_logic_vector( 18-1 downto 0 );
-    lsb_out1 : out std_logic_vector( 18-1 downto 0 )
+    msb_out8 : out std_logic_vector( 9-1 downto 0 );
+    out7 : out std_logic_vector( 9-1 downto 0 );
+    out6 : out std_logic_vector( 9-1 downto 0 );
+    out5 : out std_logic_vector( 9-1 downto 0 );
+    out4 : out std_logic_vector( 9-1 downto 0 );
+    out3 : out std_logic_vector( 9-1 downto 0 );
+    out2 : out std_logic_vector( 9-1 downto 0 );
+    lsb_out1 : out std_logic_vector( 9-1 downto 0 )
   );
 end pfb_fir_2048ch_6i_core_debus_dina_x0;
 architecture structural of pfb_fir_2048ch_6i_core_debus_dina_x0 is 
-  signal slice3_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 9-1 downto 0 );
   signal ddina_q_net : std_logic_vector( 72-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 9-1 downto 0 );
 begin
-  msb_out4 <= reinterpret4_output_port_net;
+  msb_out8 <= reinterpret8_output_port_net;
+  out7 <= reinterpret7_output_port_net;
+  out6 <= reinterpret6_output_port_net;
+  out5 <= reinterpret5_output_port_net;
+  out4 <= reinterpret4_output_port_net;
   out3 <= reinterpret3_output_port_net;
   out2 <= reinterpret2_output_port_net;
   lsb_out1 <= reinterpret1_output_port_net;
   ddina_q_net <= bus_in;
-  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -4943,7 +5247,7 @@ begin
     input_port => slice1_y_net,
     output_port => reinterpret1_output_port_net
   );
-  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -4951,51 +5255,7 @@ begin
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net
   );
-  slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 0,
-    new_msb => 17,
-    x_width => 72,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice1_y_net
-  );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 18,
-    new_msb => 35,
-    x_width => 72,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice2_y_net
-  );
-  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 36,
-    new_msb => 53,
-    x_width => 72,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice3_y_net
-  );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 54,
-    new_msb => 71,
-    x_width => 72,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice4_y_net
-  );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -5003,13 +5263,133 @@ begin
     input_port => slice3_y_net,
     output_port => reinterpret3_output_port_net
   );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => slice4_y_net,
     output_port => reinterpret4_output_port_net
+  );
+  slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 0,
+    new_msb => 8,
+    x_width => 72,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice1_y_net
+  );
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 9,
+    new_msb => 17,
+    x_width => 72,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice2_y_net
+  );
+  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 18,
+    new_msb => 26,
+    x_width => 72,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice3_y_net
+  );
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 27,
+    new_msb => 35,
+    x_width => 72,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice4_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 63,
+    new_msb => 71,
+    x_width => 72,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice8_y_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 54,
+    new_msb => 62,
+    x_width => 72,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice7_y_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 45,
+    new_msb => 53,
+    x_width => 72,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice6_y_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 36,
+    new_msb => 44,
+    x_width => 72,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice5_y_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/rom/debus_dinb
@@ -5017,32 +5397,48 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_debus_dinb is
+entity pfb_fir_2048ch_6i_core_debus_dinb_x0 is
   port (
     bus_in : in std_logic_vector( 72-1 downto 0 );
-    msb_out4 : out std_logic_vector( 18-1 downto 0 );
-    out3 : out std_logic_vector( 18-1 downto 0 );
-    out2 : out std_logic_vector( 18-1 downto 0 );
-    lsb_out1 : out std_logic_vector( 18-1 downto 0 )
+    msb_out8 : out std_logic_vector( 9-1 downto 0 );
+    out7 : out std_logic_vector( 9-1 downto 0 );
+    out6 : out std_logic_vector( 9-1 downto 0 );
+    out5 : out std_logic_vector( 9-1 downto 0 );
+    out4 : out std_logic_vector( 9-1 downto 0 );
+    out3 : out std_logic_vector( 9-1 downto 0 );
+    out2 : out std_logic_vector( 9-1 downto 0 );
+    lsb_out1 : out std_logic_vector( 9-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_debus_dinb;
-architecture structural of pfb_fir_2048ch_6i_core_debus_dinb is 
-  signal slice4_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
+end pfb_fir_2048ch_6i_core_debus_dinb_x0;
+architecture structural of pfb_fir_2048ch_6i_core_debus_dinb_x0 is 
+  signal slice2_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 9-1 downto 0 );
   signal ddinb_q_net : std_logic_vector( 72-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 9-1 downto 0 );
 begin
-  msb_out4 <= reinterpret4_output_port_net;
+  msb_out8 <= reinterpret8_output_port_net;
+  out7 <= reinterpret7_output_port_net;
+  out6 <= reinterpret6_output_port_net;
+  out5 <= reinterpret5_output_port_net;
+  out4 <= reinterpret4_output_port_net;
   out3 <= reinterpret3_output_port_net;
   out2 <= reinterpret2_output_port_net;
   lsb_out1 <= reinterpret1_output_port_net;
   ddinb_q_net <= bus_in;
-  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -5050,7 +5446,7 @@ begin
     input_port => slice1_y_net,
     output_port => reinterpret1_output_port_net
   );
-  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -5058,51 +5454,7 @@ begin
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net
   );
-  slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 0,
-    new_msb => 17,
-    x_width => 72,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice1_y_net
-  );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 18,
-    new_msb => 35,
-    x_width => 72,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice2_y_net
-  );
-  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 36,
-    new_msb => 53,
-    x_width => 72,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice3_y_net
-  );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 54,
-    new_msb => 71,
-    x_width => 72,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice4_y_net
-  );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -5110,7 +5462,7 @@ begin
     input_port => slice3_y_net,
     output_port => reinterpret3_output_port_net
   );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -5118,29 +5470,161 @@ begin
     input_port => slice4_y_net,
     output_port => reinterpret4_output_port_net
   );
+  slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 0,
+    new_msb => 8,
+    x_width => 72,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice1_y_net
+  );
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 9,
+    new_msb => 17,
+    x_width => 72,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice2_y_net
+  );
+  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 18,
+    new_msb => 26,
+    x_width => 72,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice3_y_net
+  );
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 27,
+    new_msb => 35,
+    x_width => 72,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice4_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 63,
+    new_msb => 71,
+    x_width => 72,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice8_y_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 54,
+    new_msb => 62,
+    x_width => 72,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice7_y_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 45,
+    new_msb => 53,
+    x_width => 72,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice6_y_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 36,
+    new_msb => 44,
+    x_width => 72,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice5_y_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
+  );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/rom/debus_wea
 library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_debus_wea is
+entity pfb_fir_2048ch_6i_core_debus_wea_x0 is
   port (
-    bus_in : in std_logic_vector( 4-1 downto 0 );
-    msb_out4 : out std_logic_vector( 1-1 downto 0 );
+    bus_in : in std_logic_vector( 8-1 downto 0 );
+    msb_out8 : out std_logic_vector( 1-1 downto 0 );
+    out7 : out std_logic_vector( 1-1 downto 0 );
+    out6 : out std_logic_vector( 1-1 downto 0 );
+    out5 : out std_logic_vector( 1-1 downto 0 );
+    out4 : out std_logic_vector( 1-1 downto 0 );
     out3 : out std_logic_vector( 1-1 downto 0 );
     out2 : out std_logic_vector( 1-1 downto 0 );
     lsb_out1 : out std_logic_vector( 1-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_debus_wea;
-architecture structural of pfb_fir_2048ch_6i_core_debus_wea is 
-  signal concatenate_y_net : std_logic_vector( 4-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 1-1 downto 0 );
+end pfb_fir_2048ch_6i_core_debus_wea_x0;
+architecture structural of pfb_fir_2048ch_6i_core_debus_wea_x0 is 
+  signal concatenate_y_net : std_logic_vector( 8-1 downto 0 );
   signal slice1_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 1-1 downto 0 );
   signal slice3_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 1-1 downto 0 );
 begin
-  msb_out4 <= slice4_y_net;
+  msb_out8 <= slice8_y_net;
+  out7 <= slice7_y_net;
+  out6 <= slice6_y_net;
+  out5 <= slice5_y_net;
+  out4 <= slice4_y_net;
   out3 <= slice3_y_net;
   out2 <= slice2_y_net;
   lsb_out1 <= slice1_y_net;
@@ -5149,7 +5633,7 @@ begin
   generic map (
     new_lsb => 0,
     new_msb => 0,
-    x_width => 4,
+    x_width => 8,
     y_width => 1
   )
   port map (
@@ -5160,7 +5644,7 @@ begin
   generic map (
     new_lsb => 1,
     new_msb => 1,
-    x_width => 4,
+    x_width => 8,
     y_width => 1
   )
   port map (
@@ -5171,7 +5655,7 @@ begin
   generic map (
     new_lsb => 2,
     new_msb => 2,
-    x_width => 4,
+    x_width => 8,
     y_width => 1
   )
   port map (
@@ -5182,12 +5666,56 @@ begin
   generic map (
     new_lsb => 3,
     new_msb => 3,
-    x_width => 4,
+    x_width => 8,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
     y => slice4_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 7,
+    new_msb => 7,
+    x_width => 8,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice8_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 6,
+    new_msb => 6,
+    x_width => 8,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice7_y_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 5,
+    new_msb => 5,
+    x_width => 8,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice6_y_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 4,
+    new_msb => 4,
+    x_width => 8,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice5_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/rom/debus_web
@@ -5195,23 +5723,35 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_debus_web is
+entity pfb_fir_2048ch_6i_core_debus_web_x0 is
   port (
-    bus_in : in std_logic_vector( 4-1 downto 0 );
-    msb_out4 : out std_logic_vector( 1-1 downto 0 );
+    bus_in : in std_logic_vector( 8-1 downto 0 );
+    msb_out8 : out std_logic_vector( 1-1 downto 0 );
+    out7 : out std_logic_vector( 1-1 downto 0 );
+    out6 : out std_logic_vector( 1-1 downto 0 );
+    out5 : out std_logic_vector( 1-1 downto 0 );
+    out4 : out std_logic_vector( 1-1 downto 0 );
     out3 : out std_logic_vector( 1-1 downto 0 );
     out2 : out std_logic_vector( 1-1 downto 0 );
     lsb_out1 : out std_logic_vector( 1-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_debus_web;
-architecture structural of pfb_fir_2048ch_6i_core_debus_web is 
+end pfb_fir_2048ch_6i_core_debus_web_x0;
+architecture structural of pfb_fir_2048ch_6i_core_debus_web_x0 is 
   signal slice1_y_net : std_logic_vector( 1-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 4-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 1-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 8-1 downto 0 );
   signal slice2_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 1-1 downto 0 );
 begin
-  msb_out4 <= slice4_y_net;
+  msb_out8 <= slice8_y_net;
+  out7 <= slice7_y_net;
+  out6 <= slice6_y_net;
+  out5 <= slice5_y_net;
+  out4 <= slice4_y_net;
   out3 <= slice3_y_net;
   out2 <= slice2_y_net;
   lsb_out1 <= slice1_y_net;
@@ -5220,7 +5760,7 @@ begin
   generic map (
     new_lsb => 0,
     new_msb => 0,
-    x_width => 4,
+    x_width => 8,
     y_width => 1
   )
   port map (
@@ -5231,7 +5771,7 @@ begin
   generic map (
     new_lsb => 1,
     new_msb => 1,
-    x_width => 4,
+    x_width => 8,
     y_width => 1
   )
   port map (
@@ -5242,7 +5782,7 @@ begin
   generic map (
     new_lsb => 2,
     new_msb => 2,
-    x_width => 4,
+    x_width => 8,
     y_width => 1
   )
   port map (
@@ -5253,12 +5793,56 @@ begin
   generic map (
     new_lsb => 3,
     new_msb => 3,
-    x_width => 4,
+    x_width => 8,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
     y => slice4_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 7,
+    new_msb => 7,
+    x_width => 8,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice8_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 6,
+    new_msb => 6,
+    x_width => 8,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice7_y_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 5,
+    new_msb => 5,
+    x_width => 8,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice6_y_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 4,
+    new_msb => 4,
+    x_width => 8,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice5_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/rom/rep_addra/bussify
@@ -5266,32 +5850,48 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_bussify_x6 is
+entity pfb_fir_2048ch_6i_core_bussify_x10 is
   port (
-    in1 : in std_logic_vector( 11-1 downto 0 );
-    in2 : in std_logic_vector( 11-1 downto 0 );
-    in3 : in std_logic_vector( 11-1 downto 0 );
-    in4 : in std_logic_vector( 11-1 downto 0 );
-    bus_out : out std_logic_vector( 44-1 downto 0 )
+    in1 : in std_logic_vector( 13-1 downto 0 );
+    in2 : in std_logic_vector( 13-1 downto 0 );
+    in3 : in std_logic_vector( 13-1 downto 0 );
+    in4 : in std_logic_vector( 13-1 downto 0 );
+    in5 : in std_logic_vector( 13-1 downto 0 );
+    in6 : in std_logic_vector( 13-1 downto 0 );
+    in7 : in std_logic_vector( 13-1 downto 0 );
+    in8 : in std_logic_vector( 13-1 downto 0 );
+    bus_out : out std_logic_vector( 104-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_bussify_x6;
-architecture structural of pfb_fir_2048ch_6i_core_bussify_x6 is 
-  signal din0_0_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_1_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_2_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_3_q_net : std_logic_vector( 11-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 44-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 11-1 downto 0 );
+end pfb_fir_2048ch_6i_core_bussify_x10;
+architecture structural of pfb_fir_2048ch_6i_core_bussify_x10 is 
+  signal reinterpret7_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_4_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_3_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_1_q_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 104-1 downto 0 );
+  signal din0_0_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_7_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_6_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_5_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_2_q_net : std_logic_vector( 13-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   din0_0_q_net <= in1;
   din0_1_q_net <= in2;
   din0_2_q_net <= in3;
   din0_3_q_net <= in4;
-  concatenate : entity xil_defaultlib.sysgen_concat_abf0929c33 
+  din0_4_q_net <= in5;
+  din0_5_q_net <= in6;
+  din0_6_q_net <= in7;
+  din0_7_q_net <= in8;
+  concatenate : entity xil_defaultlib.sysgen_concat_6b6e20fcb6 
   port map (
     clk => '0',
     ce => '0',
@@ -5300,9 +5900,13 @@ begin
     in1 => reinterpret2_output_port_net,
     in2 => reinterpret3_output_port_net,
     in3 => reinterpret4_output_port_net,
+    in4 => reinterpret5_output_port_net,
+    in5 => reinterpret6_output_port_net,
+    in6 => reinterpret7_output_port_net,
+    in7 => reinterpret8_output_port_net,
     y => concatenate_y_net
   );
-  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -5310,7 +5914,7 @@ begin
     input_port => din0_0_q_net,
     output_port => reinterpret1_output_port_net
   );
-  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -5318,7 +5922,7 @@ begin
     input_port => din0_1_q_net,
     output_port => reinterpret2_output_port_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -5326,13 +5930,45 @@ begin
     input_port => din0_2_q_net,
     output_port => reinterpret3_output_port_net
   );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => din0_3_q_net,
     output_port => reinterpret4_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_4_q_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_5_q_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_6_q_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_7_q_net,
+    output_port => reinterpret8_output_port_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/rom/rep_addra
@@ -5342,32 +5978,40 @@ library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
 entity pfb_fir_2048ch_6i_core_rep_addra_x0 is
   port (
-    in_x0 : in std_logic_vector( 11-1 downto 0 );
+    in_x0 : in std_logic_vector( 13-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
-    out_x0 : out std_logic_vector( 44-1 downto 0 )
+    out_x0 : out std_logic_vector( 104-1 downto 0 )
   );
 end pfb_fir_2048ch_6i_core_rep_addra_x0;
 architecture structural of pfb_fir_2048ch_6i_core_rep_addra_x0 is 
-  signal concatenate_y_net : std_logic_vector( 44-1 downto 0 );
+  signal din0_6_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_7_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_3_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_4_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_5_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_0_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_1_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_2_q_net : std_logic_vector( 13-1 downto 0 );
   signal ce_net : std_logic;
-  signal din0_0_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_1_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_2_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_3_q_net : std_logic_vector( 11-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
   signal clk_net : std_logic;
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 104-1 downto 0 );
 begin
   out_x0 <= concatenate_y_net;
   counter_op_net <= in_x0;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x6 
+  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x10 
   port map (
     in1 => din0_0_q_net,
     in2 => din0_1_q_net,
     in3 => din0_2_q_net,
     in4 => din0_3_q_net,
+    in5 => din0_4_q_net,
+    in6 => din0_5_q_net,
+    in7 => din0_6_q_net,
+    in8 => din0_7_q_net,
     bus_out => concatenate_y_net
   );
   din0_0 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
@@ -5375,7 +6019,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -5390,7 +6034,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -5405,7 +6049,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -5420,7 +6064,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -5430,38 +6074,114 @@ begin
     ce => ce_net,
     q => din0_3_q_net
   );
+  din0_4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_4_q_net
+  );
+  din0_5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_5_q_net
+  );
+  din0_6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_6_q_net
+  );
+  din0_7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_7_q_net
+  );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/rom/rep_addrb/bussify
 library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_bussify_x8 is
+entity pfb_fir_2048ch_6i_core_bussify_x9 is
   port (
-    in1 : in std_logic_vector( 11-1 downto 0 );
-    in2 : in std_logic_vector( 11-1 downto 0 );
-    in3 : in std_logic_vector( 11-1 downto 0 );
-    in4 : in std_logic_vector( 11-1 downto 0 );
-    bus_out : out std_logic_vector( 44-1 downto 0 )
+    in1 : in std_logic_vector( 13-1 downto 0 );
+    in2 : in std_logic_vector( 13-1 downto 0 );
+    in3 : in std_logic_vector( 13-1 downto 0 );
+    in4 : in std_logic_vector( 13-1 downto 0 );
+    in5 : in std_logic_vector( 13-1 downto 0 );
+    in6 : in std_logic_vector( 13-1 downto 0 );
+    in7 : in std_logic_vector( 13-1 downto 0 );
+    in8 : in std_logic_vector( 13-1 downto 0 );
+    bus_out : out std_logic_vector( 104-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_bussify_x8;
-architecture structural of pfb_fir_2048ch_6i_core_bussify_x8 is 
-  signal reinterpret1_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 44-1 downto 0 );
-  signal din0_0_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_3_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_1_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_2_q_net : std_logic_vector( 11-1 downto 0 );
+end pfb_fir_2048ch_6i_core_bussify_x9;
+architecture structural of pfb_fir_2048ch_6i_core_bussify_x9 is 
+  signal din0_4_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_2_q_net : std_logic_vector( 13-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 104-1 downto 0 );
+  signal din0_5_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_1_q_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_3_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_7_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_6_q_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_0_q_net : std_logic_vector( 13-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   din0_0_q_net <= in1;
   din0_1_q_net <= in2;
   din0_2_q_net <= in3;
   din0_3_q_net <= in4;
-  concatenate : entity xil_defaultlib.sysgen_concat_abf0929c33 
+  din0_4_q_net <= in5;
+  din0_5_q_net <= in6;
+  din0_6_q_net <= in7;
+  din0_7_q_net <= in8;
+  concatenate : entity xil_defaultlib.sysgen_concat_6b6e20fcb6 
   port map (
     clk => '0',
     ce => '0',
@@ -5470,9 +6190,13 @@ begin
     in1 => reinterpret2_output_port_net,
     in2 => reinterpret3_output_port_net,
     in3 => reinterpret4_output_port_net,
+    in4 => reinterpret5_output_port_net,
+    in5 => reinterpret6_output_port_net,
+    in6 => reinterpret7_output_port_net,
+    in7 => reinterpret8_output_port_net,
     y => concatenate_y_net
   );
-  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -5480,7 +6204,7 @@ begin
     input_port => din0_0_q_net,
     output_port => reinterpret1_output_port_net
   );
-  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -5488,7 +6212,7 @@ begin
     input_port => din0_1_q_net,
     output_port => reinterpret2_output_port_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -5496,13 +6220,45 @@ begin
     input_port => din0_2_q_net,
     output_port => reinterpret3_output_port_net
   );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => din0_3_q_net,
     output_port => reinterpret4_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_4_q_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_5_q_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_6_q_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_7_q_net,
+    output_port => reinterpret8_output_port_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/rom/rep_addrb
@@ -5512,32 +6268,40 @@ library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
 entity pfb_fir_2048ch_6i_core_rep_addrb_x0 is
   port (
-    in_x0 : in std_logic_vector( 11-1 downto 0 );
+    in_x0 : in std_logic_vector( 13-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
-    out_x0 : out std_logic_vector( 44-1 downto 0 )
+    out_x0 : out std_logic_vector( 104-1 downto 0 )
   );
 end pfb_fir_2048ch_6i_core_rep_addrb_x0;
 architecture structural of pfb_fir_2048ch_6i_core_rep_addrb_x0 is 
-  signal inverter_op_net : std_logic_vector( 11-1 downto 0 );
   signal clk_net : std_logic;
+  signal inverter_op_net : std_logic_vector( 13-1 downto 0 );
   signal ce_net : std_logic;
-  signal concatenate_y_net : std_logic_vector( 44-1 downto 0 );
-  signal din0_0_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_1_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_2_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_3_q_net : std_logic_vector( 11-1 downto 0 );
+  signal din0_0_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_1_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_2_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_3_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_4_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_5_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_6_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_7_q_net : std_logic_vector( 13-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 104-1 downto 0 );
 begin
   out_x0 <= concatenate_y_net;
   inverter_op_net <= in_x0;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x8 
+  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x9 
   port map (
     in1 => din0_0_q_net,
     in2 => din0_1_q_net,
     in3 => din0_2_q_net,
     in4 => din0_3_q_net,
+    in5 => din0_4_q_net,
+    in6 => din0_5_q_net,
+    in7 => din0_6_q_net,
+    in8 => din0_7_q_net,
     bus_out => concatenate_y_net
   );
   din0_0 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
@@ -5545,7 +6309,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -5560,7 +6324,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -5575,7 +6339,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -5590,7 +6354,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -5600,29 +6364,93 @@ begin
     ce => ce_net,
     q => din0_3_q_net
   );
+  din0_4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => inverter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_4_q_net
+  );
+  din0_5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => inverter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_5_q_net
+  );
+  din0_6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => inverter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_6_q_net
+  );
+  din0_7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => inverter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_7_q_net
+  );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/rom/rep_wea/bussify
 library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_bussify_x5 is
+entity pfb_fir_2048ch_6i_core_bussify_x8 is
   port (
     in1 : in std_logic_vector( 1-1 downto 0 );
-    bus_out : out std_logic_vector( 4-1 downto 0 )
+    bus_out : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_bussify_x5;
-architecture structural of pfb_fir_2048ch_6i_core_bussify_x5 is 
-  signal reinterpret4_output_port_net : std_logic_vector( 1-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 4-1 downto 0 );
-  signal rom_we_op_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 1-1 downto 0 );
+end pfb_fir_2048ch_6i_core_bussify_x8;
+architecture structural of pfb_fir_2048ch_6i_core_bussify_x8 is 
   signal reinterpret2_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal rom_we_op_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 8-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   rom_we_op_net <= in1;
-  concatenate : entity xil_defaultlib.sysgen_concat_27ea541150 
+  concatenate : entity xil_defaultlib.sysgen_concat_270df0b66f 
   port map (
     clk => '0',
     ce => '0',
@@ -5631,6 +6459,10 @@ begin
     in1 => reinterpret2_output_port_net,
     in2 => reinterpret3_output_port_net,
     in3 => reinterpret4_output_port_net,
+    in4 => reinterpret5_output_port_net,
+    in5 => reinterpret6_output_port_net,
+    in6 => reinterpret7_output_port_net,
+    in7 => reinterpret8_output_port_net,
     y => concatenate_y_net
   );
   reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
@@ -5665,6 +6497,38 @@ begin
     input_port => rom_we_op_net,
     output_port => reinterpret4_output_port_net
   );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => rom_we_op_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => rom_we_op_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => rom_we_op_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => rom_we_op_net,
+    output_port => reinterpret8_output_port_net
+  );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/rom/rep_wea
 library IEEE;
@@ -5674,16 +6538,16 @@ use xil_defaultlib.conv_pkg.all;
 entity pfb_fir_2048ch_6i_core_rep_wea_x0 is
   port (
     in_x0 : in std_logic_vector( 1-1 downto 0 );
-    out_x0 : out std_logic_vector( 4-1 downto 0 )
+    out_x0 : out std_logic_vector( 8-1 downto 0 )
   );
 end pfb_fir_2048ch_6i_core_rep_wea_x0;
 architecture structural of pfb_fir_2048ch_6i_core_rep_wea_x0 is 
-  signal concatenate_y_net : std_logic_vector( 4-1 downto 0 );
   signal rom_we_op_net : std_logic_vector( 1-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 8-1 downto 0 );
 begin
   out_x0 <= concatenate_y_net;
   rom_we_op_net <= in_x0;
-  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x5 
+  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x8 
   port map (
     in1 => rom_we_op_net,
     bus_out => concatenate_y_net
@@ -5697,20 +6561,24 @@ use xil_defaultlib.conv_pkg.all;
 entity pfb_fir_2048ch_6i_core_bussify_x7 is
   port (
     in1 : in std_logic_vector( 1-1 downto 0 );
-    bus_out : out std_logic_vector( 4-1 downto 0 )
+    bus_out : out std_logic_vector( 8-1 downto 0 )
   );
 end pfb_fir_2048ch_6i_core_bussify_x7;
 architecture structural of pfb_fir_2048ch_6i_core_bussify_x7 is 
-  signal reinterpret1_output_port_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret4_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 1-1 downto 0 );
   signal rom_we_op_net : std_logic_vector( 1-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 4-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 1-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   rom_we_op_net <= in1;
-  concatenate : entity xil_defaultlib.sysgen_concat_27ea541150 
+  concatenate : entity xil_defaultlib.sysgen_concat_270df0b66f 
   port map (
     clk => '0',
     ce => '0',
@@ -5719,6 +6587,10 @@ begin
     in1 => reinterpret2_output_port_net,
     in2 => reinterpret3_output_port_net,
     in3 => reinterpret4_output_port_net,
+    in4 => reinterpret5_output_port_net,
+    in5 => reinterpret6_output_port_net,
+    in6 => reinterpret7_output_port_net,
+    in7 => reinterpret8_output_port_net,
     y => concatenate_y_net
   );
   reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
@@ -5753,6 +6625,38 @@ begin
     input_port => rom_we_op_net,
     output_port => reinterpret4_output_port_net
   );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => rom_we_op_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => rom_we_op_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => rom_we_op_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => rom_we_op_net,
+    output_port => reinterpret8_output_port_net
+  );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen/rom/rep_web
 library IEEE;
@@ -5762,11 +6666,11 @@ use xil_defaultlib.conv_pkg.all;
 entity pfb_fir_2048ch_6i_core_rep_web_x0 is
   port (
     in_x0 : in std_logic_vector( 1-1 downto 0 );
-    out_x0 : out std_logic_vector( 4-1 downto 0 )
+    out_x0 : out std_logic_vector( 8-1 downto 0 )
   );
 end pfb_fir_2048ch_6i_core_rep_web_x0;
 architecture structural of pfb_fir_2048ch_6i_core_rep_web_x0 is 
-  signal concatenate_y_net : std_logic_vector( 4-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 8-1 downto 0 );
   signal rom_we_op_net : std_logic_vector( 1-1 downto 0 );
 begin
   out_x0 <= concatenate_y_net;
@@ -5784,10 +6688,10 @@ library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
 entity pfb_fir_2048ch_6i_core_rom is
   port (
-    addra : in std_logic_vector( 11-1 downto 0 );
+    addra : in std_logic_vector( 13-1 downto 0 );
     dina : in std_logic_vector( 72-1 downto 0 );
     wea : in std_logic_vector( 1-1 downto 0 );
-    addrb : in std_logic_vector( 11-1 downto 0 );
+    addrb : in std_logic_vector( 13-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     a : out std_logic_vector( 72-1 downto 0 );
@@ -5795,52 +6699,84 @@ entity pfb_fir_2048ch_6i_core_rom is
   );
 end pfb_fir_2048ch_6i_core_rom;
 architecture structural of pfb_fir_2048ch_6i_core_rom is 
-  signal rom_din_op_net : std_logic_vector( 72-1 downto 0 );
-  signal rom_we_op_net : std_logic_vector( 1-1 downto 0 );
-  signal inverter_op_net : std_logic_vector( 11-1 downto 0 );
-  signal concatenate_y_net_x4 : std_logic_vector( 44-1 downto 0 );
-  signal reinterpret4_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret3_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret2_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret1_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal concatenate_y_net_x3 : std_logic_vector( 44-1 downto 0 );
-  signal reinterpret4_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret2_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal ddina_q_net : std_logic_vector( 72-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal concatenate_y_net_x2 : std_logic_vector( 4-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal concatenate_y_net_x1 : std_logic_vector( 104-1 downto 0 );
+  signal reinterpret8_output_port_net_x0 : std_logic_vector( 13-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 1-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
+  signal concatenate_y_net_x0 : std_logic_vector( 72-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 72-1 downto 0 );
+  signal slice2_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice1_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal concatenate_y_net_x4 : std_logic_vector( 8-1 downto 0 );
   signal slice4_y_net : std_logic_vector( 1-1 downto 0 );
   signal slice3_y_net : std_logic_vector( 1-1 downto 0 );
   signal slice2_y_net : std_logic_vector( 1-1 downto 0 );
+  signal clk_net : std_logic;
+  signal ddina_q_net : std_logic_vector( 72-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 9-1 downto 0 );
   signal slice1_y_net : std_logic_vector( 1-1 downto 0 );
-  signal concatenate_y_net_x1 : std_logic_vector( 4-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concatenate_y_net_x3 : std_logic_vector( 8-1 downto 0 );
+  signal bram3_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram4_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram5_douta_net : std_logic_vector( 9-1 downto 0 );
   signal ddinb_q_net : std_logic_vector( 72-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret3_output_port_net_x1 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret2_output_port_net_x1 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret1_output_port_net_x1 : std_logic_vector( 9-1 downto 0 );
+  signal rom_din_op_net : std_logic_vector( 72-1 downto 0 );
+  signal reinterpret7_output_port_net_x0 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret6_output_port_net_x0 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret8_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret4_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal bram5_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram6_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram7_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret5_output_port_net_x0 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal bram6_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram7_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram0_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret3_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret2_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret1_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal slice8_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice7_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice6_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal ce_net : std_logic;
+  signal inverter_op_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret7_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret6_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret5_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret4_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal concatenate_y_net_x2 : std_logic_vector( 104-1 downto 0 );
+  signal reinterpret8_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret7_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret6_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret5_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret4_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal bram0_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram1_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram2_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram1_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram2_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram3_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram4_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret3_output_port_net_x0 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret2_output_port_net_x0 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret1_output_port_net_x0 : std_logic_vector( 13-1 downto 0 );
+  signal rom_we_op_net : std_logic_vector( 1-1 downto 0 );
+  signal slice5_y_net_x0 : std_logic_vector( 1-1 downto 0 );
   signal slice4_y_net_x0 : std_logic_vector( 1-1 downto 0 );
   signal slice3_y_net_x0 : std_logic_vector( 1-1 downto 0 );
-  signal slice2_y_net_x0 : std_logic_vector( 1-1 downto 0 );
-  signal slice1_y_net_x0 : std_logic_vector( 1-1 downto 0 );
-  signal bram1_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal bram2_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal bram3_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net_x2 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret3_output_port_net_x2 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret2_output_port_net_x2 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret1_output_port_net_x2 : std_logic_vector( 11-1 downto 0 );
-  signal bram0_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram1_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram2_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram3_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram0_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 72-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
-  signal concatenate_y_net_x0 : std_logic_vector( 72-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
 begin
   a <= concatenate_y_net_x0;
   b <= concatenate_y_net;
@@ -5850,12 +6786,16 @@ begin
   inverter_op_net <= addrb;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  a_bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_a_bussify 
+  a_bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_a_bussify_x0 
   port map (
     in1 => bram0_douta_net,
     in2 => bram1_douta_net,
     in3 => bram2_douta_net,
     in4 => bram3_douta_net,
+    in5 => bram4_douta_net,
+    in6 => bram5_douta_net,
+    in7 => bram6_douta_net,
+    in8 => bram7_douta_net,
     bus_out => concatenate_y_net_x0
   );
   b_bussify_x0 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_b_bussify 
@@ -5864,79 +6804,215 @@ begin
     in2 => bram1_doutb_net,
     in3 => bram2_doutb_net,
     in4 => bram3_doutb_net,
+    in5 => bram4_doutb_net,
+    in6 => bram5_doutb_net,
+    in7 => bram6_doutb_net,
+    in8 => bram7_doutb_net,
     bus_out => concatenate_y_net
   );
   debus_addra : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_addra_x0 
   port map (
-    bus_in => concatenate_y_net_x4,
-    msb_out4 => reinterpret4_output_port_net_x2,
-    out3 => reinterpret3_output_port_net_x2,
-    out2 => reinterpret2_output_port_net_x2,
-    lsb_out1 => reinterpret1_output_port_net_x2
-  );
-  debus_addrb : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_addrb 
-  port map (
-    bus_in => concatenate_y_net_x3,
-    msb_out4 => reinterpret4_output_port_net_x1,
-    out3 => reinterpret3_output_port_net_x1,
-    out2 => reinterpret2_output_port_net_x1,
-    lsb_out1 => reinterpret1_output_port_net_x1
-  );
-  debus_dina : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_dina_x0 
-  port map (
-    bus_in => ddina_q_net,
-    msb_out4 => reinterpret4_output_port_net_x0,
-    out3 => reinterpret3_output_port_net_x0,
-    out2 => reinterpret2_output_port_net_x0,
-    lsb_out1 => reinterpret1_output_port_net_x0
-  );
-  debus_dinb : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_dinb 
-  port map (
-    bus_in => ddinb_q_net,
-    msb_out4 => reinterpret4_output_port_net,
+    bus_in => concatenate_y_net_x1,
+    msb_out8 => reinterpret8_output_port_net_x1,
+    out7 => reinterpret7_output_port_net_x0,
+    out6 => reinterpret6_output_port_net_x0,
+    out5 => reinterpret5_output_port_net_x0,
+    out4 => reinterpret4_output_port_net,
     out3 => reinterpret3_output_port_net,
     out2 => reinterpret2_output_port_net,
     lsb_out1 => reinterpret1_output_port_net
   );
-  debus_wea : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_wea 
+  debus_addrb : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_addrb_x0 
   port map (
     bus_in => concatenate_y_net_x2,
-    msb_out4 => slice4_y_net_x0,
-    out3 => slice3_y_net_x0,
-    out2 => slice2_y_net_x0,
-    lsb_out1 => slice1_y_net_x0
+    msb_out8 => reinterpret8_output_port_net_x0,
+    out7 => reinterpret7_output_port_net_x1,
+    out6 => reinterpret6_output_port_net_x1,
+    out5 => reinterpret5_output_port_net_x1,
+    out4 => reinterpret4_output_port_net_x1,
+    out3 => reinterpret3_output_port_net_x0,
+    out2 => reinterpret2_output_port_net_x0,
+    lsb_out1 => reinterpret1_output_port_net_x0
   );
-  debus_web : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_web 
+  debus_dina : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_dina_x0 
   port map (
-    bus_in => concatenate_y_net_x1,
-    msb_out4 => slice4_y_net,
+    bus_in => ddina_q_net,
+    msb_out8 => reinterpret8_output_port_net_x2,
+    out7 => reinterpret7_output_port_net_x2,
+    out6 => reinterpret6_output_port_net_x2,
+    out5 => reinterpret5_output_port_net_x2,
+    out4 => reinterpret4_output_port_net_x2,
+    out3 => reinterpret3_output_port_net_x1,
+    out2 => reinterpret2_output_port_net_x1,
+    lsb_out1 => reinterpret1_output_port_net_x1
+  );
+  debus_dinb : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_dinb_x0 
+  port map (
+    bus_in => ddinb_q_net,
+    msb_out8 => reinterpret8_output_port_net,
+    out7 => reinterpret7_output_port_net,
+    out6 => reinterpret6_output_port_net,
+    out5 => reinterpret5_output_port_net,
+    out4 => reinterpret4_output_port_net_x0,
+    out3 => reinterpret3_output_port_net_x2,
+    out2 => reinterpret2_output_port_net_x2,
+    lsb_out1 => reinterpret1_output_port_net_x2
+  );
+  debus_wea : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_wea_x0 
+  port map (
+    bus_in => concatenate_y_net_x3,
+    msb_out8 => slice8_y_net,
+    out7 => slice7_y_net,
+    out6 => slice6_y_net,
+    out5 => slice5_y_net,
+    out4 => slice4_y_net,
     out3 => slice3_y_net,
     out2 => slice2_y_net,
     lsb_out1 => slice1_y_net
+  );
+  debus_web : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_web_x0 
+  port map (
+    bus_in => concatenate_y_net_x4,
+    msb_out8 => slice8_y_net_x0,
+    out7 => slice7_y_net_x0,
+    out6 => slice6_y_net_x0,
+    out5 => slice5_y_net_x0,
+    out4 => slice4_y_net_x0,
+    out3 => slice3_y_net_x0,
+    out2 => slice2_y_net_x0,
+    lsb_out1 => slice1_y_net_x0
   );
   rep_addra : entity xil_defaultlib.pfb_fir_2048ch_6i_core_rep_addra_x0 
   port map (
     in_x0 => counter_op_net,
     clk_1 => clk_net,
     ce_1 => ce_net,
-    out_x0 => concatenate_y_net_x4
+    out_x0 => concatenate_y_net_x1
   );
   rep_addrb : entity xil_defaultlib.pfb_fir_2048ch_6i_core_rep_addrb_x0 
   port map (
     in_x0 => inverter_op_net,
     clk_1 => clk_net,
     ce_1 => ce_net,
-    out_x0 => concatenate_y_net_x3
+    out_x0 => concatenate_y_net_x2
   );
   rep_wea : entity xil_defaultlib.pfb_fir_2048ch_6i_core_rep_wea_x0 
   port map (
     in_x0 => rom_we_op_net,
-    out_x0 => concatenate_y_net_x2
+    out_x0 => concatenate_y_net_x3
   );
   rep_web : entity xil_defaultlib.pfb_fir_2048ch_6i_core_rep_web_x0 
   port map (
     in_x0 => rom_we_op_net,
-    out_x0 => concatenate_y_net_x1
+    out_x0 => concatenate_y_net_x4
+  );
+  bram0 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i0",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret8_output_port_net_x1,
+    dina => reinterpret8_output_port_net_x2,
+    wea => slice8_y_net,
+    addrb => reinterpret8_output_port_net_x0,
+    dinb => reinterpret8_output_port_net,
+    web => slice8_y_net_x0,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram0_douta_net,
+    doutb => bram0_doutb_net
+  );
+  bram1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i1",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret7_output_port_net_x0,
+    dina => reinterpret7_output_port_net_x2,
+    wea => slice7_y_net,
+    addrb => reinterpret7_output_port_net_x1,
+    dinb => reinterpret7_output_port_net,
+    web => slice7_y_net_x0,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram1_douta_net,
+    doutb => bram1_doutb_net
+  );
+  bram2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i2",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret6_output_port_net_x0,
+    dina => reinterpret6_output_port_net_x2,
+    wea => slice6_y_net,
+    addrb => reinterpret6_output_port_net_x1,
+    dinb => reinterpret6_output_port_net,
+    web => slice6_y_net_x0,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram2_douta_net,
+    doutb => bram2_doutb_net
+  );
+  bram3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i3",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret5_output_port_net_x0,
+    dina => reinterpret5_output_port_net_x2,
+    wea => slice5_y_net,
+    addrb => reinterpret5_output_port_net_x1,
+    dinb => reinterpret5_output_port_net,
+    web => slice5_y_net_x0,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram3_douta_net,
+    doutb => bram3_doutb_net
   );
   ddina : entity xil_defaultlib.sysgen_delay_9d1145b960 
   port map (
@@ -5954,13 +7030,13 @@ begin
     d => rom_din_op_net,
     q => ddinb_q_net
   );
-  bram0 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i0",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4",
     latency => 3
   )
   port map (
@@ -5968,26 +7044,26 @@ begin
     enb => "1",
     rsta => "0",
     rstb => "0",
-    addra => reinterpret4_output_port_net_x2,
-    dina => reinterpret4_output_port_net_x0,
-    wea => slice4_y_net_x0,
+    addra => reinterpret4_output_port_net,
+    dina => reinterpret4_output_port_net_x2,
+    wea => slice4_y_net,
     addrb => reinterpret4_output_port_net_x1,
-    dinb => reinterpret4_output_port_net,
-    web => slice4_y_net,
+    dinb => reinterpret4_output_port_net_x0,
+    web => slice4_y_net_x0,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram0_douta_net,
-    doutb => bram0_doutb_net
+    douta => bram4_douta_net,
+    doutb => bram4_doutb_net
   );
-  bram1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i1",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i5",
     latency => 3
   )
   port map (
@@ -5995,26 +7071,26 @@ begin
     enb => "1",
     rsta => "0",
     rstb => "0",
-    addra => reinterpret3_output_port_net_x2,
-    dina => reinterpret3_output_port_net_x0,
-    wea => slice3_y_net_x0,
-    addrb => reinterpret3_output_port_net_x1,
-    dinb => reinterpret3_output_port_net,
-    web => slice3_y_net,
+    addra => reinterpret3_output_port_net,
+    dina => reinterpret3_output_port_net_x1,
+    wea => slice3_y_net,
+    addrb => reinterpret3_output_port_net_x0,
+    dinb => reinterpret3_output_port_net_x2,
+    web => slice3_y_net_x0,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram1_douta_net,
-    doutb => bram1_doutb_net
+    douta => bram5_douta_net,
+    doutb => bram5_doutb_net
   );
-  bram2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i2",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i6",
     latency => 3
   )
   port map (
@@ -6022,26 +7098,26 @@ begin
     enb => "1",
     rsta => "0",
     rstb => "0",
-    addra => reinterpret2_output_port_net_x2,
-    dina => reinterpret2_output_port_net_x0,
-    wea => slice2_y_net_x0,
-    addrb => reinterpret2_output_port_net_x1,
-    dinb => reinterpret2_output_port_net,
-    web => slice2_y_net,
+    addra => reinterpret2_output_port_net,
+    dina => reinterpret2_output_port_net_x1,
+    wea => slice2_y_net,
+    addrb => reinterpret2_output_port_net_x0,
+    dinb => reinterpret2_output_port_net_x2,
+    web => slice2_y_net_x0,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram2_douta_net,
-    doutb => bram2_doutb_net
+    douta => bram6_douta_net,
+    doutb => bram6_doutb_net
   );
-  bram3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i3",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i7",
     latency => 3
   )
   port map (
@@ -6049,18 +7125,18 @@ begin
     enb => "1",
     rsta => "0",
     rstb => "0",
-    addra => reinterpret1_output_port_net_x2,
-    dina => reinterpret1_output_port_net_x0,
-    wea => slice1_y_net_x0,
-    addrb => reinterpret1_output_port_net_x1,
-    dinb => reinterpret1_output_port_net,
-    web => slice1_y_net,
+    addra => reinterpret1_output_port_net,
+    dina => reinterpret1_output_port_net_x1,
+    wea => slice1_y_net,
+    addrb => reinterpret1_output_port_net_x0,
+    dinb => reinterpret1_output_port_net_x2,
+    web => slice1_y_net_x0,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram3_douta_net,
-    doutb => bram3_doutb_net
+    douta => bram7_douta_net,
+    doutb => bram7_doutb_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_coeff_gen
@@ -6080,45 +7156,45 @@ entity pfb_fir_2048ch_6i_core_pfb_fir_coeff_gen is
   );
 end pfb_fir_2048ch_6i_core_pfb_fir_coeff_gen;
 architecture structural of pfb_fir_2048ch_6i_core_pfb_fir_coeff_gen is 
-  signal ce_net : std_logic;
+  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret0_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal zero_op_net : std_logic_vector( 13-1 downto 0 );
+  signal d3_q_net : std_logic_vector( 18-1 downto 0 );
+  signal mux0_y_net : std_logic_vector( 18-1 downto 0 );
+  signal d5_q_net : std_logic_vector( 18-1 downto 0 );
+  signal d6_q_net : std_logic_vector( 18-1 downto 0 );
+  signal const0_op_net : std_logic_vector( 18-1 downto 0 );
+  signal d4_q_net : std_logic_vector( 18-1 downto 0 );
+  signal const1_op_net : std_logic_vector( 18-1 downto 0 );
+  signal first_op_net : std_logic_vector( 1-1 downto 0 );
+  signal dfirst_q_net : std_logic_vector( 1-1 downto 0 );
+  signal mux1_y_net : std_logic_vector( 18-1 downto 0 );
+  signal d7_q_net : std_logic_vector( 18-1 downto 0 );
+  signal d0_q_net : std_logic_vector( 18-1 downto 0 );
+  signal d1_q_net : std_logic_vector( 18-1 downto 0 );
+  signal d2_q_net : std_logic_vector( 18-1 downto 0 );
+  signal sync_delay_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din_delay_q_net : std_logic_vector( 96-1 downto 0 );
+  signal concat_y_net : std_logic_vector( 144-1 downto 0 );
   signal reinterpret4_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
   signal reinterpret3_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret0_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret2_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net_x1 : std_logic_vector( 18-1 downto 0 );
-  signal concatenate_y_net_x0 : std_logic_vector( 72-1 downto 0 );
+  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
+  signal clk_net : std_logic;
+  signal concatenate_y_net_x1 : std_logic_vector( 96-1 downto 0 );
+  signal ce_net : std_logic;
   signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret1_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret_out_output_port_net : std_logic_vector( 72-1 downto 0 );
-  signal const0_op_net : std_logic_vector( 18-1 downto 0 );
-  signal zero_op_net : std_logic_vector( 11-1 downto 0 );
-  signal d1_q_net : std_logic_vector( 18-1 downto 0 );
-  signal d2_q_net : std_logic_vector( 18-1 downto 0 );
-  signal d3_q_net : std_logic_vector( 18-1 downto 0 );
-  signal mux0_y_net : std_logic_vector( 18-1 downto 0 );
-  signal d5_q_net : std_logic_vector( 18-1 downto 0 );
-  signal mux1_y_net : std_logic_vector( 18-1 downto 0 );
-  signal d7_q_net : std_logic_vector( 18-1 downto 0 );
-  signal sync_delay_q_net : std_logic_vector( 1-1 downto 0 );
-  signal din_delay_q_net : std_logic_vector( 96-1 downto 0 );
-  signal concat_y_net : std_logic_vector( 144-1 downto 0 );
+  signal reinterpret1_output_port_net_x1 : std_logic_vector( 18-1 downto 0 );
   signal concatenate_y_net : std_logic_vector( 72-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
   signal rom_din_op_net : std_logic_vector( 72-1 downto 0 );
   signal rom_we_op_net : std_logic_vector( 1-1 downto 0 );
-  signal inverter_op_net : std_logic_vector( 11-1 downto 0 );
-  signal first_op_net : std_logic_vector( 1-1 downto 0 );
-  signal dfirst_q_net : std_logic_vector( 1-1 downto 0 );
-  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
-  signal concatenate_y_net_x1 : std_logic_vector( 96-1 downto 0 );
-  signal clk_net : std_logic;
-  signal d0_q_net : std_logic_vector( 18-1 downto 0 );
-  signal d6_q_net : std_logic_vector( 18-1 downto 0 );
-  signal d4_q_net : std_logic_vector( 18-1 downto 0 );
-  signal const1_op_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret_out_output_port_net : std_logic_vector( 72-1 downto 0 );
+  signal concatenate_y_net_x0 : std_logic_vector( 72-1 downto 0 );
+  signal inverter_op_net : std_logic_vector( 13-1 downto 0 );
 begin
   sync_out <= sync_delay_q_net;
   dout <= din_delay_q_net;
@@ -6129,7 +7205,7 @@ begin
   ce_net <= ce_1;
   a_expand : entity xil_defaultlib.pfb_fir_2048ch_6i_core_a_expand 
   port map (
-    bus_in => concatenate_y_net_x0,
+    bus_in => concatenate_y_net,
     msb_out4 => reinterpret4_output_port_net_x0,
     out3 => reinterpret3_output_port_net_x0,
     out2 => reinterpret2_output_port_net_x0,
@@ -6145,7 +7221,7 @@ begin
   );
   munge : entity xil_defaultlib.pfb_fir_2048ch_6i_core_munge 
   port map (
-    din => concatenate_y_net,
+    din => concatenate_y_net_x0,
     dout => reinterpret_out_output_port_net
   );
   rom : entity xil_defaultlib.pfb_fir_2048ch_6i_core_rom 
@@ -6156,84 +7232,8 @@ begin
     addrb => inverter_op_net,
     clk_1 => clk_net,
     ce_1 => ce_net,
-    a => concatenate_y_net_x0,
-    b => concatenate_y_net
-  );
-  sync_delay : entity xil_defaultlib.sysgen_delay_af471eb3e4 
-  port map (
-    clr => '0',
-    d => slice_y_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => sync_delay_q_net
-  );
-  din_delay : entity xil_defaultlib.sysgen_delay_e3dfe0c785 
-  port map (
-    clr => '0',
-    d => concatenate_y_net_x1,
-    clk => clk_net,
-    ce => ce_net,
-    q => din_delay_q_net
-  );
-  counter : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlcounter_free 
-  generic map (
-    core_name0 => "pfb_fir_2048ch_6i_core_c_counter_binary_v12_0_i0",
-    op_arith => xlUnsigned,
-    op_width => 11
-  )
-  port map (
-    en => "1",
-    clr => '0',
-    rst => slice_y_net,
-    clk => clk_net,
-    ce => ce_net,
-    op => counter_op_net
-  );
-  inverter : entity xil_defaultlib.sysgen_inverter_ec7dddc748 
-  port map (
-    clr => '0',
-    ip => counter_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    op => inverter_op_net
-  );
-  rom_din : entity xil_defaultlib.sysgen_constant_d84c7d2c96 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    op => rom_din_op_net
-  );
-  rom_we : entity xil_defaultlib.sysgen_constant_09f24f45be 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    op => rom_we_op_net
-  );
-  zero : entity xil_defaultlib.sysgen_constant_58e12751b7 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    op => zero_op_net
-  );
-  first : entity xil_defaultlib.sysgen_relational_377d0637f5 
-  port map (
-    clr => '0',
-    a => zero_op_net,
-    b => counter_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    op => first_op_net
-  );
-  dfirst : entity xil_defaultlib.sysgen_delay_da1f2fc4fd 
-  port map (
-    clr => '0',
-    d => first_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => dfirst_q_net
+    a => concatenate_y_net,
+    b => concatenate_y_net_x0
   );
   concat : entity xil_defaultlib.sysgen_concat_b1267c92fb 
   port map (
@@ -6249,6 +7249,34 @@ begin
     in6 => mux1_y_net,
     in7 => d7_q_net,
     y => concat_y_net
+  );
+  const0 : entity xil_defaultlib.sysgen_constant_bfa1a655c2 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    op => const0_op_net
+  );
+  const1 : entity xil_defaultlib.sysgen_constant_0ec7db0ace 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    op => const1_op_net
+  );
+  counter : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlcounter_free 
+  generic map (
+    core_name0 => "pfb_fir_2048ch_6i_core_c_counter_binary_v12_0_i0",
+    op_arith => xlUnsigned,
+    op_width => 13
+  )
+  port map (
+    en => "1",
+    clr => '0',
+    rst => slice_y_net,
+    clk => clk_net,
+    ce => ce_net,
+    op => counter_op_net
   );
   d0 : entity xil_defaultlib.sysgen_delay_e4259160b8 
   port map (
@@ -6290,31 +7318,6 @@ begin
     ce => ce_net,
     q => d4_q_net
   );
-  const0 : entity xil_defaultlib.sysgen_constant_bfa1a655c2 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    op => const0_op_net
-  );
-  reinterpret0 : entity xil_defaultlib.sysgen_reinterpret_86149e1cd3 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => const0_op_net,
-    output_port => reinterpret0_output_port_net
-  );
-  mux0 : entity xil_defaultlib.sysgen_mux_0cfe8e7b22 
-  port map (
-    clr => '0',
-    sel => dfirst_q_net,
-    d0 => d4_q_net,
-    d1 => reinterpret0_output_port_net,
-    clk => clk_net,
-    ce => ce_net,
-    y => mux0_y_net
-  );
   d5 : entity xil_defaultlib.sysgen_delay_e4259160b8 
   port map (
     clr => '0',
@@ -6331,20 +7334,56 @@ begin
     ce => ce_net,
     q => d6_q_net
   );
-  const1 : entity xil_defaultlib.sysgen_constant_0ec7db0ace 
+  d7 : entity xil_defaultlib.sysgen_delay_e4259160b8 
   port map (
-    clk => '0',
-    ce => '0',
     clr => '0',
-    op => const1_op_net
+    d => reinterpret1_output_port_net_x0,
+    clk => clk_net,
+    ce => ce_net,
+    q => d7_q_net
   );
-  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_86149e1cd3 
+  dfirst : entity xil_defaultlib.sysgen_delay_da1f2fc4fd 
   port map (
-    clk => '0',
-    ce => '0',
     clr => '0',
-    input_port => const1_op_net,
-    output_port => reinterpret1_output_port_net
+    d => first_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => dfirst_q_net
+  );
+  din_delay : entity xil_defaultlib.sysgen_delay_e3dfe0c785 
+  port map (
+    clr => '0',
+    d => concatenate_y_net_x1,
+    clk => clk_net,
+    ce => ce_net,
+    q => din_delay_q_net
+  );
+  first : entity xil_defaultlib.sysgen_relational_39d42096de 
+  port map (
+    clr => '0',
+    a => zero_op_net,
+    b => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    op => first_op_net
+  );
+  inverter : entity xil_defaultlib.sysgen_inverter_5f63763953 
+  port map (
+    clr => '0',
+    ip => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    op => inverter_op_net
+  );
+  mux0 : entity xil_defaultlib.sysgen_mux_0cfe8e7b22 
+  port map (
+    clr => '0',
+    sel => dfirst_q_net,
+    d0 => d4_q_net,
+    d1 => reinterpret0_output_port_net,
+    clk => clk_net,
+    ce => ce_net,
+    y => mux0_y_net
   );
   mux1 : entity xil_defaultlib.sysgen_mux_0cfe8e7b22 
   port map (
@@ -6356,13 +7395,50 @@ begin
     ce => ce_net,
     y => mux1_y_net
   );
-  d7 : entity xil_defaultlib.sysgen_delay_e4259160b8 
+  reinterpret0 : entity xil_defaultlib.sysgen_reinterpret_86149e1cd3 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => const0_op_net,
+    output_port => reinterpret0_output_port_net
+  );
+  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_86149e1cd3 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => const1_op_net,
+    output_port => reinterpret1_output_port_net
+  );
+  rom_din : entity xil_defaultlib.sysgen_constant_d84c7d2c96 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    op => rom_din_op_net
+  );
+  rom_we : entity xil_defaultlib.sysgen_constant_09f24f45be 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    op => rom_we_op_net
+  );
+  sync_delay : entity xil_defaultlib.sysgen_delay_af471eb3e4 
   port map (
     clr => '0',
-    d => reinterpret1_output_port_net_x0,
+    d => slice_y_net,
     clk => clk_net,
     ce => ce_net,
-    q => d7_q_net
+    q => sync_delay_q_net
+  );
+  zero : entity xil_defaultlib.sysgen_constant_7ff69862a5 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    op => zero_op_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/bus_adder_tree/add_tree0
@@ -6382,15 +7458,15 @@ entity pfb_fir_2048ch_6i_core_add_tree0 is
   );
 end pfb_fir_2048ch_6i_core_add_tree0;
 architecture structural of pfb_fir_2048ch_6i_core_add_tree0 is 
-  signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
   signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal addr2_s_net : std_logic_vector( 27-1 downto 0 );
+  signal reinterpret12_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret12_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret12_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
   signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret12_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret12_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret12_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret12_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal addr2_s_net : std_logic_vector( 27-1 downto 0 );
+  signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
+  signal ce_net : std_logic;
 begin
   dout <= addr3_s_net;
   reinterpret12_output_port_net <= din1;
@@ -6444,15 +7520,15 @@ entity pfb_fir_2048ch_6i_core_add_tree1 is
   );
 end pfb_fir_2048ch_6i_core_add_tree1;
 architecture structural of pfb_fir_2048ch_6i_core_add_tree1 is 
-  signal clk_net : std_logic;
+  signal reinterpret11_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret11_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret11_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
   signal ce_net : std_logic;
   signal addr2_s_net : std_logic_vector( 27-1 downto 0 );
+  signal clk_net : std_logic;
   signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
-  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret11_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret11_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret11_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= addr3_s_net;
   reinterpret11_output_port_net <= din1;
@@ -6507,14 +7583,14 @@ entity pfb_fir_2048ch_6i_core_add_tree10 is
 end pfb_fir_2048ch_6i_core_add_tree10;
 architecture structural of pfb_fir_2048ch_6i_core_add_tree10 is 
   signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
-  signal reinterpret2_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
-  signal clk_net : std_logic;
   signal ce_net : std_logic;
-  signal addr2_s_net : std_logic_vector( 27-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret2_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal clk_net : std_logic;
+  signal reinterpret2_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
   signal reinterpret2_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret2_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
+  signal addr2_s_net : std_logic_vector( 27-1 downto 0 );
 begin
   dout <= addr3_s_net;
   reinterpret2_output_port_net <= din1;
@@ -6568,15 +7644,15 @@ entity pfb_fir_2048ch_6i_core_add_tree11 is
   );
 end pfb_fir_2048ch_6i_core_add_tree11;
 architecture structural of pfb_fir_2048ch_6i_core_add_tree11 is 
-  signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
   signal addr2_s_net : std_logic_vector( 27-1 downto 0 );
   signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret1_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
   signal reinterpret1_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret1_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret1_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
+  signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
+  signal ce_net : std_logic;
+  signal clk_net : std_logic;
+  signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= addr3_s_net;
   reinterpret1_output_port_net <= din1;
@@ -6630,15 +7706,15 @@ entity pfb_fir_2048ch_6i_core_add_tree2 is
   );
 end pfb_fir_2048ch_6i_core_add_tree2;
 architecture structural of pfb_fir_2048ch_6i_core_add_tree2 is 
-  signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
   signal reinterpret10_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret10_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
-  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret10_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal addr2_s_net : std_logic_vector( 27-1 downto 0 );
+  signal reinterpret10_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
   signal clk_net : std_logic;
   signal ce_net : std_logic;
+  signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
+  signal addr2_s_net : std_logic_vector( 27-1 downto 0 );
+  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= addr3_s_net;
   reinterpret10_output_port_net <= din1;
@@ -6692,15 +7768,15 @@ entity pfb_fir_2048ch_6i_core_add_tree3 is
   );
 end pfb_fir_2048ch_6i_core_add_tree3;
 architecture structural of pfb_fir_2048ch_6i_core_add_tree3 is 
+  signal ce_net : std_logic;
   signal addr2_s_net : std_logic_vector( 27-1 downto 0 );
   signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
-  signal reinterpret9_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret9_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret9_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
   signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret9_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
   signal reinterpret9_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret9_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
   signal clk_net : std_logic;
-  signal ce_net : std_logic;
+  signal reinterpret9_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= addr3_s_net;
   reinterpret9_output_port_net <= din1;
@@ -6754,14 +7830,14 @@ entity pfb_fir_2048ch_6i_core_add_tree4 is
   );
 end pfb_fir_2048ch_6i_core_add_tree4;
 architecture structural of pfb_fir_2048ch_6i_core_add_tree4 is 
-  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret8_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret8_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret8_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
-  signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
-  signal addr2_s_net : std_logic_vector( 27-1 downto 0 );
   signal clk_net : std_logic;
+  signal reinterpret8_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret8_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
+  signal addr2_s_net : std_logic_vector( 27-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
+  signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
+  signal reinterpret8_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
   signal ce_net : std_logic;
 begin
   dout <= addr3_s_net;
@@ -6816,15 +7892,15 @@ entity pfb_fir_2048ch_6i_core_add_tree5 is
   );
 end pfb_fir_2048ch_6i_core_add_tree5;
 architecture structural of pfb_fir_2048ch_6i_core_add_tree5 is 
-  signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
   signal addr2_s_net : std_logic_vector( 27-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret7_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret7_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal ce_net : std_logic;
-  signal reinterpret7_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
-  signal clk_net : std_logic;
+  signal reinterpret7_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
+  signal ce_net : std_logic;
+  signal clk_net : std_logic;
+  signal reinterpret7_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret7_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
+  signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
 begin
   dout <= addr3_s_net;
   reinterpret7_output_port_net <= din1;
@@ -6878,15 +7954,15 @@ entity pfb_fir_2048ch_6i_core_add_tree6 is
   );
 end pfb_fir_2048ch_6i_core_add_tree6;
 architecture structural of pfb_fir_2048ch_6i_core_add_tree6 is 
-  signal reinterpret6_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret6_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
-  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
   signal addr2_s_net : std_logic_vector( 27-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
+  signal ce_net : std_logic;
+  signal clk_net : std_logic;
+  signal reinterpret6_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret6_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
   signal reinterpret6_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
 begin
   dout <= addr3_s_net;
   reinterpret6_output_port_net <= din1;
@@ -6940,15 +8016,15 @@ entity pfb_fir_2048ch_6i_core_add_tree7 is
   );
 end pfb_fir_2048ch_6i_core_add_tree7;
 architecture structural of pfb_fir_2048ch_6i_core_add_tree7 is 
-  signal reinterpret5_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret5_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
-  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret5_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
   signal addr2_s_net : std_logic_vector( 27-1 downto 0 );
+  signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
+  signal ce_net : std_logic;
+  signal clk_net : std_logic;
+  signal reinterpret5_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret5_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret5_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
 begin
   dout <= addr3_s_net;
   reinterpret5_output_port_net <= din1;
@@ -7002,15 +8078,15 @@ entity pfb_fir_2048ch_6i_core_add_tree8 is
   );
 end pfb_fir_2048ch_6i_core_add_tree8;
 architecture structural of pfb_fir_2048ch_6i_core_add_tree8 is 
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal addr2_s_net : std_logic_vector( 27-1 downto 0 );
-  signal reinterpret4_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret4_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret4_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
   signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
+  signal ce_net : std_logic;
+  signal clk_net : std_logic;
+  signal reinterpret4_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret4_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret4_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
 begin
   dout <= addr3_s_net;
   reinterpret4_output_port_net <= din1;
@@ -7065,14 +8141,14 @@ entity pfb_fir_2048ch_6i_core_add_tree9 is
 end pfb_fir_2048ch_6i_core_add_tree9;
 architecture structural of pfb_fir_2048ch_6i_core_add_tree9 is 
   signal addr2_s_net : std_logic_vector( 27-1 downto 0 );
-  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret3_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal reinterpret3_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret3_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
   signal addr1_s_net : std_logic_vector( 27-1 downto 0 );
+  signal ce_net : std_logic;
+  signal reinterpret3_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret3_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret3_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
+  signal clk_net : std_logic;
 begin
   dout <= addr3_s_net;
   reinterpret3_output_port_net <= din1;
@@ -7132,31 +8208,31 @@ entity pfb_fir_2048ch_6i_core_d_bussify is
   );
 end pfb_fir_2048ch_6i_core_d_bussify;
 architecture structural of pfb_fir_2048ch_6i_core_d_bussify is 
-  signal addr3_s_net_x1 : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret10_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret11_output_port_net : std_logic_vector( 28-1 downto 0 );
   signal reinterpret12_output_port_net : std_logic_vector( 28-1 downto 0 );
-  signal addr3_s_net_x0 : std_logic_vector( 28-1 downto 0 );
-  signal addr3_s_net_x10 : std_logic_vector( 28-1 downto 0 );
-  signal addr3_s_net_x9 : std_logic_vector( 28-1 downto 0 );
-  signal addr3_s_net_x8 : std_logic_vector( 28-1 downto 0 );
-  signal addr3_s_net_x7 : std_logic_vector( 28-1 downto 0 );
-  signal addr3_s_net_x4 : std_logic_vector( 28-1 downto 0 );
-  signal addr3_s_net_x3 : std_logic_vector( 28-1 downto 0 );
-  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 336-1 downto 0 );
-  signal addr3_s_net_x6 : std_logic_vector( 28-1 downto 0 );
-  signal addr3_s_net_x5 : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal addr3_s_net_x1 : std_logic_vector( 28-1 downto 0 );
   signal addr3_s_net_x2 : std_logic_vector( 28-1 downto 0 );
+  signal addr3_s_net_x5 : std_logic_vector( 28-1 downto 0 );
+  signal addr3_s_net_x6 : std_logic_vector( 28-1 downto 0 );
+  signal addr3_s_net_x10 : std_logic_vector( 28-1 downto 0 );
+  signal addr3_s_net_x0 : std_logic_vector( 28-1 downto 0 );
+  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
+  signal addr3_s_net_x3 : std_logic_vector( 28-1 downto 0 );
+  signal addr3_s_net_x4 : std_logic_vector( 28-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 336-1 downto 0 );
+  signal addr3_s_net_x8 : std_logic_vector( 28-1 downto 0 );
+  signal addr3_s_net_x9 : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 28-1 downto 0 );
+  signal addr3_s_net_x7 : std_logic_vector( 28-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   addr3_s_net_x4 <= in1;
@@ -7197,6 +8273,30 @@ begin
     clr => '0',
     input_port => addr3_s_net_x4,
     output_port => reinterpret1_output_port_net
+  );
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_410f9ade60 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => addr3_s_net_x5,
+    output_port => reinterpret10_output_port_net
+  );
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_410f9ade60 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => addr3_s_net_x2,
+    output_port => reinterpret11_output_port_net
+  );
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_410f9ade60 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => addr3_s_net_x1,
+    output_port => reinterpret12_output_port_net
   );
   reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_410f9ade60 
   port map (
@@ -7262,30 +8362,6 @@ begin
     input_port => addr3_s_net_x6,
     output_port => reinterpret9_output_port_net
   );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_410f9ade60 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => addr3_s_net_x5,
-    output_port => reinterpret10_output_port_net
-  );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_410f9ade60 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => addr3_s_net_x2,
-    output_port => reinterpret11_output_port_net
-  );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_410f9ade60 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => addr3_s_net_x1,
-    output_port => reinterpret12_output_port_net
-  );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/bus_adder_tree/expand0
 library IEEE;
@@ -7310,31 +8386,31 @@ entity pfb_fir_2048ch_6i_core_expand0 is
   );
 end pfb_fir_2048ch_6i_core_expand0;
 architecture structural of pfb_fir_2048ch_6i_core_expand0 is 
-  signal slice11_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice5_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice7_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice12_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice8_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice9_y_net : std_logic_vector( 26-1 downto 0 );
   signal slice10_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal slice6_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice11_y_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret4_output_port_net : std_logic_vector( 312-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret8_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal slice12_y_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret4_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal slice9_y_net : std_logic_vector( 26-1 downto 0 );
 begin
   msb_out12 <= reinterpret12_output_port_net;
   out11 <= reinterpret11_output_port_net;
@@ -7357,6 +8433,30 @@ begin
     input_port => slice1_y_net,
     output_port => reinterpret1_output_port_net
   );
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice10_y_net,
+    output_port => reinterpret10_output_port_net
+  );
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice11_y_net,
+    output_port => reinterpret11_output_port_net
+  );
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice12_y_net,
+    output_port => reinterpret12_output_port_net
+  );
   reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
   port map (
     clk => '0',
@@ -7364,6 +8464,62 @@ begin
     clr => '0',
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice3_y_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice4_y_net,
+    output_port => reinterpret4_output_port_net_x0
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice9_y_net,
+    output_port => reinterpret9_output_port_net
   );
   slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -7376,35 +8532,16 @@ begin
     x => reinterpret4_output_port_net,
     y => slice1_y_net
   );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 26,
-    new_msb => 51,
+    new_lsb => 234,
+    new_msb => 259,
     x_width => 312,
     y_width => 26
   )
   port map (
     x => reinterpret4_output_port_net,
-    y => slice2_y_net
-  );
-  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 286,
-    new_msb => 311,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret4_output_port_net,
-    y => slice12_y_net
-  );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice12_y_net,
-    output_port => reinterpret12_output_port_net
+    y => slice10_y_net
   );
   slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -7417,146 +8554,27 @@ begin
     x => reinterpret4_output_port_net,
     y => slice11_y_net
   );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice11_y_net,
-    output_port => reinterpret11_output_port_net
-  );
-  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 234,
-    new_msb => 259,
+    new_lsb => 286,
+    new_msb => 311,
     x_width => 312,
     y_width => 26
   )
   port map (
     x => reinterpret4_output_port_net,
-    y => slice10_y_net
+    y => slice12_y_net
   );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice10_y_net,
-    output_port => reinterpret10_output_port_net
-  );
-  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 208,
-    new_msb => 233,
+    new_lsb => 26,
+    new_msb => 51,
     x_width => 312,
     y_width => 26
   )
   port map (
     x => reinterpret4_output_port_net,
-    y => slice9_y_net
-  );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice9_y_net,
-    output_port => reinterpret9_output_port_net
-  );
-  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 182,
-    new_msb => 207,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret4_output_port_net,
-    y => slice8_y_net
-  );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice8_y_net,
-    output_port => reinterpret8_output_port_net
-  );
-  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 156,
-    new_msb => 181,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret4_output_port_net,
-    y => slice7_y_net
-  );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice7_y_net,
-    output_port => reinterpret7_output_port_net
-  );
-  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 130,
-    new_msb => 155,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret4_output_port_net,
-    y => slice6_y_net
-  );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice6_y_net,
-    output_port => reinterpret6_output_port_net
-  );
-  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 104,
-    new_msb => 129,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret4_output_port_net,
-    y => slice5_y_net
-  );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice5_y_net,
-    output_port => reinterpret5_output_port_net
-  );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 78,
-    new_msb => 103,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret4_output_port_net,
-    y => slice4_y_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice4_y_net,
-    output_port => reinterpret4_output_port_net_x0
+    y => slice2_y_net
   );
   slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -7569,13 +8587,71 @@ begin
     x => reinterpret4_output_port_net,
     y => slice3_y_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 78,
+    new_msb => 103,
+    x_width => 312,
+    y_width => 26
+  )
   port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice3_y_net,
-    output_port => reinterpret3_output_port_net
+    x => reinterpret4_output_port_net,
+    y => slice4_y_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 104,
+    new_msb => 129,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret4_output_port_net,
+    y => slice5_y_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 130,
+    new_msb => 155,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret4_output_port_net,
+    y => slice6_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 156,
+    new_msb => 181,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret4_output_port_net,
+    y => slice7_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 182,
+    new_msb => 207,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret4_output_port_net,
+    y => slice8_y_net
+  );
+  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 208,
+    new_msb => 233,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret4_output_port_net,
+    y => slice9_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/bus_adder_tree/expand1
@@ -7601,31 +8677,31 @@ entity pfb_fir_2048ch_6i_core_expand1 is
   );
 end pfb_fir_2048ch_6i_core_expand1;
 architecture structural of pfb_fir_2048ch_6i_core_expand1 is 
-  signal reinterpret12_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal slice10_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice12_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice6_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice11_y_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal slice7_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice5_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice8_y_net : std_logic_vector( 26-1 downto 0 );
   signal slice9_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 312-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 26-1 downto 0 );
   signal slice2_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal slice12_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice11_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice10_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 312-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret3_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 26-1 downto 0 );
 begin
   msb_out12 <= reinterpret12_output_port_net;
   out11 <= reinterpret11_output_port_net;
@@ -7648,6 +8724,30 @@ begin
     input_port => slice1_y_net,
     output_port => reinterpret1_output_port_net
   );
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice10_y_net,
+    output_port => reinterpret10_output_port_net
+  );
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice11_y_net,
+    output_port => reinterpret11_output_port_net
+  );
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice12_y_net,
+    output_port => reinterpret12_output_port_net
+  );
   reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
   port map (
     clk => '0',
@@ -7655,6 +8755,62 @@ begin
     clr => '0',
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice3_y_net,
+    output_port => reinterpret3_output_port_net_x0
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice4_y_net,
+    output_port => reinterpret4_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice9_y_net,
+    output_port => reinterpret9_output_port_net
   );
   slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -7667,35 +8823,16 @@ begin
     x => reinterpret3_output_port_net,
     y => slice1_y_net
   );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 26,
-    new_msb => 51,
+    new_lsb => 234,
+    new_msb => 259,
     x_width => 312,
     y_width => 26
   )
   port map (
     x => reinterpret3_output_port_net,
-    y => slice2_y_net
-  );
-  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 286,
-    new_msb => 311,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret3_output_port_net,
-    y => slice12_y_net
-  );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice12_y_net,
-    output_port => reinterpret12_output_port_net
+    y => slice10_y_net
   );
   slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -7708,146 +8845,27 @@ begin
     x => reinterpret3_output_port_net,
     y => slice11_y_net
   );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice11_y_net,
-    output_port => reinterpret11_output_port_net
-  );
-  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 234,
-    new_msb => 259,
+    new_lsb => 286,
+    new_msb => 311,
     x_width => 312,
     y_width => 26
   )
   port map (
     x => reinterpret3_output_port_net,
-    y => slice10_y_net
+    y => slice12_y_net
   );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice10_y_net,
-    output_port => reinterpret10_output_port_net
-  );
-  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 208,
-    new_msb => 233,
+    new_lsb => 26,
+    new_msb => 51,
     x_width => 312,
     y_width => 26
   )
   port map (
     x => reinterpret3_output_port_net,
-    y => slice9_y_net
-  );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice9_y_net,
-    output_port => reinterpret9_output_port_net
-  );
-  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 182,
-    new_msb => 207,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret3_output_port_net,
-    y => slice8_y_net
-  );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice8_y_net,
-    output_port => reinterpret8_output_port_net
-  );
-  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 156,
-    new_msb => 181,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret3_output_port_net,
-    y => slice7_y_net
-  );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice7_y_net,
-    output_port => reinterpret7_output_port_net
-  );
-  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 130,
-    new_msb => 155,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret3_output_port_net,
-    y => slice6_y_net
-  );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice6_y_net,
-    output_port => reinterpret6_output_port_net
-  );
-  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 104,
-    new_msb => 129,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret3_output_port_net,
-    y => slice5_y_net
-  );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice5_y_net,
-    output_port => reinterpret5_output_port_net
-  );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 78,
-    new_msb => 103,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret3_output_port_net,
-    y => slice4_y_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice4_y_net,
-    output_port => reinterpret4_output_port_net
+    y => slice2_y_net
   );
   slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -7860,13 +8878,71 @@ begin
     x => reinterpret3_output_port_net,
     y => slice3_y_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 78,
+    new_msb => 103,
+    x_width => 312,
+    y_width => 26
+  )
   port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice3_y_net,
-    output_port => reinterpret3_output_port_net_x0
+    x => reinterpret3_output_port_net,
+    y => slice4_y_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 104,
+    new_msb => 129,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret3_output_port_net,
+    y => slice5_y_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 130,
+    new_msb => 155,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret3_output_port_net,
+    y => slice6_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 156,
+    new_msb => 181,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret3_output_port_net,
+    y => slice7_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 182,
+    new_msb => 207,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret3_output_port_net,
+    y => slice8_y_net
+  );
+  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 208,
+    new_msb => 233,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret3_output_port_net,
+    y => slice9_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/bus_adder_tree/expand2
@@ -7892,31 +8968,31 @@ entity pfb_fir_2048ch_6i_core_expand2 is
   );
 end pfb_fir_2048ch_6i_core_expand2;
 architecture structural of pfb_fir_2048ch_6i_core_expand2 is 
-  signal reinterpret3_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal slice12_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice11_y_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal slice10_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice9_y_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 312-1 downto 0 );
   signal reinterpret2_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 26-1 downto 0 );
   signal slice7_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice5_y_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret6_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret12_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal slice1_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice12_y_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal slice11_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice6_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice8_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice9_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice10_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 312-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 26-1 downto 0 );
 begin
   msb_out12 <= reinterpret12_output_port_net;
   out11 <= reinterpret11_output_port_net;
@@ -7939,6 +9015,30 @@ begin
     input_port => slice1_y_net,
     output_port => reinterpret1_output_port_net
   );
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice10_y_net,
+    output_port => reinterpret10_output_port_net
+  );
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice11_y_net,
+    output_port => reinterpret11_output_port_net
+  );
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice12_y_net,
+    output_port => reinterpret12_output_port_net
+  );
   reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
   port map (
     clk => '0',
@@ -7946,6 +9046,62 @@ begin
     clr => '0',
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net_x0
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice3_y_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice4_y_net,
+    output_port => reinterpret4_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice9_y_net,
+    output_port => reinterpret9_output_port_net
   );
   slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -7958,35 +9114,16 @@ begin
     x => reinterpret2_output_port_net,
     y => slice1_y_net
   );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 26,
-    new_msb => 51,
+    new_lsb => 234,
+    new_msb => 259,
     x_width => 312,
     y_width => 26
   )
   port map (
     x => reinterpret2_output_port_net,
-    y => slice2_y_net
-  );
-  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 286,
-    new_msb => 311,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret2_output_port_net,
-    y => slice12_y_net
-  );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice12_y_net,
-    output_port => reinterpret12_output_port_net
+    y => slice10_y_net
   );
   slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -7999,146 +9136,27 @@ begin
     x => reinterpret2_output_port_net,
     y => slice11_y_net
   );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice11_y_net,
-    output_port => reinterpret11_output_port_net
-  );
-  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 234,
-    new_msb => 259,
+    new_lsb => 286,
+    new_msb => 311,
     x_width => 312,
     y_width => 26
   )
   port map (
     x => reinterpret2_output_port_net,
-    y => slice10_y_net
+    y => slice12_y_net
   );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice10_y_net,
-    output_port => reinterpret10_output_port_net
-  );
-  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 208,
-    new_msb => 233,
+    new_lsb => 26,
+    new_msb => 51,
     x_width => 312,
     y_width => 26
   )
   port map (
     x => reinterpret2_output_port_net,
-    y => slice9_y_net
-  );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice9_y_net,
-    output_port => reinterpret9_output_port_net
-  );
-  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 182,
-    new_msb => 207,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret2_output_port_net,
-    y => slice8_y_net
-  );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice8_y_net,
-    output_port => reinterpret8_output_port_net
-  );
-  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 156,
-    new_msb => 181,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret2_output_port_net,
-    y => slice7_y_net
-  );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice7_y_net,
-    output_port => reinterpret7_output_port_net
-  );
-  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 130,
-    new_msb => 155,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret2_output_port_net,
-    y => slice6_y_net
-  );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice6_y_net,
-    output_port => reinterpret6_output_port_net
-  );
-  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 104,
-    new_msb => 129,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret2_output_port_net,
-    y => slice5_y_net
-  );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice5_y_net,
-    output_port => reinterpret5_output_port_net
-  );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 78,
-    new_msb => 103,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret2_output_port_net,
-    y => slice4_y_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice4_y_net,
-    output_port => reinterpret4_output_port_net
+    y => slice2_y_net
   );
   slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -8151,13 +9169,71 @@ begin
     x => reinterpret2_output_port_net,
     y => slice3_y_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 78,
+    new_msb => 103,
+    x_width => 312,
+    y_width => 26
+  )
   port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice3_y_net,
-    output_port => reinterpret3_output_port_net
+    x => reinterpret2_output_port_net,
+    y => slice4_y_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 104,
+    new_msb => 129,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret2_output_port_net,
+    y => slice5_y_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 130,
+    new_msb => 155,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret2_output_port_net,
+    y => slice6_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 156,
+    new_msb => 181,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret2_output_port_net,
+    y => slice7_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 182,
+    new_msb => 207,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret2_output_port_net,
+    y => slice8_y_net
+  );
+  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 208,
+    new_msb => 233,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret2_output_port_net,
+    y => slice9_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/bus_adder_tree/expand3
@@ -8183,31 +9259,31 @@ entity pfb_fir_2048ch_6i_core_expand3 is
   );
 end pfb_fir_2048ch_6i_core_expand3;
 architecture structural of pfb_fir_2048ch_6i_core_expand3 is 
-  signal slice6_y_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal slice12_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice11_y_net : std_logic_vector( 26-1 downto 0 );
   signal slice8_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice7_y_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret1_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 312-1 downto 0 );
-  signal slice5_y_net : std_logic_vector( 26-1 downto 0 );
   signal slice4_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 26-1 downto 0 );
-  signal slice9_y_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal slice10_y_net : std_logic_vector( 26-1 downto 0 );
   signal slice1_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice9_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice12_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 26-1 downto 0 );
+  signal slice11_y_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret1_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 26-1 downto 0 );
 begin
   msb_out12 <= reinterpret12_output_port_net;
   out11 <= reinterpret11_output_port_net;
@@ -8230,6 +9306,30 @@ begin
     input_port => slice1_y_net,
     output_port => reinterpret1_output_port_net_x0
   );
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice10_y_net,
+    output_port => reinterpret10_output_port_net
+  );
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice11_y_net,
+    output_port => reinterpret11_output_port_net
+  );
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice12_y_net,
+    output_port => reinterpret12_output_port_net
+  );
   reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
   port map (
     clk => '0',
@@ -8237,6 +9337,62 @@ begin
     clr => '0',
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice3_y_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice4_y_net,
+    output_port => reinterpret4_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice9_y_net,
+    output_port => reinterpret9_output_port_net
   );
   slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -8249,35 +9405,16 @@ begin
     x => reinterpret1_output_port_net,
     y => slice1_y_net
   );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 26,
-    new_msb => 51,
+    new_lsb => 234,
+    new_msb => 259,
     x_width => 312,
     y_width => 26
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice2_y_net
-  );
-  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 286,
-    new_msb => 311,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice12_y_net
-  );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice12_y_net,
-    output_port => reinterpret12_output_port_net
+    y => slice10_y_net
   );
   slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -8290,146 +9427,27 @@ begin
     x => reinterpret1_output_port_net,
     y => slice11_y_net
   );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice11_y_net,
-    output_port => reinterpret11_output_port_net
-  );
-  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 234,
-    new_msb => 259,
+    new_lsb => 286,
+    new_msb => 311,
     x_width => 312,
     y_width => 26
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice10_y_net
+    y => slice12_y_net
   );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice10_y_net,
-    output_port => reinterpret10_output_port_net
-  );
-  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 208,
-    new_msb => 233,
+    new_lsb => 26,
+    new_msb => 51,
     x_width => 312,
     y_width => 26
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice9_y_net
-  );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice9_y_net,
-    output_port => reinterpret9_output_port_net
-  );
-  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 182,
-    new_msb => 207,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice8_y_net
-  );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice8_y_net,
-    output_port => reinterpret8_output_port_net
-  );
-  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 156,
-    new_msb => 181,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice7_y_net
-  );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice7_y_net,
-    output_port => reinterpret7_output_port_net
-  );
-  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 130,
-    new_msb => 155,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice6_y_net
-  );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice6_y_net,
-    output_port => reinterpret6_output_port_net
-  );
-  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 104,
-    new_msb => 129,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice5_y_net
-  );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice5_y_net,
-    output_port => reinterpret5_output_port_net
-  );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 78,
-    new_msb => 103,
-    x_width => 312,
-    y_width => 26
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice4_y_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice4_y_net,
-    output_port => reinterpret4_output_port_net
+    y => slice2_y_net
   );
   slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -8442,13 +9460,71 @@ begin
     x => reinterpret1_output_port_net,
     y => slice3_y_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_6883533fdf 
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 78,
+    new_msb => 103,
+    x_width => 312,
+    y_width => 26
+  )
   port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice3_y_net,
-    output_port => reinterpret3_output_port_net
+    x => reinterpret1_output_port_net,
+    y => slice4_y_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 104,
+    new_msb => 129,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice5_y_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 130,
+    new_msb => 155,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice6_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 156,
+    new_msb => 181,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice7_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 182,
+    new_msb => 207,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice8_y_net
+  );
+  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 208,
+    new_msb => 233,
+    x_width => 312,
+    y_width => 26
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice9_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/bus_adder_tree
@@ -8468,73 +9544,73 @@ entity pfb_fir_2048ch_6i_core_bus_adder_tree is
   );
 end pfb_fir_2048ch_6i_core_bus_adder_tree;
 architecture structural of pfb_fir_2048ch_6i_core_bus_adder_tree is 
-  signal reinterpret10_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret10_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal addr3_s_net_x1 : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret9_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret9_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret9_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret5_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret5_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal addr3_s_net_x7 : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret4_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret4_output_port_net_x3 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret6_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret6_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret6_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal addr3_s_net_x6 : std_logic_vector( 28-1 downto 0 );
   signal reinterpret5_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret4_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret4_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal addr3_s_net_x8 : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret3_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret3_output_port_net_x3 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret3_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret3_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret1_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret1_output_port_net_x3 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret1_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret1_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal addr3_s_net_x0 : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret10_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret11_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret11_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
   signal addr3_s_net_x10 : std_logic_vector( 28-1 downto 0 );
   signal reinterpret2_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret2_output_port_net_x3 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret2_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret2_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
-  signal addr3_s_net_x9 : std_logic_vector( 28-1 downto 0 );
+  signal addr3_s_net_x2 : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret8_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 312-1 downto 0 );
   signal reinterpret12_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
   signal reinterpret12_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
   signal reinterpret12_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net_x7 : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret6_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret6_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret4_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net_x8 : std_logic_vector( 28-1 downto 0 );
   signal reinterpret12_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
   signal addr3_s_net_x5 : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret11_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
-  signal addr3_s_net_x3 : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret7_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 312-1 downto 0 );
+  signal reinterpret10_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret10_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret10_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret1_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret1_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net_x0 : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret5_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret5_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret3_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret3_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret3_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret3_output_port_net_x3 : std_logic_vector( 26-1 downto 0 );
+  signal ce_net : std_logic;
   signal reinterpret7_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
   signal reinterpret7_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
   signal reinterpret7_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal addr3_s_net_x4 : std_logic_vector( 28-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 336-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 312-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 312-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 312-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 312-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal reinterpret9_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal addr3_s_net_x2 : std_logic_vector( 28-1 downto 0 );
-  signal reinterpret8_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret2_output_port_net_x3 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret2_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret2_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
   signal reinterpret8_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
   signal reinterpret8_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
   signal reinterpret8_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net_x4 : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret6_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net_x9 : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret9_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 312-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 336-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 312-1 downto 0 );
+  signal reinterpret11_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret11_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net_x1 : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret9_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret9_output_port_net_x0 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret4_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret4_output_port_net_x3 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret4_output_port_net_x1 : std_logic_vector( 26-1 downto 0 );
+  signal clk_net : std_logic;
+  signal addr3_s_net_x3 : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret7_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net : std_logic_vector( 28-1 downto 0 );
+  signal reinterpret1_output_port_net_x2 : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret1_output_port_net_x3 : std_logic_vector( 26-1 downto 0 );
 begin
   out_x0 <= concatenate_y_net;
   reinterpret4_output_port_net <= d0;
@@ -8803,12 +9879,67 @@ entity pfb_fir_2048ch_6i_core_a_b_bussify is
   );
 end pfb_fir_2048ch_6i_core_a_b_bussify;
 architecture structural of pfb_fir_2048ch_6i_core_a_b_bussify is 
+  signal mult14_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult13_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult21_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult35_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult30_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult17_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult15_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult41_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult22_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult44_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult19_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult8_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult4_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult7_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult36_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult5_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult29_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult39_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult28_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult48_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult42_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult38_p_net : std_logic_vector( 26-1 downto 0 );
   signal mult23_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult32_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult45_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult2_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult3_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult6_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult27_p_net : std_logic_vector( 26-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 1248-1 downto 0 );
+  signal mult43_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult16_p_net : std_logic_vector( 26-1 downto 0 );
   signal mult24_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult25_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult10_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult11_p_net : std_logic_vector( 26-1 downto 0 );
   signal mult12_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult11_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult31_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult37_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult25_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult47_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult10_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult9_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult34_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult20_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult40_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult33_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult18_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult46_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult26_p_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret13_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret14_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret15_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret32_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret16_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret17_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret18_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret19_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret20_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret21_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret22_output_port_net : std_logic_vector( 26-1 downto 0 );
@@ -8816,20 +9947,12 @@ architecture structural of pfb_fir_2048ch_6i_core_a_b_bussify is
   signal reinterpret24_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret25_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret26_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret13_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret14_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret27_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret28_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret29_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret30_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret31_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret15_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret16_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret17_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret18_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret19_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret33_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret34_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret35_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret36_output_port_net : std_logic_vector( 26-1 downto 0 );
@@ -8837,36 +9960,6 @@ architecture structural of pfb_fir_2048ch_6i_core_a_b_bussify is
   signal reinterpret38_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret39_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret40_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal mult15_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult16_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult33_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult17_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult42_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult43_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult34_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult35_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult26_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult27_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult28_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult21_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult22_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult4_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult5_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult6_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult18_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult19_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult20_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult44_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult45_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult46_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult31_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult32_p_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret41_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret42_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret43_output_port_net : std_logic_vector( 26-1 downto 0 );
@@ -8874,32 +9967,15 @@ architecture structural of pfb_fir_2048ch_6i_core_a_b_bussify is
   signal reinterpret45_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret46_output_port_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret47_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal mult39_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult40_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult41_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult29_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult30_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult47_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult48_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult13_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult14_p_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret48_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 1248-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult2_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult3_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult7_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult8_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult9_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult36_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult37_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult38_p_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret27_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret28_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret29_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret30_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret32_output_port_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret33_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 26-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   mult1_p_net <= in1;
@@ -9013,70 +10089,6 @@ begin
     input_port => mult1_p_net,
     output_port => reinterpret1_output_port_net
   );
-  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => mult2_p_net,
-    output_port => reinterpret2_output_port_net
-  );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => mult3_p_net,
-    output_port => reinterpret3_output_port_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => mult4_p_net,
-    output_port => reinterpret4_output_port_net
-  );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => mult5_p_net,
-    output_port => reinterpret5_output_port_net
-  );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => mult6_p_net,
-    output_port => reinterpret6_output_port_net
-  );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => mult7_p_net,
-    output_port => reinterpret7_output_port_net
-  );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => mult8_p_net,
-    output_port => reinterpret8_output_port_net
-  );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => mult9_p_net,
-    output_port => reinterpret9_output_port_net
-  );
   reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
   port map (
     clk => '0',
@@ -9156,6 +10168,14 @@ begin
     clr => '0',
     input_port => mult19_p_net,
     output_port => reinterpret19_output_port_net
+  );
+  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => mult2_p_net,
+    output_port => reinterpret2_output_port_net
   );
   reinterpret20 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
   port map (
@@ -9237,6 +10257,14 @@ begin
     input_port => mult29_p_net,
     output_port => reinterpret29_output_port_net
   );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => mult3_p_net,
+    output_port => reinterpret3_output_port_net
+  );
   reinterpret30 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
   port map (
     clk => '0',
@@ -9317,6 +10345,14 @@ begin
     input_port => mult39_p_net,
     output_port => reinterpret39_output_port_net
   );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => mult4_p_net,
+    output_port => reinterpret4_output_port_net
+  );
   reinterpret40 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
   port map (
     clk => '0',
@@ -9389,6 +10425,46 @@ begin
     input_port => mult48_p_net,
     output_port => reinterpret48_output_port_net
   );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => mult5_p_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => mult6_p_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => mult7_p_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => mult8_p_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_560decf9e6 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => mult9_p_net,
+    output_port => reinterpret9_output_port_net
+  );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/bus_mult/a_debus
 library IEEE;
@@ -9449,103 +10525,103 @@ entity pfb_fir_2048ch_6i_core_a_debus is
   );
 end pfb_fir_2048ch_6i_core_a_debus;
 architecture structural of pfb_fir_2048ch_6i_core_a_debus is 
-  signal slice40_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice42_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice43_y_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal slice35_y_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret46_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal slice48_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice39_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice9_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 8-1 downto 0 );
   signal slice5_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice29_y_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret39_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret38_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret37_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret42_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret41_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret40_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret17_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret23_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret22_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret21_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret25_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret24_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret28_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret27_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret26_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret31_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret30_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret29_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret34_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret33_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret16_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret32_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret36_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret35_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal slice13_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice36_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice37_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice6_y_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret15_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret14_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret13_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal slice44_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice41_y_net : std_logic_vector( 8-1 downto 0 );
   signal slice33_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice37_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice48_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice47_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice44_y_net : std_logic_vector( 8-1 downto 0 );
   signal slice22_y_net : std_logic_vector( 8-1 downto 0 );
   signal slice28_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice27_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice8_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice30_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice38_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice25_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice26_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice7_y_net : std_logic_vector( 8-1 downto 0 );
   signal slice3_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice23_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice34_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice21_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice18_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice32_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice16_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice47_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice14_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice11_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice9_y_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret47_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret45_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret44_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret43_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret48_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal slice31_y_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret20_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret19_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret18_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal slice24_y_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret1_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 384-1 downto 0 );
-  signal slice45_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice19_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice46_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice17_y_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal slice20_y_net : std_logic_vector( 8-1 downto 0 );
-  signal slice15_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice27_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice25_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice24_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice23_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice21_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice31_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice30_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice26_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice43_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice35_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice36_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice41_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice32_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice40_y_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret21_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret48_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret22_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret46_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret19_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret20_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret17_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret18_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret15_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret45_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret47_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret1_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret13_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret14_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal slice10_y_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 384-1 downto 0 );
+  signal reinterpret41_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal slice11_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice13_y_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret42_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret39_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret40_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret37_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal slice14_y_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret38_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret31_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret35_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret36_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret33_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret34_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal slice16_y_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret32_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret29_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret30_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal slice15_y_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret27_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret28_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret25_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret26_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret23_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal slice18_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice17_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice19_y_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret24_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal slice39_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice38_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice45_y_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret43_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal slice42_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice34_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret44_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal slice12_y_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal slice46_y_net : std_logic_vector( 8-1 downto 0 );
+  signal slice29_y_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret16_output_port_net : std_logic_vector( 8-1 downto 0 );
 begin
   msb_out48 <= reinterpret48_output_port_net;
   out47 <= reinterpret47_output_port_net;
@@ -9604,6 +10680,86 @@ begin
     input_port => slice1_y_net,
     output_port => reinterpret1_output_port_net_x0
   );
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice10_y_net,
+    output_port => reinterpret10_output_port_net
+  );
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice11_y_net,
+    output_port => reinterpret11_output_port_net
+  );
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice12_y_net,
+    output_port => reinterpret12_output_port_net
+  );
+  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice13_y_net,
+    output_port => reinterpret13_output_port_net
+  );
+  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice14_y_net,
+    output_port => reinterpret14_output_port_net
+  );
+  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice15_y_net,
+    output_port => reinterpret15_output_port_net
+  );
+  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice16_y_net,
+    output_port => reinterpret16_output_port_net
+  );
+  reinterpret17 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice17_y_net,
+    output_port => reinterpret17_output_port_net
+  );
+  reinterpret18 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice18_y_net,
+    output_port => reinterpret18_output_port_net
+  );
+  reinterpret19 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice19_y_net,
+    output_port => reinterpret19_output_port_net
+  );
   reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
   port map (
     clk => '0',
@@ -9611,6 +10767,294 @@ begin
     clr => '0',
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net
+  );
+  reinterpret20 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice20_y_net,
+    output_port => reinterpret20_output_port_net
+  );
+  reinterpret21 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice21_y_net,
+    output_port => reinterpret21_output_port_net
+  );
+  reinterpret22 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice22_y_net,
+    output_port => reinterpret22_output_port_net
+  );
+  reinterpret23 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice23_y_net,
+    output_port => reinterpret23_output_port_net
+  );
+  reinterpret24 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice24_y_net,
+    output_port => reinterpret24_output_port_net
+  );
+  reinterpret25 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice25_y_net,
+    output_port => reinterpret25_output_port_net
+  );
+  reinterpret26 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice26_y_net,
+    output_port => reinterpret26_output_port_net
+  );
+  reinterpret27 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice27_y_net,
+    output_port => reinterpret27_output_port_net
+  );
+  reinterpret28 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice28_y_net,
+    output_port => reinterpret28_output_port_net
+  );
+  reinterpret29 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice29_y_net,
+    output_port => reinterpret29_output_port_net
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice3_y_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret30 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice30_y_net,
+    output_port => reinterpret30_output_port_net
+  );
+  reinterpret31 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice31_y_net,
+    output_port => reinterpret31_output_port_net
+  );
+  reinterpret32 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice32_y_net,
+    output_port => reinterpret32_output_port_net
+  );
+  reinterpret33 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice33_y_net,
+    output_port => reinterpret33_output_port_net
+  );
+  reinterpret34 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice34_y_net,
+    output_port => reinterpret34_output_port_net
+  );
+  reinterpret35 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice35_y_net,
+    output_port => reinterpret35_output_port_net
+  );
+  reinterpret36 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice36_y_net,
+    output_port => reinterpret36_output_port_net
+  );
+  reinterpret37 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice37_y_net,
+    output_port => reinterpret37_output_port_net
+  );
+  reinterpret38 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice38_y_net,
+    output_port => reinterpret38_output_port_net
+  );
+  reinterpret39 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice39_y_net,
+    output_port => reinterpret39_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice4_y_net,
+    output_port => reinterpret4_output_port_net
+  );
+  reinterpret40 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice40_y_net,
+    output_port => reinterpret40_output_port_net
+  );
+  reinterpret41 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice41_y_net,
+    output_port => reinterpret41_output_port_net
+  );
+  reinterpret42 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice42_y_net,
+    output_port => reinterpret42_output_port_net
+  );
+  reinterpret43 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice43_y_net,
+    output_port => reinterpret43_output_port_net
+  );
+  reinterpret44 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice44_y_net,
+    output_port => reinterpret44_output_port_net
+  );
+  reinterpret45 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice45_y_net,
+    output_port => reinterpret45_output_port_net
+  );
+  reinterpret46 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice46_y_net,
+    output_port => reinterpret46_output_port_net
+  );
+  reinterpret47 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice47_y_net,
+    output_port => reinterpret47_output_port_net
+  );
+  reinterpret48 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice48_y_net,
+    output_port => reinterpret48_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice9_y_net,
+    output_port => reinterpret9_output_port_net
   );
   slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -9623,719 +11067,16 @@ begin
     x => reinterpret1_output_port_net,
     y => slice1_y_net
   );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 8,
-    new_msb => 15,
+    new_lsb => 72,
+    new_msb => 79,
     x_width => 384,
     y_width => 8
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice2_y_net
-  );
-  slice48 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 376,
-    new_msb => 383,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice48_y_net
-  );
-  reinterpret48 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice48_y_net,
-    output_port => reinterpret48_output_port_net
-  );
-  slice47 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 368,
-    new_msb => 375,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice47_y_net
-  );
-  reinterpret47 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice47_y_net,
-    output_port => reinterpret47_output_port_net
-  );
-  slice46 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 360,
-    new_msb => 367,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice46_y_net
-  );
-  reinterpret46 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice46_y_net,
-    output_port => reinterpret46_output_port_net
-  );
-  slice45 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 352,
-    new_msb => 359,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice45_y_net
-  );
-  reinterpret45 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice45_y_net,
-    output_port => reinterpret45_output_port_net
-  );
-  slice44 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 344,
-    new_msb => 351,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice44_y_net
-  );
-  reinterpret44 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice44_y_net,
-    output_port => reinterpret44_output_port_net
-  );
-  slice43 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 336,
-    new_msb => 343,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice43_y_net
-  );
-  reinterpret43 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice43_y_net,
-    output_port => reinterpret43_output_port_net
-  );
-  slice42 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 328,
-    new_msb => 335,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice42_y_net
-  );
-  reinterpret42 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice42_y_net,
-    output_port => reinterpret42_output_port_net
-  );
-  slice41 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 320,
-    new_msb => 327,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice41_y_net
-  );
-  reinterpret41 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice41_y_net,
-    output_port => reinterpret41_output_port_net
-  );
-  slice40 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 312,
-    new_msb => 319,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice40_y_net
-  );
-  reinterpret40 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice40_y_net,
-    output_port => reinterpret40_output_port_net
-  );
-  slice39 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 304,
-    new_msb => 311,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice39_y_net
-  );
-  reinterpret39 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice39_y_net,
-    output_port => reinterpret39_output_port_net
-  );
-  slice38 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 296,
-    new_msb => 303,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice38_y_net
-  );
-  reinterpret38 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice38_y_net,
-    output_port => reinterpret38_output_port_net
-  );
-  slice37 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 288,
-    new_msb => 295,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice37_y_net
-  );
-  reinterpret37 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice37_y_net,
-    output_port => reinterpret37_output_port_net
-  );
-  slice36 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 280,
-    new_msb => 287,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice36_y_net
-  );
-  reinterpret36 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice36_y_net,
-    output_port => reinterpret36_output_port_net
-  );
-  slice35 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 272,
-    new_msb => 279,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice35_y_net
-  );
-  reinterpret35 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice35_y_net,
-    output_port => reinterpret35_output_port_net
-  );
-  slice34 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 264,
-    new_msb => 271,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice34_y_net
-  );
-  reinterpret34 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice34_y_net,
-    output_port => reinterpret34_output_port_net
-  );
-  slice33 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 256,
-    new_msb => 263,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice33_y_net
-  );
-  reinterpret33 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice33_y_net,
-    output_port => reinterpret33_output_port_net
-  );
-  slice32 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 248,
-    new_msb => 255,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice32_y_net
-  );
-  reinterpret32 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice32_y_net,
-    output_port => reinterpret32_output_port_net
-  );
-  slice31 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 240,
-    new_msb => 247,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice31_y_net
-  );
-  reinterpret31 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice31_y_net,
-    output_port => reinterpret31_output_port_net
-  );
-  slice30 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 232,
-    new_msb => 239,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice30_y_net
-  );
-  reinterpret30 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice30_y_net,
-    output_port => reinterpret30_output_port_net
-  );
-  slice29 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 224,
-    new_msb => 231,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice29_y_net
-  );
-  reinterpret29 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice29_y_net,
-    output_port => reinterpret29_output_port_net
-  );
-  slice28 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 216,
-    new_msb => 223,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice28_y_net
-  );
-  reinterpret28 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice28_y_net,
-    output_port => reinterpret28_output_port_net
-  );
-  slice27 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 208,
-    new_msb => 215,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice27_y_net
-  );
-  reinterpret27 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice27_y_net,
-    output_port => reinterpret27_output_port_net
-  );
-  slice26 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 200,
-    new_msb => 207,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice26_y_net
-  );
-  reinterpret26 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice26_y_net,
-    output_port => reinterpret26_output_port_net
-  );
-  slice25 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 192,
-    new_msb => 199,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice25_y_net
-  );
-  reinterpret25 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice25_y_net,
-    output_port => reinterpret25_output_port_net
-  );
-  slice24 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 184,
-    new_msb => 191,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice24_y_net
-  );
-  reinterpret24 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice24_y_net,
-    output_port => reinterpret24_output_port_net
-  );
-  slice23 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 176,
-    new_msb => 183,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice23_y_net
-  );
-  reinterpret23 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice23_y_net,
-    output_port => reinterpret23_output_port_net
-  );
-  slice22 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 168,
-    new_msb => 175,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice22_y_net
-  );
-  reinterpret22 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice22_y_net,
-    output_port => reinterpret22_output_port_net
-  );
-  slice21 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 160,
-    new_msb => 167,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice21_y_net
-  );
-  reinterpret21 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice21_y_net,
-    output_port => reinterpret21_output_port_net
-  );
-  slice20 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 152,
-    new_msb => 159,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice20_y_net
-  );
-  reinterpret20 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice20_y_net,
-    output_port => reinterpret20_output_port_net
-  );
-  slice19 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 144,
-    new_msb => 151,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice19_y_net
-  );
-  reinterpret19 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice19_y_net,
-    output_port => reinterpret19_output_port_net
-  );
-  slice18 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 136,
-    new_msb => 143,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice18_y_net
-  );
-  reinterpret18 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice18_y_net,
-    output_port => reinterpret18_output_port_net
-  );
-  slice17 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 128,
-    new_msb => 135,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice17_y_net
-  );
-  reinterpret17 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice17_y_net,
-    output_port => reinterpret17_output_port_net
-  );
-  slice16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 120,
-    new_msb => 127,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice16_y_net
-  );
-  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice16_y_net,
-    output_port => reinterpret16_output_port_net
-  );
-  slice15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 112,
-    new_msb => 119,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice15_y_net
-  );
-  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice15_y_net,
-    output_port => reinterpret15_output_port_net
-  );
-  slice14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 104,
-    new_msb => 111,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice14_y_net
-  );
-  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice14_y_net,
-    output_port => reinterpret14_output_port_net
-  );
-  slice13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 96,
-    new_msb => 103,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice13_y_net
-  );
-  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice13_y_net,
-    output_port => reinterpret13_output_port_net
-  );
-  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 88,
-    new_msb => 95,
-    x_width => 384,
-    y_width => 8
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice12_y_net
-  );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice12_y_net,
-    output_port => reinterpret12_output_port_net
+    y => slice10_y_net
   );
   slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -10348,146 +11089,214 @@ begin
     x => reinterpret1_output_port_net,
     y => slice11_y_net
   );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice11_y_net,
-    output_port => reinterpret11_output_port_net
-  );
-  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 72,
-    new_msb => 79,
+    new_lsb => 88,
+    new_msb => 95,
     x_width => 384,
     y_width => 8
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice10_y_net
+    y => slice12_y_net
   );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice10_y_net,
-    output_port => reinterpret10_output_port_net
-  );
-  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 64,
-    new_msb => 71,
+    new_lsb => 96,
+    new_msb => 103,
     x_width => 384,
     y_width => 8
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice9_y_net
+    y => slice13_y_net
   );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice9_y_net,
-    output_port => reinterpret9_output_port_net
-  );
-  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 56,
-    new_msb => 63,
+    new_lsb => 104,
+    new_msb => 111,
     x_width => 384,
     y_width => 8
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice8_y_net
+    y => slice14_y_net
   );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice8_y_net,
-    output_port => reinterpret8_output_port_net
-  );
-  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 48,
-    new_msb => 55,
+    new_lsb => 112,
+    new_msb => 119,
     x_width => 384,
     y_width => 8
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice7_y_net
+    y => slice15_y_net
   );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice7_y_net,
-    output_port => reinterpret7_output_port_net
-  );
-  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 40,
-    new_msb => 47,
+    new_lsb => 120,
+    new_msb => 127,
     x_width => 384,
     y_width => 8
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice6_y_net
+    y => slice16_y_net
   );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice6_y_net,
-    output_port => reinterpret6_output_port_net
-  );
-  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice17 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 32,
-    new_msb => 39,
+    new_lsb => 128,
+    new_msb => 135,
     x_width => 384,
     y_width => 8
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice5_y_net
+    y => slice17_y_net
   );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice5_y_net,
-    output_port => reinterpret5_output_port_net
-  );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice18 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 24,
-    new_msb => 31,
+    new_lsb => 136,
+    new_msb => 143,
     x_width => 384,
     y_width => 8
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice4_y_net
+    y => slice18_y_net
   );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  slice19 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 144,
+    new_msb => 151,
+    x_width => 384,
+    y_width => 8
+  )
   port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice4_y_net,
-    output_port => reinterpret4_output_port_net
+    x => reinterpret1_output_port_net,
+    y => slice19_y_net
+  );
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 8,
+    new_msb => 15,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice2_y_net
+  );
+  slice20 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 152,
+    new_msb => 159,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice20_y_net
+  );
+  slice21 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 160,
+    new_msb => 167,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice21_y_net
+  );
+  slice22 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 168,
+    new_msb => 175,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice22_y_net
+  );
+  slice23 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 176,
+    new_msb => 183,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice23_y_net
+  );
+  slice24 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 184,
+    new_msb => 191,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice24_y_net
+  );
+  slice25 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 192,
+    new_msb => 199,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice25_y_net
+  );
+  slice26 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 200,
+    new_msb => 207,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice26_y_net
+  );
+  slice27 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 208,
+    new_msb => 215,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice27_y_net
+  );
+  slice28 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 216,
+    new_msb => 223,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice28_y_net
+  );
+  slice29 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 224,
+    new_msb => 231,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice29_y_net
   );
   slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -10500,13 +11309,280 @@ begin
     x => reinterpret1_output_port_net,
     y => slice3_y_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_c574d1481d 
+  slice30 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 232,
+    new_msb => 239,
+    x_width => 384,
+    y_width => 8
+  )
   port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice3_y_net,
-    output_port => reinterpret3_output_port_net
+    x => reinterpret1_output_port_net,
+    y => slice30_y_net
+  );
+  slice31 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 240,
+    new_msb => 247,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice31_y_net
+  );
+  slice32 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 248,
+    new_msb => 255,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice32_y_net
+  );
+  slice33 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 256,
+    new_msb => 263,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice33_y_net
+  );
+  slice34 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 264,
+    new_msb => 271,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice34_y_net
+  );
+  slice35 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 272,
+    new_msb => 279,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice35_y_net
+  );
+  slice36 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 280,
+    new_msb => 287,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice36_y_net
+  );
+  slice37 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 288,
+    new_msb => 295,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice37_y_net
+  );
+  slice38 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 296,
+    new_msb => 303,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice38_y_net
+  );
+  slice39 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 304,
+    new_msb => 311,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice39_y_net
+  );
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 24,
+    new_msb => 31,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice4_y_net
+  );
+  slice40 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 312,
+    new_msb => 319,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice40_y_net
+  );
+  slice41 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 320,
+    new_msb => 327,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice41_y_net
+  );
+  slice42 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 328,
+    new_msb => 335,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice42_y_net
+  );
+  slice43 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 336,
+    new_msb => 343,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice43_y_net
+  );
+  slice44 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 344,
+    new_msb => 351,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice44_y_net
+  );
+  slice45 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 352,
+    new_msb => 359,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice45_y_net
+  );
+  slice46 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 360,
+    new_msb => 367,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice46_y_net
+  );
+  slice47 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 368,
+    new_msb => 375,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice47_y_net
+  );
+  slice48 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 376,
+    new_msb => 383,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice48_y_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 32,
+    new_msb => 39,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice5_y_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 40,
+    new_msb => 47,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice6_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 48,
+    new_msb => 55,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice7_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 56,
+    new_msb => 63,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice8_y_net
+  );
+  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 64,
+    new_msb => 71,
+    x_width => 384,
+    y_width => 8
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice9_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/bus_mult/b_debus
@@ -10568,103 +11644,103 @@ entity pfb_fir_2048ch_6i_core_b_debus is
   );
 end pfb_fir_2048ch_6i_core_b_debus;
 architecture structural of pfb_fir_2048ch_6i_core_b_debus is 
-  signal slice4_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice27_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice26_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice25_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice24_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice23_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice22_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice21_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret47_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal slice9_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice10_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice11_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice12_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice13_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice14_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice15_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice16_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice17_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice18_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice20_y_net : std_logic_vector( 18-1 downto 0 );
   signal slice8_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret40_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret39_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret38_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret43_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret42_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret41_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice36_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice30_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret15_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret14_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret16_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret32_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret31_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 864-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice48_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice47_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice46_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice7_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice32_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice35_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice5_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret21_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret20_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret19_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice39_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret18_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret17_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice37_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice29_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice40_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice43_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret37_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret36_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret35_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret34_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice11_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret35_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret33_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret30_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret29_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret28_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice43_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice28_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice48_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice47_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice29_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice37_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice46_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice38_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice44_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice45_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice30_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice36_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice42_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice41_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice32_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice31_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice40_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice33_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice34_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice39_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret14_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice23_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret44_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice22_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret13_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret12_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret11_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice28_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice33_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice34_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice44_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice19_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice31_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice38_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice26_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret16_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret46_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret45_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret44_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 864-1 downto 0 );
+  signal reinterpret18_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice21_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice20_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret15_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice19_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice27_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret48_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice45_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice41_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice6_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice42_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret17_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice25_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret1_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret47_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret24_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret23_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret20_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret22_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret27_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice24_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret21_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice18_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice16_y_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret26_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice17_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret23_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice13_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret27_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice15_y_net : std_logic_vector( 18-1 downto 0 );
+  signal slice14_y_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret25_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret29_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret30_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret32_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice12_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret31_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret45_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret39_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice35_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret40_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret43_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice10_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret42_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret19_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret38_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret37_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret36_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret28_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret41_output_port_net : std_logic_vector( 18-1 downto 0 );
 begin
   msb_out48 <= reinterpret48_output_port_net;
   out47 <= reinterpret47_output_port_net;
@@ -10723,6 +11799,86 @@ begin
     input_port => slice1_y_net,
     output_port => reinterpret1_output_port_net_x0
   );
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice10_y_net,
+    output_port => reinterpret10_output_port_net
+  );
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice11_y_net,
+    output_port => reinterpret11_output_port_net
+  );
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice12_y_net,
+    output_port => reinterpret12_output_port_net
+  );
+  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice13_y_net,
+    output_port => reinterpret13_output_port_net
+  );
+  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice14_y_net,
+    output_port => reinterpret14_output_port_net
+  );
+  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice15_y_net,
+    output_port => reinterpret15_output_port_net
+  );
+  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice16_y_net,
+    output_port => reinterpret16_output_port_net
+  );
+  reinterpret17 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice17_y_net,
+    output_port => reinterpret17_output_port_net
+  );
+  reinterpret18 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice18_y_net,
+    output_port => reinterpret18_output_port_net
+  );
+  reinterpret19 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice19_y_net,
+    output_port => reinterpret19_output_port_net
+  );
   reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
   port map (
     clk => '0',
@@ -10730,6 +11886,294 @@ begin
     clr => '0',
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net
+  );
+  reinterpret20 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice20_y_net,
+    output_port => reinterpret20_output_port_net
+  );
+  reinterpret21 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice21_y_net,
+    output_port => reinterpret21_output_port_net
+  );
+  reinterpret22 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice22_y_net,
+    output_port => reinterpret22_output_port_net
+  );
+  reinterpret23 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice23_y_net,
+    output_port => reinterpret23_output_port_net
+  );
+  reinterpret24 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice24_y_net,
+    output_port => reinterpret24_output_port_net
+  );
+  reinterpret25 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice25_y_net,
+    output_port => reinterpret25_output_port_net
+  );
+  reinterpret26 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice26_y_net,
+    output_port => reinterpret26_output_port_net
+  );
+  reinterpret27 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice27_y_net,
+    output_port => reinterpret27_output_port_net
+  );
+  reinterpret28 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice28_y_net,
+    output_port => reinterpret28_output_port_net
+  );
+  reinterpret29 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice29_y_net,
+    output_port => reinterpret29_output_port_net
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice3_y_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret30 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice30_y_net,
+    output_port => reinterpret30_output_port_net
+  );
+  reinterpret31 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice31_y_net,
+    output_port => reinterpret31_output_port_net
+  );
+  reinterpret32 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice32_y_net,
+    output_port => reinterpret32_output_port_net
+  );
+  reinterpret33 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice33_y_net,
+    output_port => reinterpret33_output_port_net
+  );
+  reinterpret34 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice34_y_net,
+    output_port => reinterpret34_output_port_net
+  );
+  reinterpret35 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice35_y_net,
+    output_port => reinterpret35_output_port_net
+  );
+  reinterpret36 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice36_y_net,
+    output_port => reinterpret36_output_port_net
+  );
+  reinterpret37 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice37_y_net,
+    output_port => reinterpret37_output_port_net
+  );
+  reinterpret38 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice38_y_net,
+    output_port => reinterpret38_output_port_net
+  );
+  reinterpret39 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice39_y_net,
+    output_port => reinterpret39_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice4_y_net,
+    output_port => reinterpret4_output_port_net
+  );
+  reinterpret40 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice40_y_net,
+    output_port => reinterpret40_output_port_net
+  );
+  reinterpret41 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice41_y_net,
+    output_port => reinterpret41_output_port_net
+  );
+  reinterpret42 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice42_y_net,
+    output_port => reinterpret42_output_port_net
+  );
+  reinterpret43 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice43_y_net,
+    output_port => reinterpret43_output_port_net
+  );
+  reinterpret44 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice44_y_net,
+    output_port => reinterpret44_output_port_net
+  );
+  reinterpret45 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice45_y_net,
+    output_port => reinterpret45_output_port_net
+  );
+  reinterpret46 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice46_y_net,
+    output_port => reinterpret46_output_port_net
+  );
+  reinterpret47 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice47_y_net,
+    output_port => reinterpret47_output_port_net
+  );
+  reinterpret48 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice48_y_net,
+    output_port => reinterpret48_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice9_y_net,
+    output_port => reinterpret9_output_port_net
   );
   slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -10742,719 +12186,16 @@ begin
     x => reinterpret1_output_port_net,
     y => slice1_y_net
   );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 18,
-    new_msb => 35,
+    new_lsb => 162,
+    new_msb => 179,
     x_width => 864,
     y_width => 18
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice2_y_net
-  );
-  slice48 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 846,
-    new_msb => 863,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice48_y_net
-  );
-  reinterpret48 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice48_y_net,
-    output_port => reinterpret48_output_port_net
-  );
-  slice47 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 828,
-    new_msb => 845,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice47_y_net
-  );
-  reinterpret47 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice47_y_net,
-    output_port => reinterpret47_output_port_net
-  );
-  slice46 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 810,
-    new_msb => 827,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice46_y_net
-  );
-  reinterpret46 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice46_y_net,
-    output_port => reinterpret46_output_port_net
-  );
-  slice45 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 792,
-    new_msb => 809,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice45_y_net
-  );
-  reinterpret45 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice45_y_net,
-    output_port => reinterpret45_output_port_net
-  );
-  slice44 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 774,
-    new_msb => 791,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice44_y_net
-  );
-  reinterpret44 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice44_y_net,
-    output_port => reinterpret44_output_port_net
-  );
-  slice43 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 756,
-    new_msb => 773,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice43_y_net
-  );
-  reinterpret43 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice43_y_net,
-    output_port => reinterpret43_output_port_net
-  );
-  slice42 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 738,
-    new_msb => 755,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice42_y_net
-  );
-  reinterpret42 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice42_y_net,
-    output_port => reinterpret42_output_port_net
-  );
-  slice41 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 720,
-    new_msb => 737,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice41_y_net
-  );
-  reinterpret41 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice41_y_net,
-    output_port => reinterpret41_output_port_net
-  );
-  slice40 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 702,
-    new_msb => 719,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice40_y_net
-  );
-  reinterpret40 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice40_y_net,
-    output_port => reinterpret40_output_port_net
-  );
-  slice39 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 684,
-    new_msb => 701,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice39_y_net
-  );
-  reinterpret39 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice39_y_net,
-    output_port => reinterpret39_output_port_net
-  );
-  slice38 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 666,
-    new_msb => 683,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice38_y_net
-  );
-  reinterpret38 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice38_y_net,
-    output_port => reinterpret38_output_port_net
-  );
-  slice37 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 648,
-    new_msb => 665,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice37_y_net
-  );
-  reinterpret37 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice37_y_net,
-    output_port => reinterpret37_output_port_net
-  );
-  slice36 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 630,
-    new_msb => 647,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice36_y_net
-  );
-  reinterpret36 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice36_y_net,
-    output_port => reinterpret36_output_port_net
-  );
-  slice35 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 612,
-    new_msb => 629,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice35_y_net
-  );
-  reinterpret35 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice35_y_net,
-    output_port => reinterpret35_output_port_net
-  );
-  slice34 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 594,
-    new_msb => 611,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice34_y_net
-  );
-  reinterpret34 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice34_y_net,
-    output_port => reinterpret34_output_port_net
-  );
-  slice33 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 576,
-    new_msb => 593,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice33_y_net
-  );
-  reinterpret33 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice33_y_net,
-    output_port => reinterpret33_output_port_net
-  );
-  slice32 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 558,
-    new_msb => 575,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice32_y_net
-  );
-  reinterpret32 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice32_y_net,
-    output_port => reinterpret32_output_port_net
-  );
-  slice31 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 540,
-    new_msb => 557,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice31_y_net
-  );
-  reinterpret31 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice31_y_net,
-    output_port => reinterpret31_output_port_net
-  );
-  slice30 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 522,
-    new_msb => 539,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice30_y_net
-  );
-  reinterpret30 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice30_y_net,
-    output_port => reinterpret30_output_port_net
-  );
-  slice29 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 504,
-    new_msb => 521,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice29_y_net
-  );
-  reinterpret29 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice29_y_net,
-    output_port => reinterpret29_output_port_net
-  );
-  slice28 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 486,
-    new_msb => 503,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice28_y_net
-  );
-  reinterpret28 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice28_y_net,
-    output_port => reinterpret28_output_port_net
-  );
-  slice27 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 468,
-    new_msb => 485,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice27_y_net
-  );
-  reinterpret27 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice27_y_net,
-    output_port => reinterpret27_output_port_net
-  );
-  slice26 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 450,
-    new_msb => 467,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice26_y_net
-  );
-  reinterpret26 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice26_y_net,
-    output_port => reinterpret26_output_port_net
-  );
-  slice25 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 432,
-    new_msb => 449,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice25_y_net
-  );
-  reinterpret25 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice25_y_net,
-    output_port => reinterpret25_output_port_net
-  );
-  slice24 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 414,
-    new_msb => 431,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice24_y_net
-  );
-  reinterpret24 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice24_y_net,
-    output_port => reinterpret24_output_port_net
-  );
-  slice23 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 396,
-    new_msb => 413,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice23_y_net
-  );
-  reinterpret23 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice23_y_net,
-    output_port => reinterpret23_output_port_net
-  );
-  slice22 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 378,
-    new_msb => 395,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice22_y_net
-  );
-  reinterpret22 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice22_y_net,
-    output_port => reinterpret22_output_port_net
-  );
-  slice21 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 360,
-    new_msb => 377,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice21_y_net
-  );
-  reinterpret21 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice21_y_net,
-    output_port => reinterpret21_output_port_net
-  );
-  slice20 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 342,
-    new_msb => 359,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice20_y_net
-  );
-  reinterpret20 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice20_y_net,
-    output_port => reinterpret20_output_port_net
-  );
-  slice19 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 324,
-    new_msb => 341,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice19_y_net
-  );
-  reinterpret19 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice19_y_net,
-    output_port => reinterpret19_output_port_net
-  );
-  slice18 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 306,
-    new_msb => 323,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice18_y_net
-  );
-  reinterpret18 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice18_y_net,
-    output_port => reinterpret18_output_port_net
-  );
-  slice17 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 288,
-    new_msb => 305,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice17_y_net
-  );
-  reinterpret17 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice17_y_net,
-    output_port => reinterpret17_output_port_net
-  );
-  slice16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 270,
-    new_msb => 287,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice16_y_net
-  );
-  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice16_y_net,
-    output_port => reinterpret16_output_port_net
-  );
-  slice15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 252,
-    new_msb => 269,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice15_y_net
-  );
-  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice15_y_net,
-    output_port => reinterpret15_output_port_net
-  );
-  slice14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 234,
-    new_msb => 251,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice14_y_net
-  );
-  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice14_y_net,
-    output_port => reinterpret14_output_port_net
-  );
-  slice13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 216,
-    new_msb => 233,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice13_y_net
-  );
-  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice13_y_net,
-    output_port => reinterpret13_output_port_net
-  );
-  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 198,
-    new_msb => 215,
-    x_width => 864,
-    y_width => 18
-  )
-  port map (
-    x => reinterpret1_output_port_net,
-    y => slice12_y_net
-  );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice12_y_net,
-    output_port => reinterpret12_output_port_net
+    y => slice10_y_net
   );
   slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -11467,146 +12208,214 @@ begin
     x => reinterpret1_output_port_net,
     y => slice11_y_net
   );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice11_y_net,
-    output_port => reinterpret11_output_port_net
-  );
-  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 162,
-    new_msb => 179,
+    new_lsb => 198,
+    new_msb => 215,
     x_width => 864,
     y_width => 18
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice10_y_net
+    y => slice12_y_net
   );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice10_y_net,
-    output_port => reinterpret10_output_port_net
-  );
-  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 144,
-    new_msb => 161,
+    new_lsb => 216,
+    new_msb => 233,
     x_width => 864,
     y_width => 18
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice9_y_net
+    y => slice13_y_net
   );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice9_y_net,
-    output_port => reinterpret9_output_port_net
-  );
-  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 126,
-    new_msb => 143,
+    new_lsb => 234,
+    new_msb => 251,
     x_width => 864,
     y_width => 18
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice8_y_net
+    y => slice14_y_net
   );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice8_y_net,
-    output_port => reinterpret8_output_port_net
-  );
-  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 108,
-    new_msb => 125,
+    new_lsb => 252,
+    new_msb => 269,
     x_width => 864,
     y_width => 18
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice7_y_net
+    y => slice15_y_net
   );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice7_y_net,
-    output_port => reinterpret7_output_port_net
-  );
-  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 90,
-    new_msb => 107,
+    new_lsb => 270,
+    new_msb => 287,
     x_width => 864,
     y_width => 18
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice6_y_net
+    y => slice16_y_net
   );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice6_y_net,
-    output_port => reinterpret6_output_port_net
-  );
-  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice17 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 72,
-    new_msb => 89,
+    new_lsb => 288,
+    new_msb => 305,
     x_width => 864,
     y_width => 18
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice5_y_net
+    y => slice17_y_net
   );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice5_y_net,
-    output_port => reinterpret5_output_port_net
-  );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice18 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 54,
-    new_msb => 71,
+    new_lsb => 306,
+    new_msb => 323,
     x_width => 864,
     y_width => 18
   )
   port map (
     x => reinterpret1_output_port_net,
-    y => slice4_y_net
+    y => slice18_y_net
   );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  slice19 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 324,
+    new_msb => 341,
+    x_width => 864,
+    y_width => 18
+  )
   port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice4_y_net,
-    output_port => reinterpret4_output_port_net
+    x => reinterpret1_output_port_net,
+    y => slice19_y_net
+  );
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 18,
+    new_msb => 35,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice2_y_net
+  );
+  slice20 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 342,
+    new_msb => 359,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice20_y_net
+  );
+  slice21 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 360,
+    new_msb => 377,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice21_y_net
+  );
+  slice22 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 378,
+    new_msb => 395,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice22_y_net
+  );
+  slice23 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 396,
+    new_msb => 413,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice23_y_net
+  );
+  slice24 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 414,
+    new_msb => 431,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice24_y_net
+  );
+  slice25 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 432,
+    new_msb => 449,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice25_y_net
+  );
+  slice26 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 450,
+    new_msb => 467,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice26_y_net
+  );
+  slice27 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 468,
+    new_msb => 485,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice27_y_net
+  );
+  slice28 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 486,
+    new_msb => 503,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice28_y_net
+  );
+  slice29 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 504,
+    new_msb => 521,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice29_y_net
   );
   slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -11619,13 +12428,280 @@ begin
     x => reinterpret1_output_port_net,
     y => slice3_y_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_479aa83822 
+  slice30 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 522,
+    new_msb => 539,
+    x_width => 864,
+    y_width => 18
+  )
   port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice3_y_net,
-    output_port => reinterpret3_output_port_net
+    x => reinterpret1_output_port_net,
+    y => slice30_y_net
+  );
+  slice31 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 540,
+    new_msb => 557,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice31_y_net
+  );
+  slice32 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 558,
+    new_msb => 575,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice32_y_net
+  );
+  slice33 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 576,
+    new_msb => 593,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice33_y_net
+  );
+  slice34 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 594,
+    new_msb => 611,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice34_y_net
+  );
+  slice35 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 612,
+    new_msb => 629,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice35_y_net
+  );
+  slice36 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 630,
+    new_msb => 647,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice36_y_net
+  );
+  slice37 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 648,
+    new_msb => 665,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice37_y_net
+  );
+  slice38 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 666,
+    new_msb => 683,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice38_y_net
+  );
+  slice39 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 684,
+    new_msb => 701,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice39_y_net
+  );
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 54,
+    new_msb => 71,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice4_y_net
+  );
+  slice40 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 702,
+    new_msb => 719,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice40_y_net
+  );
+  slice41 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 720,
+    new_msb => 737,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice41_y_net
+  );
+  slice42 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 738,
+    new_msb => 755,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice42_y_net
+  );
+  slice43 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 756,
+    new_msb => 773,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice43_y_net
+  );
+  slice44 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 774,
+    new_msb => 791,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice44_y_net
+  );
+  slice45 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 792,
+    new_msb => 809,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice45_y_net
+  );
+  slice46 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 810,
+    new_msb => 827,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice46_y_net
+  );
+  slice47 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 828,
+    new_msb => 845,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice47_y_net
+  );
+  slice48 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 846,
+    new_msb => 863,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice48_y_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 72,
+    new_msb => 89,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice5_y_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 90,
+    new_msb => 107,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice6_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 108,
+    new_msb => 125,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice7_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 126,
+    new_msb => 143,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice8_y_net
+  );
+  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 144,
+    new_msb => 161,
+    x_width => 864,
+    y_width => 18
+  )
+  port map (
+    x => reinterpret1_output_port_net,
+    y => slice9_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/bus_mult/repa/bussify
@@ -11633,13 +12709,13 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_bussify_x10 is
+entity pfb_fir_2048ch_6i_core_bussify is
   port (
     in1 : in std_logic_vector( 384-1 downto 0 );
     bus_out : out std_logic_vector( 384-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_bussify_x10;
-architecture structural of pfb_fir_2048ch_6i_core_bussify_x10 is 
+end pfb_fir_2048ch_6i_core_bussify;
+architecture structural of pfb_fir_2048ch_6i_core_bussify is 
   signal mult_din_y_net : std_logic_vector( 384-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 384-1 downto 0 );
 begin
@@ -11666,12 +12742,12 @@ entity pfb_fir_2048ch_6i_core_repa is
   );
 end pfb_fir_2048ch_6i_core_repa;
 architecture structural of pfb_fir_2048ch_6i_core_repa is 
-  signal mult_din_y_net : std_logic_vector( 384-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 384-1 downto 0 );
+  signal mult_din_y_net : std_logic_vector( 384-1 downto 0 );
 begin
   out_x0 <= reinterpret1_output_port_net;
   mult_din_y_net <= in_x0;
-  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x10 
+  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify 
   port map (
     in1 => mult_din_y_net,
     bus_out => reinterpret1_output_port_net
@@ -11682,15 +12758,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_bussify_x9 is
+entity pfb_fir_2048ch_6i_core_bussify_x4 is
   port (
     in1 : in std_logic_vector( 864-1 downto 0 );
     bus_out : out std_logic_vector( 864-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_bussify_x9;
-architecture structural of pfb_fir_2048ch_6i_core_bussify_x9 is 
-  signal reinterpret1_output_port_net : std_logic_vector( 864-1 downto 0 );
+end pfb_fir_2048ch_6i_core_bussify_x4;
+architecture structural of pfb_fir_2048ch_6i_core_bussify_x4 is 
   signal dcoeffs_q_net : std_logic_vector( 864-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 864-1 downto 0 );
 begin
   bus_out <= reinterpret1_output_port_net;
   dcoeffs_q_net <= in1;
@@ -11720,7 +12796,7 @@ architecture structural of pfb_fir_2048ch_6i_core_repb is
 begin
   out_x0 <= reinterpret1_output_port_net;
   dcoeffs_q_net <= in_x0;
-  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x9 
+  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x4 
   port map (
     in1 => dcoeffs_q_net,
     bus_out => reinterpret1_output_port_net
@@ -11741,157 +12817,157 @@ entity pfb_fir_2048ch_6i_core_bus_mult is
   );
 end pfb_fir_2048ch_6i_core_bus_mult;
 architecture structural of pfb_fir_2048ch_6i_core_bus_mult is 
-  signal concatenate_y_net : std_logic_vector( 1248-1 downto 0 );
-  signal mult_din_y_net : std_logic_vector( 384-1 downto 0 );
-  signal mult21_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult9_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult10_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult11_p_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret43_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret42_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret41_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal mult22_p_net : std_logic_vector( 26-1 downto 0 );
   signal mult23_p_net : std_logic_vector( 26-1 downto 0 );
   signal mult24_p_net : std_logic_vector( 26-1 downto 0 );
   signal mult25_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult26_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult27_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult28_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult29_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult47_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult48_p_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret29_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret28_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret27_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret15_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret31_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret30_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret26_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret25_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret24_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret29_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret28_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret27_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal mult12_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult13_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult14_p_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret1_output_port_net_x1 : std_logic_vector( 864-1 downto 0 );
+  signal reinterpret26_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret25_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret24_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal dcoeffs_q_net : std_logic_vector( 864-1 downto 0 );
+  signal reinterpret1_output_port_net_x0 : std_logic_vector( 384-1 downto 0 );
+  signal reinterpret48_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret47_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret23_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret22_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret21_output_port_net : std_logic_vector( 8-1 downto 0 );
   signal reinterpret44_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal reinterpret43_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal reinterpret42_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal reinterpret41_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
-  signal mult6_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult7_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult8_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult9_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult10_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult11_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult12_p_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret1_output_port_net_x2 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net_x1 : std_logic_vector( 864-1 downto 0 );
-  signal reinterpret21_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret20_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret19_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret18_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret17_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret16_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret14_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret39_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret38_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret37_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret36_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret35_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret34_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret33_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret32_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret15_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret31_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret30_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret29_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret28_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret27_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret26_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret25_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal mult38_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult39_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult40_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult41_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult42_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult43_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult44_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult45_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult46_p_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret2_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal mult30_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult31_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult32_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult33_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult35_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult36_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult37_p_net : std_logic_vector( 26-1 downto 0 );
-  signal reinterpret16_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret14_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret13_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret12_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret11_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret10_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret31_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret30_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret29_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret28_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret27_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret26_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret25_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret24_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret23_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret22_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret13_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret9_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret8_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret7_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret6_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
-  signal dcoeffs_q_net : std_logic_vector( 864-1 downto 0 );
   signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal mult3_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult4_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult5_p_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret48_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal reinterpret47_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal reinterpret46_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal reinterpret45_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
-  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult2_p_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret6_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal reinterpret5_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal reinterpret4_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret1_output_port_net_x0 : std_logic_vector( 384-1 downto 0 );
-  signal reinterpret48_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret20_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret19_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret18_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal mult_din_y_net : std_logic_vector( 384-1 downto 0 );
+  signal reinterpret46_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret45_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret44_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal mult34_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult19_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult20_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult21_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult30_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult31_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult32_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult33_p_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret3_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret2_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret1_output_port_net_x2 : std_logic_vector( 18-1 downto 0 );
+  signal mult35_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult36_p_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret40_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal reinterpret39_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal reinterpret38_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal reinterpret37_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
+  signal mult1_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult2_p_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret12_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret11_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret10_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal mult45_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult46_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult47_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult48_p_net : std_logic_vector( 26-1 downto 0 );
+  signal ce_net : std_logic;
+  signal mult37_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult38_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult39_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult40_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult26_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult27_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult28_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult29_p_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret23_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret22_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret21_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret17_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret16_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret13_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret17_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret16_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret13_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 1248-1 downto 0 );
+  signal reinterpret9_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret8_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret7_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret20_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret19_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret18_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret34_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret33_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret32_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal mult15_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult16_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult17_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult18_p_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret32_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret15_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret31_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret30_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret14_output_port_net : std_logic_vector( 8-1 downto 0 );
+  signal mult6_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult7_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult8_p_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret40_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret39_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret38_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret14_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
+  signal mult41_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult42_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult43_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult44_p_net : std_logic_vector( 26-1 downto 0 );
+  signal reinterpret37_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret36_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret35_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal mult3_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult4_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult5_p_net : std_logic_vector( 26-1 downto 0 );
   signal reinterpret36_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal reinterpret35_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal reinterpret34_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal reinterpret33_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret32_output_port_net_x0 : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret15_output_port_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret47_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret46_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret45_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret44_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret43_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret42_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret41_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret40_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret24_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret23_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret22_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret21_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret20_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret19_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret18_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret17_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal mult13_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult14_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult15_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult16_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult17_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult34_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult18_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult19_p_net : std_logic_vector( 26-1 downto 0 );
-  signal mult20_p_net : std_logic_vector( 26-1 downto 0 );
 begin
   a_b <= concatenate_y_net;
   mult_din_y_net <= a;
@@ -12073,78 +13149,6 @@ begin
     ce => ce_net,
     p => mult1_p_net
   );
-  mult2 : entity xil_defaultlib.sysgen_mult_91e306affd 
-  port map (
-    clr => '0',
-    a => reinterpret47_output_port_net_x0,
-    b => reinterpret47_output_port_net,
-    clk => clk_net,
-    ce => ce_net,
-    p => mult2_p_net
-  );
-  mult3 : entity xil_defaultlib.sysgen_mult_91e306affd 
-  port map (
-    clr => '0',
-    a => reinterpret46_output_port_net_x0,
-    b => reinterpret46_output_port_net,
-    clk => clk_net,
-    ce => ce_net,
-    p => mult3_p_net
-  );
-  mult4 : entity xil_defaultlib.sysgen_mult_91e306affd 
-  port map (
-    clr => '0',
-    a => reinterpret45_output_port_net_x0,
-    b => reinterpret45_output_port_net,
-    clk => clk_net,
-    ce => ce_net,
-    p => mult4_p_net
-  );
-  mult5 : entity xil_defaultlib.sysgen_mult_91e306affd 
-  port map (
-    clr => '0',
-    a => reinterpret44_output_port_net_x0,
-    b => reinterpret44_output_port_net,
-    clk => clk_net,
-    ce => ce_net,
-    p => mult5_p_net
-  );
-  mult6 : entity xil_defaultlib.sysgen_mult_91e306affd 
-  port map (
-    clr => '0',
-    a => reinterpret43_output_port_net_x0,
-    b => reinterpret43_output_port_net,
-    clk => clk_net,
-    ce => ce_net,
-    p => mult6_p_net
-  );
-  mult7 : entity xil_defaultlib.sysgen_mult_91e306affd 
-  port map (
-    clr => '0',
-    a => reinterpret42_output_port_net_x0,
-    b => reinterpret42_output_port_net,
-    clk => clk_net,
-    ce => ce_net,
-    p => mult7_p_net
-  );
-  mult8 : entity xil_defaultlib.sysgen_mult_91e306affd 
-  port map (
-    clr => '0',
-    a => reinterpret41_output_port_net_x0,
-    b => reinterpret41_output_port_net,
-    clk => clk_net,
-    ce => ce_net,
-    p => mult8_p_net
-  );
-  mult9 : entity xil_defaultlib.sysgen_mult_91e306affd 
-  port map (
-    clr => '0',
-    a => reinterpret40_output_port_net_x0,
-    b => reinterpret40_output_port_net,
-    clk => clk_net,
-    ce => ce_net,
-    p => mult9_p_net
-  );
   mult10 : entity xil_defaultlib.sysgen_mult_91e306affd 
   port map (
     clr => '0',
@@ -12234,6 +13238,15 @@ begin
     clk => clk_net,
     ce => ce_net,
     p => mult19_p_net
+  );
+  mult2 : entity xil_defaultlib.sysgen_mult_91e306affd 
+  port map (
+    clr => '0',
+    a => reinterpret47_output_port_net_x0,
+    b => reinterpret47_output_port_net,
+    clk => clk_net,
+    ce => ce_net,
+    p => mult2_p_net
   );
   mult20 : entity xil_defaultlib.sysgen_mult_91e306affd 
   port map (
@@ -12325,6 +13338,15 @@ begin
     ce => ce_net,
     p => mult29_p_net
   );
+  mult3 : entity xil_defaultlib.sysgen_mult_91e306affd 
+  port map (
+    clr => '0',
+    a => reinterpret46_output_port_net_x0,
+    b => reinterpret46_output_port_net,
+    clk => clk_net,
+    ce => ce_net,
+    p => mult3_p_net
+  );
   mult30 : entity xil_defaultlib.sysgen_mult_91e306affd 
   port map (
     clr => '0',
@@ -12415,6 +13437,15 @@ begin
     ce => ce_net,
     p => mult39_p_net
   );
+  mult4 : entity xil_defaultlib.sysgen_mult_91e306affd 
+  port map (
+    clr => '0',
+    a => reinterpret45_output_port_net_x0,
+    b => reinterpret45_output_port_net,
+    clk => clk_net,
+    ce => ce_net,
+    p => mult4_p_net
+  );
   mult40 : entity xil_defaultlib.sysgen_mult_91e306affd 
   port map (
     clr => '0',
@@ -12496,6 +13527,51 @@ begin
     ce => ce_net,
     p => mult48_p_net
   );
+  mult5 : entity xil_defaultlib.sysgen_mult_91e306affd 
+  port map (
+    clr => '0',
+    a => reinterpret44_output_port_net_x0,
+    b => reinterpret44_output_port_net,
+    clk => clk_net,
+    ce => ce_net,
+    p => mult5_p_net
+  );
+  mult6 : entity xil_defaultlib.sysgen_mult_91e306affd 
+  port map (
+    clr => '0',
+    a => reinterpret43_output_port_net_x0,
+    b => reinterpret43_output_port_net,
+    clk => clk_net,
+    ce => ce_net,
+    p => mult6_p_net
+  );
+  mult7 : entity xil_defaultlib.sysgen_mult_91e306affd 
+  port map (
+    clr => '0',
+    a => reinterpret42_output_port_net_x0,
+    b => reinterpret42_output_port_net,
+    clk => clk_net,
+    ce => ce_net,
+    p => mult7_p_net
+  );
+  mult8 : entity xil_defaultlib.sysgen_mult_91e306affd 
+  port map (
+    clr => '0',
+    a => reinterpret41_output_port_net_x0,
+    b => reinterpret41_output_port_net,
+    clk => clk_net,
+    ce => ce_net,
+    p => mult8_p_net
+  );
+  mult9 : entity xil_defaultlib.sysgen_mult_91e306affd 
+  port map (
+    clr => '0',
+    a => reinterpret40_output_port_net_x0,
+    b => reinterpret40_output_port_net,
+    clk => clk_net,
+    ce => ce_net,
+    p => mult9_p_net
+  );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/sync_delay
 library IEEE;
@@ -12511,38 +13587,38 @@ entity pfb_fir_2048ch_6i_core_sync_delay is
   );
 end pfb_fir_2048ch_6i_core_sync_delay;
 architecture structural of pfb_fir_2048ch_6i_core_sync_delay is 
-  signal sync_delay_q_net : std_logic_vector( 1-1 downto 0 );
+  signal constant_op_net : std_logic_vector( 15-1 downto 0 );
   signal clk_net : std_logic;
-  signal constant1_op_net : std_logic_vector( 13-1 downto 0 );
-  signal constant_op_net : std_logic_vector( 13-1 downto 0 );
-  signal ce_net : std_logic;
+  signal constant1_op_net : std_logic_vector( 15-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 15-1 downto 0 );
+  signal logical_y_net : std_logic_vector( 1-1 downto 0 );
   signal mux_y_net : std_logic_vector( 1-1 downto 0 );
+  signal sync_delay_q_net : std_logic_vector( 1-1 downto 0 );
+  signal constant3_op_net : std_logic_vector( 1-1 downto 0 );
+  signal ce_net : std_logic;
+  signal constant2_op_net : std_logic_vector( 15-1 downto 0 );
   signal relational_op_net : std_logic_vector( 1-1 downto 0 );
   signal relational1_op_net : std_logic_vector( 1-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
-  signal logical_y_net : std_logic_vector( 1-1 downto 0 );
-  signal constant2_op_net : std_logic_vector( 13-1 downto 0 );
-  signal constant3_op_net : std_logic_vector( 1-1 downto 0 );
 begin
   out_x0 <= mux_y_net;
   sync_delay_q_net <= in_x0;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  constant_x0 : entity xil_defaultlib.sysgen_constant_f494f6fb48 
+  constant_x0 : entity xil_defaultlib.sysgen_constant_6267c4742e 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     op => constant_op_net
   );
-  constant1 : entity xil_defaultlib.sysgen_constant_7ff69862a5 
+  constant1 : entity xil_defaultlib.sysgen_constant_a3ec6ea48d 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     op => constant1_op_net
   );
-  constant2 : entity xil_defaultlib.sysgen_constant_7a1fa8683e 
+  constant2 : entity xil_defaultlib.sysgen_constant_6cbf1dd472 
   port map (
     clk => '0',
     ce => '0',
@@ -12560,7 +13636,7 @@ begin
   generic map (
     core_name0 => "pfb_fir_2048ch_6i_core_c_counter_binary_v12_0_i1",
     op_arith => xlUnsigned,
-    op_width => 13
+    op_width => 15
   )
   port map (
     rst => "0",
@@ -12591,7 +13667,7 @@ begin
     d1 => relational_op_net,
     y => mux_y_net
   );
-  relational : entity xil_defaultlib.sysgen_relational_73960e5492 
+  relational : entity xil_defaultlib.sysgen_relational_77b54e2fe9 
   port map (
     clk => '0',
     ce => '0',
@@ -12600,7 +13676,7 @@ begin
     b => counter_op_net,
     op => relational_op_net
   );
-  relational1 : entity xil_defaultlib.sysgen_relational_623cadea46 
+  relational1 : entity xil_defaultlib.sysgen_relational_bb4f4e6d53 
   port map (
     clk => '0',
     ce => '0',
@@ -12615,61 +13691,109 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_a_bussify_x0 is
+entity pfb_fir_2048ch_6i_core_a_bussify is
   port (
-    in1 : in std_logic_vector( 18-1 downto 0 );
-    in2 : in std_logic_vector( 18-1 downto 0 );
-    in3 : in std_logic_vector( 18-1 downto 0 );
-    in4 : in std_logic_vector( 18-1 downto 0 );
-    in5 : in std_logic_vector( 18-1 downto 0 );
-    in6 : in std_logic_vector( 18-1 downto 0 );
-    in7 : in std_logic_vector( 18-1 downto 0 );
-    in8 : in std_logic_vector( 18-1 downto 0 );
-    in9 : in std_logic_vector( 18-1 downto 0 );
-    in10 : in std_logic_vector( 18-1 downto 0 );
-    in11 : in std_logic_vector( 18-1 downto 0 );
-    in12 : in std_logic_vector( 18-1 downto 0 );
-    in13 : in std_logic_vector( 18-1 downto 0 );
-    in14 : in std_logic_vector( 18-1 downto 0 );
-    in15 : in std_logic_vector( 18-1 downto 0 );
-    in16 : in std_logic_vector( 18-1 downto 0 );
+    in1 : in std_logic_vector( 9-1 downto 0 );
+    in2 : in std_logic_vector( 9-1 downto 0 );
+    in3 : in std_logic_vector( 9-1 downto 0 );
+    in4 : in std_logic_vector( 9-1 downto 0 );
+    in5 : in std_logic_vector( 9-1 downto 0 );
+    in6 : in std_logic_vector( 9-1 downto 0 );
+    in7 : in std_logic_vector( 9-1 downto 0 );
+    in8 : in std_logic_vector( 9-1 downto 0 );
+    in9 : in std_logic_vector( 9-1 downto 0 );
+    in10 : in std_logic_vector( 9-1 downto 0 );
+    in11 : in std_logic_vector( 9-1 downto 0 );
+    in12 : in std_logic_vector( 9-1 downto 0 );
+    in13 : in std_logic_vector( 9-1 downto 0 );
+    in14 : in std_logic_vector( 9-1 downto 0 );
+    in15 : in std_logic_vector( 9-1 downto 0 );
+    in16 : in std_logic_vector( 9-1 downto 0 );
+    in17 : in std_logic_vector( 9-1 downto 0 );
+    in18 : in std_logic_vector( 9-1 downto 0 );
+    in19 : in std_logic_vector( 9-1 downto 0 );
+    in20 : in std_logic_vector( 9-1 downto 0 );
+    in21 : in std_logic_vector( 9-1 downto 0 );
+    in22 : in std_logic_vector( 9-1 downto 0 );
+    in23 : in std_logic_vector( 9-1 downto 0 );
+    in24 : in std_logic_vector( 9-1 downto 0 );
+    in25 : in std_logic_vector( 9-1 downto 0 );
+    in26 : in std_logic_vector( 9-1 downto 0 );
+    in27 : in std_logic_vector( 9-1 downto 0 );
+    in28 : in std_logic_vector( 9-1 downto 0 );
+    in29 : in std_logic_vector( 9-1 downto 0 );
+    in30 : in std_logic_vector( 9-1 downto 0 );
+    in31 : in std_logic_vector( 9-1 downto 0 );
+    in32 : in std_logic_vector( 9-1 downto 0 );
     bus_out : out std_logic_vector( 288-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_a_bussify_x0;
-architecture structural of pfb_fir_2048ch_6i_core_a_bussify_x0 is 
-  signal reinterpret15_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret16_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret13_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret14_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal bram13_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram14_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram15_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram3_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram4_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram0_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram1_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram2_douta_net : std_logic_vector( 18-1 downto 0 );
+end pfb_fir_2048ch_6i_core_a_bussify;
+architecture structural of pfb_fir_2048ch_6i_core_a_bussify is 
+  signal reinterpret16_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret17_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret18_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret22_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret23_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret24_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret28_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret29_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret30_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret31_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret25_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret26_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret27_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret19_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret20_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret21_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal bram4_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram2_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram9_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram0_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram7_douta_net : std_logic_vector( 9-1 downto 0 );
   signal concatenate_y_net : std_logic_vector( 288-1 downto 0 );
-  signal bram5_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram6_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram7_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram8_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram9_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram10_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram11_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram12_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal bram1_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram5_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram3_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret13_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret14_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret32_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret15_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal bram28_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram26_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram30_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram27_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram22_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram24_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram23_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram29_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram31_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram19_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram25_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram21_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram14_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram18_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram20_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram12_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram13_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram10_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram15_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram17_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram11_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram6_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram8_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal bram16_douta_net : std_logic_vector( 9-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   bram0_douta_net <= in1;
@@ -12688,7 +13812,23 @@ begin
   bram13_douta_net <= in14;
   bram14_douta_net <= in15;
   bram15_douta_net <= in16;
-  concatenate : entity xil_defaultlib.sysgen_concat_8c13495bbb 
+  bram16_douta_net <= in17;
+  bram17_douta_net <= in18;
+  bram18_douta_net <= in19;
+  bram19_douta_net <= in20;
+  bram20_douta_net <= in21;
+  bram21_douta_net <= in22;
+  bram22_douta_net <= in23;
+  bram23_douta_net <= in24;
+  bram24_douta_net <= in25;
+  bram25_douta_net <= in26;
+  bram26_douta_net <= in27;
+  bram27_douta_net <= in28;
+  bram28_douta_net <= in29;
+  bram29_douta_net <= in30;
+  bram30_douta_net <= in31;
+  bram31_douta_net <= in32;
+  concatenate : entity xil_defaultlib.sysgen_concat_0c8e1ab643 
   port map (
     clk => '0',
     ce => '0',
@@ -12709,9 +13849,25 @@ begin
     in13 => reinterpret14_output_port_net,
     in14 => reinterpret15_output_port_net,
     in15 => reinterpret16_output_port_net,
+    in16 => reinterpret17_output_port_net,
+    in17 => reinterpret18_output_port_net,
+    in18 => reinterpret19_output_port_net,
+    in19 => reinterpret20_output_port_net,
+    in20 => reinterpret21_output_port_net,
+    in21 => reinterpret22_output_port_net,
+    in22 => reinterpret23_output_port_net,
+    in23 => reinterpret24_output_port_net,
+    in24 => reinterpret25_output_port_net,
+    in25 => reinterpret26_output_port_net,
+    in26 => reinterpret27_output_port_net,
+    in27 => reinterpret28_output_port_net,
+    in28 => reinterpret29_output_port_net,
+    in29 => reinterpret30_output_port_net,
+    in30 => reinterpret31_output_port_net,
+    in31 => reinterpret32_output_port_net,
     y => concatenate_y_net
   );
-  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -12719,71 +13875,7 @@ begin
     input_port => bram0_douta_net,
     output_port => reinterpret1_output_port_net
   );
-  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => bram1_douta_net,
-    output_port => reinterpret2_output_port_net
-  );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => bram2_douta_net,
-    output_port => reinterpret3_output_port_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => bram3_douta_net,
-    output_port => reinterpret4_output_port_net
-  );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => bram4_douta_net,
-    output_port => reinterpret5_output_port_net
-  );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => bram5_douta_net,
-    output_port => reinterpret6_output_port_net
-  );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => bram6_douta_net,
-    output_port => reinterpret7_output_port_net
-  );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => bram7_douta_net,
-    output_port => reinterpret8_output_port_net
-  );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => bram8_douta_net,
-    output_port => reinterpret9_output_port_net
-  );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -12791,7 +13883,7 @@ begin
     input_port => bram9_douta_net,
     output_port => reinterpret10_output_port_net
   );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -12799,7 +13891,7 @@ begin
     input_port => bram10_douta_net,
     output_port => reinterpret11_output_port_net
   );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -12807,7 +13899,7 @@ begin
     input_port => bram11_douta_net,
     output_port => reinterpret12_output_port_net
   );
-  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -12815,7 +13907,7 @@ begin
     input_port => bram12_douta_net,
     output_port => reinterpret13_output_port_net
   );
-  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -12823,7 +13915,7 @@ begin
     input_port => bram13_douta_net,
     output_port => reinterpret14_output_port_net
   );
-  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -12831,13 +13923,205 @@ begin
     input_port => bram14_douta_net,
     output_port => reinterpret15_output_port_net
   );
-  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => bram15_douta_net,
     output_port => reinterpret16_output_port_net
+  );
+  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram1_douta_net,
+    output_port => reinterpret2_output_port_net
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram2_douta_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram3_douta_net,
+    output_port => reinterpret4_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram4_douta_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram5_douta_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram6_douta_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram7_douta_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram8_douta_net,
+    output_port => reinterpret9_output_port_net
+  );
+  reinterpret17 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram16_douta_net,
+    output_port => reinterpret17_output_port_net
+  );
+  reinterpret18 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram17_douta_net,
+    output_port => reinterpret18_output_port_net
+  );
+  reinterpret19 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram18_douta_net,
+    output_port => reinterpret19_output_port_net
+  );
+  reinterpret20 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram19_douta_net,
+    output_port => reinterpret20_output_port_net
+  );
+  reinterpret21 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram20_douta_net,
+    output_port => reinterpret21_output_port_net
+  );
+  reinterpret22 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram21_douta_net,
+    output_port => reinterpret22_output_port_net
+  );
+  reinterpret23 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram22_douta_net,
+    output_port => reinterpret23_output_port_net
+  );
+  reinterpret24 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram23_douta_net,
+    output_port => reinterpret24_output_port_net
+  );
+  reinterpret25 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram24_douta_net,
+    output_port => reinterpret25_output_port_net
+  );
+  reinterpret26 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram25_douta_net,
+    output_port => reinterpret26_output_port_net
+  );
+  reinterpret27 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram26_douta_net,
+    output_port => reinterpret27_output_port_net
+  );
+  reinterpret28 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram27_douta_net,
+    output_port => reinterpret28_output_port_net
+  );
+  reinterpret29 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram28_douta_net,
+    output_port => reinterpret29_output_port_net
+  );
+  reinterpret30 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram29_douta_net,
+    output_port => reinterpret30_output_port_net
+  );
+  reinterpret31 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram30_douta_net,
+    output_port => reinterpret31_output_port_net
+  );
+  reinterpret32 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => bram31_douta_net,
+    output_port => reinterpret32_output_port_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/tap_delays/debus_addra
@@ -12847,61 +14131,125 @@ library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
 entity pfb_fir_2048ch_6i_core_debus_addra is
   port (
-    bus_in : in std_logic_vector( 176-1 downto 0 );
-    msb_out16 : out std_logic_vector( 11-1 downto 0 );
-    out15 : out std_logic_vector( 11-1 downto 0 );
-    out14 : out std_logic_vector( 11-1 downto 0 );
-    out13 : out std_logic_vector( 11-1 downto 0 );
-    out12 : out std_logic_vector( 11-1 downto 0 );
-    out11 : out std_logic_vector( 11-1 downto 0 );
-    out10 : out std_logic_vector( 11-1 downto 0 );
-    out9 : out std_logic_vector( 11-1 downto 0 );
-    out8 : out std_logic_vector( 11-1 downto 0 );
-    out7 : out std_logic_vector( 11-1 downto 0 );
-    out6 : out std_logic_vector( 11-1 downto 0 );
-    out5 : out std_logic_vector( 11-1 downto 0 );
-    out4 : out std_logic_vector( 11-1 downto 0 );
-    out3 : out std_logic_vector( 11-1 downto 0 );
-    out2 : out std_logic_vector( 11-1 downto 0 );
-    lsb_out1 : out std_logic_vector( 11-1 downto 0 )
+    bus_in : in std_logic_vector( 416-1 downto 0 );
+    msb_out32 : out std_logic_vector( 13-1 downto 0 );
+    out31 : out std_logic_vector( 13-1 downto 0 );
+    out30 : out std_logic_vector( 13-1 downto 0 );
+    out29 : out std_logic_vector( 13-1 downto 0 );
+    out28 : out std_logic_vector( 13-1 downto 0 );
+    out27 : out std_logic_vector( 13-1 downto 0 );
+    out26 : out std_logic_vector( 13-1 downto 0 );
+    out25 : out std_logic_vector( 13-1 downto 0 );
+    out24 : out std_logic_vector( 13-1 downto 0 );
+    out23 : out std_logic_vector( 13-1 downto 0 );
+    out22 : out std_logic_vector( 13-1 downto 0 );
+    out21 : out std_logic_vector( 13-1 downto 0 );
+    out20 : out std_logic_vector( 13-1 downto 0 );
+    out19 : out std_logic_vector( 13-1 downto 0 );
+    out18 : out std_logic_vector( 13-1 downto 0 );
+    out17 : out std_logic_vector( 13-1 downto 0 );
+    out16 : out std_logic_vector( 13-1 downto 0 );
+    out15 : out std_logic_vector( 13-1 downto 0 );
+    out14 : out std_logic_vector( 13-1 downto 0 );
+    out13 : out std_logic_vector( 13-1 downto 0 );
+    out12 : out std_logic_vector( 13-1 downto 0 );
+    out11 : out std_logic_vector( 13-1 downto 0 );
+    out10 : out std_logic_vector( 13-1 downto 0 );
+    out9 : out std_logic_vector( 13-1 downto 0 );
+    out8 : out std_logic_vector( 13-1 downto 0 );
+    out7 : out std_logic_vector( 13-1 downto 0 );
+    out6 : out std_logic_vector( 13-1 downto 0 );
+    out5 : out std_logic_vector( 13-1 downto 0 );
+    out4 : out std_logic_vector( 13-1 downto 0 );
+    out3 : out std_logic_vector( 13-1 downto 0 );
+    out2 : out std_logic_vector( 13-1 downto 0 );
+    lsb_out1 : out std_logic_vector( 13-1 downto 0 )
   );
 end pfb_fir_2048ch_6i_core_debus_addra;
 architecture structural of pfb_fir_2048ch_6i_core_debus_addra is 
-  signal slice3_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice5_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice11_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice12_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice13_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice14_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice15_y_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret16_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal slice10_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice8_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice6_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice16_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice7_y_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 176-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal slice9_y_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret15_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret14_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret13_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 11-1 downto 0 );
+  signal reinterpret25_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret17_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice11_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret16_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice10_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice28_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice9_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice26_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret26_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 416-1 downto 0 );
+  signal reinterpret31_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice13_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret27_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice24_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret18_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice12_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice14_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice29_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice27_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret32_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice15_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret19_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret30_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret24_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret29_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice16_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice32_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret13_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret22_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret21_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret20_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret15_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret23_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice17_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice21_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice22_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice23_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice18_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice31_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice30_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice19_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice20_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret14_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret28_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice25_y_net : std_logic_vector( 13-1 downto 0 );
 begin
-  msb_out16 <= reinterpret16_output_port_net;
+  msb_out32 <= reinterpret32_output_port_net;
+  out31 <= reinterpret31_output_port_net;
+  out30 <= reinterpret30_output_port_net;
+  out29 <= reinterpret29_output_port_net;
+  out28 <= reinterpret28_output_port_net;
+  out27 <= reinterpret27_output_port_net;
+  out26 <= reinterpret26_output_port_net;
+  out25 <= reinterpret25_output_port_net;
+  out24 <= reinterpret24_output_port_net;
+  out23 <= reinterpret23_output_port_net;
+  out22 <= reinterpret22_output_port_net;
+  out21 <= reinterpret21_output_port_net;
+  out20 <= reinterpret20_output_port_net;
+  out19 <= reinterpret19_output_port_net;
+  out18 <= reinterpret18_output_port_net;
+  out17 <= reinterpret17_output_port_net;
+  out16 <= reinterpret16_output_port_net;
   out15 <= reinterpret15_output_port_net;
   out14 <= reinterpret14_output_port_net;
   out13 <= reinterpret13_output_port_net;
@@ -12918,7 +14266,7 @@ begin
   out2 <= reinterpret2_output_port_net;
   lsb_out1 <= reinterpret1_output_port_net;
   concatenate_y_net <= bus_in;
-  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -12926,162 +14274,7 @@ begin
     input_port => slice1_y_net,
     output_port => reinterpret1_output_port_net
   );
-  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice2_y_net,
-    output_port => reinterpret2_output_port_net
-  );
-  slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 0,
-    new_msb => 10,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice1_y_net
-  );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 11,
-    new_msb => 21,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice2_y_net
-  );
-  slice16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 165,
-    new_msb => 175,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice16_y_net
-  );
-  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice16_y_net,
-    output_port => reinterpret16_output_port_net
-  );
-  slice15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 154,
-    new_msb => 164,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice15_y_net
-  );
-  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice15_y_net,
-    output_port => reinterpret15_output_port_net
-  );
-  slice14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 143,
-    new_msb => 153,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice14_y_net
-  );
-  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice14_y_net,
-    output_port => reinterpret14_output_port_net
-  );
-  slice13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 132,
-    new_msb => 142,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice13_y_net
-  );
-  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice13_y_net,
-    output_port => reinterpret13_output_port_net
-  );
-  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 121,
-    new_msb => 131,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice12_y_net
-  );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice12_y_net,
-    output_port => reinterpret12_output_port_net
-  );
-  slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 110,
-    new_msb => 120,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice11_y_net
-  );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice11_y_net,
-    output_port => reinterpret11_output_port_net
-  );
-  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 99,
-    new_msb => 109,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice10_y_net
-  );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -13089,113 +14282,71 @@ begin
     input_port => slice10_y_net,
     output_port => reinterpret10_output_port_net
   );
-  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 88,
-    new_msb => 98,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice9_y_net
-  );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice9_y_net,
-    output_port => reinterpret9_output_port_net
+    input_port => slice11_y_net,
+    output_port => reinterpret11_output_port_net
   );
-  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 77,
-    new_msb => 87,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice8_y_net
-  );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice8_y_net,
-    output_port => reinterpret8_output_port_net
+    input_port => slice12_y_net,
+    output_port => reinterpret12_output_port_net
   );
-  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 66,
-    new_msb => 76,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice7_y_net
-  );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice7_y_net,
-    output_port => reinterpret7_output_port_net
+    input_port => slice13_y_net,
+    output_port => reinterpret13_output_port_net
   );
-  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 55,
-    new_msb => 65,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice6_y_net
-  );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice6_y_net,
-    output_port => reinterpret6_output_port_net
+    input_port => slice14_y_net,
+    output_port => reinterpret14_output_port_net
   );
-  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 44,
-    new_msb => 54,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice5_y_net
-  );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice5_y_net,
-    output_port => reinterpret5_output_port_net
+    input_port => slice15_y_net,
+    output_port => reinterpret15_output_port_net
   );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 33,
-    new_msb => 43,
-    x_width => 176,
-    y_width => 11
-  )
+  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
-    x => concatenate_y_net,
-    y => slice4_y_net
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice16_y_net,
+    output_port => reinterpret16_output_port_net
   );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice2_y_net,
+    output_port => reinterpret2_output_port_net
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice3_y_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -13203,24 +14354,525 @@ begin
     input_port => slice4_y_net,
     output_port => reinterpret4_output_port_net
   );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice9_y_net,
+    output_port => reinterpret9_output_port_net
+  );
+  slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 0,
+    new_msb => 12,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice1_y_net
+  );
+  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 117,
+    new_msb => 129,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice10_y_net
+  );
+  slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 130,
+    new_msb => 142,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice11_y_net
+  );
+  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 143,
+    new_msb => 155,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice12_y_net
+  );
+  slice13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 156,
+    new_msb => 168,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice13_y_net
+  );
+  slice14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 169,
+    new_msb => 181,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice14_y_net
+  );
+  slice15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 182,
+    new_msb => 194,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice15_y_net
+  );
+  slice16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 195,
+    new_msb => 207,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice16_y_net
+  );
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 13,
+    new_msb => 25,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice2_y_net
+  );
   slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 22,
-    new_msb => 32,
-    x_width => 176,
-    y_width => 11
+    new_lsb => 26,
+    new_msb => 38,
+    x_width => 416,
+    y_width => 13
   )
   port map (
     x => concatenate_y_net,
     y => slice3_y_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 39,
+    new_msb => 51,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice4_y_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 52,
+    new_msb => 64,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice5_y_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 65,
+    new_msb => 77,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice6_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 78,
+    new_msb => 90,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice7_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 91,
+    new_msb => 103,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice8_y_net
+  );
+  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 104,
+    new_msb => 116,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice9_y_net
+  );
+  slice32 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 403,
+    new_msb => 415,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice32_y_net
+  );
+  reinterpret32 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice3_y_net,
-    output_port => reinterpret3_output_port_net
+    input_port => slice32_y_net,
+    output_port => reinterpret32_output_port_net
+  );
+  slice31 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 390,
+    new_msb => 402,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice31_y_net
+  );
+  reinterpret31 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice31_y_net,
+    output_port => reinterpret31_output_port_net
+  );
+  slice30 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 377,
+    new_msb => 389,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice30_y_net
+  );
+  reinterpret30 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice30_y_net,
+    output_port => reinterpret30_output_port_net
+  );
+  slice29 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 364,
+    new_msb => 376,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice29_y_net
+  );
+  reinterpret29 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice29_y_net,
+    output_port => reinterpret29_output_port_net
+  );
+  slice28 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 351,
+    new_msb => 363,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice28_y_net
+  );
+  reinterpret28 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice28_y_net,
+    output_port => reinterpret28_output_port_net
+  );
+  slice27 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 338,
+    new_msb => 350,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice27_y_net
+  );
+  reinterpret27 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice27_y_net,
+    output_port => reinterpret27_output_port_net
+  );
+  slice26 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 325,
+    new_msb => 337,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice26_y_net
+  );
+  reinterpret26 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice26_y_net,
+    output_port => reinterpret26_output_port_net
+  );
+  slice25 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 312,
+    new_msb => 324,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice25_y_net
+  );
+  reinterpret25 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice25_y_net,
+    output_port => reinterpret25_output_port_net
+  );
+  slice24 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 299,
+    new_msb => 311,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice24_y_net
+  );
+  reinterpret24 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice24_y_net,
+    output_port => reinterpret24_output_port_net
+  );
+  slice23 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 286,
+    new_msb => 298,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice23_y_net
+  );
+  reinterpret23 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice23_y_net,
+    output_port => reinterpret23_output_port_net
+  );
+  slice22 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 273,
+    new_msb => 285,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice22_y_net
+  );
+  reinterpret22 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice22_y_net,
+    output_port => reinterpret22_output_port_net
+  );
+  slice21 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 260,
+    new_msb => 272,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice21_y_net
+  );
+  reinterpret21 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice21_y_net,
+    output_port => reinterpret21_output_port_net
+  );
+  slice20 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 247,
+    new_msb => 259,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice20_y_net
+  );
+  reinterpret20 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice20_y_net,
+    output_port => reinterpret20_output_port_net
+  );
+  slice19 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 234,
+    new_msb => 246,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice19_y_net
+  );
+  reinterpret19 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice19_y_net,
+    output_port => reinterpret19_output_port_net
+  );
+  slice18 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 221,
+    new_msb => 233,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice18_y_net
+  );
+  reinterpret18 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice18_y_net,
+    output_port => reinterpret18_output_port_net
+  );
+  slice17 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 208,
+    new_msb => 220,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice17_y_net
+  );
+  reinterpret17 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice17_y_net,
+    output_port => reinterpret17_output_port_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/tap_delays/debus_addrb
@@ -13228,63 +14880,127 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_debus_addrb_x0 is
+entity pfb_fir_2048ch_6i_core_debus_addrb is
   port (
-    bus_in : in std_logic_vector( 176-1 downto 0 );
-    msb_out16 : out std_logic_vector( 11-1 downto 0 );
-    out15 : out std_logic_vector( 11-1 downto 0 );
-    out14 : out std_logic_vector( 11-1 downto 0 );
-    out13 : out std_logic_vector( 11-1 downto 0 );
-    out12 : out std_logic_vector( 11-1 downto 0 );
-    out11 : out std_logic_vector( 11-1 downto 0 );
-    out10 : out std_logic_vector( 11-1 downto 0 );
-    out9 : out std_logic_vector( 11-1 downto 0 );
-    out8 : out std_logic_vector( 11-1 downto 0 );
-    out7 : out std_logic_vector( 11-1 downto 0 );
-    out6 : out std_logic_vector( 11-1 downto 0 );
-    out5 : out std_logic_vector( 11-1 downto 0 );
-    out4 : out std_logic_vector( 11-1 downto 0 );
-    out3 : out std_logic_vector( 11-1 downto 0 );
-    out2 : out std_logic_vector( 11-1 downto 0 );
-    lsb_out1 : out std_logic_vector( 11-1 downto 0 )
+    bus_in : in std_logic_vector( 416-1 downto 0 );
+    msb_out32 : out std_logic_vector( 13-1 downto 0 );
+    out31 : out std_logic_vector( 13-1 downto 0 );
+    out30 : out std_logic_vector( 13-1 downto 0 );
+    out29 : out std_logic_vector( 13-1 downto 0 );
+    out28 : out std_logic_vector( 13-1 downto 0 );
+    out27 : out std_logic_vector( 13-1 downto 0 );
+    out26 : out std_logic_vector( 13-1 downto 0 );
+    out25 : out std_logic_vector( 13-1 downto 0 );
+    out24 : out std_logic_vector( 13-1 downto 0 );
+    out23 : out std_logic_vector( 13-1 downto 0 );
+    out22 : out std_logic_vector( 13-1 downto 0 );
+    out21 : out std_logic_vector( 13-1 downto 0 );
+    out20 : out std_logic_vector( 13-1 downto 0 );
+    out19 : out std_logic_vector( 13-1 downto 0 );
+    out18 : out std_logic_vector( 13-1 downto 0 );
+    out17 : out std_logic_vector( 13-1 downto 0 );
+    out16 : out std_logic_vector( 13-1 downto 0 );
+    out15 : out std_logic_vector( 13-1 downto 0 );
+    out14 : out std_logic_vector( 13-1 downto 0 );
+    out13 : out std_logic_vector( 13-1 downto 0 );
+    out12 : out std_logic_vector( 13-1 downto 0 );
+    out11 : out std_logic_vector( 13-1 downto 0 );
+    out10 : out std_logic_vector( 13-1 downto 0 );
+    out9 : out std_logic_vector( 13-1 downto 0 );
+    out8 : out std_logic_vector( 13-1 downto 0 );
+    out7 : out std_logic_vector( 13-1 downto 0 );
+    out6 : out std_logic_vector( 13-1 downto 0 );
+    out5 : out std_logic_vector( 13-1 downto 0 );
+    out4 : out std_logic_vector( 13-1 downto 0 );
+    out3 : out std_logic_vector( 13-1 downto 0 );
+    out2 : out std_logic_vector( 13-1 downto 0 );
+    lsb_out1 : out std_logic_vector( 13-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_debus_addrb_x0;
-architecture structural of pfb_fir_2048ch_6i_core_debus_addrb_x0 is 
-  signal reinterpret8_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret13_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal slice14_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice12_y_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal slice13_y_net : std_logic_vector( 11-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 176-1 downto 0 );
-  signal slice9_y_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal slice16_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice5_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice7_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice11_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice8_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice10_y_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret16_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 11-1 downto 0 );
-  signal slice6_y_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret15_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret14_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal slice15_y_net : std_logic_vector( 11-1 downto 0 );
+end pfb_fir_2048ch_6i_core_debus_addrb;
+architecture structural of pfb_fir_2048ch_6i_core_debus_addrb is 
+  signal slice17_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice30_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice26_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice20_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice19_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice9_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice21_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice18_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice23_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice22_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice28_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice27_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice12_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice15_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice29_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice24_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice25_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice16_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice10_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice13_y_net : std_logic_vector( 13-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice14_y_net : std_logic_vector( 13-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 416-1 downto 0 );
+  signal slice11_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret15_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice32_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret17_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret14_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret19_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret16_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret18_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret21_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret25_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret20_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret23_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret22_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret27_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret26_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret29_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret24_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret30_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret31_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice31_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret28_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret32_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret13_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 13-1 downto 0 );
 begin
-  msb_out16 <= reinterpret16_output_port_net;
+  msb_out32 <= reinterpret32_output_port_net;
+  out31 <= reinterpret31_output_port_net;
+  out30 <= reinterpret30_output_port_net;
+  out29 <= reinterpret29_output_port_net;
+  out28 <= reinterpret28_output_port_net;
+  out27 <= reinterpret27_output_port_net;
+  out26 <= reinterpret26_output_port_net;
+  out25 <= reinterpret25_output_port_net;
+  out24 <= reinterpret24_output_port_net;
+  out23 <= reinterpret23_output_port_net;
+  out22 <= reinterpret22_output_port_net;
+  out21 <= reinterpret21_output_port_net;
+  out20 <= reinterpret20_output_port_net;
+  out19 <= reinterpret19_output_port_net;
+  out18 <= reinterpret18_output_port_net;
+  out17 <= reinterpret17_output_port_net;
+  out16 <= reinterpret16_output_port_net;
   out15 <= reinterpret15_output_port_net;
   out14 <= reinterpret14_output_port_net;
   out13 <= reinterpret13_output_port_net;
@@ -13301,7 +15017,7 @@ begin
   out2 <= reinterpret2_output_port_net;
   lsb_out1 <= reinterpret1_output_port_net;
   concatenate_y_net <= bus_in;
-  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -13309,162 +15025,7 @@ begin
     input_port => slice1_y_net,
     output_port => reinterpret1_output_port_net
   );
-  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice2_y_net,
-    output_port => reinterpret2_output_port_net
-  );
-  slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 0,
-    new_msb => 10,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice1_y_net
-  );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 11,
-    new_msb => 21,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice2_y_net
-  );
-  slice16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 165,
-    new_msb => 175,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice16_y_net
-  );
-  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice16_y_net,
-    output_port => reinterpret16_output_port_net
-  );
-  slice15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 154,
-    new_msb => 164,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice15_y_net
-  );
-  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice15_y_net,
-    output_port => reinterpret15_output_port_net
-  );
-  slice14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 143,
-    new_msb => 153,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice14_y_net
-  );
-  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice14_y_net,
-    output_port => reinterpret14_output_port_net
-  );
-  slice13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 132,
-    new_msb => 142,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice13_y_net
-  );
-  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice13_y_net,
-    output_port => reinterpret13_output_port_net
-  );
-  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 121,
-    new_msb => 131,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice12_y_net
-  );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice12_y_net,
-    output_port => reinterpret12_output_port_net
-  );
-  slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 110,
-    new_msb => 120,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice11_y_net
-  );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice11_y_net,
-    output_port => reinterpret11_output_port_net
-  );
-  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 99,
-    new_msb => 109,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice10_y_net
-  );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -13472,113 +15033,71 @@ begin
     input_port => slice10_y_net,
     output_port => reinterpret10_output_port_net
   );
-  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 88,
-    new_msb => 98,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice9_y_net
-  );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice9_y_net,
-    output_port => reinterpret9_output_port_net
+    input_port => slice11_y_net,
+    output_port => reinterpret11_output_port_net
   );
-  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 77,
-    new_msb => 87,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice8_y_net
-  );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice8_y_net,
-    output_port => reinterpret8_output_port_net
+    input_port => slice12_y_net,
+    output_port => reinterpret12_output_port_net
   );
-  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 66,
-    new_msb => 76,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice7_y_net
-  );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice7_y_net,
-    output_port => reinterpret7_output_port_net
+    input_port => slice13_y_net,
+    output_port => reinterpret13_output_port_net
   );
-  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 55,
-    new_msb => 65,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice6_y_net
-  );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice6_y_net,
-    output_port => reinterpret6_output_port_net
+    input_port => slice14_y_net,
+    output_port => reinterpret14_output_port_net
   );
-  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 44,
-    new_msb => 54,
-    x_width => 176,
-    y_width => 11
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice5_y_net
-  );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice5_y_net,
-    output_port => reinterpret5_output_port_net
+    input_port => slice15_y_net,
+    output_port => reinterpret15_output_port_net
   );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 33,
-    new_msb => 43,
-    x_width => 176,
-    y_width => 11
-  )
+  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
-    x => concatenate_y_net,
-    y => slice4_y_net
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice16_y_net,
+    output_port => reinterpret16_output_port_net
   );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice2_y_net,
+    output_port => reinterpret2_output_port_net
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice3_y_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -13586,24 +15105,525 @@ begin
     input_port => slice4_y_net,
     output_port => reinterpret4_output_port_net
   );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice9_y_net,
+    output_port => reinterpret9_output_port_net
+  );
+  slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 0,
+    new_msb => 12,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice1_y_net
+  );
+  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 117,
+    new_msb => 129,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice10_y_net
+  );
+  slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 130,
+    new_msb => 142,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice11_y_net
+  );
+  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 143,
+    new_msb => 155,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice12_y_net
+  );
+  slice13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 156,
+    new_msb => 168,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice13_y_net
+  );
+  slice14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 169,
+    new_msb => 181,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice14_y_net
+  );
+  slice15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 182,
+    new_msb => 194,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice15_y_net
+  );
+  slice16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 195,
+    new_msb => 207,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice16_y_net
+  );
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 13,
+    new_msb => 25,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice2_y_net
+  );
   slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 22,
-    new_msb => 32,
-    x_width => 176,
-    y_width => 11
+    new_lsb => 26,
+    new_msb => 38,
+    x_width => 416,
+    y_width => 13
   )
   port map (
     x => concatenate_y_net,
     y => slice3_y_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 39,
+    new_msb => 51,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice4_y_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 52,
+    new_msb => 64,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice5_y_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 65,
+    new_msb => 77,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice6_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 78,
+    new_msb => 90,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice7_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 91,
+    new_msb => 103,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice8_y_net
+  );
+  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 104,
+    new_msb => 116,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice9_y_net
+  );
+  slice32 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 403,
+    new_msb => 415,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice32_y_net
+  );
+  reinterpret32 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice3_y_net,
-    output_port => reinterpret3_output_port_net
+    input_port => slice32_y_net,
+    output_port => reinterpret32_output_port_net
+  );
+  slice31 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 390,
+    new_msb => 402,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice31_y_net
+  );
+  reinterpret31 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice31_y_net,
+    output_port => reinterpret31_output_port_net
+  );
+  slice30 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 377,
+    new_msb => 389,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice30_y_net
+  );
+  reinterpret30 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice30_y_net,
+    output_port => reinterpret30_output_port_net
+  );
+  slice29 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 364,
+    new_msb => 376,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice29_y_net
+  );
+  reinterpret29 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice29_y_net,
+    output_port => reinterpret29_output_port_net
+  );
+  slice28 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 351,
+    new_msb => 363,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice28_y_net
+  );
+  reinterpret28 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice28_y_net,
+    output_port => reinterpret28_output_port_net
+  );
+  slice27 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 338,
+    new_msb => 350,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice27_y_net
+  );
+  reinterpret27 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice27_y_net,
+    output_port => reinterpret27_output_port_net
+  );
+  slice26 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 325,
+    new_msb => 337,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice26_y_net
+  );
+  reinterpret26 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice26_y_net,
+    output_port => reinterpret26_output_port_net
+  );
+  slice25 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 312,
+    new_msb => 324,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice25_y_net
+  );
+  reinterpret25 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice25_y_net,
+    output_port => reinterpret25_output_port_net
+  );
+  slice24 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 299,
+    new_msb => 311,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice24_y_net
+  );
+  reinterpret24 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice24_y_net,
+    output_port => reinterpret24_output_port_net
+  );
+  slice23 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 286,
+    new_msb => 298,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice23_y_net
+  );
+  reinterpret23 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice23_y_net,
+    output_port => reinterpret23_output_port_net
+  );
+  slice22 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 273,
+    new_msb => 285,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice22_y_net
+  );
+  reinterpret22 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice22_y_net,
+    output_port => reinterpret22_output_port_net
+  );
+  slice21 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 260,
+    new_msb => 272,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice21_y_net
+  );
+  reinterpret21 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice21_y_net,
+    output_port => reinterpret21_output_port_net
+  );
+  slice20 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 247,
+    new_msb => 259,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice20_y_net
+  );
+  reinterpret20 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice20_y_net,
+    output_port => reinterpret20_output_port_net
+  );
+  slice19 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 234,
+    new_msb => 246,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice19_y_net
+  );
+  reinterpret19 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice19_y_net,
+    output_port => reinterpret19_output_port_net
+  );
+  slice18 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 221,
+    new_msb => 233,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice18_y_net
+  );
+  reinterpret18 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice18_y_net,
+    output_port => reinterpret18_output_port_net
+  );
+  slice17 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 208,
+    new_msb => 220,
+    x_width => 416,
+    y_width => 13
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice17_y_net
+  );
+  reinterpret17 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice17_y_net,
+    output_port => reinterpret17_output_port_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/tap_delays/debus_dina
@@ -13614,60 +15634,124 @@ use xil_defaultlib.conv_pkg.all;
 entity pfb_fir_2048ch_6i_core_debus_dina is
   port (
     bus_in : in std_logic_vector( 288-1 downto 0 );
-    msb_out16 : out std_logic_vector( 18-1 downto 0 );
-    out15 : out std_logic_vector( 18-1 downto 0 );
-    out14 : out std_logic_vector( 18-1 downto 0 );
-    out13 : out std_logic_vector( 18-1 downto 0 );
-    out12 : out std_logic_vector( 18-1 downto 0 );
-    out11 : out std_logic_vector( 18-1 downto 0 );
-    out10 : out std_logic_vector( 18-1 downto 0 );
-    out9 : out std_logic_vector( 18-1 downto 0 );
-    out8 : out std_logic_vector( 18-1 downto 0 );
-    out7 : out std_logic_vector( 18-1 downto 0 );
-    out6 : out std_logic_vector( 18-1 downto 0 );
-    out5 : out std_logic_vector( 18-1 downto 0 );
-    out4 : out std_logic_vector( 18-1 downto 0 );
-    out3 : out std_logic_vector( 18-1 downto 0 );
-    out2 : out std_logic_vector( 18-1 downto 0 );
-    lsb_out1 : out std_logic_vector( 18-1 downto 0 )
+    msb_out32 : out std_logic_vector( 9-1 downto 0 );
+    out31 : out std_logic_vector( 9-1 downto 0 );
+    out30 : out std_logic_vector( 9-1 downto 0 );
+    out29 : out std_logic_vector( 9-1 downto 0 );
+    out28 : out std_logic_vector( 9-1 downto 0 );
+    out27 : out std_logic_vector( 9-1 downto 0 );
+    out26 : out std_logic_vector( 9-1 downto 0 );
+    out25 : out std_logic_vector( 9-1 downto 0 );
+    out24 : out std_logic_vector( 9-1 downto 0 );
+    out23 : out std_logic_vector( 9-1 downto 0 );
+    out22 : out std_logic_vector( 9-1 downto 0 );
+    out21 : out std_logic_vector( 9-1 downto 0 );
+    out20 : out std_logic_vector( 9-1 downto 0 );
+    out19 : out std_logic_vector( 9-1 downto 0 );
+    out18 : out std_logic_vector( 9-1 downto 0 );
+    out17 : out std_logic_vector( 9-1 downto 0 );
+    out16 : out std_logic_vector( 9-1 downto 0 );
+    out15 : out std_logic_vector( 9-1 downto 0 );
+    out14 : out std_logic_vector( 9-1 downto 0 );
+    out13 : out std_logic_vector( 9-1 downto 0 );
+    out12 : out std_logic_vector( 9-1 downto 0 );
+    out11 : out std_logic_vector( 9-1 downto 0 );
+    out10 : out std_logic_vector( 9-1 downto 0 );
+    out9 : out std_logic_vector( 9-1 downto 0 );
+    out8 : out std_logic_vector( 9-1 downto 0 );
+    out7 : out std_logic_vector( 9-1 downto 0 );
+    out6 : out std_logic_vector( 9-1 downto 0 );
+    out5 : out std_logic_vector( 9-1 downto 0 );
+    out4 : out std_logic_vector( 9-1 downto 0 );
+    out3 : out std_logic_vector( 9-1 downto 0 );
+    out2 : out std_logic_vector( 9-1 downto 0 );
+    lsb_out1 : out std_logic_vector( 9-1 downto 0 )
   );
 end pfb_fir_2048ch_6i_core_debus_dina;
 architecture structural of pfb_fir_2048ch_6i_core_debus_dina is 
-  signal slice13_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret24_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice28_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice26_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice18_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice16_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret16_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret30_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice15_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret17_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice10_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice9_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret32_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret18_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret22_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret31_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice17_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice11_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice27_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret23_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret21_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice32_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice24_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice25_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret25_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret28_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret27_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret26_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice23_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice29_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice30_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice31_y_net : std_logic_vector( 9-1 downto 0 );
   signal ddina_q_net : std_logic_vector( 288-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice8_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret15_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice10_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret14_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret13_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice9_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice15_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice16_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice14_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice5_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice6_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice12_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice7_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice11_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret16_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal slice19_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret13_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice20_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice21_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice22_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret29_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret20_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice14_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice13_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice12_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret14_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret15_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret19_output_port_net : std_logic_vector( 9-1 downto 0 );
 begin
-  msb_out16 <= reinterpret16_output_port_net;
+  msb_out32 <= reinterpret32_output_port_net;
+  out31 <= reinterpret31_output_port_net;
+  out30 <= reinterpret30_output_port_net;
+  out29 <= reinterpret29_output_port_net;
+  out28 <= reinterpret28_output_port_net;
+  out27 <= reinterpret27_output_port_net;
+  out26 <= reinterpret26_output_port_net;
+  out25 <= reinterpret25_output_port_net;
+  out24 <= reinterpret24_output_port_net;
+  out23 <= reinterpret23_output_port_net;
+  out22 <= reinterpret22_output_port_net;
+  out21 <= reinterpret21_output_port_net;
+  out20 <= reinterpret20_output_port_net;
+  out19 <= reinterpret19_output_port_net;
+  out18 <= reinterpret18_output_port_net;
+  out17 <= reinterpret17_output_port_net;
+  out16 <= reinterpret16_output_port_net;
   out15 <= reinterpret15_output_port_net;
   out14 <= reinterpret14_output_port_net;
   out13 <= reinterpret13_output_port_net;
@@ -13684,7 +15768,7 @@ begin
   out2 <= reinterpret2_output_port_net;
   lsb_out1 <= reinterpret1_output_port_net;
   ddina_q_net <= bus_in;
-  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -13692,162 +15776,7 @@ begin
     input_port => slice1_y_net,
     output_port => reinterpret1_output_port_net
   );
-  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice2_y_net,
-    output_port => reinterpret2_output_port_net
-  );
-  slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 0,
-    new_msb => 17,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice1_y_net
-  );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 18,
-    new_msb => 35,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice2_y_net
-  );
-  slice16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 270,
-    new_msb => 287,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice16_y_net
-  );
-  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice16_y_net,
-    output_port => reinterpret16_output_port_net
-  );
-  slice15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 252,
-    new_msb => 269,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice15_y_net
-  );
-  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice15_y_net,
-    output_port => reinterpret15_output_port_net
-  );
-  slice14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 234,
-    new_msb => 251,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice14_y_net
-  );
-  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice14_y_net,
-    output_port => reinterpret14_output_port_net
-  );
-  slice13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 216,
-    new_msb => 233,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice13_y_net
-  );
-  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice13_y_net,
-    output_port => reinterpret13_output_port_net
-  );
-  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 198,
-    new_msb => 215,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice12_y_net
-  );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice12_y_net,
-    output_port => reinterpret12_output_port_net
-  );
-  slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 180,
-    new_msb => 197,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice11_y_net
-  );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice11_y_net,
-    output_port => reinterpret11_output_port_net
-  );
-  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 162,
-    new_msb => 179,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice10_y_net
-  );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -13855,132 +15784,63 @@ begin
     input_port => slice10_y_net,
     output_port => reinterpret10_output_port_net
   );
-  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 144,
-    new_msb => 161,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice9_y_net
-  );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice9_y_net,
-    output_port => reinterpret9_output_port_net
+    input_port => slice11_y_net,
+    output_port => reinterpret11_output_port_net
   );
-  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 126,
-    new_msb => 143,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice8_y_net
-  );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice8_y_net,
-    output_port => reinterpret8_output_port_net
+    input_port => slice12_y_net,
+    output_port => reinterpret12_output_port_net
   );
-  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 108,
-    new_msb => 125,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice7_y_net
-  );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice7_y_net,
-    output_port => reinterpret7_output_port_net
+    input_port => slice13_y_net,
+    output_port => reinterpret13_output_port_net
   );
-  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 90,
-    new_msb => 107,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice6_y_net
-  );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice6_y_net,
-    output_port => reinterpret6_output_port_net
+    input_port => slice14_y_net,
+    output_port => reinterpret14_output_port_net
   );
-  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 72,
-    new_msb => 89,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice5_y_net
-  );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice5_y_net,
-    output_port => reinterpret5_output_port_net
+    input_port => slice15_y_net,
+    output_port => reinterpret15_output_port_net
   );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 54,
-    new_msb => 71,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddina_q_net,
-    y => slice4_y_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice4_y_net,
-    output_port => reinterpret4_output_port_net
+    input_port => slice16_y_net,
+    output_port => reinterpret16_output_port_net
   );
-  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 36,
-    new_msb => 53,
-    x_width => 288,
-    y_width => 18
-  )
+  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
-    x => ddina_q_net,
-    y => slice3_y_net
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice2_y_net,
+    output_port => reinterpret2_output_port_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -13988,69 +15848,661 @@ begin
     input_port => slice3_y_net,
     output_port => reinterpret3_output_port_net
   );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice4_y_net,
+    output_port => reinterpret4_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice9_y_net,
+    output_port => reinterpret9_output_port_net
+  );
+  slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 0,
+    new_msb => 8,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice1_y_net
+  );
+  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 81,
+    new_msb => 89,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice10_y_net
+  );
+  slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 90,
+    new_msb => 98,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice11_y_net
+  );
+  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 99,
+    new_msb => 107,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice12_y_net
+  );
+  slice13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 108,
+    new_msb => 116,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice13_y_net
+  );
+  slice14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 117,
+    new_msb => 125,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice14_y_net
+  );
+  slice15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 126,
+    new_msb => 134,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice15_y_net
+  );
+  slice16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 135,
+    new_msb => 143,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice16_y_net
+  );
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 9,
+    new_msb => 17,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice2_y_net
+  );
+  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 18,
+    new_msb => 26,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice3_y_net
+  );
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 27,
+    new_msb => 35,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice4_y_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 36,
+    new_msb => 44,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice5_y_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 45,
+    new_msb => 53,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice6_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 54,
+    new_msb => 62,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice7_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 63,
+    new_msb => 71,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice8_y_net
+  );
+  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 72,
+    new_msb => 80,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice9_y_net
+  );
+  slice32 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 279,
+    new_msb => 287,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice32_y_net
+  );
+  reinterpret32 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice32_y_net,
+    output_port => reinterpret32_output_port_net
+  );
+  slice31 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 270,
+    new_msb => 278,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice31_y_net
+  );
+  reinterpret31 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice31_y_net,
+    output_port => reinterpret31_output_port_net
+  );
+  slice30 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 261,
+    new_msb => 269,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice30_y_net
+  );
+  reinterpret30 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice30_y_net,
+    output_port => reinterpret30_output_port_net
+  );
+  slice29 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 252,
+    new_msb => 260,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice29_y_net
+  );
+  reinterpret29 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice29_y_net,
+    output_port => reinterpret29_output_port_net
+  );
+  slice28 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 243,
+    new_msb => 251,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice28_y_net
+  );
+  reinterpret28 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice28_y_net,
+    output_port => reinterpret28_output_port_net
+  );
+  slice27 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 234,
+    new_msb => 242,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice27_y_net
+  );
+  reinterpret27 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice27_y_net,
+    output_port => reinterpret27_output_port_net
+  );
+  slice26 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 225,
+    new_msb => 233,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice26_y_net
+  );
+  reinterpret26 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice26_y_net,
+    output_port => reinterpret26_output_port_net
+  );
+  slice25 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 216,
+    new_msb => 224,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice25_y_net
+  );
+  reinterpret25 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice25_y_net,
+    output_port => reinterpret25_output_port_net
+  );
+  slice24 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 207,
+    new_msb => 215,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice24_y_net
+  );
+  reinterpret24 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice24_y_net,
+    output_port => reinterpret24_output_port_net
+  );
+  slice23 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 198,
+    new_msb => 206,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice23_y_net
+  );
+  reinterpret23 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice23_y_net,
+    output_port => reinterpret23_output_port_net
+  );
+  slice22 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 189,
+    new_msb => 197,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice22_y_net
+  );
+  reinterpret22 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice22_y_net,
+    output_port => reinterpret22_output_port_net
+  );
+  slice21 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 180,
+    new_msb => 188,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice21_y_net
+  );
+  reinterpret21 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice21_y_net,
+    output_port => reinterpret21_output_port_net
+  );
+  slice20 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 171,
+    new_msb => 179,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice20_y_net
+  );
+  reinterpret20 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice20_y_net,
+    output_port => reinterpret20_output_port_net
+  );
+  slice19 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 162,
+    new_msb => 170,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice19_y_net
+  );
+  reinterpret19 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice19_y_net,
+    output_port => reinterpret19_output_port_net
+  );
+  slice18 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 153,
+    new_msb => 161,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice18_y_net
+  );
+  reinterpret18 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice18_y_net,
+    output_port => reinterpret18_output_port_net
+  );
+  slice17 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 144,
+    new_msb => 152,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddina_q_net,
+    y => slice17_y_net
+  );
+  reinterpret17 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice17_y_net,
+    output_port => reinterpret17_output_port_net
+  );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/tap_delays/debus_dinb
 library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_debus_dinb_x0 is
+entity pfb_fir_2048ch_6i_core_debus_dinb is
   port (
     bus_in : in std_logic_vector( 288-1 downto 0 );
-    msb_out16 : out std_logic_vector( 18-1 downto 0 );
-    out15 : out std_logic_vector( 18-1 downto 0 );
-    out14 : out std_logic_vector( 18-1 downto 0 );
-    out13 : out std_logic_vector( 18-1 downto 0 );
-    out12 : out std_logic_vector( 18-1 downto 0 );
-    out11 : out std_logic_vector( 18-1 downto 0 );
-    out10 : out std_logic_vector( 18-1 downto 0 );
-    out9 : out std_logic_vector( 18-1 downto 0 );
-    out8 : out std_logic_vector( 18-1 downto 0 );
-    out7 : out std_logic_vector( 18-1 downto 0 );
-    out6 : out std_logic_vector( 18-1 downto 0 );
-    out5 : out std_logic_vector( 18-1 downto 0 );
-    out4 : out std_logic_vector( 18-1 downto 0 );
-    out3 : out std_logic_vector( 18-1 downto 0 );
-    out2 : out std_logic_vector( 18-1 downto 0 );
-    lsb_out1 : out std_logic_vector( 18-1 downto 0 )
+    msb_out32 : out std_logic_vector( 9-1 downto 0 );
+    out31 : out std_logic_vector( 9-1 downto 0 );
+    out30 : out std_logic_vector( 9-1 downto 0 );
+    out29 : out std_logic_vector( 9-1 downto 0 );
+    out28 : out std_logic_vector( 9-1 downto 0 );
+    out27 : out std_logic_vector( 9-1 downto 0 );
+    out26 : out std_logic_vector( 9-1 downto 0 );
+    out25 : out std_logic_vector( 9-1 downto 0 );
+    out24 : out std_logic_vector( 9-1 downto 0 );
+    out23 : out std_logic_vector( 9-1 downto 0 );
+    out22 : out std_logic_vector( 9-1 downto 0 );
+    out21 : out std_logic_vector( 9-1 downto 0 );
+    out20 : out std_logic_vector( 9-1 downto 0 );
+    out19 : out std_logic_vector( 9-1 downto 0 );
+    out18 : out std_logic_vector( 9-1 downto 0 );
+    out17 : out std_logic_vector( 9-1 downto 0 );
+    out16 : out std_logic_vector( 9-1 downto 0 );
+    out15 : out std_logic_vector( 9-1 downto 0 );
+    out14 : out std_logic_vector( 9-1 downto 0 );
+    out13 : out std_logic_vector( 9-1 downto 0 );
+    out12 : out std_logic_vector( 9-1 downto 0 );
+    out11 : out std_logic_vector( 9-1 downto 0 );
+    out10 : out std_logic_vector( 9-1 downto 0 );
+    out9 : out std_logic_vector( 9-1 downto 0 );
+    out8 : out std_logic_vector( 9-1 downto 0 );
+    out7 : out std_logic_vector( 9-1 downto 0 );
+    out6 : out std_logic_vector( 9-1 downto 0 );
+    out5 : out std_logic_vector( 9-1 downto 0 );
+    out4 : out std_logic_vector( 9-1 downto 0 );
+    out3 : out std_logic_vector( 9-1 downto 0 );
+    out2 : out std_logic_vector( 9-1 downto 0 );
+    lsb_out1 : out std_logic_vector( 9-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_debus_dinb_x0;
-architecture structural of pfb_fir_2048ch_6i_core_debus_dinb_x0 is 
-  signal slice7_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret15_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret14_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret13_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret16_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice8_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice10_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice9_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice6_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice15_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice12_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice16_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice5_y_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
+end pfb_fir_2048ch_6i_core_debus_dinb;
+architecture structural of pfb_fir_2048ch_6i_core_debus_dinb is 
+  signal reinterpret21_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret24_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret32_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret30_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret31_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret16_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret18_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret14_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret23_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret22_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice31_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice18_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice23_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice19_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret17_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice17_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice20_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice24_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret19_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret20_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice16_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret13_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret15_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret27_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret26_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret28_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret29_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret25_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice11_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice15_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice9_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 9-1 downto 0 );
   signal ddinb_q_net : std_logic_vector( 288-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice11_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice14_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice13_y_net : std_logic_vector( 18-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice26_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice27_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice28_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice22_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice21_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice29_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice30_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice13_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice32_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice25_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice10_y_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice14_y_net : std_logic_vector( 9-1 downto 0 );
+  signal slice12_y_net : std_logic_vector( 9-1 downto 0 );
 begin
-  msb_out16 <= reinterpret16_output_port_net;
+  msb_out32 <= reinterpret32_output_port_net;
+  out31 <= reinterpret31_output_port_net;
+  out30 <= reinterpret30_output_port_net;
+  out29 <= reinterpret29_output_port_net;
+  out28 <= reinterpret28_output_port_net;
+  out27 <= reinterpret27_output_port_net;
+  out26 <= reinterpret26_output_port_net;
+  out25 <= reinterpret25_output_port_net;
+  out24 <= reinterpret24_output_port_net;
+  out23 <= reinterpret23_output_port_net;
+  out22 <= reinterpret22_output_port_net;
+  out21 <= reinterpret21_output_port_net;
+  out20 <= reinterpret20_output_port_net;
+  out19 <= reinterpret19_output_port_net;
+  out18 <= reinterpret18_output_port_net;
+  out17 <= reinterpret17_output_port_net;
+  out16 <= reinterpret16_output_port_net;
   out15 <= reinterpret15_output_port_net;
   out14 <= reinterpret14_output_port_net;
   out13 <= reinterpret13_output_port_net;
@@ -14067,7 +16519,7 @@ begin
   out2 <= reinterpret2_output_port_net;
   lsb_out1 <= reinterpret1_output_port_net;
   ddinb_q_net <= bus_in;
-  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -14075,162 +16527,7 @@ begin
     input_port => slice1_y_net,
     output_port => reinterpret1_output_port_net
   );
-  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice2_y_net,
-    output_port => reinterpret2_output_port_net
-  );
-  slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 0,
-    new_msb => 17,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice1_y_net
-  );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 18,
-    new_msb => 35,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice2_y_net
-  );
-  slice16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 270,
-    new_msb => 287,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice16_y_net
-  );
-  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice16_y_net,
-    output_port => reinterpret16_output_port_net
-  );
-  slice15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 252,
-    new_msb => 269,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice15_y_net
-  );
-  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice15_y_net,
-    output_port => reinterpret15_output_port_net
-  );
-  slice14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 234,
-    new_msb => 251,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice14_y_net
-  );
-  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice14_y_net,
-    output_port => reinterpret14_output_port_net
-  );
-  slice13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 216,
-    new_msb => 233,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice13_y_net
-  );
-  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice13_y_net,
-    output_port => reinterpret13_output_port_net
-  );
-  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 198,
-    new_msb => 215,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice12_y_net
-  );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice12_y_net,
-    output_port => reinterpret12_output_port_net
-  );
-  slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 180,
-    new_msb => 197,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice11_y_net
-  );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice11_y_net,
-    output_port => reinterpret11_output_port_net
-  );
-  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 162,
-    new_msb => 179,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice10_y_net
-  );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -14238,132 +16535,63 @@ begin
     input_port => slice10_y_net,
     output_port => reinterpret10_output_port_net
   );
-  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 144,
-    new_msb => 161,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice9_y_net
-  );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice9_y_net,
-    output_port => reinterpret9_output_port_net
+    input_port => slice11_y_net,
+    output_port => reinterpret11_output_port_net
   );
-  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 126,
-    new_msb => 143,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice8_y_net
-  );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice8_y_net,
-    output_port => reinterpret8_output_port_net
+    input_port => slice12_y_net,
+    output_port => reinterpret12_output_port_net
   );
-  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 108,
-    new_msb => 125,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice7_y_net
-  );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice7_y_net,
-    output_port => reinterpret7_output_port_net
+    input_port => slice13_y_net,
+    output_port => reinterpret13_output_port_net
   );
-  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 90,
-    new_msb => 107,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice6_y_net
-  );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice6_y_net,
-    output_port => reinterpret6_output_port_net
+    input_port => slice14_y_net,
+    output_port => reinterpret14_output_port_net
   );
-  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 72,
-    new_msb => 89,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice5_y_net
-  );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice5_y_net,
-    output_port => reinterpret5_output_port_net
+    input_port => slice15_y_net,
+    output_port => reinterpret15_output_port_net
   );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 54,
-    new_msb => 71,
-    x_width => 288,
-    y_width => 18
-  )
-  port map (
-    x => ddinb_q_net,
-    y => slice4_y_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => slice4_y_net,
-    output_port => reinterpret4_output_port_net
+    input_port => slice16_y_net,
+    output_port => reinterpret16_output_port_net
   );
-  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 36,
-    new_msb => 53,
-    x_width => 288,
-    y_width => 18
-  )
+  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
-    x => ddinb_q_net,
-    y => slice3_y_net
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice2_y_net,
+    output_port => reinterpret2_output_port_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_01d3c44b66 
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
   port map (
     clk => '0',
     ce => '0',
@@ -14371,16 +16599,560 @@ begin
     input_port => slice3_y_net,
     output_port => reinterpret3_output_port_net
   );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice4_y_net,
+    output_port => reinterpret4_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice5_y_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice6_y_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice7_y_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice8_y_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice9_y_net,
+    output_port => reinterpret9_output_port_net
+  );
+  slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 0,
+    new_msb => 8,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice1_y_net
+  );
+  slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 81,
+    new_msb => 89,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice10_y_net
+  );
+  slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 90,
+    new_msb => 98,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice11_y_net
+  );
+  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 99,
+    new_msb => 107,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice12_y_net
+  );
+  slice13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 108,
+    new_msb => 116,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice13_y_net
+  );
+  slice14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 117,
+    new_msb => 125,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice14_y_net
+  );
+  slice15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 126,
+    new_msb => 134,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice15_y_net
+  );
+  slice16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 135,
+    new_msb => 143,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice16_y_net
+  );
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 9,
+    new_msb => 17,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice2_y_net
+  );
+  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 18,
+    new_msb => 26,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice3_y_net
+  );
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 27,
+    new_msb => 35,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice4_y_net
+  );
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 36,
+    new_msb => 44,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice5_y_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 45,
+    new_msb => 53,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice6_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 54,
+    new_msb => 62,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice7_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 63,
+    new_msb => 71,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice8_y_net
+  );
+  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 72,
+    new_msb => 80,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice9_y_net
+  );
+  slice32 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 279,
+    new_msb => 287,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice32_y_net
+  );
+  reinterpret32 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice32_y_net,
+    output_port => reinterpret32_output_port_net
+  );
+  slice31 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 270,
+    new_msb => 278,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice31_y_net
+  );
+  reinterpret31 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice31_y_net,
+    output_port => reinterpret31_output_port_net
+  );
+  slice30 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 261,
+    new_msb => 269,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice30_y_net
+  );
+  reinterpret30 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice30_y_net,
+    output_port => reinterpret30_output_port_net
+  );
+  slice29 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 252,
+    new_msb => 260,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice29_y_net
+  );
+  reinterpret29 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice29_y_net,
+    output_port => reinterpret29_output_port_net
+  );
+  slice28 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 243,
+    new_msb => 251,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice28_y_net
+  );
+  reinterpret28 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice28_y_net,
+    output_port => reinterpret28_output_port_net
+  );
+  slice27 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 234,
+    new_msb => 242,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice27_y_net
+  );
+  reinterpret27 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice27_y_net,
+    output_port => reinterpret27_output_port_net
+  );
+  slice26 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 225,
+    new_msb => 233,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice26_y_net
+  );
+  reinterpret26 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice26_y_net,
+    output_port => reinterpret26_output_port_net
+  );
+  slice25 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 216,
+    new_msb => 224,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice25_y_net
+  );
+  reinterpret25 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice25_y_net,
+    output_port => reinterpret25_output_port_net
+  );
+  slice24 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 207,
+    new_msb => 215,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice24_y_net
+  );
+  reinterpret24 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice24_y_net,
+    output_port => reinterpret24_output_port_net
+  );
+  slice23 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 198,
+    new_msb => 206,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice23_y_net
+  );
+  reinterpret23 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice23_y_net,
+    output_port => reinterpret23_output_port_net
+  );
+  slice22 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 189,
+    new_msb => 197,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice22_y_net
+  );
+  reinterpret22 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice22_y_net,
+    output_port => reinterpret22_output_port_net
+  );
+  slice21 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 180,
+    new_msb => 188,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice21_y_net
+  );
+  reinterpret21 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice21_y_net,
+    output_port => reinterpret21_output_port_net
+  );
+  slice20 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 171,
+    new_msb => 179,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice20_y_net
+  );
+  reinterpret20 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice20_y_net,
+    output_port => reinterpret20_output_port_net
+  );
+  slice19 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 162,
+    new_msb => 170,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice19_y_net
+  );
+  reinterpret19 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice19_y_net,
+    output_port => reinterpret19_output_port_net
+  );
+  slice18 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 153,
+    new_msb => 161,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice18_y_net
+  );
+  reinterpret18 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice18_y_net,
+    output_port => reinterpret18_output_port_net
+  );
+  slice17 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 144,
+    new_msb => 152,
+    x_width => 288,
+    y_width => 9
+  )
+  port map (
+    x => ddinb_q_net,
+    y => slice17_y_net
+  );
+  reinterpret17 : entity xil_defaultlib.sysgen_reinterpret_c7e4f57a1a 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice17_y_net,
+    output_port => reinterpret17_output_port_net
+  );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/tap_delays/debus_wea
 library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_debus_wea_x0 is
+entity pfb_fir_2048ch_6i_core_debus_wea is
   port (
-    bus_in : in std_logic_vector( 16-1 downto 0 );
-    msb_out16 : out std_logic_vector( 1-1 downto 0 );
+    bus_in : in std_logic_vector( 32-1 downto 0 );
+    msb_out32 : out std_logic_vector( 1-1 downto 0 );
+    out31 : out std_logic_vector( 1-1 downto 0 );
+    out30 : out std_logic_vector( 1-1 downto 0 );
+    out29 : out std_logic_vector( 1-1 downto 0 );
+    out28 : out std_logic_vector( 1-1 downto 0 );
+    out27 : out std_logic_vector( 1-1 downto 0 );
+    out26 : out std_logic_vector( 1-1 downto 0 );
+    out25 : out std_logic_vector( 1-1 downto 0 );
+    out24 : out std_logic_vector( 1-1 downto 0 );
+    out23 : out std_logic_vector( 1-1 downto 0 );
+    out22 : out std_logic_vector( 1-1 downto 0 );
+    out21 : out std_logic_vector( 1-1 downto 0 );
+    out20 : out std_logic_vector( 1-1 downto 0 );
+    out19 : out std_logic_vector( 1-1 downto 0 );
+    out18 : out std_logic_vector( 1-1 downto 0 );
+    out17 : out std_logic_vector( 1-1 downto 0 );
+    out16 : out std_logic_vector( 1-1 downto 0 );
     out15 : out std_logic_vector( 1-1 downto 0 );
     out14 : out std_logic_vector( 1-1 downto 0 );
     out13 : out std_logic_vector( 1-1 downto 0 );
@@ -14397,27 +17169,59 @@ entity pfb_fir_2048ch_6i_core_debus_wea_x0 is
     out2 : out std_logic_vector( 1-1 downto 0 );
     lsb_out1 : out std_logic_vector( 1-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_debus_wea_x0;
-architecture structural of pfb_fir_2048ch_6i_core_debus_wea_x0 is 
-  signal slice2_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 1-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 16-1 downto 0 );
-  signal slice13_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice12_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice11_y_net : std_logic_vector( 1-1 downto 0 );
+end pfb_fir_2048ch_6i_core_debus_wea;
+architecture structural of pfb_fir_2048ch_6i_core_debus_wea is 
   signal slice10_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice9_y_net : std_logic_vector( 1-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 32-1 downto 0 );
+  signal slice12_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice18_y_net : std_logic_vector( 1-1 downto 0 );
   signal slice16_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice15_y_net : std_logic_vector( 1-1 downto 0 );
   signal slice14_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice5_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 1-1 downto 0 );
   signal slice4_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice8_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice21_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice23_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice11_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice13_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice25_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice27_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice29_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice15_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice17_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice32_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 1-1 downto 0 );
   signal slice7_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice30_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice9_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice31_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice28_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice22_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice24_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice26_y_net : std_logic_vector( 1-1 downto 0 );
   signal slice6_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice20_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice19_y_net : std_logic_vector( 1-1 downto 0 );
 begin
-  msb_out16 <= slice16_y_net;
+  msb_out32 <= slice32_y_net;
+  out31 <= slice31_y_net;
+  out30 <= slice30_y_net;
+  out29 <= slice29_y_net;
+  out28 <= slice28_y_net;
+  out27 <= slice27_y_net;
+  out26 <= slice26_y_net;
+  out25 <= slice25_y_net;
+  out24 <= slice24_y_net;
+  out23 <= slice23_y_net;
+  out22 <= slice22_y_net;
+  out21 <= slice21_y_net;
+  out20 <= slice20_y_net;
+  out19 <= slice19_y_net;
+  out18 <= slice18_y_net;
+  out17 <= slice17_y_net;
+  out16 <= slice16_y_net;
   out15 <= slice15_y_net;
   out14 <= slice14_y_net;
   out13 <= slice13_y_net;
@@ -14438,177 +17242,353 @@ begin
   generic map (
     new_lsb => 0,
     new_msb => 0,
-    x_width => 16,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
     y => slice1_y_net
   );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 1,
-    new_msb => 1,
-    x_width => 16,
-    y_width => 1
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice2_y_net
-  );
-  slice16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 15,
-    new_msb => 15,
-    x_width => 16,
-    y_width => 1
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice16_y_net
-  );
-  slice15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 14,
-    new_msb => 14,
-    x_width => 16,
-    y_width => 1
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice15_y_net
-  );
-  slice14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 13,
-    new_msb => 13,
-    x_width => 16,
-    y_width => 1
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice14_y_net
-  );
-  slice13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 12,
-    new_msb => 12,
-    x_width => 16,
-    y_width => 1
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice13_y_net
-  );
-  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 11,
-    new_msb => 11,
-    x_width => 16,
-    y_width => 1
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice12_y_net
-  );
-  slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 10,
-    new_msb => 10,
-    x_width => 16,
-    y_width => 1
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice11_y_net
-  );
   slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
     new_lsb => 9,
     new_msb => 9,
-    x_width => 16,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
     y => slice10_y_net
   );
-  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 8,
-    new_msb => 8,
-    x_width => 16,
+    new_lsb => 10,
+    new_msb => 10,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
-    y => slice9_y_net
+    y => slice11_y_net
   );
-  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 7,
-    new_msb => 7,
-    x_width => 16,
+    new_lsb => 11,
+    new_msb => 11,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
-    y => slice8_y_net
+    y => slice12_y_net
   );
-  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 6,
-    new_msb => 6,
-    x_width => 16,
+    new_lsb => 12,
+    new_msb => 12,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
-    y => slice7_y_net
+    y => slice13_y_net
   );
-  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 5,
-    new_msb => 5,
-    x_width => 16,
+    new_lsb => 13,
+    new_msb => 13,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
-    y => slice6_y_net
+    y => slice14_y_net
   );
-  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 4,
-    new_msb => 4,
-    x_width => 16,
+    new_lsb => 14,
+    new_msb => 14,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
-    y => slice5_y_net
+    y => slice15_y_net
+  );
+  slice16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 15,
+    new_msb => 15,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice16_y_net
+  );
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 1,
+    new_msb => 1,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice2_y_net
+  );
+  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 2,
+    new_msb => 2,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice3_y_net
   );
   slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
     new_lsb => 3,
     new_msb => 3,
-    x_width => 16,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
     y => slice4_y_net
   );
-  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 2,
-    new_msb => 2,
-    x_width => 16,
+    new_lsb => 4,
+    new_msb => 4,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
-    y => slice3_y_net
+    y => slice5_y_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 5,
+    new_msb => 5,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice6_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 6,
+    new_msb => 6,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice7_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 7,
+    new_msb => 7,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice8_y_net
+  );
+  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 8,
+    new_msb => 8,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice9_y_net
+  );
+  slice32 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 31,
+    new_msb => 31,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice32_y_net
+  );
+  slice31 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 30,
+    new_msb => 30,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice31_y_net
+  );
+  slice30 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 29,
+    new_msb => 29,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice30_y_net
+  );
+  slice29 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 28,
+    new_msb => 28,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice29_y_net
+  );
+  slice28 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 27,
+    new_msb => 27,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice28_y_net
+  );
+  slice27 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 26,
+    new_msb => 26,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice27_y_net
+  );
+  slice26 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 25,
+    new_msb => 25,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice26_y_net
+  );
+  slice25 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 24,
+    new_msb => 24,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice25_y_net
+  );
+  slice24 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 23,
+    new_msb => 23,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice24_y_net
+  );
+  slice23 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 22,
+    new_msb => 22,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice23_y_net
+  );
+  slice22 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 21,
+    new_msb => 21,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice22_y_net
+  );
+  slice21 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 20,
+    new_msb => 20,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice21_y_net
+  );
+  slice20 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 19,
+    new_msb => 19,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice20_y_net
+  );
+  slice19 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 18,
+    new_msb => 18,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice19_y_net
+  );
+  slice18 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 17,
+    new_msb => 17,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice18_y_net
+  );
+  slice17 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 16,
+    new_msb => 16,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice17_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/tap_delays/debus_web
@@ -14616,10 +17596,26 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_debus_web_x0 is
+entity pfb_fir_2048ch_6i_core_debus_web is
   port (
-    bus_in : in std_logic_vector( 16-1 downto 0 );
-    msb_out16 : out std_logic_vector( 1-1 downto 0 );
+    bus_in : in std_logic_vector( 32-1 downto 0 );
+    msb_out32 : out std_logic_vector( 1-1 downto 0 );
+    out31 : out std_logic_vector( 1-1 downto 0 );
+    out30 : out std_logic_vector( 1-1 downto 0 );
+    out29 : out std_logic_vector( 1-1 downto 0 );
+    out28 : out std_logic_vector( 1-1 downto 0 );
+    out27 : out std_logic_vector( 1-1 downto 0 );
+    out26 : out std_logic_vector( 1-1 downto 0 );
+    out25 : out std_logic_vector( 1-1 downto 0 );
+    out24 : out std_logic_vector( 1-1 downto 0 );
+    out23 : out std_logic_vector( 1-1 downto 0 );
+    out22 : out std_logic_vector( 1-1 downto 0 );
+    out21 : out std_logic_vector( 1-1 downto 0 );
+    out20 : out std_logic_vector( 1-1 downto 0 );
+    out19 : out std_logic_vector( 1-1 downto 0 );
+    out18 : out std_logic_vector( 1-1 downto 0 );
+    out17 : out std_logic_vector( 1-1 downto 0 );
+    out16 : out std_logic_vector( 1-1 downto 0 );
     out15 : out std_logic_vector( 1-1 downto 0 );
     out14 : out std_logic_vector( 1-1 downto 0 );
     out13 : out std_logic_vector( 1-1 downto 0 );
@@ -14636,27 +17632,59 @@ entity pfb_fir_2048ch_6i_core_debus_web_x0 is
     out2 : out std_logic_vector( 1-1 downto 0 );
     lsb_out1 : out std_logic_vector( 1-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_debus_web_x0;
-architecture structural of pfb_fir_2048ch_6i_core_debus_web_x0 is 
-  signal concatenate_y_net : std_logic_vector( 16-1 downto 0 );
-  signal slice11_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice10_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice9_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice8_y_net : std_logic_vector( 1-1 downto 0 );
+end pfb_fir_2048ch_6i_core_debus_web;
+architecture structural of pfb_fir_2048ch_6i_core_debus_web is 
   signal slice7_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice14_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice11_y_net : std_logic_vector( 1-1 downto 0 );
   signal slice13_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice12_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice6_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice5_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice16_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice15_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice9_y_net : std_logic_vector( 1-1 downto 0 );
   signal slice3_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice30_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice25_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice23_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice21_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice32_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice28_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice19_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice15_y_net : std_logic_vector( 1-1 downto 0 );
   signal slice1_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice17_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice31_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice29_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice24_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice22_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice20_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice18_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice16_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice14_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice12_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice10_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 1-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 32-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice27_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice26_y_net : std_logic_vector( 1-1 downto 0 );
 begin
-  msb_out16 <= slice16_y_net;
+  msb_out32 <= slice32_y_net;
+  out31 <= slice31_y_net;
+  out30 <= slice30_y_net;
+  out29 <= slice29_y_net;
+  out28 <= slice28_y_net;
+  out27 <= slice27_y_net;
+  out26 <= slice26_y_net;
+  out25 <= slice25_y_net;
+  out24 <= slice24_y_net;
+  out23 <= slice23_y_net;
+  out22 <= slice22_y_net;
+  out21 <= slice21_y_net;
+  out20 <= slice20_y_net;
+  out19 <= slice19_y_net;
+  out18 <= slice18_y_net;
+  out17 <= slice17_y_net;
+  out16 <= slice16_y_net;
   out15 <= slice15_y_net;
   out14 <= slice14_y_net;
   out13 <= slice13_y_net;
@@ -14677,177 +17705,353 @@ begin
   generic map (
     new_lsb => 0,
     new_msb => 0,
-    x_width => 16,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
     y => slice1_y_net
   );
-  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 1,
-    new_msb => 1,
-    x_width => 16,
-    y_width => 1
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice2_y_net
-  );
-  slice16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 15,
-    new_msb => 15,
-    x_width => 16,
-    y_width => 1
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice16_y_net
-  );
-  slice15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 14,
-    new_msb => 14,
-    x_width => 16,
-    y_width => 1
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice15_y_net
-  );
-  slice14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 13,
-    new_msb => 13,
-    x_width => 16,
-    y_width => 1
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice14_y_net
-  );
-  slice13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 12,
-    new_msb => 12,
-    x_width => 16,
-    y_width => 1
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice13_y_net
-  );
-  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 11,
-    new_msb => 11,
-    x_width => 16,
-    y_width => 1
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice12_y_net
-  );
-  slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 10,
-    new_msb => 10,
-    x_width => 16,
-    y_width => 1
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice11_y_net
-  );
   slice10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
     new_lsb => 9,
     new_msb => 9,
-    x_width => 16,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
     y => slice10_y_net
   );
-  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 8,
-    new_msb => 8,
-    x_width => 16,
+    new_lsb => 10,
+    new_msb => 10,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
-    y => slice9_y_net
+    y => slice11_y_net
   );
-  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 7,
-    new_msb => 7,
-    x_width => 16,
+    new_lsb => 11,
+    new_msb => 11,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
-    y => slice8_y_net
+    y => slice12_y_net
   );
-  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 6,
-    new_msb => 6,
-    x_width => 16,
+    new_lsb => 12,
+    new_msb => 12,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
-    y => slice7_y_net
+    y => slice13_y_net
   );
-  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 5,
-    new_msb => 5,
-    x_width => 16,
+    new_lsb => 13,
+    new_msb => 13,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
-    y => slice6_y_net
+    y => slice14_y_net
   );
-  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 4,
-    new_msb => 4,
-    x_width => 16,
+    new_lsb => 14,
+    new_msb => 14,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
-    y => slice5_y_net
+    y => slice15_y_net
+  );
+  slice16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 15,
+    new_msb => 15,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice16_y_net
+  );
+  slice2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 1,
+    new_msb => 1,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice2_y_net
+  );
+  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 2,
+    new_msb => 2,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice3_y_net
   );
   slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
     new_lsb => 3,
     new_msb => 3,
-    x_width => 16,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
     y => slice4_y_net
   );
-  slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  slice5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
-    new_lsb => 2,
-    new_msb => 2,
-    x_width => 16,
+    new_lsb => 4,
+    new_msb => 4,
+    x_width => 32,
     y_width => 1
   )
   port map (
     x => concatenate_y_net,
-    y => slice3_y_net
+    y => slice5_y_net
+  );
+  slice6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 5,
+    new_msb => 5,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice6_y_net
+  );
+  slice7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 6,
+    new_msb => 6,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice7_y_net
+  );
+  slice8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 7,
+    new_msb => 7,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice8_y_net
+  );
+  slice9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 8,
+    new_msb => 8,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice9_y_net
+  );
+  slice32 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 31,
+    new_msb => 31,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice32_y_net
+  );
+  slice31 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 30,
+    new_msb => 30,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice31_y_net
+  );
+  slice30 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 29,
+    new_msb => 29,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice30_y_net
+  );
+  slice29 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 28,
+    new_msb => 28,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice29_y_net
+  );
+  slice28 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 27,
+    new_msb => 27,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice28_y_net
+  );
+  slice27 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 26,
+    new_msb => 26,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice27_y_net
+  );
+  slice26 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 25,
+    new_msb => 25,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice26_y_net
+  );
+  slice25 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 24,
+    new_msb => 24,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice25_y_net
+  );
+  slice24 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 23,
+    new_msb => 23,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice24_y_net
+  );
+  slice23 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 22,
+    new_msb => 22,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice23_y_net
+  );
+  slice22 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 21,
+    new_msb => 21,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice22_y_net
+  );
+  slice21 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 20,
+    new_msb => 20,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice21_y_net
+  );
+  slice20 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 19,
+    new_msb => 19,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice20_y_net
+  );
+  slice19 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 18,
+    new_msb => 18,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice19_y_net
+  );
+  slice18 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 17,
+    new_msb => 17,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice18_y_net
+  );
+  slice17 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 16,
+    new_msb => 16,
+    x_width => 32,
+    y_width => 1
+  )
+  port map (
+    x => concatenate_y_net,
+    y => slice17_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/tap_delays/rep_addra/bussify
@@ -14855,61 +18059,109 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_bussify_x4 is
+entity pfb_fir_2048ch_6i_core_bussify_x0 is
   port (
-    in1 : in std_logic_vector( 11-1 downto 0 );
-    in2 : in std_logic_vector( 11-1 downto 0 );
-    in3 : in std_logic_vector( 11-1 downto 0 );
-    in4 : in std_logic_vector( 11-1 downto 0 );
-    in5 : in std_logic_vector( 11-1 downto 0 );
-    in6 : in std_logic_vector( 11-1 downto 0 );
-    in7 : in std_logic_vector( 11-1 downto 0 );
-    in8 : in std_logic_vector( 11-1 downto 0 );
-    in9 : in std_logic_vector( 11-1 downto 0 );
-    in10 : in std_logic_vector( 11-1 downto 0 );
-    in11 : in std_logic_vector( 11-1 downto 0 );
-    in12 : in std_logic_vector( 11-1 downto 0 );
-    in13 : in std_logic_vector( 11-1 downto 0 );
-    in14 : in std_logic_vector( 11-1 downto 0 );
-    in15 : in std_logic_vector( 11-1 downto 0 );
-    in16 : in std_logic_vector( 11-1 downto 0 );
-    bus_out : out std_logic_vector( 176-1 downto 0 )
+    in1 : in std_logic_vector( 13-1 downto 0 );
+    in2 : in std_logic_vector( 13-1 downto 0 );
+    in3 : in std_logic_vector( 13-1 downto 0 );
+    in4 : in std_logic_vector( 13-1 downto 0 );
+    in5 : in std_logic_vector( 13-1 downto 0 );
+    in6 : in std_logic_vector( 13-1 downto 0 );
+    in7 : in std_logic_vector( 13-1 downto 0 );
+    in8 : in std_logic_vector( 13-1 downto 0 );
+    in9 : in std_logic_vector( 13-1 downto 0 );
+    in10 : in std_logic_vector( 13-1 downto 0 );
+    in11 : in std_logic_vector( 13-1 downto 0 );
+    in12 : in std_logic_vector( 13-1 downto 0 );
+    in13 : in std_logic_vector( 13-1 downto 0 );
+    in14 : in std_logic_vector( 13-1 downto 0 );
+    in15 : in std_logic_vector( 13-1 downto 0 );
+    in16 : in std_logic_vector( 13-1 downto 0 );
+    in17 : in std_logic_vector( 13-1 downto 0 );
+    in18 : in std_logic_vector( 13-1 downto 0 );
+    in19 : in std_logic_vector( 13-1 downto 0 );
+    in20 : in std_logic_vector( 13-1 downto 0 );
+    in21 : in std_logic_vector( 13-1 downto 0 );
+    in22 : in std_logic_vector( 13-1 downto 0 );
+    in23 : in std_logic_vector( 13-1 downto 0 );
+    in24 : in std_logic_vector( 13-1 downto 0 );
+    in25 : in std_logic_vector( 13-1 downto 0 );
+    in26 : in std_logic_vector( 13-1 downto 0 );
+    in27 : in std_logic_vector( 13-1 downto 0 );
+    in28 : in std_logic_vector( 13-1 downto 0 );
+    in29 : in std_logic_vector( 13-1 downto 0 );
+    in30 : in std_logic_vector( 13-1 downto 0 );
+    in31 : in std_logic_vector( 13-1 downto 0 );
+    in32 : in std_logic_vector( 13-1 downto 0 );
+    bus_out : out std_logic_vector( 416-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_bussify_x4;
-architecture structural of pfb_fir_2048ch_6i_core_bussify_x4 is 
-  signal reinterpret1_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_3_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_4_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_5_q_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret13_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret14_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret15_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret16_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_11_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_12_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_13_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_14_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_15_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_8_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_9_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_10_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_6_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_7_q_net : std_logic_vector( 11-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 176-1 downto 0 );
-  signal din0_0_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_1_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_2_q_net : std_logic_vector( 11-1 downto 0 );
+end pfb_fir_2048ch_6i_core_bussify_x0;
+architecture structural of pfb_fir_2048ch_6i_core_bussify_x0 is 
+  signal reinterpret1_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret24_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret25_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret26_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret13_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret14_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret31_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret30_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret32_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret27_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret28_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret29_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_10_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_8_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_23_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_31_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_4_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_2_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_6_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_27_q_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret18_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret19_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret20_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_25_q_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret21_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret22_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret23_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_15_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_11_q_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_16_q_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_9_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_7_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_18_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_19_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_5_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_3_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_1_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_30_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_28_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_26_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_24_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_13_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_22_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_20_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_21_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_14_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_17_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_29_q_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret15_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret16_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret17_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_0_q_net : std_logic_vector( 13-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 416-1 downto 0 );
+  signal din0_12_q_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 13-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   din0_0_q_net <= in1;
@@ -14928,7 +18180,23 @@ begin
   din0_13_q_net <= in14;
   din0_14_q_net <= in15;
   din0_15_q_net <= in16;
-  concatenate : entity xil_defaultlib.sysgen_concat_dd187d1e79 
+  din0_16_q_net <= in17;
+  din0_17_q_net <= in18;
+  din0_18_q_net <= in19;
+  din0_19_q_net <= in20;
+  din0_20_q_net <= in21;
+  din0_21_q_net <= in22;
+  din0_22_q_net <= in23;
+  din0_23_q_net <= in24;
+  din0_24_q_net <= in25;
+  din0_25_q_net <= in26;
+  din0_26_q_net <= in27;
+  din0_27_q_net <= in28;
+  din0_28_q_net <= in29;
+  din0_29_q_net <= in30;
+  din0_30_q_net <= in31;
+  din0_31_q_net <= in32;
+  concatenate : entity xil_defaultlib.sysgen_concat_55b4997cf0 
   port map (
     clk => '0',
     ce => '0',
@@ -14949,9 +18217,25 @@ begin
     in13 => reinterpret14_output_port_net,
     in14 => reinterpret15_output_port_net,
     in15 => reinterpret16_output_port_net,
+    in16 => reinterpret17_output_port_net,
+    in17 => reinterpret18_output_port_net,
+    in18 => reinterpret19_output_port_net,
+    in19 => reinterpret20_output_port_net,
+    in20 => reinterpret21_output_port_net,
+    in21 => reinterpret22_output_port_net,
+    in22 => reinterpret23_output_port_net,
+    in23 => reinterpret24_output_port_net,
+    in24 => reinterpret25_output_port_net,
+    in25 => reinterpret26_output_port_net,
+    in26 => reinterpret27_output_port_net,
+    in27 => reinterpret28_output_port_net,
+    in28 => reinterpret29_output_port_net,
+    in29 => reinterpret30_output_port_net,
+    in30 => reinterpret31_output_port_net,
+    in31 => reinterpret32_output_port_net,
     y => concatenate_y_net
   );
-  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -14959,71 +18243,7 @@ begin
     input_port => din0_0_q_net,
     output_port => reinterpret1_output_port_net
   );
-  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => din0_1_q_net,
-    output_port => reinterpret2_output_port_net
-  );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => din0_2_q_net,
-    output_port => reinterpret3_output_port_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => din0_3_q_net,
-    output_port => reinterpret4_output_port_net
-  );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => din0_4_q_net,
-    output_port => reinterpret5_output_port_net
-  );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => din0_5_q_net,
-    output_port => reinterpret6_output_port_net
-  );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => din0_6_q_net,
-    output_port => reinterpret7_output_port_net
-  );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => din0_7_q_net,
-    output_port => reinterpret8_output_port_net
-  );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => din0_8_q_net,
-    output_port => reinterpret9_output_port_net
-  );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -15031,7 +18251,7 @@ begin
     input_port => din0_9_q_net,
     output_port => reinterpret10_output_port_net
   );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -15039,7 +18259,7 @@ begin
     input_port => din0_10_q_net,
     output_port => reinterpret11_output_port_net
   );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -15047,7 +18267,7 @@ begin
     input_port => din0_11_q_net,
     output_port => reinterpret12_output_port_net
   );
-  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -15055,7 +18275,7 @@ begin
     input_port => din0_12_q_net,
     output_port => reinterpret13_output_port_net
   );
-  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -15063,7 +18283,7 @@ begin
     input_port => din0_13_q_net,
     output_port => reinterpret14_output_port_net
   );
-  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -15071,13 +18291,205 @@ begin
     input_port => din0_14_q_net,
     output_port => reinterpret15_output_port_net
   );
-  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => din0_15_q_net,
     output_port => reinterpret16_output_port_net
+  );
+  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_1_q_net,
+    output_port => reinterpret2_output_port_net
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_2_q_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_3_q_net,
+    output_port => reinterpret4_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_4_q_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_5_q_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_6_q_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_7_q_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_8_q_net,
+    output_port => reinterpret9_output_port_net
+  );
+  reinterpret17 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_16_q_net,
+    output_port => reinterpret17_output_port_net
+  );
+  reinterpret18 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_17_q_net,
+    output_port => reinterpret18_output_port_net
+  );
+  reinterpret19 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_18_q_net,
+    output_port => reinterpret19_output_port_net
+  );
+  reinterpret20 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_19_q_net,
+    output_port => reinterpret20_output_port_net
+  );
+  reinterpret21 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_20_q_net,
+    output_port => reinterpret21_output_port_net
+  );
+  reinterpret22 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_21_q_net,
+    output_port => reinterpret22_output_port_net
+  );
+  reinterpret23 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_22_q_net,
+    output_port => reinterpret23_output_port_net
+  );
+  reinterpret24 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_23_q_net,
+    output_port => reinterpret24_output_port_net
+  );
+  reinterpret25 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_24_q_net,
+    output_port => reinterpret25_output_port_net
+  );
+  reinterpret26 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_25_q_net,
+    output_port => reinterpret26_output_port_net
+  );
+  reinterpret27 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_26_q_net,
+    output_port => reinterpret27_output_port_net
+  );
+  reinterpret28 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_27_q_net,
+    output_port => reinterpret28_output_port_net
+  );
+  reinterpret29 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_28_q_net,
+    output_port => reinterpret29_output_port_net
+  );
+  reinterpret30 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_29_q_net,
+    output_port => reinterpret30_output_port_net
+  );
+  reinterpret31 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_30_q_net,
+    output_port => reinterpret31_output_port_net
+  );
+  reinterpret32 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_31_q_net,
+    output_port => reinterpret32_output_port_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/tap_delays/rep_addra
@@ -15087,39 +18499,55 @@ library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
 entity pfb_fir_2048ch_6i_core_rep_addra is
   port (
-    in_x0 : in std_logic_vector( 11-1 downto 0 );
+    in_x0 : in std_logic_vector( 13-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
-    out_x0 : out std_logic_vector( 176-1 downto 0 )
+    out_x0 : out std_logic_vector( 416-1 downto 0 )
   );
 end pfb_fir_2048ch_6i_core_rep_addra;
 architecture structural of pfb_fir_2048ch_6i_core_rep_addra is 
-  signal din0_11_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_12_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_13_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_14_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_15_q_net : std_logic_vector( 11-1 downto 0 );
+  signal din0_0_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_14_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_15_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_16_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_17_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_20_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_21_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_22_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_23_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_24_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_25_q_net : std_logic_vector( 13-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 416-1 downto 0 );
+  signal din0_29_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_30_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_31_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_8_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_9_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_10_q_net : std_logic_vector( 13-1 downto 0 );
   signal ce_net : std_logic;
-  signal din0_0_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_1_q_net : std_logic_vector( 11-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_26_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_27_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_28_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_18_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_19_q_net : std_logic_vector( 13-1 downto 0 );
   signal clk_net : std_logic;
-  signal din0_2_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_3_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_4_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_5_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_6_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_7_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_8_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_9_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_10_q_net : std_logic_vector( 11-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 176-1 downto 0 );
+  signal din0_1_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_2_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_3_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_4_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_11_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_12_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_13_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_5_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_6_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_7_q_net : std_logic_vector( 13-1 downto 0 );
 begin
   out_x0 <= concatenate_y_net;
   counter_op_net <= in_x0;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x4 
+  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x0 
   port map (
     in1 => din0_0_q_net,
     in2 => din0_1_q_net,
@@ -15137,6 +18565,22 @@ begin
     in14 => din0_13_q_net,
     in15 => din0_14_q_net,
     in16 => din0_15_q_net,
+    in17 => din0_16_q_net,
+    in18 => din0_17_q_net,
+    in19 => din0_18_q_net,
+    in20 => din0_19_q_net,
+    in21 => din0_20_q_net,
+    in22 => din0_21_q_net,
+    in23 => din0_22_q_net,
+    in24 => din0_23_q_net,
+    in25 => din0_24_q_net,
+    in26 => din0_25_q_net,
+    in27 => din0_26_q_net,
+    in28 => din0_27_q_net,
+    in29 => din0_28_q_net,
+    in30 => din0_29_q_net,
+    in31 => din0_30_q_net,
+    in32 => din0_31_q_net,
     bus_out => concatenate_y_net
   );
   din0_0 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
@@ -15144,7 +18588,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -15159,7 +18603,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -15169,132 +18613,12 @@ begin
     ce => ce_net,
     q => din0_1_q_net
   );
-  din0_2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 11
-  )
-  port map (
-    en => '1',
-    rst => '1',
-    d => counter_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => din0_2_q_net
-  );
-  din0_3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 11
-  )
-  port map (
-    en => '1',
-    rst => '1',
-    d => counter_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => din0_3_q_net
-  );
-  din0_4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 11
-  )
-  port map (
-    en => '1',
-    rst => '1',
-    d => counter_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => din0_4_q_net
-  );
-  din0_5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 11
-  )
-  port map (
-    en => '1',
-    rst => '1',
-    d => counter_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => din0_5_q_net
-  );
-  din0_6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 11
-  )
-  port map (
-    en => '1',
-    rst => '1',
-    d => counter_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => din0_6_q_net
-  );
-  din0_7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 11
-  )
-  port map (
-    en => '1',
-    rst => '1',
-    d => counter_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => din0_7_q_net
-  );
-  din0_8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 11
-  )
-  port map (
-    en => '1',
-    rst => '1',
-    d => counter_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => din0_8_q_net
-  );
-  din0_9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 11
-  )
-  port map (
-    en => '1',
-    rst => '1',
-    d => counter_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => din0_9_q_net
-  );
   din0_10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
   generic map (
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -15309,7 +18633,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -15324,7 +18648,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -15339,7 +18663,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -15354,7 +18678,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -15369,7 +18693,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -15379,67 +18703,475 @@ begin
     ce => ce_net,
     q => din0_15_q_net
   );
+  din0_2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_2_q_net
+  );
+  din0_3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_3_q_net
+  );
+  din0_4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_4_q_net
+  );
+  din0_5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_5_q_net
+  );
+  din0_6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_6_q_net
+  );
+  din0_7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_7_q_net
+  );
+  din0_8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_8_q_net
+  );
+  din0_9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_9_q_net
+  );
+  din0_16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_16_q_net
+  );
+  din0_17 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_17_q_net
+  );
+  din0_18 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_18_q_net
+  );
+  din0_19 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_19_q_net
+  );
+  din0_20 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_20_q_net
+  );
+  din0_21 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_21_q_net
+  );
+  din0_22 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_22_q_net
+  );
+  din0_23 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_23_q_net
+  );
+  din0_24 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_24_q_net
+  );
+  din0_25 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_25_q_net
+  );
+  din0_26 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_26_q_net
+  );
+  din0_27 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_27_q_net
+  );
+  din0_28 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_28_q_net
+  );
+  din0_29 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_29_q_net
+  );
+  din0_30 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_30_q_net
+  );
+  din0_31 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_31_q_net
+  );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/tap_delays/rep_addrb/bussify
 library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_bussify_x2 is
+entity pfb_fir_2048ch_6i_core_bussify_x3 is
   port (
-    in1 : in std_logic_vector( 11-1 downto 0 );
-    in2 : in std_logic_vector( 11-1 downto 0 );
-    in3 : in std_logic_vector( 11-1 downto 0 );
-    in4 : in std_logic_vector( 11-1 downto 0 );
-    in5 : in std_logic_vector( 11-1 downto 0 );
-    in6 : in std_logic_vector( 11-1 downto 0 );
-    in7 : in std_logic_vector( 11-1 downto 0 );
-    in8 : in std_logic_vector( 11-1 downto 0 );
-    in9 : in std_logic_vector( 11-1 downto 0 );
-    in10 : in std_logic_vector( 11-1 downto 0 );
-    in11 : in std_logic_vector( 11-1 downto 0 );
-    in12 : in std_logic_vector( 11-1 downto 0 );
-    in13 : in std_logic_vector( 11-1 downto 0 );
-    in14 : in std_logic_vector( 11-1 downto 0 );
-    in15 : in std_logic_vector( 11-1 downto 0 );
-    in16 : in std_logic_vector( 11-1 downto 0 );
-    bus_out : out std_logic_vector( 176-1 downto 0 )
+    in1 : in std_logic_vector( 13-1 downto 0 );
+    in2 : in std_logic_vector( 13-1 downto 0 );
+    in3 : in std_logic_vector( 13-1 downto 0 );
+    in4 : in std_logic_vector( 13-1 downto 0 );
+    in5 : in std_logic_vector( 13-1 downto 0 );
+    in6 : in std_logic_vector( 13-1 downto 0 );
+    in7 : in std_logic_vector( 13-1 downto 0 );
+    in8 : in std_logic_vector( 13-1 downto 0 );
+    in9 : in std_logic_vector( 13-1 downto 0 );
+    in10 : in std_logic_vector( 13-1 downto 0 );
+    in11 : in std_logic_vector( 13-1 downto 0 );
+    in12 : in std_logic_vector( 13-1 downto 0 );
+    in13 : in std_logic_vector( 13-1 downto 0 );
+    in14 : in std_logic_vector( 13-1 downto 0 );
+    in15 : in std_logic_vector( 13-1 downto 0 );
+    in16 : in std_logic_vector( 13-1 downto 0 );
+    in17 : in std_logic_vector( 13-1 downto 0 );
+    in18 : in std_logic_vector( 13-1 downto 0 );
+    in19 : in std_logic_vector( 13-1 downto 0 );
+    in20 : in std_logic_vector( 13-1 downto 0 );
+    in21 : in std_logic_vector( 13-1 downto 0 );
+    in22 : in std_logic_vector( 13-1 downto 0 );
+    in23 : in std_logic_vector( 13-1 downto 0 );
+    in24 : in std_logic_vector( 13-1 downto 0 );
+    in25 : in std_logic_vector( 13-1 downto 0 );
+    in26 : in std_logic_vector( 13-1 downto 0 );
+    in27 : in std_logic_vector( 13-1 downto 0 );
+    in28 : in std_logic_vector( 13-1 downto 0 );
+    in29 : in std_logic_vector( 13-1 downto 0 );
+    in30 : in std_logic_vector( 13-1 downto 0 );
+    in31 : in std_logic_vector( 13-1 downto 0 );
+    in32 : in std_logic_vector( 13-1 downto 0 );
+    bus_out : out std_logic_vector( 416-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_bussify_x2;
-architecture structural of pfb_fir_2048ch_6i_core_bussify_x2 is 
-  signal din0_10_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_11_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_12_q_net : std_logic_vector( 11-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 176-1 downto 0 );
-  signal din0_7_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_8_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_9_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_0_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_1_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_13_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_14_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_5_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_6_q_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret13_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret14_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret15_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret16_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_2_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_3_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_4_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_15_q_net : std_logic_vector( 11-1 downto 0 );
+end pfb_fir_2048ch_6i_core_bussify_x3;
+architecture structural of pfb_fir_2048ch_6i_core_bussify_x3 is 
+  signal din0_18_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_10_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_27_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_22_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_14_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_19_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_12_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_24_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_16_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_21_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_29_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_5_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_3_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_2_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_1_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_0_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_17_q_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_15_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_13_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_11_q_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret13_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret14_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret31_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret15_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_9_q_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret16_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret17_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret18_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret19_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret20_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret21_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_8_q_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret22_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret23_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret24_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret25_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret26_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret27_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret28_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret29_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret30_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret32_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 416-1 downto 0 );
+  signal din0_7_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_6_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_30_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_31_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_28_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_26_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_25_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_23_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_20_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_4_q_net : std_logic_vector( 13-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   din0_0_q_net <= in1;
@@ -15458,7 +19190,23 @@ begin
   din0_13_q_net <= in14;
   din0_14_q_net <= in15;
   din0_15_q_net <= in16;
-  concatenate : entity xil_defaultlib.sysgen_concat_dd187d1e79 
+  din0_16_q_net <= in17;
+  din0_17_q_net <= in18;
+  din0_18_q_net <= in19;
+  din0_19_q_net <= in20;
+  din0_20_q_net <= in21;
+  din0_21_q_net <= in22;
+  din0_22_q_net <= in23;
+  din0_23_q_net <= in24;
+  din0_24_q_net <= in25;
+  din0_25_q_net <= in26;
+  din0_26_q_net <= in27;
+  din0_27_q_net <= in28;
+  din0_28_q_net <= in29;
+  din0_29_q_net <= in30;
+  din0_30_q_net <= in31;
+  din0_31_q_net <= in32;
+  concatenate : entity xil_defaultlib.sysgen_concat_55b4997cf0 
   port map (
     clk => '0',
     ce => '0',
@@ -15479,9 +19227,25 @@ begin
     in13 => reinterpret14_output_port_net,
     in14 => reinterpret15_output_port_net,
     in15 => reinterpret16_output_port_net,
+    in16 => reinterpret17_output_port_net,
+    in17 => reinterpret18_output_port_net,
+    in18 => reinterpret19_output_port_net,
+    in19 => reinterpret20_output_port_net,
+    in20 => reinterpret21_output_port_net,
+    in21 => reinterpret22_output_port_net,
+    in22 => reinterpret23_output_port_net,
+    in23 => reinterpret24_output_port_net,
+    in24 => reinterpret25_output_port_net,
+    in25 => reinterpret26_output_port_net,
+    in26 => reinterpret27_output_port_net,
+    in27 => reinterpret28_output_port_net,
+    in28 => reinterpret29_output_port_net,
+    in29 => reinterpret30_output_port_net,
+    in30 => reinterpret31_output_port_net,
+    in31 => reinterpret32_output_port_net,
     y => concatenate_y_net
   );
-  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -15489,71 +19253,7 @@ begin
     input_port => din0_0_q_net,
     output_port => reinterpret1_output_port_net
   );
-  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => din0_1_q_net,
-    output_port => reinterpret2_output_port_net
-  );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => din0_2_q_net,
-    output_port => reinterpret3_output_port_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => din0_3_q_net,
-    output_port => reinterpret4_output_port_net
-  );
-  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => din0_4_q_net,
-    output_port => reinterpret5_output_port_net
-  );
-  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => din0_5_q_net,
-    output_port => reinterpret6_output_port_net
-  );
-  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => din0_6_q_net,
-    output_port => reinterpret7_output_port_net
-  );
-  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => din0_7_q_net,
-    output_port => reinterpret8_output_port_net
-  );
-  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => din0_8_q_net,
-    output_port => reinterpret9_output_port_net
-  );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -15561,7 +19261,7 @@ begin
     input_port => din0_9_q_net,
     output_port => reinterpret10_output_port_net
   );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -15569,7 +19269,7 @@ begin
     input_port => din0_10_q_net,
     output_port => reinterpret11_output_port_net
   );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -15577,7 +19277,7 @@ begin
     input_port => din0_11_q_net,
     output_port => reinterpret12_output_port_net
   );
-  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -15585,7 +19285,7 @@ begin
     input_port => din0_12_q_net,
     output_port => reinterpret13_output_port_net
   );
-  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -15593,7 +19293,7 @@ begin
     input_port => din0_13_q_net,
     output_port => reinterpret14_output_port_net
   );
-  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
@@ -15601,13 +19301,205 @@ begin
     input_port => din0_14_q_net,
     output_port => reinterpret15_output_port_net
   );
-  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_18f7d18567 
+  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => din0_15_q_net,
     output_port => reinterpret16_output_port_net
+  );
+  reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_1_q_net,
+    output_port => reinterpret2_output_port_net
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_2_q_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_3_q_net,
+    output_port => reinterpret4_output_port_net
+  );
+  reinterpret5 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_4_q_net,
+    output_port => reinterpret5_output_port_net
+  );
+  reinterpret6 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_5_q_net,
+    output_port => reinterpret6_output_port_net
+  );
+  reinterpret7 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_6_q_net,
+    output_port => reinterpret7_output_port_net
+  );
+  reinterpret8 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_7_q_net,
+    output_port => reinterpret8_output_port_net
+  );
+  reinterpret9 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_8_q_net,
+    output_port => reinterpret9_output_port_net
+  );
+  reinterpret17 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_16_q_net,
+    output_port => reinterpret17_output_port_net
+  );
+  reinterpret18 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_17_q_net,
+    output_port => reinterpret18_output_port_net
+  );
+  reinterpret19 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_18_q_net,
+    output_port => reinterpret19_output_port_net
+  );
+  reinterpret20 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_19_q_net,
+    output_port => reinterpret20_output_port_net
+  );
+  reinterpret21 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_20_q_net,
+    output_port => reinterpret21_output_port_net
+  );
+  reinterpret22 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_21_q_net,
+    output_port => reinterpret22_output_port_net
+  );
+  reinterpret23 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_22_q_net,
+    output_port => reinterpret23_output_port_net
+  );
+  reinterpret24 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_23_q_net,
+    output_port => reinterpret24_output_port_net
+  );
+  reinterpret25 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_24_q_net,
+    output_port => reinterpret25_output_port_net
+  );
+  reinterpret26 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_25_q_net,
+    output_port => reinterpret26_output_port_net
+  );
+  reinterpret27 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_26_q_net,
+    output_port => reinterpret27_output_port_net
+  );
+  reinterpret28 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_27_q_net,
+    output_port => reinterpret28_output_port_net
+  );
+  reinterpret29 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_28_q_net,
+    output_port => reinterpret29_output_port_net
+  );
+  reinterpret30 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_29_q_net,
+    output_port => reinterpret30_output_port_net
+  );
+  reinterpret31 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_30_q_net,
+    output_port => reinterpret31_output_port_net
+  );
+  reinterpret32 : entity xil_defaultlib.sysgen_reinterpret_dcbe3689d9 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_31_q_net,
+    output_port => reinterpret32_output_port_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/tap_delays/rep_addrb
@@ -15617,39 +19509,55 @@ library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
 entity pfb_fir_2048ch_6i_core_rep_addrb is
   port (
-    in_x0 : in std_logic_vector( 11-1 downto 0 );
+    in_x0 : in std_logic_vector( 13-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
-    out_x0 : out std_logic_vector( 176-1 downto 0 )
+    out_x0 : out std_logic_vector( 416-1 downto 0 )
   );
 end pfb_fir_2048ch_6i_core_rep_addrb;
 architecture structural of pfb_fir_2048ch_6i_core_rep_addrb is 
-  signal concatenate_y_net : std_logic_vector( 176-1 downto 0 );
-  signal daddr_q_net : std_logic_vector( 11-1 downto 0 );
   signal clk_net : std_logic;
+  signal concatenate_y_net : std_logic_vector( 416-1 downto 0 );
+  signal din0_19_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_20_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_21_q_net : std_logic_vector( 13-1 downto 0 );
   signal ce_net : std_logic;
-  signal din0_8_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_9_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_10_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_11_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_12_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_13_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_14_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_15_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_0_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_1_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_2_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_3_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_4_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_5_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_6_q_net : std_logic_vector( 11-1 downto 0 );
-  signal din0_7_q_net : std_logic_vector( 11-1 downto 0 );
+  signal din0_4_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_5_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_6_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_16_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_17_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_18_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_10_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_11_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_12_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_22_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_23_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_24_q_net : std_logic_vector( 13-1 downto 0 );
+  signal daddr_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_28_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_29_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_30_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_7_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_8_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_9_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_25_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_26_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_27_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_1_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_2_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_3_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_13_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_14_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_15_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_31_q_net : std_logic_vector( 13-1 downto 0 );
+  signal din0_0_q_net : std_logic_vector( 13-1 downto 0 );
 begin
   out_x0 <= concatenate_y_net;
   daddr_q_net <= in_x0;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x2 
+  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x3 
   port map (
     in1 => din0_0_q_net,
     in2 => din0_1_q_net,
@@ -15667,6 +19575,22 @@ begin
     in14 => din0_13_q_net,
     in15 => din0_14_q_net,
     in16 => din0_15_q_net,
+    in17 => din0_16_q_net,
+    in18 => din0_17_q_net,
+    in19 => din0_18_q_net,
+    in20 => din0_19_q_net,
+    in21 => din0_20_q_net,
+    in22 => din0_21_q_net,
+    in23 => din0_22_q_net,
+    in24 => din0_23_q_net,
+    in25 => din0_24_q_net,
+    in26 => din0_25_q_net,
+    in27 => din0_26_q_net,
+    in28 => din0_27_q_net,
+    in29 => din0_28_q_net,
+    in30 => din0_29_q_net,
+    in31 => din0_30_q_net,
+    in32 => din0_31_q_net,
     bus_out => concatenate_y_net
   );
   din0_0 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
@@ -15674,7 +19598,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -15689,7 +19613,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -15699,132 +19623,12 @@ begin
     ce => ce_net,
     q => din0_1_q_net
   );
-  din0_2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 11
-  )
-  port map (
-    en => '1',
-    rst => '1',
-    d => daddr_q_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => din0_2_q_net
-  );
-  din0_3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 11
-  )
-  port map (
-    en => '1',
-    rst => '1',
-    d => daddr_q_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => din0_3_q_net
-  );
-  din0_4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 11
-  )
-  port map (
-    en => '1',
-    rst => '1',
-    d => daddr_q_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => din0_4_q_net
-  );
-  din0_5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 11
-  )
-  port map (
-    en => '1',
-    rst => '1',
-    d => daddr_q_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => din0_5_q_net
-  );
-  din0_6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 11
-  )
-  port map (
-    en => '1',
-    rst => '1',
-    d => daddr_q_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => din0_6_q_net
-  );
-  din0_7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 11
-  )
-  port map (
-    en => '1',
-    rst => '1',
-    d => daddr_q_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => din0_7_q_net
-  );
-  din0_8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 11
-  )
-  port map (
-    en => '1',
-    rst => '1',
-    d => daddr_q_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => din0_8_q_net
-  );
-  din0_9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
-  generic map (
-    latency => 1,
-    reg_retiming => 0,
-    reset => 0,
-    width => 11
-  )
-  port map (
-    en => '1',
-    rst => '1',
-    d => daddr_q_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => din0_9_q_net
-  );
   din0_10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
   generic map (
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -15839,7 +19643,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -15854,7 +19658,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -15869,7 +19673,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -15884,7 +19688,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -15899,7 +19703,7 @@ begin
     latency => 1,
     reg_retiming => 0,
     reset => 0,
-    width => 11
+    width => 13
   )
   port map (
     en => '1',
@@ -15909,41 +19713,417 @@ begin
     ce => ce_net,
     q => din0_15_q_net
   );
+  din0_2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_2_q_net
+  );
+  din0_3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_3_q_net
+  );
+  din0_4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_4_q_net
+  );
+  din0_5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_5_q_net
+  );
+  din0_6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_6_q_net
+  );
+  din0_7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_7_q_net
+  );
+  din0_8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_8_q_net
+  );
+  din0_9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_9_q_net
+  );
+  din0_16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_16_q_net
+  );
+  din0_17 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_17_q_net
+  );
+  din0_18 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_18_q_net
+  );
+  din0_19 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_19_q_net
+  );
+  din0_20 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_20_q_net
+  );
+  din0_21 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_21_q_net
+  );
+  din0_22 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_22_q_net
+  );
+  din0_23 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_23_q_net
+  );
+  din0_24 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_24_q_net
+  );
+  din0_25 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_25_q_net
+  );
+  din0_26 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_26_q_net
+  );
+  din0_27 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_27_q_net
+  );
+  din0_28 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_28_q_net
+  );
+  din0_29 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_29_q_net
+  );
+  din0_30 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_30_q_net
+  );
+  din0_31 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 13
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => daddr_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_31_q_net
+  );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/tap_delays/rep_wea/bussify
 library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_2048ch_6i_core_bussify_x3 is
+entity pfb_fir_2048ch_6i_core_bussify_x2 is
   port (
     in1 : in std_logic_vector( 1-1 downto 0 );
-    bus_out : out std_logic_vector( 16-1 downto 0 )
+    bus_out : out std_logic_vector( 32-1 downto 0 )
   );
-end pfb_fir_2048ch_6i_core_bussify_x3;
-architecture structural of pfb_fir_2048ch_6i_core_bussify_x3 is 
+end pfb_fir_2048ch_6i_core_bussify_x2;
+architecture structural of pfb_fir_2048ch_6i_core_bussify_x2 is 
+  signal reinterpret16_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret17_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret18_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret19_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret20_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret30_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret31_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret24_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret25_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret26_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret32_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret21_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret22_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret23_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret27_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret28_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret29_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret9_output_port_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret10_output_port_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret11_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal never_op_net : std_logic_vector( 1-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 32-1 downto 0 );
   signal reinterpret12_output_port_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret13_output_port_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret14_output_port_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret15_output_port_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret16_output_port_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 1-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 16-1 downto 0 );
-  signal never_op_net : std_logic_vector( 1-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   never_op_net <= in1;
-  concatenate : entity xil_defaultlib.sysgen_concat_f2eda23efe 
+  concatenate : entity xil_defaultlib.sysgen_concat_c9aa3d9933 
   port map (
     clk => '0',
     ce => '0',
@@ -15964,6 +20144,22 @@ begin
     in13 => reinterpret14_output_port_net,
     in14 => reinterpret15_output_port_net,
     in15 => reinterpret16_output_port_net,
+    in16 => reinterpret17_output_port_net,
+    in17 => reinterpret18_output_port_net,
+    in18 => reinterpret19_output_port_net,
+    in19 => reinterpret20_output_port_net,
+    in20 => reinterpret21_output_port_net,
+    in21 => reinterpret22_output_port_net,
+    in22 => reinterpret23_output_port_net,
+    in23 => reinterpret24_output_port_net,
+    in24 => reinterpret25_output_port_net,
+    in25 => reinterpret26_output_port_net,
+    in26 => reinterpret27_output_port_net,
+    in27 => reinterpret28_output_port_net,
+    in28 => reinterpret29_output_port_net,
+    in29 => reinterpret30_output_port_net,
+    in30 => reinterpret31_output_port_net,
+    in31 => reinterpret32_output_port_net,
     y => concatenate_y_net
   );
   reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
@@ -15973,6 +20169,62 @@ begin
     clr => '0',
     input_port => never_op_net,
     output_port => reinterpret1_output_port_net
+  );
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => never_op_net,
+    output_port => reinterpret10_output_port_net
+  );
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => never_op_net,
+    output_port => reinterpret11_output_port_net
+  );
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => never_op_net,
+    output_port => reinterpret12_output_port_net
+  );
+  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => never_op_net,
+    output_port => reinterpret13_output_port_net
+  );
+  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => never_op_net,
+    output_port => reinterpret14_output_port_net
+  );
+  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => never_op_net,
+    output_port => reinterpret15_output_port_net
+  );
+  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => never_op_net,
+    output_port => reinterpret16_output_port_net
   );
   reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
   port map (
@@ -16038,61 +20290,133 @@ begin
     input_port => never_op_net,
     output_port => reinterpret9_output_port_net
   );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  reinterpret17 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => never_op_net,
-    output_port => reinterpret10_output_port_net
+    output_port => reinterpret17_output_port_net
   );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  reinterpret18 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => never_op_net,
-    output_port => reinterpret11_output_port_net
+    output_port => reinterpret18_output_port_net
   );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  reinterpret19 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => never_op_net,
-    output_port => reinterpret12_output_port_net
+    output_port => reinterpret19_output_port_net
   );
-  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  reinterpret20 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => never_op_net,
-    output_port => reinterpret13_output_port_net
+    output_port => reinterpret20_output_port_net
   );
-  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  reinterpret21 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => never_op_net,
-    output_port => reinterpret14_output_port_net
+    output_port => reinterpret21_output_port_net
   );
-  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  reinterpret22 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => never_op_net,
-    output_port => reinterpret15_output_port_net
+    output_port => reinterpret22_output_port_net
   );
-  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  reinterpret23 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
     input_port => never_op_net,
-    output_port => reinterpret16_output_port_net
+    output_port => reinterpret23_output_port_net
+  );
+  reinterpret24 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => never_op_net,
+    output_port => reinterpret24_output_port_net
+  );
+  reinterpret25 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => never_op_net,
+    output_port => reinterpret25_output_port_net
+  );
+  reinterpret26 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => never_op_net,
+    output_port => reinterpret26_output_port_net
+  );
+  reinterpret27 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => never_op_net,
+    output_port => reinterpret27_output_port_net
+  );
+  reinterpret28 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => never_op_net,
+    output_port => reinterpret28_output_port_net
+  );
+  reinterpret29 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => never_op_net,
+    output_port => reinterpret29_output_port_net
+  );
+  reinterpret30 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => never_op_net,
+    output_port => reinterpret30_output_port_net
+  );
+  reinterpret31 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => never_op_net,
+    output_port => reinterpret31_output_port_net
+  );
+  reinterpret32 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => never_op_net,
+    output_port => reinterpret32_output_port_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/tap_delays/rep_wea
@@ -16103,16 +20427,16 @@ use xil_defaultlib.conv_pkg.all;
 entity pfb_fir_2048ch_6i_core_rep_wea is
   port (
     in_x0 : in std_logic_vector( 1-1 downto 0 );
-    out_x0 : out std_logic_vector( 16-1 downto 0 )
+    out_x0 : out std_logic_vector( 32-1 downto 0 )
   );
 end pfb_fir_2048ch_6i_core_rep_wea;
 architecture structural of pfb_fir_2048ch_6i_core_rep_wea is 
+  signal concatenate_y_net : std_logic_vector( 32-1 downto 0 );
   signal never_op_net : std_logic_vector( 1-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 16-1 downto 0 );
 begin
   out_x0 <= concatenate_y_net;
   never_op_net <= in_x0;
-  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x3 
+  bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bussify_x2 
   port map (
     in1 => never_op_net,
     bus_out => concatenate_y_net
@@ -16141,43 +20465,91 @@ entity pfb_fir_2048ch_6i_core_bussify_x1 is
     in14 : in std_logic_vector( 1-1 downto 0 );
     in15 : in std_logic_vector( 1-1 downto 0 );
     in16 : in std_logic_vector( 1-1 downto 0 );
-    bus_out : out std_logic_vector( 16-1 downto 0 )
+    in17 : in std_logic_vector( 1-1 downto 0 );
+    in18 : in std_logic_vector( 1-1 downto 0 );
+    in19 : in std_logic_vector( 1-1 downto 0 );
+    in20 : in std_logic_vector( 1-1 downto 0 );
+    in21 : in std_logic_vector( 1-1 downto 0 );
+    in22 : in std_logic_vector( 1-1 downto 0 );
+    in23 : in std_logic_vector( 1-1 downto 0 );
+    in24 : in std_logic_vector( 1-1 downto 0 );
+    in25 : in std_logic_vector( 1-1 downto 0 );
+    in26 : in std_logic_vector( 1-1 downto 0 );
+    in27 : in std_logic_vector( 1-1 downto 0 );
+    in28 : in std_logic_vector( 1-1 downto 0 );
+    in29 : in std_logic_vector( 1-1 downto 0 );
+    in30 : in std_logic_vector( 1-1 downto 0 );
+    in31 : in std_logic_vector( 1-1 downto 0 );
+    in32 : in std_logic_vector( 1-1 downto 0 );
+    bus_out : out std_logic_vector( 32-1 downto 0 )
   );
 end pfb_fir_2048ch_6i_core_bussify_x1;
 architecture structural of pfb_fir_2048ch_6i_core_bussify_x1 is 
-  signal din0_2_q_net : std_logic_vector( 1-1 downto 0 );
-  signal din0_3_q_net : std_logic_vector( 1-1 downto 0 );
-  signal din0_4_q_net : std_logic_vector( 1-1 downto 0 );
-  signal din0_15_q_net : std_logic_vector( 1-1 downto 0 );
-  signal din0_13_q_net : std_logic_vector( 1-1 downto 0 );
-  signal din0_14_q_net : std_logic_vector( 1-1 downto 0 );
-  signal din0_10_q_net : std_logic_vector( 1-1 downto 0 );
-  signal din0_11_q_net : std_logic_vector( 1-1 downto 0 );
-  signal din0_12_q_net : std_logic_vector( 1-1 downto 0 );
-  signal din0_7_q_net : std_logic_vector( 1-1 downto 0 );
-  signal din0_8_q_net : std_logic_vector( 1-1 downto 0 );
-  signal din0_9_q_net : std_logic_vector( 1-1 downto 0 );
-  signal din0_5_q_net : std_logic_vector( 1-1 downto 0 );
-  signal din0_6_q_net : std_logic_vector( 1-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 16-1 downto 0 );
-  signal din0_0_q_net : std_logic_vector( 1-1 downto 0 );
-  signal din0_1_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_27_q_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret25_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret26_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_26_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_30_q_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret30_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret31_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_23_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_31_q_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret14_output_port_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret15_output_port_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret16_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret27_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret28_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret29_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_5_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_7_q_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret5_output_port_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret6_output_port_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret7_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret32_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret19_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret20_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret21_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_20_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_21_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_9_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_3_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_2_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_10_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_4_q_net : std_logic_vector( 1-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 32-1 downto 0 );
+  signal din0_0_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_1_q_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret16_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret17_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret18_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_11_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_28_q_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret8_output_port_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret9_output_port_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret10_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_12_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_6_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_22_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_24_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_19_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_29_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_17_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_16_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_14_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_13_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_15_q_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret11_output_port_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret12_output_port_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret13_output_port_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret22_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret23_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret24_output_port_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_25_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_18_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_8_q_net : std_logic_vector( 1-1 downto 0 );
 begin
   bus_out <= concatenate_y_net;
   din0_0_q_net <= in1;
@@ -16196,7 +20568,23 @@ begin
   din0_13_q_net <= in14;
   din0_14_q_net <= in15;
   din0_15_q_net <= in16;
-  concatenate : entity xil_defaultlib.sysgen_concat_f2eda23efe 
+  din0_16_q_net <= in17;
+  din0_17_q_net <= in18;
+  din0_18_q_net <= in19;
+  din0_19_q_net <= in20;
+  din0_20_q_net <= in21;
+  din0_21_q_net <= in22;
+  din0_22_q_net <= in23;
+  din0_23_q_net <= in24;
+  din0_24_q_net <= in25;
+  din0_25_q_net <= in26;
+  din0_26_q_net <= in27;
+  din0_27_q_net <= in28;
+  din0_28_q_net <= in29;
+  din0_29_q_net <= in30;
+  din0_30_q_net <= in31;
+  din0_31_q_net <= in32;
+  concatenate : entity xil_defaultlib.sysgen_concat_c9aa3d9933 
   port map (
     clk => '0',
     ce => '0',
@@ -16217,6 +20605,22 @@ begin
     in13 => reinterpret14_output_port_net,
     in14 => reinterpret15_output_port_net,
     in15 => reinterpret16_output_port_net,
+    in16 => reinterpret17_output_port_net,
+    in17 => reinterpret18_output_port_net,
+    in18 => reinterpret19_output_port_net,
+    in19 => reinterpret20_output_port_net,
+    in20 => reinterpret21_output_port_net,
+    in21 => reinterpret22_output_port_net,
+    in22 => reinterpret23_output_port_net,
+    in23 => reinterpret24_output_port_net,
+    in24 => reinterpret25_output_port_net,
+    in25 => reinterpret26_output_port_net,
+    in26 => reinterpret27_output_port_net,
+    in27 => reinterpret28_output_port_net,
+    in28 => reinterpret29_output_port_net,
+    in29 => reinterpret30_output_port_net,
+    in30 => reinterpret31_output_port_net,
+    in31 => reinterpret32_output_port_net,
     y => concatenate_y_net
   );
   reinterpret1 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
@@ -16226,6 +20630,62 @@ begin
     clr => '0',
     input_port => din0_0_q_net,
     output_port => reinterpret1_output_port_net
+  );
+  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_9_q_net,
+    output_port => reinterpret10_output_port_net
+  );
+  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_10_q_net,
+    output_port => reinterpret11_output_port_net
+  );
+  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_11_q_net,
+    output_port => reinterpret12_output_port_net
+  );
+  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_12_q_net,
+    output_port => reinterpret13_output_port_net
+  );
+  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_13_q_net,
+    output_port => reinterpret14_output_port_net
+  );
+  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_14_q_net,
+    output_port => reinterpret15_output_port_net
+  );
+  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_15_q_net,
+    output_port => reinterpret16_output_port_net
   );
   reinterpret2 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
   port map (
@@ -16291,61 +20751,133 @@ begin
     input_port => din0_8_q_net,
     output_port => reinterpret9_output_port_net
   );
-  reinterpret10 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  reinterpret17 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => din0_9_q_net,
-    output_port => reinterpret10_output_port_net
+    input_port => din0_16_q_net,
+    output_port => reinterpret17_output_port_net
   );
-  reinterpret11 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  reinterpret18 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => din0_10_q_net,
-    output_port => reinterpret11_output_port_net
+    input_port => din0_17_q_net,
+    output_port => reinterpret18_output_port_net
   );
-  reinterpret12 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  reinterpret19 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => din0_11_q_net,
-    output_port => reinterpret12_output_port_net
+    input_port => din0_18_q_net,
+    output_port => reinterpret19_output_port_net
   );
-  reinterpret13 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  reinterpret20 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => din0_12_q_net,
-    output_port => reinterpret13_output_port_net
+    input_port => din0_19_q_net,
+    output_port => reinterpret20_output_port_net
   );
-  reinterpret14 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  reinterpret21 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => din0_13_q_net,
-    output_port => reinterpret14_output_port_net
+    input_port => din0_20_q_net,
+    output_port => reinterpret21_output_port_net
   );
-  reinterpret15 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  reinterpret22 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => din0_14_q_net,
-    output_port => reinterpret15_output_port_net
+    input_port => din0_21_q_net,
+    output_port => reinterpret22_output_port_net
   );
-  reinterpret16 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  reinterpret23 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
   port map (
     clk => '0',
     ce => '0',
     clr => '0',
-    input_port => din0_15_q_net,
-    output_port => reinterpret16_output_port_net
+    input_port => din0_22_q_net,
+    output_port => reinterpret23_output_port_net
+  );
+  reinterpret24 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_23_q_net,
+    output_port => reinterpret24_output_port_net
+  );
+  reinterpret25 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_24_q_net,
+    output_port => reinterpret25_output_port_net
+  );
+  reinterpret26 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_25_q_net,
+    output_port => reinterpret26_output_port_net
+  );
+  reinterpret27 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_26_q_net,
+    output_port => reinterpret27_output_port_net
+  );
+  reinterpret28 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_27_q_net,
+    output_port => reinterpret28_output_port_net
+  );
+  reinterpret29 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_28_q_net,
+    output_port => reinterpret29_output_port_net
+  );
+  reinterpret30 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_29_q_net,
+    output_port => reinterpret30_output_port_net
+  );
+  reinterpret31 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_30_q_net,
+    output_port => reinterpret31_output_port_net
+  );
+  reinterpret32 : entity xil_defaultlib.sysgen_reinterpret_662d0c373d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => din0_31_q_net,
+    output_port => reinterpret32_output_port_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/tap_delays/rep_web
@@ -16358,30 +20890,46 @@ entity pfb_fir_2048ch_6i_core_rep_web is
     in_x0 : in std_logic_vector( 1-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
-    out_x0 : out std_logic_vector( 16-1 downto 0 )
+    out_x0 : out std_logic_vector( 32-1 downto 0 )
   );
 end pfb_fir_2048ch_6i_core_rep_web;
 architecture structural of pfb_fir_2048ch_6i_core_rep_web is 
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
+  signal din0_24_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_25_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_26_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_27_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_20_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_21_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_22_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_23_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_28_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_29_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_30_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_31_q_net : std_logic_vector( 1-1 downto 0 );
   signal din0_9_q_net : std_logic_vector( 1-1 downto 0 );
   signal din0_10_q_net : std_logic_vector( 1-1 downto 0 );
   signal din0_11_q_net : std_logic_vector( 1-1 downto 0 );
   signal din0_12_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_1_q_net : std_logic_vector( 1-1 downto 0 );
   signal din0_13_q_net : std_logic_vector( 1-1 downto 0 );
   signal din0_14_q_net : std_logic_vector( 1-1 downto 0 );
   signal din0_15_q_net : std_logic_vector( 1-1 downto 0 );
-  signal din0_0_q_net : std_logic_vector( 1-1 downto 0 );
-  signal din0_1_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_16_q_net : std_logic_vector( 1-1 downto 0 );
   signal din0_2_q_net : std_logic_vector( 1-1 downto 0 );
   signal din0_3_q_net : std_logic_vector( 1-1 downto 0 );
   signal din0_4_q_net : std_logic_vector( 1-1 downto 0 );
+  signal clk_net : std_logic;
+  signal ce_net : std_logic;
+  signal din0_0_q_net : std_logic_vector( 1-1 downto 0 );
+  signal always_op_net : std_logic_vector( 1-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 32-1 downto 0 );
+  signal din0_17_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_18_q_net : std_logic_vector( 1-1 downto 0 );
+  signal din0_19_q_net : std_logic_vector( 1-1 downto 0 );
   signal din0_5_q_net : std_logic_vector( 1-1 downto 0 );
   signal din0_6_q_net : std_logic_vector( 1-1 downto 0 );
   signal din0_7_q_net : std_logic_vector( 1-1 downto 0 );
   signal din0_8_q_net : std_logic_vector( 1-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 16-1 downto 0 );
-  signal always_op_net : std_logic_vector( 1-1 downto 0 );
 begin
   out_x0 <= concatenate_y_net;
   always_op_net <= in_x0;
@@ -16405,6 +20953,22 @@ begin
     in14 => din0_13_q_net,
     in15 => din0_14_q_net,
     in16 => din0_15_q_net,
+    in17 => din0_16_q_net,
+    in18 => din0_17_q_net,
+    in19 => din0_18_q_net,
+    in20 => din0_19_q_net,
+    in21 => din0_20_q_net,
+    in22 => din0_21_q_net,
+    in23 => din0_22_q_net,
+    in24 => din0_23_q_net,
+    in25 => din0_24_q_net,
+    in26 => din0_25_q_net,
+    in27 => din0_26_q_net,
+    in28 => din0_27_q_net,
+    in29 => din0_28_q_net,
+    in30 => din0_29_q_net,
+    in31 => din0_30_q_net,
+    in32 => din0_31_q_net,
     bus_out => concatenate_y_net
   );
   din0_0 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
@@ -16436,6 +21000,96 @@ begin
     clk => clk_net,
     ce => ce_net,
     q => din0_1_q_net
+  );
+  din0_10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 1
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => always_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_10_q_net
+  );
+  din0_11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 1
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => always_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_11_q_net
+  );
+  din0_12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 1
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => always_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_12_q_net
+  );
+  din0_13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 1
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => always_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_13_q_net
+  );
+  din0_14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 1
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => always_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_14_q_net
+  );
+  din0_15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 1
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => always_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_15_q_net
   );
   din0_2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
   generic map (
@@ -16557,7 +21211,7 @@ begin
     ce => ce_net,
     q => din0_9_q_net
   );
-  din0_10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  din0_16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
   generic map (
     latency => 1,
     reg_retiming => 0,
@@ -16570,9 +21224,9 @@ begin
     d => always_op_net,
     clk => clk_net,
     ce => ce_net,
-    q => din0_10_q_net
+    q => din0_16_q_net
   );
-  din0_11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  din0_17 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
   generic map (
     latency => 1,
     reg_retiming => 0,
@@ -16585,9 +21239,9 @@ begin
     d => always_op_net,
     clk => clk_net,
     ce => ce_net,
-    q => din0_11_q_net
+    q => din0_17_q_net
   );
-  din0_12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  din0_18 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
   generic map (
     latency => 1,
     reg_retiming => 0,
@@ -16600,9 +21254,9 @@ begin
     d => always_op_net,
     clk => clk_net,
     ce => ce_net,
-    q => din0_12_q_net
+    q => din0_18_q_net
   );
-  din0_13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  din0_19 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
   generic map (
     latency => 1,
     reg_retiming => 0,
@@ -16615,9 +21269,9 @@ begin
     d => always_op_net,
     clk => clk_net,
     ce => ce_net,
-    q => din0_13_q_net
+    q => din0_19_q_net
   );
-  din0_14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  din0_20 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
   generic map (
     latency => 1,
     reg_retiming => 0,
@@ -16630,9 +21284,9 @@ begin
     d => always_op_net,
     clk => clk_net,
     ce => ce_net,
-    q => din0_14_q_net
+    q => din0_20_q_net
   );
-  din0_15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  din0_21 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
   generic map (
     latency => 1,
     reg_retiming => 0,
@@ -16645,7 +21299,157 @@ begin
     d => always_op_net,
     clk => clk_net,
     ce => ce_net,
-    q => din0_15_q_net
+    q => din0_21_q_net
+  );
+  din0_22 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 1
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => always_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_22_q_net
+  );
+  din0_23 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 1
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => always_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_23_q_net
+  );
+  din0_24 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 1
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => always_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_24_q_net
+  );
+  din0_25 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 1
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => always_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_25_q_net
+  );
+  din0_26 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 1
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => always_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_26_q_net
+  );
+  din0_27 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 1
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => always_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_27_q_net
+  );
+  din0_28 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 1
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => always_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_28_q_net
+  );
+  din0_29 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 1
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => always_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_29_q_net
+  );
+  din0_30 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 1
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => always_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_30_q_net
+  );
+  din0_31 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
+  generic map (
+    latency => 1,
+    reg_retiming => 0,
+    reset => 0,
+    width => 1
+  )
+  port map (
+    en => '1',
+    rst => '1',
+    d => always_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => din0_31_q_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/tap_delays
@@ -16655,10 +21459,10 @@ library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
 entity pfb_fir_2048ch_6i_core_tap_delays is
   port (
-    addra : in std_logic_vector( 11-1 downto 0 );
+    addra : in std_logic_vector( 13-1 downto 0 );
     dina : in std_logic_vector( 288-1 downto 0 );
     wea : in std_logic_vector( 1-1 downto 0 );
-    addrb : in std_logic_vector( 11-1 downto 0 );
+    addrb : in std_logic_vector( 13-1 downto 0 );
     web : in std_logic_vector( 1-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
@@ -16666,148 +21470,276 @@ entity pfb_fir_2048ch_6i_core_tap_delays is
   );
 end pfb_fir_2048ch_6i_core_tap_delays;
 architecture structural of pfb_fir_2048ch_6i_core_tap_delays is 
-  signal slice15_y_net_x0 : std_logic_vector( 1-1 downto 0 );
-  signal slice14_y_net_x0 : std_logic_vector( 1-1 downto 0 );
-  signal slice13_y_net_x0 : std_logic_vector( 1-1 downto 0 );
-  signal slice16_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice12_y_net_x0 : std_logic_vector( 1-1 downto 0 );
-  signal slice11_y_net_x0 : std_logic_vector( 1-1 downto 0 );
-  signal slice10_y_net_x0 : std_logic_vector( 1-1 downto 0 );
-  signal slice9_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret31_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret30_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret29_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret32_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret31_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret30_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret26_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret25_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret24_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret28_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret27_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret26_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret5_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret4_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret14_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret13_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 416-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret9_output_port_net_x0 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret22_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret21_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret20_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret19_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret18_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret17_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret16_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret15_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret8_output_port_net_x0 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret7_output_port_net_x0 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret6_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret29_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret28_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret27_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret25_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret24_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret23_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal bram9_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram8_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram23_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram21_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram22_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram23_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram28_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram15_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram14_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram15_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram16_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram17_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram2_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram27_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram26_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram30_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram31_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret32_output_port_net : std_logic_vector( 13-1 downto 0 );
+  signal bram_din_y_net : std_logic_vector( 288-1 downto 0 );
+  signal bram25_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram24_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram12_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram3_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram22_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram31_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram7_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram21_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram30_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram13_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram20_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram6_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram19_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram18_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram17_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram16_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram5_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal ce_net : std_logic;
+  signal always_op_net : std_logic_vector( 1-1 downto 0 );
+  signal bram6_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram7_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram8_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram9_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal concatenate_y_net_x4 : std_logic_vector( 288-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
+  signal bram27_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram28_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram29_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret20_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret19_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret18_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal bram18_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram19_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram20_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal slice29_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice28_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice27_y_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret23_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret22_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret21_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret29_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret28_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret27_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
   signal slice8_y_net_x0 : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret9_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret8_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret7_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret6_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret1_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal ddinb_q_net : std_logic_vector( 288-1 downto 0 );
+  signal slice7_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice6_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret32_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret31_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret30_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret2_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret1_output_port_net_x0 : std_logic_vector( 13-1 downto 0 );
+  signal concatenate_y_net_x0 : std_logic_vector( 416-1 downto 0 );
+  signal slice23_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice22_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice21_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice20_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice19_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice18_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice11_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice10_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice9_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret14_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret13_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret12_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal slice26_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice25_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice24_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice29_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice28_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice27_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret17_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret16_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret15_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
   signal slice14_y_net : std_logic_vector( 1-1 downto 0 );
   signal slice13_y_net : std_logic_vector( 1-1 downto 0 );
   signal slice12_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice11_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice10_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice9_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice8_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice7_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice6_y_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret1_output_port_net_x2 : std_logic_vector( 18-1 downto 0 );
-  signal ddina_q_net : std_logic_vector( 288-1 downto 0 );
-  signal reinterpret15_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret14_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret13_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret2_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret1_output_port_net_x1 : std_logic_vector( 9-1 downto 0 );
+  signal ddinb_q_net : std_logic_vector( 288-1 downto 0 );
+  signal reinterpret5_output_port_net_x0 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret4_output_port_net_x0 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret3_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal slice32_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice31_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice30_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice17_y_net_x0 : std_logic_vector( 1-1 downto 0 );
   signal slice16_y_net_x0 : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret12_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret11_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret10_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal never_op_net : std_logic_vector( 1-1 downto 0 );
-  signal daddr_q_net : std_logic_vector( 11-1 downto 0 );
-  signal always_op_net : std_logic_vector( 1-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
-  signal bram_din_y_net : std_logic_vector( 288-1 downto 0 );
-  signal bram11_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret15_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret14_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret13_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret9_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret8_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret7_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret6_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret5_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret4_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret3_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret2_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 11-1 downto 0 );
-  signal concatenate_y_net_x0 : std_logic_vector( 176-1 downto 0 );
-  signal reinterpret16_output_port_net_x1 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret16_output_port_net_x2 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret15_output_port_net_x0 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret14_output_port_net_x0 : std_logic_vector( 11-1 downto 0 );
-  signal bram6_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal bram2_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal concatenate_y_net_x4 : std_logic_vector( 288-1 downto 0 );
-  signal bram3_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal bram10_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret13_output_port_net_x0 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret12_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret11_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret10_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret9_output_port_net_x2 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret8_output_port_net_x2 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret7_output_port_net_x2 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret6_output_port_net_x2 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret5_output_port_net_x2 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret4_output_port_net_x2 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret3_output_port_net_x2 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret2_output_port_net_x2 : std_logic_vector( 11-1 downto 0 );
-  signal reinterpret1_output_port_net_x1 : std_logic_vector( 11-1 downto 0 );
-  signal concatenate_y_net_x1 : std_logic_vector( 176-1 downto 0 );
-  signal reinterpret14_output_port_net_x2 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret13_output_port_net_x2 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret12_output_port_net_x2 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret16_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret15_output_port_net_x2 : std_logic_vector( 18-1 downto 0 );
-  signal bram9_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram10_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram11_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram12_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram13_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram14_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram15_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret16_output_port_net_x0 : std_logic_vector( 11-1 downto 0 );
-  signal bram8_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal bram7_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal bram13_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal bram0_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret11_output_port_net_x2 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret10_output_port_net_x2 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret9_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret8_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret5_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret4_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret2_output_port_net_x0 : std_logic_vector( 18-1 downto 0 );
-  signal bram14_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal bram4_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal bram5_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal bram0_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram1_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram2_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram3_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram4_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram5_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram6_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram7_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal bram8_douta_net : std_logic_vector( 18-1 downto 0 );
-  signal slice5_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice3_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice2_y_net : std_logic_vector( 1-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 1-1 downto 0 );
-  signal concatenate_y_net_x3 : std_logic_vector( 16-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal bram12_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal bram15_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal bram9_doutb_net : std_logic_vector( 18-1 downto 0 );
-  signal slice7_y_net_x0 : std_logic_vector( 1-1 downto 0 );
-  signal slice6_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice15_y_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret19_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret18_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret17_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret16_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret15_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret8_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal slice23_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice22_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice21_y_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret4_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret3_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret11_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret10_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret9_output_port_net_x2 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret14_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret13_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret12_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret11_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret10_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret9_output_port_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret31_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret30_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret29_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret22_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret21_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret20_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret25_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret24_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret23_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal slice32_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice31_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice30_y_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret28_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret27_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret26_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret3_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret2_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret1_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal ddina_q_net : std_logic_vector( 288-1 downto 0 );
+  signal reinterpret32_output_port_net_x0 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret6_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret5_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret4_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal bram24_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram25_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram26_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret12_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret11_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret10_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret9_output_port_net_x1 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret8_output_port_net_x1 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret7_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
   signal slice5_y_net_x0 : std_logic_vector( 1-1 downto 0 );
   signal slice4_y_net_x0 : std_logic_vector( 1-1 downto 0 );
   signal slice3_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret20_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret19_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret18_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret23_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret22_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret21_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret17_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret16_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret26_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret25_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret24_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal slice20_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice19_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice18_y_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret15_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret14_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret13_output_port_net_x2 : std_logic_vector( 9-1 downto 0 );
+  signal slice5_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice3_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice14_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice13_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice12_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice17_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice16_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice15_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice8_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice7_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice6_y_net : std_logic_vector( 1-1 downto 0 );
   signal slice2_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice1_y_net : std_logic_vector( 1-1 downto 0 );
+  signal concatenate_y_net_x1 : std_logic_vector( 32-1 downto 0 );
+  signal slice26_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice25_y_net : std_logic_vector( 1-1 downto 0 );
+  signal slice24_y_net : std_logic_vector( 1-1 downto 0 );
+  signal bram0_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram1_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal slice2_y_net : std_logic_vector( 1-1 downto 0 );
   signal slice1_y_net_x0 : std_logic_vector( 1-1 downto 0 );
-  signal concatenate_y_net_x2 : std_logic_vector( 16-1 downto 0 );
-  signal slice15_y_net : std_logic_vector( 1-1 downto 0 );
-  signal bram1_doutb_net : std_logic_vector( 18-1 downto 0 );
+  signal concatenate_y_net_x2 : std_logic_vector( 32-1 downto 0 );
+  signal bram11_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram10_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram0_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram1_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram2_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram3_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram4_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram5_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal clk_net : std_logic;
+  signal bram14_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal bram29_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal reinterpret8_output_port_net_x2 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret7_output_port_net_x1 : std_logic_vector( 13-1 downto 0 );
+  signal reinterpret6_output_port_net_x0 : std_logic_vector( 13-1 downto 0 );
+  signal daddr_q_net : std_logic_vector( 13-1 downto 0 );
+  signal slice11_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice10_y_net_x0 : std_logic_vector( 1-1 downto 0 );
+  signal slice9_y_net : std_logic_vector( 1-1 downto 0 );
+  signal bram4_doutb_net : std_logic_vector( 9-1 downto 0 );
+  signal never_op_net : std_logic_vector( 1-1 downto 0 );
+  signal bram10_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram11_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram12_douta_net : std_logic_vector( 9-1 downto 0 );
+  signal bram13_douta_net : std_logic_vector( 9-1 downto 0 );
 begin
   a <= concatenate_y_net_x4;
   counter_op_net <= addra;
@@ -16817,7 +21749,7 @@ begin
   always_op_net <= web;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  a_bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_a_bussify_x0 
+  a_bussify : entity xil_defaultlib.pfb_fir_2048ch_6i_core_a_bussify 
   port map (
     in1 => bram0_douta_net,
     in2 => bram1_douta_net,
@@ -16835,98 +21767,194 @@ begin
     in14 => bram13_douta_net,
     in15 => bram14_douta_net,
     in16 => bram15_douta_net,
+    in17 => bram16_douta_net,
+    in18 => bram17_douta_net,
+    in19 => bram18_douta_net,
+    in20 => bram19_douta_net,
+    in21 => bram20_douta_net,
+    in22 => bram21_douta_net,
+    in23 => bram22_douta_net,
+    in24 => bram23_douta_net,
+    in25 => bram24_douta_net,
+    in26 => bram25_douta_net,
+    in27 => bram26_douta_net,
+    in28 => bram27_douta_net,
+    in29 => bram28_douta_net,
+    in30 => bram29_douta_net,
+    in31 => bram30_douta_net,
+    in32 => bram31_douta_net,
     bus_out => concatenate_y_net_x4
   );
   debus_addra : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_addra 
   port map (
-    bus_in => concatenate_y_net_x0,
-    msb_out16 => reinterpret16_output_port_net_x0,
-    out15 => reinterpret15_output_port_net_x1,
-    out14 => reinterpret14_output_port_net_x1,
-    out13 => reinterpret13_output_port_net_x1,
+    bus_in => concatenate_y_net,
+    msb_out32 => reinterpret32_output_port_net,
+    out31 => reinterpret31_output_port_net,
+    out30 => reinterpret30_output_port_net,
+    out29 => reinterpret29_output_port_net,
+    out28 => reinterpret28_output_port_net,
+    out27 => reinterpret27_output_port_net,
+    out26 => reinterpret26_output_port_net,
+    out25 => reinterpret25_output_port_net,
+    out24 => reinterpret24_output_port_net,
+    out23 => reinterpret23_output_port_net,
+    out22 => reinterpret22_output_port_net,
+    out21 => reinterpret21_output_port_net,
+    out20 => reinterpret20_output_port_net,
+    out19 => reinterpret19_output_port_net,
+    out18 => reinterpret18_output_port_net,
+    out17 => reinterpret17_output_port_net,
+    out16 => reinterpret16_output_port_net,
+    out15 => reinterpret15_output_port_net,
+    out14 => reinterpret14_output_port_net,
+    out13 => reinterpret13_output_port_net,
     out12 => reinterpret12_output_port_net,
     out11 => reinterpret11_output_port_net,
     out10 => reinterpret10_output_port_net,
-    out9 => reinterpret9_output_port_net_x1,
-    out8 => reinterpret8_output_port_net_x1,
-    out7 => reinterpret7_output_port_net_x1,
+    out9 => reinterpret9_output_port_net_x0,
+    out8 => reinterpret8_output_port_net_x0,
+    out7 => reinterpret7_output_port_net_x0,
     out6 => reinterpret6_output_port_net_x1,
     out5 => reinterpret5_output_port_net_x1,
     out4 => reinterpret4_output_port_net_x1,
-    out3 => reinterpret3_output_port_net_x1,
-    out2 => reinterpret2_output_port_net_x1,
+    out3 => reinterpret3_output_port_net,
+    out2 => reinterpret2_output_port_net,
     lsb_out1 => reinterpret1_output_port_net
   );
-  debus_addrb : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_addrb_x0 
+  debus_addrb : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_addrb 
   port map (
-    bus_in => concatenate_y_net_x1,
-    msb_out16 => reinterpret16_output_port_net_x2,
-    out15 => reinterpret15_output_port_net_x0,
-    out14 => reinterpret14_output_port_net_x0,
-    out13 => reinterpret13_output_port_net_x0,
+    bus_in => concatenate_y_net_x0,
+    msb_out32 => reinterpret32_output_port_net_x1,
+    out31 => reinterpret31_output_port_net_x1,
+    out30 => reinterpret30_output_port_net_x1,
+    out29 => reinterpret29_output_port_net_x1,
+    out28 => reinterpret28_output_port_net_x1,
+    out27 => reinterpret27_output_port_net_x1,
+    out26 => reinterpret26_output_port_net_x1,
+    out25 => reinterpret25_output_port_net_x1,
+    out24 => reinterpret24_output_port_net_x1,
+    out23 => reinterpret23_output_port_net_x1,
+    out22 => reinterpret22_output_port_net_x1,
+    out21 => reinterpret21_output_port_net_x1,
+    out20 => reinterpret20_output_port_net_x1,
+    out19 => reinterpret19_output_port_net_x1,
+    out18 => reinterpret18_output_port_net_x1,
+    out17 => reinterpret17_output_port_net_x1,
+    out16 => reinterpret16_output_port_net_x1,
+    out15 => reinterpret15_output_port_net_x1,
+    out14 => reinterpret14_output_port_net_x1,
+    out13 => reinterpret13_output_port_net_x1,
     out12 => reinterpret12_output_port_net_x1,
     out11 => reinterpret11_output_port_net_x1,
     out10 => reinterpret10_output_port_net_x1,
     out9 => reinterpret9_output_port_net_x2,
     out8 => reinterpret8_output_port_net_x2,
-    out7 => reinterpret7_output_port_net_x2,
-    out6 => reinterpret6_output_port_net_x2,
-    out5 => reinterpret5_output_port_net_x2,
-    out4 => reinterpret4_output_port_net_x2,
-    out3 => reinterpret3_output_port_net_x2,
-    out2 => reinterpret2_output_port_net_x2,
-    lsb_out1 => reinterpret1_output_port_net_x1
+    out7 => reinterpret7_output_port_net_x1,
+    out6 => reinterpret6_output_port_net_x0,
+    out5 => reinterpret5_output_port_net_x0,
+    out4 => reinterpret4_output_port_net_x0,
+    out3 => reinterpret3_output_port_net_x1,
+    out2 => reinterpret2_output_port_net_x1,
+    lsb_out1 => reinterpret1_output_port_net_x0
   );
   debus_dina : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_dina 
   port map (
     bus_in => ddina_q_net,
-    msb_out16 => reinterpret16_output_port_net_x1,
+    msb_out32 => reinterpret32_output_port_net_x2,
+    out31 => reinterpret31_output_port_net_x2,
+    out30 => reinterpret30_output_port_net_x2,
+    out29 => reinterpret29_output_port_net_x2,
+    out28 => reinterpret28_output_port_net_x2,
+    out27 => reinterpret27_output_port_net_x2,
+    out26 => reinterpret26_output_port_net_x2,
+    out25 => reinterpret25_output_port_net_x2,
+    out24 => reinterpret24_output_port_net_x2,
+    out23 => reinterpret23_output_port_net_x2,
+    out22 => reinterpret22_output_port_net_x2,
+    out21 => reinterpret21_output_port_net_x2,
+    out20 => reinterpret20_output_port_net_x2,
+    out19 => reinterpret19_output_port_net_x2,
+    out18 => reinterpret18_output_port_net_x2,
+    out17 => reinterpret17_output_port_net_x2,
+    out16 => reinterpret16_output_port_net_x2,
     out15 => reinterpret15_output_port_net_x2,
     out14 => reinterpret14_output_port_net_x2,
     out13 => reinterpret13_output_port_net_x2,
     out12 => reinterpret12_output_port_net_x2,
     out11 => reinterpret11_output_port_net_x2,
     out10 => reinterpret10_output_port_net_x2,
+    out9 => reinterpret9_output_port_net_x1,
+    out8 => reinterpret8_output_port_net_x1,
+    out7 => reinterpret7_output_port_net_x2,
+    out6 => reinterpret6_output_port_net_x2,
+    out5 => reinterpret5_output_port_net_x2,
+    out4 => reinterpret4_output_port_net_x2,
+    out3 => reinterpret3_output_port_net_x2,
+    out2 => reinterpret2_output_port_net_x2,
+    lsb_out1 => reinterpret1_output_port_net_x2
+  );
+  debus_dinb : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_dinb 
+  port map (
+    bus_in => ddinb_q_net,
+    msb_out32 => reinterpret32_output_port_net_x0,
+    out31 => reinterpret31_output_port_net_x0,
+    out30 => reinterpret30_output_port_net_x0,
+    out29 => reinterpret29_output_port_net_x0,
+    out28 => reinterpret28_output_port_net_x0,
+    out27 => reinterpret27_output_port_net_x0,
+    out26 => reinterpret26_output_port_net_x0,
+    out25 => reinterpret25_output_port_net_x0,
+    out24 => reinterpret24_output_port_net_x0,
+    out23 => reinterpret23_output_port_net_x0,
+    out22 => reinterpret22_output_port_net_x0,
+    out21 => reinterpret21_output_port_net_x0,
+    out20 => reinterpret20_output_port_net_x0,
+    out19 => reinterpret19_output_port_net_x0,
+    out18 => reinterpret18_output_port_net_x0,
+    out17 => reinterpret17_output_port_net_x0,
+    out16 => reinterpret16_output_port_net_x0,
+    out15 => reinterpret15_output_port_net_x0,
+    out14 => reinterpret14_output_port_net_x0,
+    out13 => reinterpret13_output_port_net_x0,
+    out12 => reinterpret12_output_port_net_x0,
+    out11 => reinterpret11_output_port_net_x0,
+    out10 => reinterpret10_output_port_net_x0,
     out9 => reinterpret9_output_port_net,
     out8 => reinterpret8_output_port_net,
     out7 => reinterpret7_output_port_net,
     out6 => reinterpret6_output_port_net,
-    out5 => reinterpret5_output_port_net_x0,
-    out4 => reinterpret4_output_port_net_x0,
-    out3 => reinterpret3_output_port_net_x0,
-    out2 => reinterpret2_output_port_net_x0,
-    lsb_out1 => reinterpret1_output_port_net_x2
-  );
-  debus_dinb : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_dinb_x0 
-  port map (
-    bus_in => ddinb_q_net,
-    msb_out16 => reinterpret16_output_port_net,
-    out15 => reinterpret15_output_port_net,
-    out14 => reinterpret14_output_port_net,
-    out13 => reinterpret13_output_port_net,
-    out12 => reinterpret12_output_port_net_x0,
-    out11 => reinterpret11_output_port_net_x0,
-    out10 => reinterpret10_output_port_net_x0,
-    out9 => reinterpret9_output_port_net_x0,
-    out8 => reinterpret8_output_port_net_x0,
-    out7 => reinterpret7_output_port_net_x0,
-    out6 => reinterpret6_output_port_net_x0,
     out5 => reinterpret5_output_port_net,
     out4 => reinterpret4_output_port_net,
-    out3 => reinterpret3_output_port_net,
-    out2 => reinterpret2_output_port_net,
-    lsb_out1 => reinterpret1_output_port_net_x0
+    out3 => reinterpret3_output_port_net_x0,
+    out2 => reinterpret2_output_port_net_x0,
+    lsb_out1 => reinterpret1_output_port_net_x1
   );
-  debus_wea : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_wea_x0 
+  debus_wea : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_wea 
   port map (
-    bus_in => concatenate_y_net_x2,
-    msb_out16 => slice16_y_net_x0,
-    out15 => slice15_y_net_x0,
-    out14 => slice14_y_net_x0,
-    out13 => slice13_y_net_x0,
-    out12 => slice12_y_net_x0,
-    out11 => slice11_y_net_x0,
-    out10 => slice10_y_net_x0,
+    bus_in => concatenate_y_net_x1,
+    msb_out32 => slice32_y_net_x0,
+    out31 => slice31_y_net_x0,
+    out30 => slice30_y_net_x0,
+    out29 => slice29_y_net_x0,
+    out28 => slice28_y_net_x0,
+    out27 => slice27_y_net_x0,
+    out26 => slice26_y_net_x0,
+    out25 => slice25_y_net_x0,
+    out24 => slice24_y_net_x0,
+    out23 => slice23_y_net_x0,
+    out22 => slice22_y_net_x0,
+    out21 => slice21_y_net_x0,
+    out20 => slice20_y_net_x0,
+    out19 => slice19_y_net,
+    out18 => slice18_y_net_x0,
+    out17 => slice17_y_net_x0,
+    out16 => slice16_y_net_x0,
+    out15 => slice15_y_net,
+    out14 => slice14_y_net,
+    out13 => slice13_y_net,
+    out12 => slice12_y_net,
+    out11 => slice11_y_net,
+    out10 => slice10_y_net,
     out9 => slice9_y_net_x0,
     out8 => slice8_y_net_x0,
     out7 => slice7_y_net_x0,
@@ -16935,18 +21963,34 @@ begin
     out4 => slice4_y_net_x0,
     out3 => slice3_y_net_x0,
     out2 => slice2_y_net_x0,
-    lsb_out1 => slice1_y_net_x0
+    lsb_out1 => slice1_y_net
   );
-  debus_web : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_web_x0 
+  debus_web : entity xil_defaultlib.pfb_fir_2048ch_6i_core_debus_web 
   port map (
-    bus_in => concatenate_y_net_x3,
-    msb_out16 => slice16_y_net,
-    out15 => slice15_y_net,
-    out14 => slice14_y_net,
-    out13 => slice13_y_net,
-    out12 => slice12_y_net,
-    out11 => slice11_y_net,
-    out10 => slice10_y_net,
+    bus_in => concatenate_y_net_x2,
+    msb_out32 => slice32_y_net,
+    out31 => slice31_y_net,
+    out30 => slice30_y_net,
+    out29 => slice29_y_net,
+    out28 => slice28_y_net,
+    out27 => slice27_y_net,
+    out26 => slice26_y_net,
+    out25 => slice25_y_net,
+    out24 => slice24_y_net,
+    out23 => slice23_y_net,
+    out22 => slice22_y_net,
+    out21 => slice21_y_net,
+    out20 => slice20_y_net,
+    out19 => slice19_y_net_x0,
+    out18 => slice18_y_net,
+    out17 => slice17_y_net,
+    out16 => slice16_y_net,
+    out15 => slice15_y_net_x0,
+    out14 => slice14_y_net_x0,
+    out13 => slice13_y_net_x0,
+    out12 => slice12_y_net_x0,
+    out11 => slice11_y_net_x0,
+    out10 => slice10_y_net_x0,
     out9 => slice9_y_net,
     out8 => slice8_y_net,
     out7 => slice7_y_net,
@@ -16955,33 +21999,465 @@ begin
     out4 => slice4_y_net,
     out3 => slice3_y_net,
     out2 => slice2_y_net,
-    lsb_out1 => slice1_y_net
+    lsb_out1 => slice1_y_net_x0
   );
   rep_addra : entity xil_defaultlib.pfb_fir_2048ch_6i_core_rep_addra 
   port map (
     in_x0 => counter_op_net,
     clk_1 => clk_net,
     ce_1 => ce_net,
-    out_x0 => concatenate_y_net_x0
+    out_x0 => concatenate_y_net
   );
   rep_addrb : entity xil_defaultlib.pfb_fir_2048ch_6i_core_rep_addrb 
   port map (
     in_x0 => daddr_q_net,
     clk_1 => clk_net,
     ce_1 => ce_net,
-    out_x0 => concatenate_y_net_x1
+    out_x0 => concatenate_y_net_x0
   );
   rep_wea : entity xil_defaultlib.pfb_fir_2048ch_6i_core_rep_wea 
   port map (
     in_x0 => never_op_net,
-    out_x0 => concatenate_y_net_x2
+    out_x0 => concatenate_y_net_x1
   );
   rep_web : entity xil_defaultlib.pfb_fir_2048ch_6i_core_rep_web 
   port map (
     in_x0 => always_op_net,
     clk_1 => clk_net,
     ce_1 => ce_net,
-    out_x0 => concatenate_y_net_x3
+    out_x0 => concatenate_y_net_x2
+  );
+  bram0 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret32_output_port_net,
+    dina => reinterpret32_output_port_net_x2,
+    wea => slice32_y_net_x0,
+    addrb => reinterpret32_output_port_net_x1,
+    dinb => reinterpret32_output_port_net_x0,
+    web => slice32_y_net,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram0_douta_net,
+    doutb => bram0_doutb_net
+  );
+  bram1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret31_output_port_net,
+    dina => reinterpret31_output_port_net_x2,
+    wea => slice31_y_net_x0,
+    addrb => reinterpret31_output_port_net_x1,
+    dinb => reinterpret31_output_port_net_x0,
+    web => slice31_y_net,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram1_douta_net,
+    doutb => bram1_doutb_net
+  );
+  bram10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret22_output_port_net,
+    dina => reinterpret22_output_port_net_x2,
+    wea => slice22_y_net_x0,
+    addrb => reinterpret22_output_port_net_x1,
+    dinb => reinterpret22_output_port_net_x0,
+    web => slice22_y_net,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram10_douta_net,
+    doutb => bram10_doutb_net
+  );
+  bram11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret21_output_port_net,
+    dina => reinterpret21_output_port_net_x2,
+    wea => slice21_y_net_x0,
+    addrb => reinterpret21_output_port_net_x1,
+    dinb => reinterpret21_output_port_net_x0,
+    web => slice21_y_net,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram11_douta_net,
+    doutb => bram11_doutb_net
+  );
+  bram12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret20_output_port_net,
+    dina => reinterpret20_output_port_net_x2,
+    wea => slice20_y_net_x0,
+    addrb => reinterpret20_output_port_net_x1,
+    dinb => reinterpret20_output_port_net_x0,
+    web => slice20_y_net,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram12_douta_net,
+    doutb => bram12_doutb_net
+  );
+  bram13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret19_output_port_net,
+    dina => reinterpret19_output_port_net_x2,
+    wea => slice19_y_net,
+    addrb => reinterpret19_output_port_net_x1,
+    dinb => reinterpret19_output_port_net_x0,
+    web => slice19_y_net_x0,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram13_douta_net,
+    doutb => bram13_doutb_net
+  );
+  bram14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret18_output_port_net,
+    dina => reinterpret18_output_port_net_x2,
+    wea => slice18_y_net_x0,
+    addrb => reinterpret18_output_port_net_x1,
+    dinb => reinterpret18_output_port_net_x0,
+    web => slice18_y_net,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram14_douta_net,
+    doutb => bram14_doutb_net
+  );
+  bram15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret17_output_port_net,
+    dina => reinterpret17_output_port_net_x2,
+    wea => slice17_y_net_x0,
+    addrb => reinterpret17_output_port_net_x1,
+    dinb => reinterpret17_output_port_net_x0,
+    web => slice17_y_net,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram15_douta_net,
+    doutb => bram15_doutb_net
+  );
+  bram2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret30_output_port_net,
+    dina => reinterpret30_output_port_net_x2,
+    wea => slice30_y_net_x0,
+    addrb => reinterpret30_output_port_net_x1,
+    dinb => reinterpret30_output_port_net_x0,
+    web => slice30_y_net,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram2_douta_net,
+    doutb => bram2_doutb_net
+  );
+  bram3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret29_output_port_net,
+    dina => reinterpret29_output_port_net_x2,
+    wea => slice29_y_net_x0,
+    addrb => reinterpret29_output_port_net_x1,
+    dinb => reinterpret29_output_port_net_x0,
+    web => slice29_y_net,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram3_douta_net,
+    doutb => bram3_doutb_net
+  );
+  bram4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret28_output_port_net,
+    dina => reinterpret28_output_port_net_x2,
+    wea => slice28_y_net_x0,
+    addrb => reinterpret28_output_port_net_x1,
+    dinb => reinterpret28_output_port_net_x0,
+    web => slice28_y_net,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram4_douta_net,
+    doutb => bram4_doutb_net
+  );
+  bram5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret27_output_port_net,
+    dina => reinterpret27_output_port_net_x2,
+    wea => slice27_y_net_x0,
+    addrb => reinterpret27_output_port_net_x1,
+    dinb => reinterpret27_output_port_net_x0,
+    web => slice27_y_net,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram5_douta_net,
+    doutb => bram5_doutb_net
+  );
+  bram6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret26_output_port_net,
+    dina => reinterpret26_output_port_net_x2,
+    wea => slice26_y_net_x0,
+    addrb => reinterpret26_output_port_net_x1,
+    dinb => reinterpret26_output_port_net_x0,
+    web => slice26_y_net,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram6_douta_net,
+    doutb => bram6_doutb_net
+  );
+  bram7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret25_output_port_net,
+    dina => reinterpret25_output_port_net_x2,
+    wea => slice25_y_net_x0,
+    addrb => reinterpret25_output_port_net_x1,
+    dinb => reinterpret25_output_port_net_x0,
+    web => slice25_y_net,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram7_douta_net,
+    doutb => bram7_doutb_net
+  );
+  bram8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret24_output_port_net,
+    dina => reinterpret24_output_port_net_x2,
+    wea => slice24_y_net_x0,
+    addrb => reinterpret24_output_port_net_x1,
+    dinb => reinterpret24_output_port_net_x0,
+    web => slice24_y_net,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram8_douta_net,
+    doutb => bram8_doutb_net
+  );
+  bram9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  generic map (
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
+    latency => 3
+  )
+  port map (
+    ena => "1",
+    enb => "1",
+    rsta => "0",
+    rstb => "0",
+    addra => reinterpret23_output_port_net,
+    dina => reinterpret23_output_port_net_x2,
+    wea => slice23_y_net_x0,
+    addrb => reinterpret23_output_port_net_x1,
+    dinb => reinterpret23_output_port_net_x0,
+    web => slice23_y_net,
+    a_clk => clk_net,
+    a_ce => ce_net,
+    b_clk => clk_net,
+    b_ce => ce_net,
+    douta => bram9_douta_net,
+    doutb => bram9_doutb_net
   );
   ddina : entity xil_defaultlib.sysgen_delay_577137305d 
   port map (
@@ -17006,13 +22482,13 @@ begin
     ce => ce_net,
     q => ddinb_q_net
   );
-  bram0 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram16 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
     latency => 3
   )
   port map (
@@ -17020,26 +22496,26 @@ begin
     enb => "1",
     rsta => "0",
     rstb => "0",
-    addra => reinterpret16_output_port_net_x0,
-    dina => reinterpret16_output_port_net_x1,
+    addra => reinterpret16_output_port_net,
+    dina => reinterpret16_output_port_net_x2,
     wea => slice16_y_net_x0,
-    addrb => reinterpret16_output_port_net_x2,
-    dinb => reinterpret16_output_port_net,
+    addrb => reinterpret16_output_port_net_x1,
+    dinb => reinterpret16_output_port_net_x0,
     web => slice16_y_net,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram0_douta_net,
-    doutb => bram0_doutb_net
+    douta => bram16_douta_net,
+    doutb => bram16_doutb_net
   );
-  bram1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram17 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
     latency => 3
   )
   port map (
@@ -17047,26 +22523,26 @@ begin
     enb => "1",
     rsta => "0",
     rstb => "0",
-    addra => reinterpret15_output_port_net_x1,
+    addra => reinterpret15_output_port_net,
     dina => reinterpret15_output_port_net_x2,
-    wea => slice15_y_net_x0,
-    addrb => reinterpret15_output_port_net_x0,
-    dinb => reinterpret15_output_port_net,
-    web => slice15_y_net,
+    wea => slice15_y_net,
+    addrb => reinterpret15_output_port_net_x1,
+    dinb => reinterpret15_output_port_net_x0,
+    web => slice15_y_net_x0,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram1_douta_net,
-    doutb => bram1_doutb_net
+    douta => bram17_douta_net,
+    doutb => bram17_doutb_net
   );
-  bram2 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram18 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
     latency => 3
   )
   port map (
@@ -17074,26 +22550,26 @@ begin
     enb => "1",
     rsta => "0",
     rstb => "0",
-    addra => reinterpret14_output_port_net_x1,
+    addra => reinterpret14_output_port_net,
     dina => reinterpret14_output_port_net_x2,
-    wea => slice14_y_net_x0,
-    addrb => reinterpret14_output_port_net_x0,
-    dinb => reinterpret14_output_port_net,
-    web => slice14_y_net,
+    wea => slice14_y_net,
+    addrb => reinterpret14_output_port_net_x1,
+    dinb => reinterpret14_output_port_net_x0,
+    web => slice14_y_net_x0,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram2_douta_net,
-    doutb => bram2_doutb_net
+    douta => bram18_douta_net,
+    doutb => bram18_doutb_net
   );
-  bram3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram19 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
     latency => 3
   )
   port map (
@@ -17101,26 +22577,26 @@ begin
     enb => "1",
     rsta => "0",
     rstb => "0",
-    addra => reinterpret13_output_port_net_x1,
+    addra => reinterpret13_output_port_net,
     dina => reinterpret13_output_port_net_x2,
-    wea => slice13_y_net_x0,
-    addrb => reinterpret13_output_port_net_x0,
-    dinb => reinterpret13_output_port_net,
-    web => slice13_y_net,
+    wea => slice13_y_net,
+    addrb => reinterpret13_output_port_net_x1,
+    dinb => reinterpret13_output_port_net_x0,
+    web => slice13_y_net_x0,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram3_douta_net,
-    doutb => bram3_doutb_net
+    douta => bram19_douta_net,
+    doutb => bram19_doutb_net
   );
-  bram4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram20 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
     latency => 3
   )
   port map (
@@ -17130,24 +22606,24 @@ begin
     rstb => "0",
     addra => reinterpret12_output_port_net,
     dina => reinterpret12_output_port_net_x2,
-    wea => slice12_y_net_x0,
+    wea => slice12_y_net,
     addrb => reinterpret12_output_port_net_x1,
     dinb => reinterpret12_output_port_net_x0,
-    web => slice12_y_net,
+    web => slice12_y_net_x0,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram4_douta_net,
-    doutb => bram4_doutb_net
+    douta => bram20_douta_net,
+    doutb => bram20_doutb_net
   );
-  bram5 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram21 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
     latency => 3
   )
   port map (
@@ -17157,24 +22633,24 @@ begin
     rstb => "0",
     addra => reinterpret11_output_port_net,
     dina => reinterpret11_output_port_net_x2,
-    wea => slice11_y_net_x0,
+    wea => slice11_y_net,
     addrb => reinterpret11_output_port_net_x1,
     dinb => reinterpret11_output_port_net_x0,
-    web => slice11_y_net,
+    web => slice11_y_net_x0,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram5_douta_net,
-    doutb => bram5_doutb_net
+    douta => bram21_douta_net,
+    doutb => bram21_doutb_net
   );
-  bram6 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram22 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
     latency => 3
   )
   port map (
@@ -17184,24 +22660,24 @@ begin
     rstb => "0",
     addra => reinterpret10_output_port_net,
     dina => reinterpret10_output_port_net_x2,
-    wea => slice10_y_net_x0,
+    wea => slice10_y_net,
     addrb => reinterpret10_output_port_net_x1,
     dinb => reinterpret10_output_port_net_x0,
-    web => slice10_y_net,
+    web => slice10_y_net_x0,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram6_douta_net,
-    doutb => bram6_doutb_net
+    douta => bram22_douta_net,
+    doutb => bram22_doutb_net
   );
-  bram7 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram23 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
     latency => 3
   )
   port map (
@@ -17209,26 +22685,26 @@ begin
     enb => "1",
     rsta => "0",
     rstb => "0",
-    addra => reinterpret9_output_port_net_x1,
-    dina => reinterpret9_output_port_net,
+    addra => reinterpret9_output_port_net_x0,
+    dina => reinterpret9_output_port_net_x1,
     wea => slice9_y_net_x0,
     addrb => reinterpret9_output_port_net_x2,
-    dinb => reinterpret9_output_port_net_x0,
+    dinb => reinterpret9_output_port_net,
     web => slice9_y_net,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram7_douta_net,
-    doutb => bram7_doutb_net
+    douta => bram23_douta_net,
+    doutb => bram23_doutb_net
   );
-  bram8 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram24 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
     latency => 3
   )
   port map (
@@ -17236,26 +22712,26 @@ begin
     enb => "1",
     rsta => "0",
     rstb => "0",
-    addra => reinterpret8_output_port_net_x1,
-    dina => reinterpret8_output_port_net,
+    addra => reinterpret8_output_port_net_x0,
+    dina => reinterpret8_output_port_net_x1,
     wea => slice8_y_net_x0,
     addrb => reinterpret8_output_port_net_x2,
-    dinb => reinterpret8_output_port_net_x0,
+    dinb => reinterpret8_output_port_net,
     web => slice8_y_net,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram8_douta_net,
-    doutb => bram8_doutb_net
+    douta => bram24_douta_net,
+    doutb => bram24_doutb_net
   );
-  bram9 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram25 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
     latency => 3
   )
   port map (
@@ -17263,26 +22739,26 @@ begin
     enb => "1",
     rsta => "0",
     rstb => "0",
-    addra => reinterpret7_output_port_net_x1,
-    dina => reinterpret7_output_port_net,
+    addra => reinterpret7_output_port_net_x0,
+    dina => reinterpret7_output_port_net_x2,
     wea => slice7_y_net_x0,
-    addrb => reinterpret7_output_port_net_x2,
-    dinb => reinterpret7_output_port_net_x0,
+    addrb => reinterpret7_output_port_net_x1,
+    dinb => reinterpret7_output_port_net,
     web => slice7_y_net,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram9_douta_net,
-    doutb => bram9_doutb_net
+    douta => bram25_douta_net,
+    doutb => bram25_doutb_net
   );
-  bram10 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram26 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
     latency => 3
   )
   port map (
@@ -17291,25 +22767,25 @@ begin
     rsta => "0",
     rstb => "0",
     addra => reinterpret6_output_port_net_x1,
-    dina => reinterpret6_output_port_net,
+    dina => reinterpret6_output_port_net_x2,
     wea => slice6_y_net_x0,
-    addrb => reinterpret6_output_port_net_x2,
-    dinb => reinterpret6_output_port_net_x0,
+    addrb => reinterpret6_output_port_net_x0,
+    dinb => reinterpret6_output_port_net,
     web => slice6_y_net,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram10_douta_net,
-    doutb => bram10_doutb_net
+    douta => bram26_douta_net,
+    doutb => bram26_doutb_net
   );
-  bram11 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram27 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
     latency => 3
   )
   port map (
@@ -17318,25 +22794,25 @@ begin
     rsta => "0",
     rstb => "0",
     addra => reinterpret5_output_port_net_x1,
-    dina => reinterpret5_output_port_net_x0,
+    dina => reinterpret5_output_port_net_x2,
     wea => slice5_y_net_x0,
-    addrb => reinterpret5_output_port_net_x2,
+    addrb => reinterpret5_output_port_net_x0,
     dinb => reinterpret5_output_port_net,
     web => slice5_y_net,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram11_douta_net,
-    doutb => bram11_doutb_net
+    douta => bram27_douta_net,
+    doutb => bram27_doutb_net
   );
-  bram12 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram28 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
     latency => 3
   )
   port map (
@@ -17345,25 +22821,25 @@ begin
     rsta => "0",
     rstb => "0",
     addra => reinterpret4_output_port_net_x1,
-    dina => reinterpret4_output_port_net_x0,
+    dina => reinterpret4_output_port_net_x2,
     wea => slice4_y_net_x0,
-    addrb => reinterpret4_output_port_net_x2,
+    addrb => reinterpret4_output_port_net_x0,
     dinb => reinterpret4_output_port_net,
     web => slice4_y_net,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram12_douta_net,
-    doutb => bram12_doutb_net
+    douta => bram28_douta_net,
+    doutb => bram28_doutb_net
   );
-  bram13 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram29 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
     latency => 3
   )
   port map (
@@ -17371,26 +22847,26 @@ begin
     enb => "1",
     rsta => "0",
     rstb => "0",
-    addra => reinterpret3_output_port_net_x1,
-    dina => reinterpret3_output_port_net_x0,
+    addra => reinterpret3_output_port_net,
+    dina => reinterpret3_output_port_net_x2,
     wea => slice3_y_net_x0,
-    addrb => reinterpret3_output_port_net_x2,
-    dinb => reinterpret3_output_port_net,
+    addrb => reinterpret3_output_port_net_x1,
+    dinb => reinterpret3_output_port_net_x0,
     web => slice3_y_net,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram13_douta_net,
-    doutb => bram13_doutb_net
+    douta => bram29_douta_net,
+    doutb => bram29_doutb_net
   );
-  bram14 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram30 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
     latency => 3
   )
   port map (
@@ -17398,26 +22874,26 @@ begin
     enb => "1",
     rsta => "0",
     rstb => "0",
-    addra => reinterpret2_output_port_net_x1,
-    dina => reinterpret2_output_port_net_x0,
+    addra => reinterpret2_output_port_net,
+    dina => reinterpret2_output_port_net_x2,
     wea => slice2_y_net_x0,
-    addrb => reinterpret2_output_port_net_x2,
-    dinb => reinterpret2_output_port_net,
+    addrb => reinterpret2_output_port_net_x1,
+    dinb => reinterpret2_output_port_net_x0,
     web => slice2_y_net,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram14_douta_net,
-    doutb => bram14_doutb_net
+    douta => bram30_douta_net,
+    doutb => bram30_doutb_net
   );
-  bram15 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
+  bram31 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldpram 
   generic map (
-    c_address_width_a => 11,
-    c_address_width_b => 11,
-    c_width_a => 18,
-    c_width_b => 18,
-    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i4",
+    c_address_width_a => 13,
+    c_address_width_b => 13,
+    c_width_a => 9,
+    c_width_b => 9,
+    core_name0 => "pfb_fir_2048ch_6i_core_blk_mem_gen_v8_3_i8",
     latency => 3
   )
   port map (
@@ -17427,16 +22903,16 @@ begin
     rstb => "0",
     addra => reinterpret1_output_port_net,
     dina => reinterpret1_output_port_net_x2,
-    wea => slice1_y_net_x0,
-    addrb => reinterpret1_output_port_net_x1,
-    dinb => reinterpret1_output_port_net_x0,
-    web => slice1_y_net,
+    wea => slice1_y_net,
+    addrb => reinterpret1_output_port_net_x0,
+    dinb => reinterpret1_output_port_net_x1,
+    web => slice1_y_net_x0,
     a_clk => clk_net,
     a_ce => ce_net,
     b_clk => clk_net,
     b_ce => ce_net,
-    douta => bram15_douta_net,
-    doutb => bram15_doutb_net
+    douta => bram31_douta_net,
+    doutb => bram31_doutb_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps/tap_split
@@ -17454,15 +22930,15 @@ entity pfb_fir_2048ch_6i_core_tap_split is
   );
 end pfb_fir_2048ch_6i_core_tap_split;
 architecture structural of pfb_fir_2048ch_6i_core_tap_split is 
+  signal slice1_y_net : std_logic_vector( 312-1 downto 0 );
   signal reinterpret4_output_port_net : std_logic_vector( 312-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 312-1 downto 0 );
-  signal reinterpret2_output_port_net : std_logic_vector( 312-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 312-1 downto 0 );
-  signal concatenate_y_net : std_logic_vector( 1248-1 downto 0 );
   signal slice3_y_net : std_logic_vector( 312-1 downto 0 );
-  signal slice4_y_net : std_logic_vector( 312-1 downto 0 );
-  signal slice1_y_net : std_logic_vector( 312-1 downto 0 );
   signal slice2_y_net : std_logic_vector( 312-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 1248-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 312-1 downto 0 );
+  signal reinterpret2_output_port_net : std_logic_vector( 312-1 downto 0 );
+  signal slice4_y_net : std_logic_vector( 312-1 downto 0 );
 begin
   msb_out4 <= reinterpret4_output_port_net;
   out3 <= reinterpret3_output_port_net;
@@ -17484,6 +22960,22 @@ begin
     clr => '0',
     input_port => slice2_y_net,
     output_port => reinterpret2_output_port_net
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_070728efbe 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice3_y_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_070728efbe 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => slice4_y_net,
+    output_port => reinterpret4_output_port_net
   );
   slice1 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -17507,25 +22999,6 @@ begin
     x => concatenate_y_net,
     y => slice2_y_net
   );
-  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
-  generic map (
-    new_lsb => 936,
-    new_msb => 1247,
-    x_width => 1248,
-    y_width => 312
-  )
-  port map (
-    x => concatenate_y_net,
-    y => slice4_y_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_070728efbe 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice4_y_net,
-    output_port => reinterpret4_output_port_net
-  );
   slice3 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
     new_lsb => 624,
@@ -17537,13 +23010,16 @@ begin
     x => concatenate_y_net,
     y => slice3_y_net
   );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_070728efbe 
+  slice4 : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
+  generic map (
+    new_lsb => 936,
+    new_msb => 1247,
+    x_width => 1248,
+    y_width => 312
+  )
   port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => slice3_y_net,
-    output_port => reinterpret3_output_port_net
+    x => concatenate_y_net,
+    y => slice4_y_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic/pfb_fir_taps
@@ -17563,34 +23039,34 @@ entity pfb_fir_2048ch_6i_core_pfb_fir_taps is
   );
 end pfb_fir_2048ch_6i_core_pfb_fir_taps;
 architecture structural of pfb_fir_2048ch_6i_core_pfb_fir_taps is 
-  signal dsync0_q_net : std_logic_vector( 1-1 downto 0 );
-  signal youngest_y_net : std_logic_vector( 192-1 downto 0 );
-  signal ddin_q_net : std_logic_vector( 96-1 downto 0 );
-  signal dsync1_q_net : std_logic_vector( 1-1 downto 0 );
-  signal concatenate_y_net_x0 : std_logic_vector( 288-1 downto 0 );
-  signal counter_op_net : std_logic_vector( 11-1 downto 0 );
+  signal counter_op_net : std_logic_vector( 13-1 downto 0 );
   signal bram_din_y_net : std_logic_vector( 288-1 downto 0 );
   signal never_op_net : std_logic_vector( 1-1 downto 0 );
-  signal daddr_q_net : std_logic_vector( 11-1 downto 0 );
-  signal always_op_net : std_logic_vector( 1-1 downto 0 );
-  signal din_delay_q_net : std_logic_vector( 96-1 downto 0 );
-  signal reinterpret_out_output_port_net : std_logic_vector( 864-1 downto 0 );
-  signal dsync2_q_net : std_logic_vector( 1-1 downto 0 );
-  signal concatenate_y_net_x1 : std_logic_vector( 336-1 downto 0 );
-  signal sync_delay_q_net : std_logic_vector( 1-1 downto 0 );
   signal clk_net : std_logic;
+  signal concatenate_y_net_x1 : std_logic_vector( 1248-1 downto 0 );
+  signal mult_din_y_net : std_logic_vector( 384-1 downto 0 );
+  signal dcoeffs_q_net : std_logic_vector( 864-1 downto 0 );
+  signal mux_y_net : std_logic_vector( 1-1 downto 0 );
+  signal concatenate_y_net : std_logic_vector( 288-1 downto 0 );
   signal ce_net : std_logic;
+  signal dsync1_q_net : std_logic_vector( 1-1 downto 0 );
   signal reinterpret4_output_port_net : std_logic_vector( 312-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 312-1 downto 0 );
   signal reinterpret2_output_port_net : std_logic_vector( 312-1 downto 0 );
   signal reinterpret1_output_port_net : std_logic_vector( 312-1 downto 0 );
-  signal concatenate_y_net_x2 : std_logic_vector( 1248-1 downto 0 );
-  signal mult_din_y_net : std_logic_vector( 384-1 downto 0 );
-  signal dcoeffs_q_net : std_logic_vector( 864-1 downto 0 );
-  signal mux_y_net : std_logic_vector( 1-1 downto 0 );
+  signal dsync0_q_net : std_logic_vector( 1-1 downto 0 );
+  signal dsync2_q_net : std_logic_vector( 1-1 downto 0 );
+  signal concatenate_y_net_x2 : std_logic_vector( 336-1 downto 0 );
+  signal ddin_q_net : std_logic_vector( 96-1 downto 0 );
+  signal youngest_y_net : std_logic_vector( 192-1 downto 0 );
+  signal daddr_q_net : std_logic_vector( 13-1 downto 0 );
+  signal always_op_net : std_logic_vector( 1-1 downto 0 );
+  signal din_delay_q_net : std_logic_vector( 96-1 downto 0 );
+  signal sync_delay_q_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret_out_output_port_net : std_logic_vector( 864-1 downto 0 );
 begin
   sync_out <= dsync2_q_net;
-  dout <= concatenate_y_net_x1;
+  dout <= concatenate_y_net_x2;
   sync_delay_q_net <= sync;
   din_delay_q_net <= din;
   reinterpret_out_output_port_net <= coeffs;
@@ -17604,7 +23080,7 @@ begin
     d3 => reinterpret1_output_port_net,
     clk_1 => clk_net,
     ce_1 => ce_net,
-    out_x0 => concatenate_y_net_x1
+    out_x0 => concatenate_y_net_x2
   );
   bus_mult : entity xil_defaultlib.pfb_fir_2048ch_6i_core_bus_mult 
   port map (
@@ -17612,7 +23088,7 @@ begin
     b => dcoeffs_q_net,
     clk_1 => clk_net,
     ce_1 => ce_net,
-    a_b => concatenate_y_net_x2
+    a_b => concatenate_y_net_x1
   );
   sync_delay : entity xil_defaultlib.pfb_fir_2048ch_6i_core_sync_delay 
   port map (
@@ -17630,15 +23106,69 @@ begin
     web => always_op_net,
     clk_1 => clk_net,
     ce_1 => ce_net,
-    a => concatenate_y_net_x0
+    a => concatenate_y_net
   );
   tap_split : entity xil_defaultlib.pfb_fir_2048ch_6i_core_tap_split 
   port map (
-    bus_in => concatenate_y_net_x2,
+    bus_in => concatenate_y_net_x1,
     msb_out4 => reinterpret4_output_port_net,
     out3 => reinterpret3_output_port_net,
     out2 => reinterpret2_output_port_net,
     lsb_out1 => reinterpret1_output_port_net
+  );
+  always : entity xil_defaultlib.sysgen_constant_0408aab623 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    op => always_op_net
+  );
+  bram_din : entity xil_defaultlib.sysgen_concat_e434e8af1d 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    in0 => ddin_q_net,
+    in1 => youngest_y_net,
+    y => bram_din_y_net
+  );
+  counter : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlcounter_free 
+  generic map (
+    core_name0 => "pfb_fir_2048ch_6i_core_c_counter_binary_v12_0_i0",
+    op_arith => xlUnsigned,
+    op_width => 13
+  )
+  port map (
+    en => "1",
+    clr => '0',
+    rst => sync_delay_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    op => counter_op_net
+  );
+  daddr : entity xil_defaultlib.sysgen_delay_4a871f286a 
+  port map (
+    clr => '0',
+    d => counter_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => daddr_q_net
+  );
+  dcoeffs : entity xil_defaultlib.sysgen_delay_50342011f4 
+  port map (
+    clr => '0',
+    d => reinterpret_out_output_port_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => dcoeffs_q_net
+  );
+  ddin : entity xil_defaultlib.sysgen_delay_a45238746b 
+  port map (
+    clr => '0',
+    d => din_delay_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => ddin_q_net
   );
   dsync0 : entity xil_defaultlib.sysgen_delay_5925cfa8d0 
   port map (
@@ -17664,28 +23194,21 @@ begin
     ce => ce_net,
     q => dsync2_q_net
   );
-  ddin : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xldelay 
-  generic map (
-    latency => 4,
-    reg_retiming => 0,
-    reset => 0,
-    width => 96
-  )
+  mult_din : entity xil_defaultlib.sysgen_concat_488c1c10f1 
   port map (
-    en => '1',
-    rst => '1',
-    d => din_delay_q_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => ddin_q_net
-  );
-  dcoeffs : entity xil_defaultlib.sysgen_delay_50342011f4 
-  port map (
+    clk => '0',
+    ce => '0',
     clr => '0',
-    d => reinterpret_out_output_port_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => dcoeffs_q_net
+    in0 => ddin_q_net,
+    in1 => concatenate_y_net,
+    y => mult_din_y_net
+  );
+  never : entity xil_defaultlib.sysgen_constant_09f24f45be 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    op => never_op_net
   );
   youngest : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlslice 
   generic map (
@@ -17695,62 +23218,8 @@ begin
     y_width => 192
   )
   port map (
-    x => concatenate_y_net_x0,
+    x => concatenate_y_net,
     y => youngest_y_net
-  );
-  bram_din : entity xil_defaultlib.sysgen_concat_e434e8af1d 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    in0 => ddin_q_net,
-    in1 => youngest_y_net,
-    y => bram_din_y_net
-  );
-  mult_din : entity xil_defaultlib.sysgen_concat_488c1c10f1 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    in0 => ddin_q_net,
-    in1 => concatenate_y_net_x0,
-    y => mult_din_y_net
-  );
-  counter : entity xil_defaultlib.pfb_fir_2048ch_6i_core_xlcounter_free 
-  generic map (
-    core_name0 => "pfb_fir_2048ch_6i_core_c_counter_binary_v12_0_i0",
-    op_arith => xlUnsigned,
-    op_width => 11
-  )
-  port map (
-    en => "1",
-    clr => '0',
-    rst => sync_delay_q_net,
-    clk => clk_net,
-    ce => ce_net,
-    op => counter_op_net
-  );
-  daddr : entity xil_defaultlib.sysgen_delay_b893d002e1 
-  port map (
-    clr => '0',
-    d => counter_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => daddr_q_net
-  );
-  never : entity xil_defaultlib.sysgen_constant_09f24f45be 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    op => never_op_net
-  );
-  always : entity xil_defaultlib.sysgen_constant_0408aab623 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    op => always_op_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_2048ch_6i_core/pfb_fir_generic
@@ -17791,43 +23260,43 @@ entity pfb_fir_2048ch_6i_core_pfb_fir_generic is
   );
 end pfb_fir_2048ch_6i_core_pfb_fir_generic;
 architecture structural of pfb_fir_2048ch_6i_core_pfb_fir_generic is 
-  signal pol1_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal pol2_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal pol2_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal concatenate_y_net_x1 : std_logic_vector( 336-1 downto 0 );
   signal reinterpret_out_output_port_net : std_logic_vector( 864-1 downto 0 );
   signal concat_y_net : std_logic_vector( 144-1 downto 0 );
   signal sync_delay_q_net_x0 : std_logic_vector( 1-1 downto 0 );
   signal din_delay_q_net : std_logic_vector( 96-1 downto 0 );
   signal dsync2_q_net : std_logic_vector( 1-1 downto 0 );
-  signal pol4_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal pol5_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal pol5_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal ce_net : std_logic;
   signal concatenate_y_net_x0 : std_logic_vector( 216-1 downto 0 );
   signal concatenate_y_net_x2 : std_logic_vector( 336-1 downto 0 );
   signal concatenate_y_net : std_logic_vector( 96-1 downto 0 );
-  signal concatenate_y_net_x1 : std_logic_vector( 336-1 downto 0 );
+  signal pol5_in0_net : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal pol3_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal pol3_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal pol5_in1_net : std_logic_vector( 8-1 downto 0 );
   signal pol4_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal pol3_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal pol4_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal pol3_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal pol2_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal pol1_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal pol2_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal pol1_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal pol0_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal pol0_in0_net : std_logic_vector( 8-1 downto 0 );
   signal reinterpret8_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal sync_delay_q_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret9_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret10_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal pol0_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal pol0_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal pol1_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret11_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal sync_delay_q_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 18-1 downto 0 );
 begin
   sync_out <= sync_delay_q_net;
   pol0_out0 <= reinterpret12_output_port_net;
@@ -17943,9 +23412,8 @@ use xil_defaultlib.conv_pkg.all;
 entity pfb_fir_2048ch_6i_core_struct is
   port (
     pol0_in0 : in std_logic_vector( 8-1 downto 0 );
-    pol1_in0 : in std_logic_vector( 8-1 downto 0 );
-    sync : in std_logic_vector( 32-1 downto 0 );
     pol0_in1 : in std_logic_vector( 8-1 downto 0 );
+    pol1_in0 : in std_logic_vector( 8-1 downto 0 );
     pol1_in1 : in std_logic_vector( 8-1 downto 0 );
     pol2_in0 : in std_logic_vector( 8-1 downto 0 );
     pol2_in1 : in std_logic_vector( 8-1 downto 0 );
@@ -17955,11 +23423,11 @@ entity pfb_fir_2048ch_6i_core_struct is
     pol4_in1 : in std_logic_vector( 8-1 downto 0 );
     pol5_in0 : in std_logic_vector( 8-1 downto 0 );
     pol5_in1 : in std_logic_vector( 8-1 downto 0 );
+    sync : in std_logic_vector( 32-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     pol0_out0 : out std_logic_vector( 18-1 downto 0 );
     pol0_out1 : out std_logic_vector( 18-1 downto 0 );
-    sync_out : out std_logic_vector( 1-1 downto 0 );
     pol1_out0 : out std_logic_vector( 18-1 downto 0 );
     pol1_out1 : out std_logic_vector( 18-1 downto 0 );
     pol2_out0 : out std_logic_vector( 18-1 downto 0 );
@@ -17969,66 +23437,67 @@ entity pfb_fir_2048ch_6i_core_struct is
     pol4_out0 : out std_logic_vector( 18-1 downto 0 );
     pol4_out1 : out std_logic_vector( 18-1 downto 0 );
     pol5_out0 : out std_logic_vector( 18-1 downto 0 );
-    pol5_out1 : out std_logic_vector( 18-1 downto 0 )
+    pol5_out1 : out std_logic_vector( 18-1 downto 0 );
+    sync_out : out std_logic_vector( 1-1 downto 0 )
   );
 end pfb_fir_2048ch_6i_core_struct;
 architecture structural of pfb_fir_2048ch_6i_core_struct is 
-  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret10_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal pol4_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal pol4_in0_net : std_logic_vector( 8-1 downto 0 );
   signal reinterpret4_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal pol0_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal clk_net : std_logic;
-  signal ce_net : std_logic;
-  signal pol2_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal pol3_in0_net : std_logic_vector( 8-1 downto 0 );
   signal pol3_in1_net : std_logic_vector( 8-1 downto 0 );
   signal reinterpret9_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret3_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal pol3_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret10_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal pol2_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal pol2_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret5_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret11_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret12_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal pol1_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal pol1_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal pol0_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal slice_y_net : std_logic_vector( 1-1 downto 0 );
+  signal ce_net : std_logic;
+  signal clk_net : std_logic;
+  signal pol0_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal sync_delay_q_net : std_logic_vector( 1-1 downto 0 );
+  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
+  signal pol5_in1_net : std_logic_vector( 8-1 downto 0 );
+  signal reinterpret1_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret8_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal reinterpret2_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal reinterpret7_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal pol4_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal pol4_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal pol5_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal pol5_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret11_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal pol0_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal pol1_in1_net : std_logic_vector( 8-1 downto 0 );
-  signal pol2_in0_net : std_logic_vector( 8-1 downto 0 );
-  signal reinterpret6_output_port_net : std_logic_vector( 18-1 downto 0 );
   signal sync_net : std_logic_vector( 32-1 downto 0 );
-  signal sync_delay_q_net : std_logic_vector( 1-1 downto 0 );
-  signal reinterpret12_output_port_net : std_logic_vector( 18-1 downto 0 );
-  signal pol1_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal pol5_in0_net : std_logic_vector( 8-1 downto 0 );
 begin
   pol0_in0_net <= pol0_in0;
-  pol0_out0 <= reinterpret12_output_port_net;
-  pol1_in0_net <= pol1_in0;
-  pol0_out1 <= reinterpret6_output_port_net;
-  sync_net <= sync;
-  sync_out <= sync_delay_q_net;
   pol0_in1_net <= pol0_in1;
+  pol0_out0 <= reinterpret12_output_port_net;
+  pol0_out1 <= reinterpret6_output_port_net;
+  pol1_in0_net <= pol1_in0;
   pol1_in1_net <= pol1_in1;
-  pol2_in0_net <= pol2_in0;
-  pol2_in1_net <= pol2_in1;
-  pol3_in0_net <= pol3_in0;
-  pol3_in1_net <= pol3_in1;
-  pol4_in0_net <= pol4_in0;
-  pol4_in1_net <= pol4_in1;
-  pol5_in0_net <= pol5_in0;
-  pol5_in1_net <= pol5_in1;
   pol1_out0 <= reinterpret11_output_port_net;
   pol1_out1 <= reinterpret5_output_port_net;
+  pol2_in0_net <= pol2_in0;
+  pol2_in1_net <= pol2_in1;
   pol2_out0 <= reinterpret10_output_port_net;
   pol2_out1 <= reinterpret4_output_port_net;
+  pol3_in0_net <= pol3_in0;
+  pol3_in1_net <= pol3_in1;
   pol3_out0 <= reinterpret9_output_port_net;
   pol3_out1 <= reinterpret3_output_port_net;
+  pol4_in0_net <= pol4_in0;
+  pol4_in1_net <= pol4_in1;
   pol4_out0 <= reinterpret8_output_port_net;
   pol4_out1 <= reinterpret2_output_port_net;
+  pol5_in0_net <= pol5_in0;
+  pol5_in1_net <= pol5_in1;
   pol5_out0 <= reinterpret7_output_port_net;
   pol5_out1 <= reinterpret1_output_port_net;
+  sync_net <= sync;
+  sync_out <= sync_delay_q_net;
   clk_net <= clk_1;
   ce_net <= ce_1;
   pfb_fir_generic : entity xil_defaultlib.pfb_fir_2048ch_6i_core_pfb_fir_generic 
@@ -18111,9 +23580,8 @@ use xil_defaultlib.conv_pkg.all;
 entity pfb_fir_2048ch_6i_core is
   port (
     pol0_in0 : in std_logic_vector( 8-1 downto 0 );
-    pol1_in0 : in std_logic_vector( 8-1 downto 0 );
-    sync : in std_logic_vector( 32-1 downto 0 );
     pol0_in1 : in std_logic_vector( 8-1 downto 0 );
+    pol1_in0 : in std_logic_vector( 8-1 downto 0 );
     pol1_in1 : in std_logic_vector( 8-1 downto 0 );
     pol2_in0 : in std_logic_vector( 8-1 downto 0 );
     pol2_in1 : in std_logic_vector( 8-1 downto 0 );
@@ -18123,10 +23591,10 @@ entity pfb_fir_2048ch_6i_core is
     pol4_in1 : in std_logic_vector( 8-1 downto 0 );
     pol5_in0 : in std_logic_vector( 8-1 downto 0 );
     pol5_in1 : in std_logic_vector( 8-1 downto 0 );
+    sync : in std_logic_vector( 32-1 downto 0 );
     clk : in std_logic;
     pol0_out0 : out std_logic_vector( 18-1 downto 0 );
     pol0_out1 : out std_logic_vector( 18-1 downto 0 );
-    sync_out : out std_logic_vector( 1-1 downto 0 );
     pol1_out0 : out std_logic_vector( 18-1 downto 0 );
     pol1_out1 : out std_logic_vector( 18-1 downto 0 );
     pol2_out0 : out std_logic_vector( 18-1 downto 0 );
@@ -18136,12 +23604,13 @@ entity pfb_fir_2048ch_6i_core is
     pol4_out0 : out std_logic_vector( 18-1 downto 0 );
     pol4_out1 : out std_logic_vector( 18-1 downto 0 );
     pol5_out0 : out std_logic_vector( 18-1 downto 0 );
-    pol5_out1 : out std_logic_vector( 18-1 downto 0 )
+    pol5_out1 : out std_logic_vector( 18-1 downto 0 );
+    sync_out : out std_logic_vector( 1-1 downto 0 )
   );
 end pfb_fir_2048ch_6i_core;
 architecture structural of pfb_fir_2048ch_6i_core is 
   attribute core_generation_info : string;
-  attribute core_generation_info of structural : architecture is "pfb_fir_2048ch_6i_core,sysgen_core_2016_4,{,compilation=IP Catalog,block_icon_display=Default,family=kintex7,part=xc7k160t,speed=-2,package=ffg676,synthesis_language=vhdl,hdl_library=xil_defaultlib,synthesis_strategy=Vivado Synthesis Defaults,implementation_strategy=Vivado Implementation Defaults,testbench=0,interface_doc=0,ce_clr=0,clock_period=5,system_simulink_period=1,waveform_viewer=0,axilite_interface=0,ip_catalog_plugin=0,hwcosim_burst_mode=0,simulation_time=10,addsub=48,concat=34,constant=36,counter=3,delay=90,dpram=20,inv=1,logical=13,mult=48,mux=3,reinterpret=596,relational=3,scale=12,slice=338,}";
+  attribute core_generation_info of structural : architecture is "pfb_fir_2048ch_6i_core,sysgen_core_2016_1,{,compilation=IP Catalog,block_icon_display=Default,family=kintex7,part=xc7k160t,speed=-2,package=ffg676,synthesis_language=vhdl,hdl_library=xil_defaultlib,synthesis_strategy=Vivado Synthesis Defaults,implementation_strategy=Vivado Implementation Defaults,testbench=0,interface_doc=0,ce_clr=0,clock_period=5,system_simulink_period=1,waveform_viewer=0,axilite_interface=0,ip_catalog_plugin=0,hwcosim_burst_mode=0,simulation_time=10,addsub=48,concat=34,constant=36,counter=3,delay=146,dpram=40,inv=1,logical=13,mult=48,mux=3,reinterpret=796,relational=3,scale=12,slice=458,}";
   signal ce_1_net : std_logic;
   signal clk_1_net : std_logic;
 begin
@@ -18156,9 +23625,8 @@ begin
   pfb_fir_2048ch_6i_core_struct : entity xil_defaultlib.pfb_fir_2048ch_6i_core_struct 
   port map (
     pol0_in0 => pol0_in0,
-    pol1_in0 => pol1_in0,
-    sync => sync,
     pol0_in1 => pol0_in1,
+    pol1_in0 => pol1_in0,
     pol1_in1 => pol1_in1,
     pol2_in0 => pol2_in0,
     pol2_in1 => pol2_in1,
@@ -18168,11 +23636,11 @@ begin
     pol4_in1 => pol4_in1,
     pol5_in0 => pol5_in0,
     pol5_in1 => pol5_in1,
+    sync => sync,
     clk_1 => clk_1_net,
     ce_1 => ce_1_net,
     pol0_out0 => pol0_out0,
     pol0_out1 => pol0_out1,
-    sync_out => sync_out,
     pol1_out0 => pol1_out0,
     pol1_out1 => pol1_out1,
     pol2_out0 => pol2_out0,
@@ -18182,6 +23650,7 @@ begin
     pol4_out0 => pol4_out0,
     pol4_out1 => pol4_out1,
     pol5_out0 => pol5_out0,
-    pol5_out1 => pol5_out1
+    pol5_out1 => pol5_out1,
+    sync_out => sync_out
   );
 end structural;

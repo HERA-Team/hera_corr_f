@@ -24,7 +24,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set IP_LifeCycle_Menu {2}
 	set IP_Logo {sysgen_icon_100.png}
 	set IP_Name {}
-	set IP_Revision {141219353}
+	set IP_Revision {150307412}
 	set IP_Socket_IP {0}
 	set IP_Socket_IP_Proj_Path {}
 	set IP_Vendor_Text {User_Company}
@@ -43,20 +43,23 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 		{{xlclockdriver_rd.vhd} -lib {xil_defaultlib}}
 		{{vivado_ip.tcl}}
 		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i0_vivado.coe}}
+		{{fft_2048ch_6a_core_dist_mem_gen_v8_0_i0_vivado.coe}}
 		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i1_vivado.coe}}
 		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i2_vivado.coe}}
+		{{fft_2048ch_6a_core_dist_mem_gen_v8_0_i1_vivado.coe}}
+		{{fft_2048ch_6a_core_dist_mem_gen_v8_0_i2_vivado.coe}}
 		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i3_vivado.coe}}
 		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i4_vivado.coe}}
 		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i5_vivado.coe}}
 		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i6_vivado.coe}}
-		{{fft_2048ch_6a_core_dist_mem_gen_v8_0_i0_vivado.coe}}
-		{{fft_2048ch_6a_core_dist_mem_gen_v8_0_i1_vivado.coe}}
-		{{fft_2048ch_6a_core_dist_mem_gen_v8_0_i2_vivado.coe}}
 		{{fft_2048ch_6a_core_dist_mem_gen_v8_0_i3_vivado.coe}}
+		{{fft_2048ch_6a_core_dist_mem_gen_v8_0_i4_vivado.coe}}
 		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i7_vivado.coe}}
 		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i8_vivado.coe}}
 		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i9_vivado.coe}}
-		{{fft_2048ch_6a_core_dist_mem_gen_v8_0_i4_vivado.coe}}
+		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i10_vivado.coe}}
+		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i11_vivado.coe}}
+		{{fft_2048ch_6a_core_blk_mem_gen_v8_3_i12_vivado.coe}}
 		{{fft_2048ch_6a_core_dist_mem_gen_v8_0_i5_vivado.coe}}
 		{{fft_2048ch_6a_core_entity_declarations.vhd} -lib {xil_defaultlib}}
 		{{fft_2048ch_6a_core.vhd} -lib {xil_defaultlib}}
@@ -70,7 +73,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set SynthesisTool {Vivado}
 	set TargetDir {/home/jackh/herafengine/fft_2048ch_6a_core}
 	set TopLevelModule {fft_2048ch_6a_core}
-	set TopLevelSimulinkHandle 75555
+	set TopLevelSimulinkHandle 217067
 	set VHDLLib {xil_defaultlib}
 	set TopLevelPortInterface {}
 	dict set TopLevelPortInterface sync Name {sync}
@@ -104,10 +107,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface shift Locs {}
 	dict set TopLevelPortInterface shift IOStandard {}
 	dict set TopLevelPortInterface pol5_in1 Name {pol5_in1}
-	dict set TopLevelPortInterface pol5_in1 Type Fix_18_17
+	dict set TopLevelPortInterface pol5_in1 Type Fix_12_11
 	dict set TopLevelPortInterface pol5_in1 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol5_in1 BinaryPoint 17
-	dict set TopLevelPortInterface pol5_in1 Width 18
+	dict set TopLevelPortInterface pol5_in1 BinaryPoint 11
+	dict set TopLevelPortInterface pol5_in1 Width 12
 	dict set TopLevelPortInterface pol5_in1 DatFile {fft_2048ch_6a_core_pol5_in1.dat}
 	dict set TopLevelPortInterface pol5_in1 IconText {pol5_in1}
 	dict set TopLevelPortInterface pol5_in1 Direction in
@@ -119,10 +122,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol5_in1 Locs {}
 	dict set TopLevelPortInterface pol5_in1 IOStandard {}
 	dict set TopLevelPortInterface pol5_in0 Name {pol5_in0}
-	dict set TopLevelPortInterface pol5_in0 Type Fix_18_17
+	dict set TopLevelPortInterface pol5_in0 Type Fix_12_11
 	dict set TopLevelPortInterface pol5_in0 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol5_in0 BinaryPoint 17
-	dict set TopLevelPortInterface pol5_in0 Width 18
+	dict set TopLevelPortInterface pol5_in0 BinaryPoint 11
+	dict set TopLevelPortInterface pol5_in0 Width 12
 	dict set TopLevelPortInterface pol5_in0 DatFile {fft_2048ch_6a_core_pol5_in0.dat}
 	dict set TopLevelPortInterface pol5_in0 IconText {pol5_in0}
 	dict set TopLevelPortInterface pol5_in0 Direction in
@@ -134,10 +137,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol5_in0 Locs {}
 	dict set TopLevelPortInterface pol5_in0 IOStandard {}
 	dict set TopLevelPortInterface pol4_in1 Name {pol4_in1}
-	dict set TopLevelPortInterface pol4_in1 Type Fix_18_17
+	dict set TopLevelPortInterface pol4_in1 Type Fix_12_11
 	dict set TopLevelPortInterface pol4_in1 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol4_in1 BinaryPoint 17
-	dict set TopLevelPortInterface pol4_in1 Width 18
+	dict set TopLevelPortInterface pol4_in1 BinaryPoint 11
+	dict set TopLevelPortInterface pol4_in1 Width 12
 	dict set TopLevelPortInterface pol4_in1 DatFile {fft_2048ch_6a_core_pol4_in1.dat}
 	dict set TopLevelPortInterface pol4_in1 IconText {pol4_in1}
 	dict set TopLevelPortInterface pol4_in1 Direction in
@@ -149,10 +152,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol4_in1 Locs {}
 	dict set TopLevelPortInterface pol4_in1 IOStandard {}
 	dict set TopLevelPortInterface pol4_in0 Name {pol4_in0}
-	dict set TopLevelPortInterface pol4_in0 Type Fix_18_17
+	dict set TopLevelPortInterface pol4_in0 Type Fix_12_11
 	dict set TopLevelPortInterface pol4_in0 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol4_in0 BinaryPoint 17
-	dict set TopLevelPortInterface pol4_in0 Width 18
+	dict set TopLevelPortInterface pol4_in0 BinaryPoint 11
+	dict set TopLevelPortInterface pol4_in0 Width 12
 	dict set TopLevelPortInterface pol4_in0 DatFile {fft_2048ch_6a_core_pol4_in0.dat}
 	dict set TopLevelPortInterface pol4_in0 IconText {pol4_in0}
 	dict set TopLevelPortInterface pol4_in0 Direction in
@@ -164,10 +167,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol4_in0 Locs {}
 	dict set TopLevelPortInterface pol4_in0 IOStandard {}
 	dict set TopLevelPortInterface pol3_in1 Name {pol3_in1}
-	dict set TopLevelPortInterface pol3_in1 Type Fix_18_17
+	dict set TopLevelPortInterface pol3_in1 Type Fix_12_11
 	dict set TopLevelPortInterface pol3_in1 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol3_in1 BinaryPoint 17
-	dict set TopLevelPortInterface pol3_in1 Width 18
+	dict set TopLevelPortInterface pol3_in1 BinaryPoint 11
+	dict set TopLevelPortInterface pol3_in1 Width 12
 	dict set TopLevelPortInterface pol3_in1 DatFile {fft_2048ch_6a_core_pol3_in1.dat}
 	dict set TopLevelPortInterface pol3_in1 IconText {pol3_in1}
 	dict set TopLevelPortInterface pol3_in1 Direction in
@@ -179,10 +182,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol3_in1 Locs {}
 	dict set TopLevelPortInterface pol3_in1 IOStandard {}
 	dict set TopLevelPortInterface pol3_in0 Name {pol3_in0}
-	dict set TopLevelPortInterface pol3_in0 Type Fix_18_17
+	dict set TopLevelPortInterface pol3_in0 Type Fix_12_11
 	dict set TopLevelPortInterface pol3_in0 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol3_in0 BinaryPoint 17
-	dict set TopLevelPortInterface pol3_in0 Width 18
+	dict set TopLevelPortInterface pol3_in0 BinaryPoint 11
+	dict set TopLevelPortInterface pol3_in0 Width 12
 	dict set TopLevelPortInterface pol3_in0 DatFile {fft_2048ch_6a_core_pol3_in0.dat}
 	dict set TopLevelPortInterface pol3_in0 IconText {pol3_in0}
 	dict set TopLevelPortInterface pol3_in0 Direction in
@@ -194,10 +197,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol3_in0 Locs {}
 	dict set TopLevelPortInterface pol3_in0 IOStandard {}
 	dict set TopLevelPortInterface pol2_in1 Name {pol2_in1}
-	dict set TopLevelPortInterface pol2_in1 Type Fix_18_17
+	dict set TopLevelPortInterface pol2_in1 Type Fix_12_11
 	dict set TopLevelPortInterface pol2_in1 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol2_in1 BinaryPoint 17
-	dict set TopLevelPortInterface pol2_in1 Width 18
+	dict set TopLevelPortInterface pol2_in1 BinaryPoint 11
+	dict set TopLevelPortInterface pol2_in1 Width 12
 	dict set TopLevelPortInterface pol2_in1 DatFile {fft_2048ch_6a_core_pol2_in1.dat}
 	dict set TopLevelPortInterface pol2_in1 IconText {pol2_in1}
 	dict set TopLevelPortInterface pol2_in1 Direction in
@@ -209,10 +212,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol2_in1 Locs {}
 	dict set TopLevelPortInterface pol2_in1 IOStandard {}
 	dict set TopLevelPortInterface pol2_in0 Name {pol2_in0}
-	dict set TopLevelPortInterface pol2_in0 Type Fix_18_17
+	dict set TopLevelPortInterface pol2_in0 Type Fix_12_11
 	dict set TopLevelPortInterface pol2_in0 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol2_in0 BinaryPoint 17
-	dict set TopLevelPortInterface pol2_in0 Width 18
+	dict set TopLevelPortInterface pol2_in0 BinaryPoint 11
+	dict set TopLevelPortInterface pol2_in0 Width 12
 	dict set TopLevelPortInterface pol2_in0 DatFile {fft_2048ch_6a_core_pol2_in0.dat}
 	dict set TopLevelPortInterface pol2_in0 IconText {pol2_in0}
 	dict set TopLevelPortInterface pol2_in0 Direction in
@@ -224,10 +227,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol2_in0 Locs {}
 	dict set TopLevelPortInterface pol2_in0 IOStandard {}
 	dict set TopLevelPortInterface pol1_in1 Name {pol1_in1}
-	dict set TopLevelPortInterface pol1_in1 Type Fix_18_17
+	dict set TopLevelPortInterface pol1_in1 Type Fix_12_11
 	dict set TopLevelPortInterface pol1_in1 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol1_in1 BinaryPoint 17
-	dict set TopLevelPortInterface pol1_in1 Width 18
+	dict set TopLevelPortInterface pol1_in1 BinaryPoint 11
+	dict set TopLevelPortInterface pol1_in1 Width 12
 	dict set TopLevelPortInterface pol1_in1 DatFile {fft_2048ch_6a_core_pol1_in1.dat}
 	dict set TopLevelPortInterface pol1_in1 IconText {pol1_in1}
 	dict set TopLevelPortInterface pol1_in1 Direction in
@@ -239,10 +242,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol1_in1 Locs {}
 	dict set TopLevelPortInterface pol1_in1 IOStandard {}
 	dict set TopLevelPortInterface pol1_in0 Name {pol1_in0}
-	dict set TopLevelPortInterface pol1_in0 Type Fix_18_17
+	dict set TopLevelPortInterface pol1_in0 Type Fix_12_11
 	dict set TopLevelPortInterface pol1_in0 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol1_in0 BinaryPoint 17
-	dict set TopLevelPortInterface pol1_in0 Width 18
+	dict set TopLevelPortInterface pol1_in0 BinaryPoint 11
+	dict set TopLevelPortInterface pol1_in0 Width 12
 	dict set TopLevelPortInterface pol1_in0 DatFile {fft_2048ch_6a_core_pol1_in0.dat}
 	dict set TopLevelPortInterface pol1_in0 IconText {pol1_in0}
 	dict set TopLevelPortInterface pol1_in0 Direction in
@@ -254,10 +257,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol1_in0 Locs {}
 	dict set TopLevelPortInterface pol1_in0 IOStandard {}
 	dict set TopLevelPortInterface pol0_in1 Name {pol0_in1}
-	dict set TopLevelPortInterface pol0_in1 Type Fix_18_17
+	dict set TopLevelPortInterface pol0_in1 Type Fix_12_11
 	dict set TopLevelPortInterface pol0_in1 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol0_in1 BinaryPoint 17
-	dict set TopLevelPortInterface pol0_in1 Width 18
+	dict set TopLevelPortInterface pol0_in1 BinaryPoint 11
+	dict set TopLevelPortInterface pol0_in1 Width 12
 	dict set TopLevelPortInterface pol0_in1 DatFile {fft_2048ch_6a_core_pol0_in1.dat}
 	dict set TopLevelPortInterface pol0_in1 IconText {pol0_in1}
 	dict set TopLevelPortInterface pol0_in1 Direction in
@@ -269,10 +272,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol0_in1 Locs {}
 	dict set TopLevelPortInterface pol0_in1 IOStandard {}
 	dict set TopLevelPortInterface pol0_in0 Name {pol0_in0}
-	dict set TopLevelPortInterface pol0_in0 Type Fix_18_17
+	dict set TopLevelPortInterface pol0_in0 Type Fix_12_11
 	dict set TopLevelPortInterface pol0_in0 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol0_in0 BinaryPoint 17
-	dict set TopLevelPortInterface pol0_in0 Width 18
+	dict set TopLevelPortInterface pol0_in0 BinaryPoint 11
+	dict set TopLevelPortInterface pol0_in0 Width 12
 	dict set TopLevelPortInterface pol0_in0 DatFile {fft_2048ch_6a_core_pol0_in0.dat}
 	dict set TopLevelPortInterface pol0_in0 IconText {pol0_in0}
 	dict set TopLevelPortInterface pol0_in0 Direction in
@@ -284,10 +287,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol0_in0 Locs {}
 	dict set TopLevelPortInterface pol0_in0 IOStandard {}
 	dict set TopLevelPortInterface out0 Name {out0}
-	dict set TopLevelPortInterface out0 Type UFix_36_0
+	dict set TopLevelPortInterface out0 Type UFix_38_0
 	dict set TopLevelPortInterface out0 ArithmeticType xlUnsigned
 	dict set TopLevelPortInterface out0 BinaryPoint 0
-	dict set TopLevelPortInterface out0 Width 36
+	dict set TopLevelPortInterface out0 Width 38
 	dict set TopLevelPortInterface out0 DatFile {fft_2048ch_6a_core_out0.dat}
 	dict set TopLevelPortInterface out0 IconText {out0}
 	dict set TopLevelPortInterface out0 Direction out
@@ -299,10 +302,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface out0 Locs {}
 	dict set TopLevelPortInterface out0 IOStandard {}
 	dict set TopLevelPortInterface out1 Name {out1}
-	dict set TopLevelPortInterface out1 Type UFix_36_0
+	dict set TopLevelPortInterface out1 Type UFix_38_0
 	dict set TopLevelPortInterface out1 ArithmeticType xlUnsigned
 	dict set TopLevelPortInterface out1 BinaryPoint 0
-	dict set TopLevelPortInterface out1 Width 36
+	dict set TopLevelPortInterface out1 Width 38
 	dict set TopLevelPortInterface out1 DatFile {fft_2048ch_6a_core_out1.dat}
 	dict set TopLevelPortInterface out1 IconText {out1}
 	dict set TopLevelPortInterface out1 Direction out
@@ -314,10 +317,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface out1 Locs {}
 	dict set TopLevelPortInterface out1 IOStandard {}
 	dict set TopLevelPortInterface out2 Name {out2}
-	dict set TopLevelPortInterface out2 Type UFix_36_0
+	dict set TopLevelPortInterface out2 Type UFix_38_0
 	dict set TopLevelPortInterface out2 ArithmeticType xlUnsigned
 	dict set TopLevelPortInterface out2 BinaryPoint 0
-	dict set TopLevelPortInterface out2 Width 36
+	dict set TopLevelPortInterface out2 Width 38
 	dict set TopLevelPortInterface out2 DatFile {fft_2048ch_6a_core_out2.dat}
 	dict set TopLevelPortInterface out2 IconText {out2}
 	dict set TopLevelPortInterface out2 Direction out
@@ -329,10 +332,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface out2 Locs {}
 	dict set TopLevelPortInterface out2 IOStandard {}
 	dict set TopLevelPortInterface out3 Name {out3}
-	dict set TopLevelPortInterface out3 Type UFix_36_0
+	dict set TopLevelPortInterface out3 Type UFix_38_0
 	dict set TopLevelPortInterface out3 ArithmeticType xlUnsigned
 	dict set TopLevelPortInterface out3 BinaryPoint 0
-	dict set TopLevelPortInterface out3 Width 36
+	dict set TopLevelPortInterface out3 Width 38
 	dict set TopLevelPortInterface out3 DatFile {fft_2048ch_6a_core_out3.dat}
 	dict set TopLevelPortInterface out3 IconText {out3}
 	dict set TopLevelPortInterface out3 Direction out
@@ -344,10 +347,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface out3 Locs {}
 	dict set TopLevelPortInterface out3 IOStandard {}
 	dict set TopLevelPortInterface out4 Name {out4}
-	dict set TopLevelPortInterface out4 Type UFix_36_0
+	dict set TopLevelPortInterface out4 Type UFix_38_0
 	dict set TopLevelPortInterface out4 ArithmeticType xlUnsigned
 	dict set TopLevelPortInterface out4 BinaryPoint 0
-	dict set TopLevelPortInterface out4 Width 36
+	dict set TopLevelPortInterface out4 Width 38
 	dict set TopLevelPortInterface out4 DatFile {fft_2048ch_6a_core_out4.dat}
 	dict set TopLevelPortInterface out4 IconText {out4}
 	dict set TopLevelPortInterface out4 Direction out
@@ -359,10 +362,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface out4 Locs {}
 	dict set TopLevelPortInterface out4 IOStandard {}
 	dict set TopLevelPortInterface out5 Name {out5}
-	dict set TopLevelPortInterface out5 Type UFix_36_0
+	dict set TopLevelPortInterface out5 Type UFix_38_0
 	dict set TopLevelPortInterface out5 ArithmeticType xlUnsigned
 	dict set TopLevelPortInterface out5 BinaryPoint 0
-	dict set TopLevelPortInterface out5 Width 36
+	dict set TopLevelPortInterface out5 Width 38
 	dict set TopLevelPortInterface out5 DatFile {fft_2048ch_6a_core_out5.dat}
 	dict set TopLevelPortInterface out5 IconText {out5}
 	dict set TopLevelPortInterface out5 Direction out

@@ -1,7 +1,7 @@
 --Copyright 1986-2016 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
---Tool Version: Vivado v.2016.4 (lin64) Build 1733598 Wed Dec 14 22:35:42 MST 2016
---Date        : Wed Sep 13 10:33:53 2017
+--Tool Version: Vivado v.2016.1 (lin64) Build 1538259 Fri Apr  8 15:45:23 MDT 2016
+--Date        : Fri Feb  9 14:47:43 2018
 --Host        : acme1 running 64-bit Ubuntu 16.04.2 LTS
 --Command     : generate_target pfb_fir_2048ch_6i_core_bd_wrapper.bd
 --Design      : pfb_fir_2048ch_6i_core_bd_wrapper
