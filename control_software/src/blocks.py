@@ -216,6 +216,7 @@ class Input(Block):
         self.USE_NOISE = 0
         self.USE_ADC   = 1
         self.USE_ZERO  = 2
+        self.INT_TIME  = 2**20 / 250.0e6
 
     def use_noise(self, stream=None):
         if stream is None:
@@ -277,9 +278,11 @@ class Input(Block):
         print ''
 
     def get_histogram(self, input, sum_cores=True):
-        v = np.array(struct.unpack('>512H', self.read('bit_stats_histogram%d_output'%input, 512*2)))
-        a = v[0::2]
-        b = v[1::2]
+        self.write_int('bit_stats_input_sel', input)
+        time.sleep(2*self.INT_TIME) # wait for new data
+        v = np.array(struct.unpack('>512H', self.read('bit_stats_histogram_output', 512*2)))
+        a = v[0::128]
+        b = v[128::256]
         a = np.roll(a, 128) # roll so that array counts -128, -127, ..., 0, ..., 126, 127
         b = np.roll(b, 128) # roll so that array counts -128, -127, ..., 0, ..., 126, 127
         vals = np.arange(-128,128)
@@ -463,7 +466,7 @@ class Eq(Block):
         coeffs[coeffs>(2**self.width - 1)] = 2**self.width - 1
         coeffs = list(coeffs)
         coeffs_str = struct.pack('>%d%s' % (len(coeffs), self.format), *coeffs)
-        self.write('%d_coeffs' % stream, coeffs_str)
+        self.write('coeffs', coeffs_str, offset=struct.calcsize(self.format)*self.ncoeffs*stream)
 
     def get_coeffs(self, stream):
         coeffs_str = self.read('%d_coeffs' % stream, self.ncoeffs*struct.calcsize(self.format))
@@ -479,7 +482,7 @@ class EqTvg(Block):
         super(EqTvg, self).__init__(host, name)
         self.nstreams = nstreams
         self.nchans = nchans
-        self.format = 'Q'
+        self.format = 'B'
 
     def tvg_enable(self):
         self.write_int('tvg_en', 1)
@@ -489,11 +492,11 @@ class EqTvg(Block):
 
     def write_freq_ramp(self):
         ramp = np.arange(self.nchans)
-        ramp = np.array(ramp%16384,dtype='>%s'%self.format) # tvg values are only 16 bits
-        tv = np.zeros(self.nchans, dtype='>%s'%self.format) 
+        ramp = np.array(ramp, dtype='>%s' %self.format) # tvg values are only 8 bits
+        tv = np.zeros(self.nchans * self.nstreams, dtype='>%s' % self.format)
         for stream in range(self.nstreams):
-            tv += ((ramp + (self.nstreams - stream - 1)*(self.nchans)) << (16*stream))
-        self.write('tv', tv.tostring())
+            tv[(stream + 1) * self.nchans : stream * self.nchans] = (tv + stream) % 256
+        self.write('tv', ramp.tostring())
 
     def initialize(self):
         self.tvg_disable()
@@ -524,80 +527,69 @@ class ChanReorder(Block):
         
 
 class Packetizer(Block):
-    def __init__(self, host, name, n_interfaces=1):
+    def __init__(self, host, name, n_time_demux=2):
         super(Packetizer, self).__init__(host, name)
-        self.n_interfaces = n_interfaces
+        self.n_time_demux = n_time_demux
+        self.n_slots = 16
 
-    def use_gpu_packing(self):
-        self.write_int('stupid_gpu_packing', 1)
+    def set_dest_ip(self, ip, slot_offset=0):
+        for time_slot in range(self.n_time_demux):
+            self.write_int('ips',ip, word_offset=(time_slot * self.n_slots + slot_offset))
 
-    def use_fpga_packing(self):
-        self.write_int('stupid_gpu_packing', 0)
-
-    def set_dest_ips(self, ips, slot_offset=0,nants=3):
-        # works only if nants=3. Else every 4th slot is non-zero.
-        ips = np.repeat(np.array(ips), nants)
-        self.write('ips', struct.pack('>%dL' % ips.shape[0], *ips), offset=4*slot_offset*nants)
-
-    def set_ant_headers(self, ants=range(3), slot_offset=0): 
-        self.write('ants', struct.pack('>%dL' % len(ants), *ants), offset=4*slot_offset*len(ants))
+    def set_ant_header(self, ant, slot_offset=0): 
+        for time_slot in range(self.n_time_demux):
+            self.write_int('ants', ant, word_offset=(time_slot * self.n_slots + slot_offset))
         
-    def set_chan_headers(self, chans, slot_offset=0,nants=3):
-        #below works only if nants=3. Otherwise every 4th chan is not zero.
-        chans = np.repeat(np.array(chans), nants)
-        self.write('chans', struct.pack('>%dL' % chans.shape[0], *chans), offset=4*slot_offset*nants)
+    def set_chan_headers(self, chan, slot_offset=0):
+        for time_slot in range(self.n_time_demux):
+            self.write_int('chans', chans, word_offset=(time_slot*self.n_slots + slot_offset*nants))
 
     def initialize(self):
-        self.set_dest_ips(np.zeros(128))
-        self.set_ant_headers(np.zeros(512))
-        self.set_chan_headers(np.zeros(128))
-        self.use_fpga_packing()
+        for time_slot in range(self.n_time_slots):
+            self.set_dest_ip(0, time_slot)
+            self.set_ant_header(0, time_slot)
+            self.set_chan_header(0, time_slot)
 
-    def assign_slot(self, slot_num, chans, dest, reorder_block, ants=[0,1,2]):
+    def assign_slot(self, slot_num, chans, dests, reorder_block, ant):
         """
-        The F-engine generates 2048 channels, but can only
-        output 1536, in order to keep within the output data rate cap.
-        Each output packet contain 16 frequency channels for a single antenna.
-        There are thus effectively 96 output slots, each corresponding
-        to a block of 16 frequency channels. Each block can be filled with
-        16 arbitrary channels (they can repeat, if you want), and sent
+        The F-engine generates 8192 channels, but can only
+        output 6144(=8192 * 3/4), in order to keep within the output data rate cap.
+        Each output packet contains 384 frequency channels for a single antenna.
+        There are thus effectively 16 output slots, each corresponding
+        to a block of 384 frequency channels. Each block can be filled with
+        arbitrary channels (they can repeat, if you want), and sent
         to a particular IP address.
-        slot_num -- a value from 0 to 95 -- the slot you want to allocate
-        chans    -- an array of 16 channels, which you want to put in this slot's packet
-        dest     -- an IP integer that is the destination of this packet
+        slot_num -- a value from 0 to 15 -- the slot you want to allocate
+        chans    -- an array of 384 channels, which you want to put in this slot's packet
+        dest     -- A list of IP addresses for each time-demuxed block.
         reorder_block -- a ChanReorder block object, which allows the
-                         packetizer to manipulate the channel ordering of the design. Bit gross.
-        ants     -- an array of 3 antennas whose channels the slot contains.
+                         packetizer to manipulate the channel ordering of the design. Bit gross. Sorry.
+        ants     -- The antenna index of the first antenna on this board. One packet contains 3 antennas
 
-        1 slot => 16 channels, 3 antennas (3 pkts)
         """
+        NCHANS_PER_SLOT = 384
         chans = np.array(chans, dtype='>L')
-        if slot_num > 95:
-            raise ValueError("Only 95 output slots can be specified")
-        if chans.shape[0] != 16:
-            raise ValueError("Each slot must contain 16 frequency channels")
-
-        # Since there are 2048 channels, and 16 channels per packet,
-        # there are really 128 slots, but every 4th one must be zero.
-        # The following map figures out where in the 128 slots one of the
-        # 96 valid slots should go.
-        slot128 = int(4*(slot_num//3) + slot_num%3)
+        if slot_num > self.n_slots:
+            raise ValueError("Only %d output slots can be specified" % self.n_slots)
+        if chans.shape[0] != NCHANS_PER_SLOT:
+            raise ValueError("Each slot must contain %d frequency channels" % NCHANS_PER_SLOT)
+        if (type(dest) != list) or (len(dest) != self.n_time_demux):
+            raise ValueError("Packetizer requires a list of desitination IPs with %d entries" % self.n_time_demux)
 
         # Set the frequency header of this slot to be the first specified channel
-        self.set_chan_headers(chans[0:1], slot_offset=slot128)
+        self.set_chan_headers(chans[0:1], slot_offset=slot_num)
 
         # Set the antenna header of this slot (every slot represents 3 antennas
-        self.set_ant_headers(ants=ants, slot_offset=slot128)
+        self.set_ant_headers(ants=[ant], slot_offset=slot_num)
 
         # Set the destination address of this slot to be the specified IP address
-        self.set_dest_ips([dest], slot_offset=slot128)
+        self.set_dest_ips(dests, slot_offset=slot_num)
 
         # set the channel orders
-        # The channels supplied need to emerge at indices slot128*16 : (slot128+1)*16
+        # The channels supplied need to emerge in the first 384 channels of a block
+        # of 512
         for cn, chan in enumerate(chans):
-            reorder_block.reindex_channel(chan, slot128*16 + cn)
-
-
+            reorder_block.reindex_channel(chan, slot_num*512 + cn)
 
         
 class Eth(Block):
@@ -673,15 +665,17 @@ class Eth(Block):
 
 
 class Corr(Block):
-    def __init__(self, host, name, acc_len=2048*1e5):
+    def __init__(self, host, name, acc_len=1e5):
         super(Corr, self).__init__(host,name)
         self.acc_len = acc_len
         
-    def get_corr(self,antenna1,antenna2):
+    def get_new_corr(self, antenna1, antenna2):
         self.write_int('input_sel',(antenna1 + (antenna2 << 8)))
         cnt = self.read_uint('acc_cnt')
 
-        while self.read_uint('acc_cnt') <= (cnt+1):
+        # Wait for 2 counts to make sure we have a clean
+        # integration containing only the selected antennas
+        while self.read_uint('acc_cnt') < (cnt + 2):
             time.sleep(0.1)
             
         spec = np.array(struct.unpack('>4096L',self.read('dout',8*2048)))
@@ -693,7 +687,7 @@ class Corr(Block):
 
     def plot_corr(self,antenna1,antenna2,show=True):
         import matplotlib.pyplot as plt
-        spec = self.get_corr(antenna1,antenna2)
+        spec = self.get_new_corr(antenna1,antenna2)
         f,ax = plt.subplots(2,2)
         ax[0][0].plot(spec.real)
         ax[0][0].set_title('Real')
@@ -707,79 +701,6 @@ class Corr(Block):
         if show:
             plt.show()
             
-# class Eth(Block):
-#     def __init__(self, host, name):
-#         super(Eth, self).__init__(host, name)
-#         self.tx = self.host.gbes
-#         self.port = 10000
-#         self.ipaddr = (10 << 24) + (0 << 16) + (10 << 8) + 112
-#         self.macaddr = 0x1122334455
-
-#     def set_arp_table(self, macs):
-#         """
-#         Set the ARP table with a list of MAC addresses.
-#         The list, `macs`, is passed such that the zeroth
-#         element is the MAC address of the device with
-#         IP XXX.XXX.XXX.0, and element N is the MAC
-#         address of the device with IP XXX.XXX.XXX.N
-#         """
-#         self.tx.set_arp_table(list(macs))
-#         #macs = list(macs)
-#         #macs_pack = struct.pack('>%dQ' % (len(macs)), *macs)
-#         #self.write('sw', macs_pack, offset=0x3000)
-
-#     def get_status(self):
-#         stat = self.read_uint('sw_status')
-#         self.tx.print_10gbe_core_details()
-#         # rv = {}
-#         # rv['rx_overrun'  ] =  (stat >> 0) & 1   
-#         # rv['rx_bad_frame'] =  (stat >> 1) & 1
-#         # rv['tx_of'       ] =  (stat >> 2) & 1   # Transmission FIFO overflow
-#         # rv['tx_afull'    ] =  (stat >> 3) & 1   # Transmission FIFO almost full
-#         # rv['tx_led'      ] =  (stat >> 4) & 1   # Transmission LED
-#         # rv['rx_led'      ] =  (stat >> 5) & 1   # Receive LED
-#         # rv['up'          ] =  (stat >> 6) & 1   # LED up
-#         # rv['eof_cnt'     ] =  (stat >> 7) & (2**25-1)
-#         # return rv
-
-#     def status_reset(self):
-#         self.change_reg_bits('ctrl', 0, 18)
-#         self.change_reg_bits('ctrl', 1, 18)
-#         self.change_reg_bits('ctrl', 0, 18)
-
-#     def set_port(self, port):
-#         self.change_reg_bits('ctrl', port, 2, 16)
-
-#     def reset(self):
-#         # disable core
-#         self.change_reg_bits('ctrl', 0, 1)
-#         # toggle reset
-#         self.change_reg_bits('ctrl', 0, 0)
-#         self.change_reg_bits('ctrl', 1, 0)
-#         self.change_reg_bits('ctrl', 0, 0)
-
-#     def enable_tx(self):
-#         self.change_reg_bits('ctrl', 1, 1)
-
-#     def initialize(self):
-#         ## Set IP address of the SNAP
-#         ## mac-location 0x00
-#         ## ip-location 0x10
-#         ## port-location 0x8
-#         self.tx.setup(self.macaddr,self.ipaddr,self.port)
-#         self.host.write(self.name, self.tx.mac.packed(), 0x00)
-#         self.host.write(self.name,self.tx.ip_address.packed(),0x10)
-#         value = (fpga.read_int(self.name, word_offset = 0x10)& 0xffff0000)
-#         self.host.write_int(self.name,value,word_offset=0x10)
-#         self.tx.fabric_enable()
-#         #self.blindwrite('sw', struct.pack('>L', ipaddr), offset=0x10)
-#         #self.set_port(self.port)
-                        
-#     # def print_status(self):
-#     #     rv = self.get_status()
-#     #     for key in rv.keys():
-#     #         print '%12s : %d'%(key,rv[key])
-
 class RoachInput(Block):
     def __init__(self, host, name, nstreams=32):
         super(RoachInput, self).__init__(host, name)
