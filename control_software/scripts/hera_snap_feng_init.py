@@ -6,6 +6,7 @@ import numpy as np
 import struct
 import collections
 import time
+import yaml
 
 parser = argparse.ArgumentParser(description='Interact with a programmed SNAP board for testing and '\
                                  'networking. FLAGS OVERRIDE CONFIG FILE!',
@@ -41,8 +42,8 @@ for fn,(host,params) in enumerate(fengs.items()):
 
 # Check that there are only 48 channels per x-engine.
 for host,params in xengs.items():
-    if 'chans' in params.keys():
-        chanrange = params['chans']
+    if 'chan_range' in params.keys():
+        chanrange = params['chan_range']
         xengs[host]['chans'] = np.arange(chanrange[0], chanrange[1])
     assert(len(params['chans'])<=48), "%s: Cannot process >48 channels."%host
 
@@ -53,15 +54,16 @@ for host,params in fengs.items():
     fengine = fengs[host]['fengine']
   
     if args.initialize:
+        print '%s: Initializing..'%host
         fengine.initialize()
 
     if args.tvg:
-        print 'Enabling EQ TVGs...'
+        print '%s:  Enabling EQ TVGs...'%host
         fengine.eq_tvg.write_freq_ramp()
         fengine.eq_tvg.tvg_enable()
 
     if args.noise:
-        print 'Setting noise TVGs...'
+        print '%s:  Setting noise TVGs...'%host
         ## Noise Block
         seed = 23
         for stream in range(fengine.noise.nstreams): 
@@ -76,14 +78,14 @@ if not args.initialize:
 if not args.tvg:
     for host,params in fengs.items():
         if params['tvg']:
-            print 'Enabling EQ TVG for %s'%host
+            print '%s: Enabling EQ TVG...'%host
             params['fengine'].eq_tvg.write_freq_ramp()
             params['fengine'].eq_tvg.tvg_enable()
 
 if not args.noise:
     for host,params in fengs.items():
         if params['noise']:
-            print 'Setting noise TVG for %s'%host
+            print '%s: Setting noise TVG...'%host
             seed = 23; fengine = params['fengine']
             for stream in range(fengine.noise.nstreams): 
                 fengine.noise.set_seed(stream, seed)
@@ -106,7 +108,6 @@ fengines_list = []
 for fhost, fparams in fengs.items():
     fengine = fparams['fengine']
     fengines_list.append(fengine)
-    print 'Setting reorder and channel alignment for %s'%fhost
 
     for xhost, xparams in xengs.items():
         ip = [int(i) for i in xparams['ip'].split('.')]
@@ -115,9 +116,9 @@ for fhost, fparams in fengs.items():
             slot = pk*n_xengs + xparams['num']
             if slot < n_slots_to_send:
                 chans = xparams['chans'][pk*chans_per_packet: (pk+1)*chans_per_packet]
-                print 'Setting slot %d: IP: %s'%(slot, xparams['ip']), chans
+                print '%s: Setting slot %d: IP: %s'%(fhost, slot, xparams['ip']), chans
                 fengine.packetizer.assign_slot(slot, chans, ip, fengine.reorder, ants=fparams['ants'])
-        fengine.eth.add_arp_entry(ip,xparam['mac'])
+        fengine.eth.add_arp_entry(ip,xparams['mac'])
 
     fengine.eth.set_port(params['host_port'])
 
