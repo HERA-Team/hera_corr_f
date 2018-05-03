@@ -478,7 +478,7 @@ class Eq(Block):
             self.set_coeffs(stream, 100*np.ones(self.ncoeffs,dtype='>%s'%self.format))
 
 class EqTvg(Block):
-    def __init__(self, host, name, nstreams=3, nchans=2**11):
+    def __init__(self, host, name, nstreams=8, nchans=2**13):
         super(EqTvg, self).__init__(host, name)
         self.nstreams = nstreams
         self.nchans = nchans
@@ -495,8 +495,8 @@ class EqTvg(Block):
         ramp = np.array(ramp, dtype='>%s' %self.format) # tvg values are only 8 bits
         tv = np.zeros(self.nchans * self.nstreams, dtype='>%s' % self.format)
         for stream in range(self.nstreams):
-            tv[(stream + 1) * self.nchans : stream * self.nchans] = (tv + stream) % 256
-        self.write('tv', ramp.tostring())
+            tv[stream*self.nchans: (stream+1)*self.nchans] = ramp + stream
+        self.write('tv', tv.tostring())
 
     def initialize(self):
         self.tvg_disable()
