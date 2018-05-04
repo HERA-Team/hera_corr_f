@@ -4,9 +4,9 @@ import argparse
 import numpy as np
 
 def decode_packet(packet):
-    p = struct.unpack('>Q512H', packet)
-    time = p[0] >> 27
-    chan = (p[0] >> 16) & (2**11 - 1)
+    p = struct.unpack('>Q4608B', packet)
+    time = p[0] >> 29
+    chan = (p[0] >> 16) & (2**13 - 1)
     ant  = p[0] & 0xffff
 
     return time, chan, ant, np.array(p[1:])
@@ -36,10 +36,10 @@ parser.add_argument('--dt',dest='timeorder',action='store_true',default=False,
 
 args = parser.parse_args()
 
-BUFSIZE = 2048
+BUFSIZE = 4616
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind(('0.0.0.0', args.port))
-sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024*1024*128)
+sock.bind(('10.10.10.136', args.port))
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024*4616*128)
 
 if args.timeorder:
     payload, addr = sock.recvfrom(BUFSIZE)
@@ -67,18 +67,21 @@ if args.timeorder:
 if args.single_packet:
     payload, addr = sock.recvfrom(BUFSIZE)
     time, chan, ant, data = decode_packet(payload)
-    print 'TIME: %d (TIME%%32: %d), CHAN: %d, ANT: %d' % (time, time%32, chan, ant)
-    for i in range(16):
-        print '%3d:%3d : ' % (32*i, 32*(i+1)),
-        for d in data[32*i:32*(i+1)]:
-            print '%3d'%d,
-        print ''
+    print 'TIME: %d (TIME%%2: %d), CHAN: %d , ANT: %d' % (time, time%2, chan, ant)
+    for ant in range(3):
+        print 'Ant: %d'%ant
+        offset = ant*384*2*2
+        for i in range(12):
+            print '%3d:%3d : ' %(i*32, (i+1)*32),
+            for d in data[(offset+i*32*2*2):(offset+32*2*2*(i+1)):4]:
+                print '%3d'%d,
+            print ''
     exit()
     
 
 n = 0
-ant_counter = np.zeros(96)
-chan_counter = np.zeros(2048)
+ant_counter = np.zeros(250)
+chan_counter = np.zeros(8192)
 data_chan_counter = np.zeros(2048*3)
 err_count = 0
 while(True):
@@ -90,8 +93,8 @@ while(True):
         ant_counter[ant] += 1
         chan_counter[chan] += 1
         if args.errors or args.timeerrors:
-            if time % 32:
-                print 'ERROR: TIME not a multiple of 32!'
+            if time % 4:
+                print 'ERROR: TIME not a multiple of 4!'
                 err_count += 1
         if args.errors or args.chanerrors:
             for i in range(16):
