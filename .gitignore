@@ -2,6 +2,8 @@
 *.log
 snap_fengine/
 !snap_fengine/outputs/
+snap_poco/
+!snap_poco/outputs/
 .Xil/
 vivado*.jou
 vivado*.str
