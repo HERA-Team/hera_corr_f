@@ -80,7 +80,7 @@ class Synth(casperfpga.synth.LMX2581):
 
 class Adc(casperfpga.snapadc.SNAPADC):
     def __init__(self, host, sample_rate=500, num_chans=2, resolution=8,ref=10):
-        super(Adc, self).__init__(host)
+        super(Adc, self).__init__(host, ref=ref)
         casperfpga.snapadc.SNAPADC.__init__(self,host,ref=ref)
         self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
@@ -89,13 +89,42 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.sample_rate     = sample_rate
         self.resolution      = resolution
 
+    def set_gain(self, gain):
+        """
+        Set the coarse gain of the ADC. Allowed values
+        are 1, 1.25, 2, 2.5, 4, 5, 8, 10, 12.5, 16, 20, 25, 32, 50.
+        """
+        gain_map = {
+          1    : 0b0000,
+          1.25 : 0b0001,
+          2    : 0b0010,
+          2.5  : 0b0011,
+          4    : 0b0100,
+          5    : 0b0101,
+          8    : 0b0110,
+          10   : 0b0111,
+          12.5 : 0b1000,
+          16   : 0b1001,
+          20   : 0b1010,
+          25   : 0b1011,
+          32   : 0b1100,
+          50   : 0b1101
+        }
+
+        if gain not in gain_map.keys():
+            raise ValueError("Gain %f is not allowed! Only gains %s are allowed" % (gain, gain_map.keys()))
+        
+        self.adc.write((gain_map[gain]<<4) + gain_map[gain], 0x2b)
+        
+
     def initialize(self):
-        self.init(self.sample_rate, self.num_chans) # from the SNAPADC class
+        self.init(self.sample_rate, self.num_chans, self.resolution) # from the SNAPADC class
         #self.alignLineClock(mode='dual_pat')
         #self.alignFrameClock()
         ##If aligning complete, alignFrameClock should not output any warning
         self.selectADC()
         self.adc.selectInput([1,1,3,3])
+        self.set_gain(4)
 
 class Sync(Block):
     def __init__(self, host, name):
@@ -278,8 +307,8 @@ class Input(Block):
 
     def get_histogram(self, input, sum_cores=True):
         v = np.array(struct.unpack('>512H', self.read('bit_stats_histogram%d_output'%input, 512*2)))
-        a = v[0::2]
-        b = v[1::2]
+        a = v[0:256]
+        b = v[256:512]
         a = np.roll(a, 128) # roll so that array counts -128, -127, ..., 0, ..., 126, 127
         b = np.roll(b, 128) # roll so that array counts -128, -127, ..., 0, ..., 126, 127
         vals = np.arange(-128,128)
