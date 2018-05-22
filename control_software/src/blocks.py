@@ -80,7 +80,6 @@ class Synth(casperfpga.synth.LMX2581):
 
 class Adc(casperfpga.snapadc.SNAPADC):
     def __init__(self, host, sample_rate=500, num_chans=2, resolution=8,ref=10):
-        super(Adc, self).__init__(host, ref=ref)
         casperfpga.snapadc.SNAPADC.__init__(self,host,ref=ref)
         self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
@@ -505,7 +504,7 @@ class Eq(Block):
             self.set_coeffs(stream, 100*np.ones(self.ncoeffs,dtype='>%s'%self.format))
 
 class EqTvg(Block):
-    def __init__(self, host, name, nstreams=3, nchans=2**11):
+    def __init__(self, host, name, nstreams=8, nchans=2**13):
         super(EqTvg, self).__init__(host, name)
         self.nstreams = nstreams
         self.nchans = nchans
@@ -517,22 +516,47 @@ class EqTvg(Block):
     def tvg_disable(self):
         self.write_int('tvg_en', 0)
 
-    def write_freq_ramp(self):
+    def write_const_ants(self,equal_pols=False):
+        """
+            Write a constant to all the channels of a polarization unless 
+            equal_pols is set, then a constant is written to all pols of 
+            an antenna.
+        """
+        tv = np.zeros(self.nchans*self.nstreams, dtype='>%s'%self.format)
+        if equal_pols:
+            for stream in range(self.nstreams):
+                tv[stream*self.nchans:(stream+1)*self.nchans] = stream//2
+        else:
+            for stream in range(self.nstreams):
+                tv[stream*self.nchans:(stream+1)*self.nchans] = stream
+        self.write('tv',tv.tostring())
+
+    def write_freq_ramp(self,equal_pols=False):
+        """ Write a frequency ramp to the test vector 
+            that is repeated for all antennas. 
+            equal_pols: Write the same ramp to both pols 
+            of an antenna.
+        """
         ramp = np.arange(self.nchans)
         ramp = np.array(ramp, dtype='>%s' %self.format) # tvg values are only 8 bits
         tv = np.zeros(self.nchans * self.nstreams, dtype='>%s' % self.format)
-        for stream in range(self.nstreams):
-            tv[(stream + 1) * self.nchans : stream * self.nchans] = (tv + stream) % 256
-        self.write('tv', ramp.tostring())
+        if equal_pols:
+            for stream in range(self.nstreams):
+                tv[stream*self.nchans: (stream+1)*self.nchans] = ramp + stream//2
+        else:
+            for stream in range(self.nstreams):
+                tv[stream*self.nchans: (stream+1)*self.nchans] = ramp + stream
+        self.write('tv', tv.tostring())
 
     def initialize(self):
         self.tvg_disable()
         self.write_freq_ramp()
 
 class ChanReorder(Block):
-    def __init__(self, host, name, nchans):
+    def __init__(self, host, name, nchans=2**10):
         super(ChanReorder, self).__init__(host, name)
         self.nchans = nchans
+        self.format = 'L'
 
     def set_channel_order(self, order):
         """
@@ -543,11 +567,19 @@ class ChanReorder(Block):
         if len(order) != self.nchans:
             logger.Error("Tried to reorder channels, but map was the wrong length")
             return
-        order_str = struct.pack('>%dL' % self.nchans, *order)
-        self.write('reorder1_map1', order_str)
+        order_str = struct.pack('>%d%s' %(self.nchans,self.format), *order)
+        self.write('reorder3_map1', order_str)
+
+    def read_reorder(self, slot_num=None):
+        reorder = self.read('reorder3_map1',1024*4)
+        reorder = struct.unpack('>%d%s'%(self.nchans,self.format),reorder)
+        if slot_num: 
+            return reorder[slot_num*64:(slot_num*64)+(384//8)]
+        else:
+            return reorder 
 
     def reindex_channel(self, actual_index, output_index):
-        self.write_int('reorder1_map1', actual_index, word_offset=output_index)
+        self.write_int('reorder3_map1', actual_index, word_offset=output_index)
 
     def initialize(self):
         self.set_channel_order(np.arange(self.nchans))
@@ -561,19 +593,20 @@ class Packetizer(Block):
 
     def set_dest_ip(self, ip, slot_offset=0):
         for time_slot in range(self.n_time_demux):
-            self.write_int('ips',ip, word_offset=(time_slot * self.n_slots + slot_offset))
+            self.write_int('ips',ip[time_slot], word_offset=(time_slot * self.n_slots + slot_offset))
 
     def set_ant_header(self, ant, slot_offset=0): 
         for time_slot in range(self.n_time_demux):
             self.write_int('ants', ant, word_offset=(time_slot * self.n_slots + slot_offset))
         
-    def set_chan_headers(self, chan, slot_offset=0):
+    def set_chan_header(self, chan, slot_offset=0):
         for time_slot in range(self.n_time_demux):
-            self.write_int('chans', chans, word_offset=(time_slot*self.n_slots + slot_offset*nants))
+            self.write_int('chans', chan, word_offset=(time_slot*self.n_slots + slot_offset))
+
 
     def initialize(self):
-        for time_slot in range(self.n_time_slots):
-            self.set_dest_ip(0, time_slot)
+        for time_slot in range(self.n_slots):
+            self.set_dest_ip([0,0], time_slot)
             self.set_ant_header(0, time_slot)
             self.set_chan_header(0, time_slot)
 
@@ -588,7 +621,7 @@ class Packetizer(Block):
         to a particular IP address.
         slot_num -- a value from 0 to 15 -- the slot you want to allocate
         chans    -- an array of 384 channels, which you want to put in this slot's packet
-        dest     -- A list of IP addresses for each time-demuxed block.
+        dests     -- A list of IP addresses of the odd and even X-engines for this chan range.
         reorder_block -- a ChanReorder block object, which allows the
                          packetizer to manipulate the channel ordering of the design. Bit gross. Sorry.
         ants     -- The antenna index of the first antenna on this board. One packet contains 3 antennas
@@ -600,23 +633,24 @@ class Packetizer(Block):
             raise ValueError("Only %d output slots can be specified" % self.n_slots)
         if chans.shape[0] != NCHANS_PER_SLOT:
             raise ValueError("Each slot must contain %d frequency channels" % NCHANS_PER_SLOT)
-        if (type(dest) != list) or (len(dest) != self.n_time_demux):
+
+        if (type(dests) != list) or (len(dests) != self.n_time_demux):
             raise ValueError("Packetizer requires a list of desitination IPs with %d entries" % self.n_time_demux)
 
         # Set the frequency header of this slot to be the first specified channel
-        self.set_chan_headers(chans[0:1], slot_offset=slot_num)
+        self.set_chan_header(chans[0], slot_offset=slot_num)
 
         # Set the antenna header of this slot (every slot represents 3 antennas
-        self.set_ant_headers(ants=[ant], slot_offset=slot_num)
+        self.set_ant_header(ant=ant, slot_offset=slot_num)
 
         # Set the destination address of this slot to be the specified IP address
-        self.set_dest_ips(dests, slot_offset=slot_num)
+        self.set_dest_ip(dests, slot_offset=slot_num)
 
         # set the channel orders
         # The channels supplied need to emerge in the first 384 channels of a block
-        # of 512
-        for cn, chan in enumerate(chans):
-            reorder_block.reindex_channel(chan, slot_num*512 + cn)
+        # of 512 (first 192 clks of 256clks for 2 pols)
+        for cn, chan in enumerate(chans[::8]):
+            reorder_block.reindex_channel(chan//8, slot_num*64 + cn)
 
         
 class Eth(Block):
@@ -663,6 +697,7 @@ class Eth(Block):
         self.change_reg_bits('ctrl', 0, 18)
 
     def set_port(self, port):
+        self.port = port
         self.change_reg_bits('ctrl', port, 2, 16)
 
     def reset(self):
@@ -705,7 +740,7 @@ class Corr(Block):
         while self.read_uint('acc_cnt') < (cnt + 2):
             time.sleep(0.1)
             
-        spec = np.array(struct.unpack('>4096L',self.read('dout',8*2048)))
+        spec = np.array(struct.unpack('>1024Q',self.read('dout',8*1024)))
         
         return (spec[0::2]+1j*spec[1::2])/self.acc_len
     
