@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import argparse
+import casperfpga
 from hera_corr_f import SnapFengine
 import numpy as np
 import struct
@@ -28,6 +29,8 @@ parser = argparse.ArgumentParser(description='Interact with a programmed SNAP bo
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('config_file',type=str,
                     help = 'YAML configuration file with hosts and channels list')
+parser.add_argument('-p', '--program', action='store_true', default=False,
+                    help='Use this flag to program FPGAs with the fpgfile specified in the config file')
 args = parser.parse_args()
 
 with open(args.config_file,'r') as fp:
@@ -51,6 +54,11 @@ for host,params in xengs.items():
 
 # Initialize, set input according to command line flags.
 for host,params in fengs.items():
+
+    if args.program:
+        print "Programming %s with %s" % (params['host_ip'], config['fpgfile'])
+        f = casperfpga.CasperFpga(params['host_ip'])
+        f.upload_to_ram_and_program(config['fpgfile'])
 
     fengs[host]['fengine'] = SnapFengine(params['host_ip'])
     fengine = fengs[host]['fengine']
