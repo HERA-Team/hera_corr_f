@@ -224,7 +224,7 @@ class NoiseGen(Block):
         if stream > self.nstreams:
             logger.error('Tried to get noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
             return
-        reg_name = 'seed_%d' % (stream // 4)
+        regname = 'seed_%d' % (stream // 4)
         return (self.read_uint(regname) >> (8 * stream % 4)) & 0xff
 
 
