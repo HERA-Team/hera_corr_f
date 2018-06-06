@@ -16,7 +16,11 @@
 
 # You can set the following global parameters for all fengines 
 # or enable them for only some fengines. The global parameters 
-# overrride the individual fengine settings.
+# override the individual fengine settings.
+
+# The fpgfile that the SNAP boards have to be programmed with. 
+# Set the 'p' flag with calling the init script to program the boards.
+fpgfile: '/home/deepthi/herafengine/snap_fengine/outputs/snap_fengine_2018-05-12_1916.fpg'
 
 # You can sync the fengines using an external PPS signal
 # or manually using a software register. 
@@ -38,7 +42,7 @@ noise: False
 
 initialize: False
 
-# Disable transmission for all fengines
+# Enable transmission for all fengines
 eth: True
 
 fengines:
@@ -75,11 +79,11 @@ fengines:
 #        noise: False
 #        eth: True
 #    snap1:
-#        host_ip: '10.0.10.201'
+#        host_ip: '10.10.10.201'
 #        dest_port: 8511
 #        ants: [9,10,11]
 #        init: True
-#        tvg: True
+#        tvg: 'const_pols'
 #        noise: False
 #        eth: True
 #    snap109:

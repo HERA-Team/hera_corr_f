@@ -9,6 +9,20 @@ import collections
 import time
 import yaml
 
+parser = argparse.ArgumentParser(description='Interact with a programmed SNAP board for testing and '\
+                                 'networking. Requires a yaml based config file (see example).',
+                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('config_file',type=str,
+                    help = 'YAML configuration file with hosts and channels list')
+parser.add_argument('-p','--program', action='store_true', default=False,
+                    help='Program FPGAs with the fpgfile specified in the config file if not programmed already')
+args = parser.parse_args()
+
+with open(args.config_file,'r') as fp:
+    config = yaml.load(fp)
+fengs = config['fengines']
+xengs = config['xengines']
+
 def set_test_vector(fengine,mode):
    if mode == 'const_ants':
        fengine.eq_tvg.write_const_ants(equal_pols=True)
@@ -23,20 +37,6 @@ def set_test_vector(fengine,mode):
        fengine.eq_tvg.write_freq_ramp(equal_pols=True)
    fengine.eq_tvg.tvg_enable()
    return True
-
-parser = argparse.ArgumentParser(description='Interact with a programmed SNAP board for testing and '\
-                                 'networking. Requires a yaml based config file (see example).',
-                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('config_file',type=str,
-                    help = 'YAML configuration file with hosts and channels list')
-parser.add_argument('-p', '--program', action='store_true', default=False,
-                    help='Use this flag to program FPGAs with the fpgfile specified in the config file')
-args = parser.parse_args()
-
-with open(args.config_file,'r') as fp:
-    config = yaml.load(fp)
-fengs = config['fengines']
-xengs = config['xengines']
 
 # Check that there are only three antennas per board
 for fn,(host,params) in enumerate(fengs.items()):
@@ -56,9 +56,12 @@ for host,params in xengs.items():
 for host,params in fengs.items():
 
     if args.program:
-        print "Programming %s with %s" % (params['host_ip'], config['fpgfile'])
         f = casperfpga.CasperFpga(params['host_ip'])
-        f.upload_to_ram_and_program(config['fpgfile'])
+        if f.transport.get_metadata()['filename'] == config['fpgfile'].split('/')[-1]:
+            print "%s already programmed with file. Skipping.. " % params['host_ip']
+        else:
+            print "Programming %s with %s" % (params['host_ip'], config['fpgfile'])
+            f.upload_to_ram_and_program(config['fpgfile'])
 
     fengs[host]['fengine'] = SnapFengine(params['host_ip'])
     fengine = fengs[host]['fengine']
@@ -107,96 +110,42 @@ if not config['noise']:
 n_xengs = 16
 chans_per_packet = 384 # Hardcoded in firmware
 
-fengines_list = []
-for fhost, fparams in fengs.items():
-    fengine = fparams['fengine']
-    fengines_list.append(fengine)
+#fengines_list = []
+#for fhost, fparams in fengs.items():
+#    fengine = fparams['fengine']
+#    fengines_list.append(fengine)
+#
+#    for xhost, xparams in xengs.items():
+#        if (xparams['num'] > n_xengs): 
+#           raise ValueError("Cannot have more than %d X-engs!!"%n_xengs)
+#        print '%s: Setting Xengine %d: '%(xhost,xparams['num']),\
+#              'IP Even: %s'%xparams['even']['ip'],\
+#              'IP Odd: %s'%xparams['odd']['ip']
+#           
+#        ip = [int(i) for i in xparams['even']['ip'].split('.')]
+#        ip_even = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
+#        ip = [int(i) for i in xparams['odd']['ip'].split('.')]
+#        ip_odd = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
+#        fengine.packetizer.assign_slot(xparams['num'], xparams['chans'], \
+#                                       [ip_even,ip_odd], fengine.reorder,\
+#                                       fparams['ants'][0])
+#        fengine.eth.add_arp_entry(ip_even,xparams['even']['mac'])
+#        fengine.eth.add_arp_entry(ip_odd,xparams['odd']['mac'])
+#
+#    fengine.eth.set_port(fparams['dest_port'])
 
-    for xhost, xparams in xengs.items():
-        if (xparams['num'] > n_xengs): 
-           raise ValueError("Cannot have more than %d X-engs!!"%n_xengs)
-        print '%s: Setting Xengine %d: '%(xhost,xparams['num']),\
-              'IP Even: %s'%xparams['even']['ip'],\
-              'IP Odd: %s'%xparams['odd']['ip']
-           
-        ip = [int(i) for i in xparams['even']['ip'].split('.')]
-        ip_even = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
-        ip = [int(i) for i in xparams['odd']['ip'].split('.')]
-        ip_odd = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
-        fengine.packetizer.assign_slot(xparams['num'], xparams['chans'], \
-                                       [ip_even,ip_odd], fengine.reorder,\
-                                       fparams['ants'][0])
-        fengine.eth.add_arp_entry(ip_even,xparams['even']['mac'])
-        fengine.eth.add_arp_entry(ip_odd,xparams['odd']['mac'])
-
-    fengine.eth.set_port(fparams['dest_port'])
-
-#fengines_list=[SnapFengine('snap111')]
+fengines_list=[SnapFengine('snap111')]
 # Set packetizer chan values
-#ips = [((10<<24)+(10<<16)+(10<<8)+136),0]
-#ant = 63 #index of first antenna on board
-#
-#for slot in range(16): #16 Xengines
-#    chans = np.arange(slot*384,(slot+1)*384,1)
-#    fengs['snap111']['fengine'].packetizer.assign_slot(slot, chans, ips, fengine.reorder, ant) 
-#
-#fengs['snap111']['fengine'].eth.add_arp_entry(((10<<24)+(10<<16)+(10<<8)+136),0x02020a140102)
-#fengs['snap111']['fengine'].eth.set_port(8511)
+ips = [((10<<24)+(10<<16)+(10<<8)+136),0]
+ant = 63 #index of first antenna on board
 
-# Set the output ordering stuff
-# First set the antenna indices for each board. For now we just
-# assume 3 antennas per board, and increment in the order the
-# boards are presented as arguments to this script.
-nants = 3
-for fn, fengine in enumerate(fengines):
-    print 'Setting Antenna indices...'
-    fengine.packetizer.initialize()
-    fengine.reorder.initialize()
-    fengine.packetizer.set_ant_headers(np.arange(nants+1) + nants*fn) # TODO something smarter to number antennas
+for slot in range(16): #16 Xengines
+    chans = np.arange(slot*384,(slot+1)*384,1)
+    fengs['snap111']['fengine'].packetizer.assign_slot(slot, chans, ips, fengine.reorder, ant) 
 
-# output mappings
-# Now prepare to map the destinations of different frequency slots.
-# For now assume that we are going to send a contiguous chunk of 1536
-# channels to 32 X-engines. Generate the mapping of channels to
-# X-engine (but for now just make all the destinations the same.
+fengs['snap111']['fengine'].eth.add_arp_entry(((10<<24)+(10<<16)+(10<<8)+136),0x02020a140102)
+fengs['snap111']['fengine'].eth.set_port(8511)
 
-dest_mac = 0x0002c91f1151                               # simech1
-dest_ip  = (10<<24) + (0<<16) + (10<<8) + (123<<0)      # simech1
-
-chans_to_send = np.arange(256, 256+1536) # A contiguous block in the middle of the band
-
-n_xengs = 32
-chans_per_packet = 16 # Hardcoded in firmware
-chans_per_xeng = 1536 / 32 # 48
-packets_per_xeng = chans_per_xeng / chans_per_packet # 3
-
-xeng_ips = [dest_ip] * n_xengs
-xeng_macs = [dest_mac] * n_xengs
-
-
-chan_blocks = []
-for xn in range(n_xengs):
-    chan_blocks += [chans_to_send[xn*chans_per_xeng : (xn+1)*chans_per_xeng]]
-
-# Populate the F-engine output slots of which there are 96
-# Each slot is used to send 16 channels from all antennas to
-# an arbitrary destination.
-n_slots_to_send = 96
-for fengine in fengines:
-    for pk in range(packets_per_xeng):
-        for xn in range(n_xengs):
-            slot = pk*n_xengs + xn
-            if slot < n_slots_to_send:
-                chans = chan_blocks[xn][pk*chans_per_packet : (pk+1)*chans_per_packet]
-                print 'Setting slot %d: IP: %d' % (slot, xeng_ips[xn]) , chans
-                fengine.packetizer.assign_slot(slot, chans, xeng_ips[xn], fengine.reorder)
-    
-# Finally set the SNAP ARP tables and enable transmission
-
-for fengine in fengines:
-    fengine.eth.set_port(10000)
-    for xn in range(n_xengs):
-        fengine.eth.add_arp_entry(xeng_ips[xn], xeng_macs[xn])
 
 # Sync logic. Do global sync first, and then noise generators
 # wait for a PPS to pass then arm all the boards
