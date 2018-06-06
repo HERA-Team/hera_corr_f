@@ -548,6 +548,11 @@ class EqTvg(Block):
                 tv[stream*self.nchans: (stream+1)*self.nchans] = ramp + stream
         self.write('tv', tv.tostring())
 
+    def read_tvg(self):
+        """ Read the test vector written to the sw bram """
+        tvg = struct.unpack('>%d%s'%(self.nchans*self.nstreams,self.format),self.read('tv',8192*8))
+        return tvg
+
     def initialize(self):
         self.tvg_disable()
         self.write_freq_ramp()
@@ -740,14 +745,14 @@ class Corr(Block):
         while self.read_uint('acc_cnt') < (cnt + 2):
             time.sleep(0.1)
             
-        spec = np.array(struct.unpack('>1024Q',self.read('dout',8*1024)))
+        spec = np.array(struct.unpack('>2048L',self.read('dout',8*1024)))
         
         return (spec[0::2]+1j*spec[1::2])/self.acc_len
     
     def initialize(self):
         self.write_int('acc_len',self.acc_len)
 
-    def plot_corr(self,antenna1,antenna2,show=True):
+    def plot_corr(self,antenna1,antenna2,show=True,test=False):
         import matplotlib.pyplot as plt
         spec = self.get_new_corr(antenna1,antenna2)
         f,ax = plt.subplots(2,2)
@@ -758,7 +763,7 @@ class Corr(Block):
         ax[1][0].plot(np.angle(spec))
         ax[1][0].set_title('Phase')
         ax[1][1].plot(10*np.log10(np.abs(spec)))
-        ax[1][1].set_title('Power [dB]')
+        ax[1][1].set_title('Power [dB]')            
 
         if show:
             plt.show()
