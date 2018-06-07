@@ -686,16 +686,21 @@ class Eth(Block):
     def get_status(self):
         stat = self.read_uint('sw_txs_ss_status')
         rv = {}
-        rv['rx_overrun'  ] =  (stat >> 0) & 1   
-        rv['rx_bad_frame'] =  (stat >> 1) & 1
-        rv['tx_of'       ] =  (stat >> 2) & 1   # Transmission FIFO overflow
-        rv['tx_afull'    ] =  (stat >> 3) & 1   # Transmission FIFO almost full
-        rv['tx_led'      ] =  (stat >> 4) & 1   # Transmission LED
-        rv['rx_led'      ] =  (stat >> 5) & 1   # Receive LED
-        rv['up'          ] =  (stat >> 6) & 1   # LED up
-        rv['eof_cnt'     ] =  (stat >> 7) & (2**25-1)
+        #rv['rx_overrun'  ] =  (stat >> 0) & 1   
+        #rv['rx_bad_frame'] =  (stat >> 1) & 1
+        #rv['tx_of'       ] =  (stat >> 2) & 1   # Transmission FIFO overflow
+        #rv['tx_afull'    ] =  (stat >> 3) & 1   # Transmission FIFO almost full
+        #rv['tx_led'      ] =  (stat >> 4) & 1   # Transmission LED
+        #rv['rx_led'      ] =  (stat >> 5) & 1   # Receive LED
+        #rv['up'          ] =  (stat >> 6) & 1   # LED up
+        #rv['eof_cnt'     ] =  (stat >> 7) & (2**25-1)
+        rv['tx_of'        ] =  self.read_uint('sw_txofctr')
+        rv['tx_full'      ] =  self.read_uint('sw_txfullctr')
+        rv['tx_err'       ] =  self.read_uint('sw_txerrctr')
+        rv['tx_vld'       ] =  self.read_uint('sw_txvldctr')
+        rv['tx_ctr'       ] =  self.read_uint('sw_txctr')
         return rv
-
+        
     def status_reset(self):
         self.change_reg_bits('ctrl', 0, 18)
         self.change_reg_bits('ctrl', 1, 18)
@@ -732,7 +737,7 @@ class Eth(Block):
 
 
 class Corr(Block):
-    def __init__(self, host, name, acc_len=1e5):
+    def __init__(self, host, name, acc_len=8192*32):
         super(Corr, self).__init__(host,name)
         self.acc_len = acc_len
         
@@ -749,9 +754,6 @@ class Corr(Block):
         
         return (spec[0::2]+1j*spec[1::2])/self.acc_len
     
-    def initialize(self):
-        self.write_int('acc_len',self.acc_len)
-
     def plot_corr(self,antenna1,antenna2,show=True,test=False):
         import matplotlib.pyplot as plt
         spec = self.get_new_corr(antenna1,antenna2)
@@ -767,6 +769,14 @@ class Corr(Block):
 
         if show:
             plt.show()
+
+    def set_acc_len(self,acc_len):
+        acc_len = 8192*acc_len #Convert to clks from spectra 
+        self.write_int('acc_len',acc_len)
+
+    def initialize(self):
+        self.set_acc_len(self.acc_len)
+
             
 class RoachInput(Block):
     def __init__(self, host, name, nstreams=32):
