@@ -110,42 +110,29 @@ if not config['noise']:
 n_xengs = 16
 chans_per_packet = 384 # Hardcoded in firmware
 
-#fengines_list = []
-#for fhost, fparams in fengs.items():
-#    fengine = fparams['fengine']
-#    fengines_list.append(fengine)
-#
-#    for xhost, xparams in xengs.items():
-#        if (xparams['num'] > n_xengs): 
-#           raise ValueError("Cannot have more than %d X-engs!!"%n_xengs)
-#        print '%s: Setting Xengine %d: '%(xhost,xparams['num']),\
-#              'IP Even: %s'%xparams['even']['ip'],\
-#              'IP Odd: %s'%xparams['odd']['ip']
-#           
-#        ip = [int(i) for i in xparams['even']['ip'].split('.')]
-#        ip_even = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
-#        ip = [int(i) for i in xparams['odd']['ip'].split('.')]
-#        ip_odd = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
-#        fengine.packetizer.assign_slot(xparams['num'], xparams['chans'], \
-#                                       [ip_even,ip_odd], fengine.reorder,\
-#                                       fparams['ants'][0])
-#        fengine.eth.add_arp_entry(ip_even,xparams['even']['mac'])
-#        fengine.eth.add_arp_entry(ip_odd,xparams['odd']['mac'])
-#
-#    fengine.eth.set_port(fparams['dest_port'])
+fengines_list = []
+for fhost, fparams in fengs.items():
+    fengine = fparams['fengine']
+    fengines_list.append(fengine)
 
-fengines_list=[SnapFengine('snap111')]
-# Set packetizer chan values
-ips = [((10<<24)+(10<<16)+(10<<8)+136),0]
-ant = 63 #index of first antenna on board
+    for xhost, xparams in xengs.items():
+        if (xparams['num'] > n_xengs): 
+           raise ValueError("Cannot have more than %d X-engs!!"%n_xengs)
+        print '%s: Setting Xengine %d: '%(xhost,xparams['num']),\
+              'IP Even: %s'%xparams['even']['ip'],\
+              'IP Odd: %s'%xparams['odd']['ip']
+           
+        ip = [int(i) for i in xparams['even']['ip'].split('.')]
+        ip_even = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
+        ip = [int(i) for i in xparams['odd']['ip'].split('.')]
+        ip_odd = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
+        fengine.packetizer.assign_slot(xparams['num'], xparams['chans'], \
+                                       [ip_even,ip_odd], fengine.reorder,\
+                                       fparams['ants'][0])
+        fengine.eth.add_arp_entry(ip_even,xparams['even']['mac'])
+        fengine.eth.add_arp_entry(ip_odd,xparams['odd']['mac'])
 
-for slot in range(16): #16 Xengines
-    chans = np.arange(slot*384,(slot+1)*384,1)
-    fengs['snap111']['fengine'].packetizer.assign_slot(slot, chans, ips, fengine.reorder, ant) 
-
-fengs['snap111']['fengine'].eth.add_arp_entry(((10<<24)+(10<<16)+(10<<8)+136),0x02020a140102)
-fengs['snap111']['fengine'].eth.set_port(8511)
-
+    fengine.eth.set_port(fparams['dest_port'])
 
 # Sync logic. Do global sync first, and then noise generators
 # wait for a PPS to pass then arm all the boards
