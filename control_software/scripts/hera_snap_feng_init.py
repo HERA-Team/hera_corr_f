@@ -54,11 +54,8 @@ for host,params in fengs.items():
 
     if args.program:
         f = casperfpga.CasperFpga(params['host_ip'])
-        if f.transport.get_metadata()['filename'] == config['fpgfile'].split('/')[-1]:
-            print "%s already programmed with file. Skipping.. " % params['host_ip']
-        else:
-            print "Programming %s with %s" % (params['host_ip'], config['fpgfile'])
-            f.upload_to_ram_and_program(config['fpgfile'])
+        print "Programming %s with %s" % (params['host_ip'], config['fpgfile'])
+        f.upload_to_ram_and_program(config['fpgfile'])
 
     fengs[host]['fengine'] = SnapFengine(params['host_ip'])
     fengine = fengs[host]['fengine']
