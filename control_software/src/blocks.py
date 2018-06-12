@@ -737,7 +737,7 @@ class Eth(Block):
 
 
 class Corr(Block):
-    def __init__(self, host, name, acc_len=8192*32):
+    def __init__(self, host, name, acc_len=61035):
         super(Corr, self).__init__(host,name)
         self.acc_len = acc_len
         
