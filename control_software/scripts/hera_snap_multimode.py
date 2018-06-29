@@ -6,12 +6,14 @@ import numpy as np
 import struct
 import collections
 import time
+import yaml
+import casperfpga
 
 parser = argparse.ArgumentParser(description='Set a programmed SNAP board to send data as arbitrary number '\
                                  'of antennas in the test vector or noise generator mode. (Only headers change).',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('hosts', metavar='hosts', type=str, nargs='+',
-                    help = 'Hostnames / IPs of the SNAPs')
+parser.add_argument('config_file',type=str,
+                    help = 'YAML configuration file with hosts and channels list')
 parser.add_argument('-s', dest='sync', action='store_true', default=False,
                     help ='Use this flag to sync the F-engine(s) and Noise generators from PPS')
 parser.add_argument('-m', dest='mansync', action='store_true', default=False,
@@ -24,94 +26,117 @@ parser.add_argument('-n', dest='noise', action='store_true', default=False,
                     help ='Use this flag to switch to Noise inputs')
 parser.add_argument('-e', dest='eth', action='store_true', default=False,
                     help ='Use this flag to switch on the Ethernet outputs')
-parser.add_argument('-ants',dest='nants',type=int, default=96,
-                    help='Sets the number of antennas per SNAP')
+parser.add_argument('-p','--program', action='store_true', default=False,
+                    help='Program FPGAs with the fpgfile specified in the config file if not programmed already')
 args = parser.parse_args()
 
+with open(args.config_file,'r') as fp:
+    config = yaml.load(fp)
+fengs = config['fengines']
+xengs = config['xengines']
 
-# Initialise and set input
-fengines = [SnapFengine(host) for host in args.hosts]
-for fengine in fengines:
+## Assumptions:
+## 1. You cannot send more than 48 antennas from a SNAP.
+## 2. Number of antennas per SNAP should be a multiple of 3.
+## 2. You can send 384 channels to each X-eng.
+## 3. There are 2 time banks with 16 X-engs each.
+
+# Check that there are a maximum of 48 antennas per SNAP
+Nants = 0
+for host,params in fengs.items():
+    if 'ant_range' in params.keys():
+        ant_range = params['ant_range']
+        fengs[host]['ants'] = np.arange(ant_range[0],ant_range[1])
+    assert (len(params['ants'])<=48), "%s: Cannot allocate more than 48 antennas!"%host
+    assert (len(params['ants'])%3 == 0), "%s: Number of antennas should be a multiple of 3"%host
+    if (len(params['ants'])>Nants): Nants = len(params['ants'])
+
+# Check that there are 384 channels per X-eng
+for host,params in xengs.items():
+    if 'chan_range' in params.keys():
+        chanrange = params['chan_range']
+        xengs[host]['chans'] = np.arange(chanrange[0], chanrange[1])
+    assert(len(params['chans'])<=384), "%s: Cannot process >384 channels."%host
+
+# Initialize, set input according to command line flags.
+for host,params in fengs.items():
+
+    if args.program:
+        f = casperfpga.CasperFpga(params['host_ip'])
+        print "Programming %s with %s" % (params['host_ip'], config['fpgfile'])
+        f.upload_to_ram_and_program(config['fpgfile'])
+
+    fengs[host]['fengine'] = SnapFengine(params['host_ip'])
+    fengine = fengs[host]['fengine']
+  
     if args.initialize:
+        print '%s: Initializing..'%host
         fengine.initialize()
 
     if args.tvg:
-        print 'Enabling EQ TVGs...'
+        print '%s:  Enabling EQ TVGs...'%host
         fengine.eq_tvg.write_freq_ramp()
         fengine.eq_tvg.tvg_enable()
 
     if args.noise:
-        print 'Setting noise TVGs...'
+        print '%s:  Setting noise TVGs...'%host
+        ## Noise Block
         seed = 23
         for stream in range(fengine.noise.nstreams): 
             fengine.noise.set_seed(stream, seed)
         fengine.input.use_noise()
- 
-# Assumptions:
-# (1) There are 16 packets per channel.
-# (2) Number of antennas is a multiple of 3.
-# (3) There are 48 channels per X-eng? (Untested)
 
-chans_per_packet = 16 # Hardcoded in firmware
-num_chans = 1536*3/args.nants  # BW that gives ~10G with nants
-chans_to_send = np.arange(256,256+num_chans) # A contiguous block in the middle of the band
+# Now assign frequency slots to different X-engines as 
+# per the config file. A total of 32 Xengs are assumed for 
+# assigning slots- 16 for the even bank, 16 for the odd.  
+# Channels not assigned to Xengs in the config file are 
+# ignored.
 
-chans_per_xeng = 1536 / 32 # 48 (hardcoded)
-n_xengs = int(np.ceil(num_chans/chans_per_xeng))
-packets_per_xeng = chans_per_xeng / chans_per_packet # 3
+# For N antennas per board, you can only 
+# allot channels to (48//Nants) Xengs.
+n_xengs = 48/Nants
+chans_per_packet = 384 # Hardcoded in firmware
 
-chan_blocks = []
-for xn in range(n_xengs):
-    chan_blocks += [chans_to_send[xn*chans_per_xeng : (xn+1)*chans_per_xeng]]
+fengines_list = []
+for fhost, fparams in fengs.items():
+    fengine = fparams['fengine']
+    fengines_list.append(fengine)
 
-ant_blocks = np.arange(args.nants).reshape(-1,3)
-num_ant_slots = ant_blocks.shape[0] 
-
-# output mappings
-dest_mac = 0x02020a0a0046                               # hera-gpu0
-dest_ip = (10<<24) + (0<<16) + (10<<8) + (12<<0)        # hera-gpu0
-#dest_mac = 0x0002c91f1151                              # simech1
-#dest_ip  = (10<<24) + (0<<16) + (10<<8) + (27<<0)      # simech1
-
-# Setting all the the destinations to the same IP for now.
-xeng_ips = [dest_ip] * n_xengs
-xeng_macs = [dest_mac] * n_xengs
-
-# Populate the F-engine output slots of which there are 96
-# Each slot is used to send 16 channels from 3 antennas to
-# an arbitrary destination.
-n_slots_to_send = 96
-for fn,fengine in enumerate(fengines):
-    print 'Setting Antenna indices for fengine: %d .... '%fn
+    print 'Setting Antenna indices for fengine: %s .... '%fhost
     fengine.packetizer.initialize()
     fengine.reorder.initialize()
-    for xn in range(n_xengs):
-        for pk in range(packets_per_xeng):
-            for an in range(num_ant_slots):
-                slot = num_ant_slots*(xn*(packets_per_xeng) + pk) + an
-                if slot < n_slots_to_send:
-                    chans = chan_blocks[xn][pk*chans_per_packet : (pk+1)*chans_per_packet]
-                    antarr = fn*args.nants + ant_blocks[an]
-                    print 'Setting slot %d: IP: %d' % (slot, xeng_ips[xn]) , antarr, chans
-                    fengine.packetizer.assign_slot(slot, chans, xeng_ips[xn], fengine.reorder,ants=antarr)
-    
 
-# Finally set the SNAP ARP tables and enable transmission
+    ant_list = fparams['ants'].reshape(-1,3)
 
-for fengine in fengines:
-    fengine.eth.set_port(8511)
-    for xn in range(n_xengs):
-        fengine.eth.add_arp_entry(xeng_ips[xn], xeng_macs[xn])
+    for xhost, xparams in xengs.items():
+        if (xparams['num'] > n_xengs): 
+           raise ValueError("Cannot have more than %d X-engs!!"%n_xengs)
+        ip = [int(i) for i in xparams['even']['ip'].split('.')]
+        ip_even = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
+        ip = [int(i) for i in xparams['odd']['ip'].split('.')]
+        ip_odd = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
+        for a in range(ant_list.shape[0]):
+            slot_num = xparams['num']*ant_list.shape[0] + a 
+            print 'Slot_num: %d\t'%slot_num,
+            print 'Ants: ', ant_list[a], 
+            print '\tChans: ', xparams['chans'][0:8]
+            fengine.packetizer.assign_slot(slot_num, xparams['chans'], \
+                                           [ip_even,ip_odd], fengine.reorder,\
+                                           ant_list[a][0])
+        fengine.eth.add_arp_entry(ip_even,xparams['even']['mac'])
+        fengine.eth.add_arp_entry(ip_odd,xparams['odd']['mac'])
+
+    fengine.eth.set_port(fparams['dest_port'])
 
 # Sync logic. Do global sync first, and then noise generators
 # wait for a PPS to pass then arm all the boards
 if args.sync:
     print 'Sync-ing Fengines'
     print 'Waiting for PPS at time %.2f' % time.time()
-    fengines[0].sync.wait_for_sync()
+    fengines_list[0].sync.wait_for_sync()
     print 'Sync passed at time %.2f' % time.time()
     before_sync = time.time()
-    for fengine in fengines:
+    for fengine in fengines_list:
         fengine.sync.arm_sync()
     after_sync = time.time()
     print 'Syncing took %.2f seconds' % (after_sync - before_sync)
@@ -121,10 +146,10 @@ if args.sync:
 if args.sync:
     print 'Sync-ing Noise generators'
     print 'Waiting for PPS at time %.2f' % time.time()
-    fengines[0].sync.wait_for_sync()
+    fengines_list[0].sync.wait_for_sync()
     print 'Sync passed at time %.2f' % time.time()
     before_sync = time.time()
-    for fengine in fengines:
+    for fengine in fengines_list:
         fengine.sync.arm_noise()
     after_sync = time.time()
     print 'Syncing took %.2f seconds' % (after_sync - before_sync)
@@ -133,10 +158,10 @@ if args.sync:
 
 if args.mansync:
     print 'Generating a software sync trigger'
-    for fengine in fengines:
+    for fengine in fengines_list:
         fengine.sync.arm_sync()
         fengine.sync.arm_noise()
-    for fengine in fengines:
+    for fengine in fengines_list:
         # It takes multiple (3?) syncs to clear the mrst.
         fengine.sync.sw_sync()
         fengine.sync.sw_sync()
@@ -145,9 +170,11 @@ if args.mansync:
 
 if args.eth:
     print 'Enabling Ethernet outputs...'
-    for fengine in fengines:
+    for fengine in fengines_list:
         fengine.eth.enable_tx()
 else:
-    print '**NOT** enabling Ethernet outputs...'
+    print '*NOT* enabling ethernet output.'
+    for fengine in fengines_list:
+        fengine.eth.disable_tx()
 
 print 'Initialization complete'
