@@ -705,17 +705,34 @@ class Corr(Block):
     def __init__(self, host, name, acc_len=2048*1e5):
         super(Corr, self).__init__(host,name)
         self.acc_len = acc_len
-        
-    def get_corr(self,antenna1,antenna2):
-        self.write_int('input_sel',(antenna1 + (antenna2 << 8)))
-        cnt = self.read_uint('acc_cnt')
 
+    def set_inputs(self, input1, input2):
+        """
+        Set the correlator inputs to `input1` and
+        `input2`.
+        """
+        self.write_int('input_sel',(input1 + (input2 << 8)))
+
+    def wait_for_new_corr(self):
+        """
+        Blocks until new data are ready.
+        """
+        cnt = self.read_uint('acc_cnt')
         while self.read_uint('acc_cnt') <= (cnt+1):
             time.sleep(0.1)
-            
+
+    def read_corr(self):
+        """
+        Read correlator brams
+        """
         spec = np.array(struct.unpack('>4096L',self.read('dout',8*2048)))
-        
         return (spec[0::2]+1j*spec[1::2])/self.acc_len
+
+    def get_new_corr(self, input1, input2):
+        self.set_inputs(input1, input2)
+        self.wait_for_new_corr()
+        self.wait_for_new_corr()
+        return self.read_corr()
     
     def initialize(self):
         self.write_int('acc_len',self.acc_len)
