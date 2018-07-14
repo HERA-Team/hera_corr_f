@@ -521,6 +521,10 @@ class EqTvg(Block):
             Write a constant to all the channels of a polarization unless 
             equal_pols is set, then a constant is written to all pols of 
             an antenna.
+            if `equal_pols`:
+               tv[ant][pol] = ant
+            else
+               tv[ant][pol] = 2*ant + pol
         """
         tv = np.zeros(self.nchans*self.nstreams, dtype='>%s'%self.format)
         if equal_pols:
