@@ -754,9 +754,9 @@ class Corr(Block):
         while self.read_uint('acc_cnt') < (cnt + 2):
             time.sleep(0.1)
             
-        spec = np.array(struct.unpack('>2048L',self.read('dout',8*1024)))
+        spec = np.array(struct.unpack('>2048l',self.read('dout',8*1024)))
         
-        return (spec[0::2]+1j*spec[1::2])/self.acc_len
+        return (spec[0::2]+1j*spec[1::2])/float(self.acc_len)
     
     def plot_corr(self,antenna1,antenna2,show=True,test=False):
         import matplotlib.pyplot as plt
