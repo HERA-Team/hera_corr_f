@@ -305,8 +305,12 @@ class Input(Block):
         for i in rms: print '%3f'%i,
         print ''
 
+    def set_input(self, i):
+        self.write_int('source_sel', i)
+
     def get_histogram(self, input, sum_cores=True):
-        v = np.array(struct.unpack('>512H', self.read('bit_stats_histogram%d_output'%input, 512*2)))
+        self.set_input(input)
+        v = np.array(struct.unpack('>512H', self.read('bit_stats_histogram_output', 512*2)))
         a = v[0:256]
         b = v[256:512]
         a = np.roll(a, 128) # roll so that array counts -128, -127, ..., 0, ..., 126, 127
