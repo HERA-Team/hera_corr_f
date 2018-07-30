@@ -23,6 +23,7 @@ class SnapFengine(object):
         self.eq          = Eq(self.fpga, 'eq_core', nstreams=6, ncoeffs=2**10)
         self.eq_tvg      = EqTvg(self.fpga, 'eqtvg', nstreams=6, nchans=2**13)
         self.reorder     = ChanReorder(self.fpga, 'chan_reorder', nchans=2**10)
+        self.rotator     = Rotator(self.fpga, 'rotator')
         self.packetizer  = Packetizer(self.fpga, 'packetizer', n_time_demux=2) # Round robin time packets to two destinations
         self.eth         = Eth(self.fpga, 'eth')
         self.corr        = Corr(self.fpga,'corr_0')
