@@ -79,7 +79,7 @@ class Synth(casperfpga.synth.LMX2581):
         self.powerOn()
 
 class Adc(casperfpga.snapadc.SNAPADC):
-    def __init__(self, host, sample_rate=500, num_chans=2, resolution=8,ref=10):
+    def __init__(self, host, sample_rate=500, num_chans=2, resolution=8, ref=10):
         casperfpga.snapadc.SNAPADC.__init__(self,host,ref=ref)
         self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
@@ -306,7 +306,9 @@ class Input(Block):
         print ''
 
     def get_histogram(self, input, sum_cores=True):
-        v = np.array(struct.unpack('>512H', self.read('bit_stats_histogram%d_output'%input, 512*2)))
+        self.write_int('bit_stats_input_sel',input)
+        time.sleep(0.1)
+        v = np.array(struct.unpack('>512H', self.read('bit_stats_histogram_output', 512*2)))
         a = v[0:256]
         b = v[256:512]
         a = np.roll(a, 128) # roll so that array counts -128, -127, ..., 0, ..., 126, 127
@@ -315,7 +317,7 @@ class Input(Block):
         if sum_cores:
             return vals, a+b
         else:
-            return val, a, b
+            return vals, a, b
 
     def get_input_histogram(self, ant):
         vals, a = self.get_histogram(ant*2, sum_cores=True)
@@ -362,6 +364,16 @@ class Delay(Block):
 
     def initialize(self):
         self.write_int('delays', 0)
+
+class Rotator(Block):
+    def __init__(self, host, name):
+        super(Rotator, self).__init__(host, name)
+        
+    def disable(self):
+        self.write_int('en',0)
+
+    def initialize(self):
+        self.disable()
 
 class Pfb(Block):
     def __init__(self, host, name):
@@ -476,13 +488,14 @@ class PhaseSwitch(Block):
         self.set_delay(0)
         
 class Eq(Block):
-    def __init__(self, host, name, nstreams=6, ncoeffs=2**11):
+    def __init__(self, host, name, nstreams=8, ncoeffs=2**10):
         super(Eq, self).__init__(host, name)
         self.nstreams = nstreams
         self.ncoeffs = ncoeffs
         self.width = 16
         self.bp = 6
         self.format = 'H'#'L'
+        self.streamsize = struct.calcsize(self.format)*self.ncoeffs
 
     def set_coeffs(self, stream, coeffs):
         coeffs *= 2**self.bp
@@ -492,16 +505,22 @@ class Eq(Block):
         coeffs[coeffs>(2**self.width - 1)] = 2**self.width - 1
         coeffs = list(coeffs)
         coeffs_str = struct.pack('>%d%s' % (len(coeffs), self.format), *coeffs)
-        self.write('coeffs', coeffs_str, offset=struct.calcsize(self.format)*self.ncoeffs*stream)
+        self.write('coeffs', coeffs_str, offset= self.streamsize * stream)
 
     def get_coeffs(self, stream):
-        coeffs_str = self.read('%d_coeffs' % stream, self.ncoeffs*struct.calcsize(self.format))
+        coeffs_str = self.read('coeffs', self.streamsize, offset= self.streamsize * stream)
         coeffs = np.array(struct.unpack('>%d%s' % (self.ncoeffs, self.format), coeffs_str))
         return coeffs / (2.**self.bp)
 
+    def clip_count(self):
+        return self.read_int('clip_cnt')
+
+    def print_status(self):
+        print 'Number of times input got clipped: %d'%self.clip_count()
+
     def initialize(self):
         for stream in range(self.nstreams):
-            self.set_coeffs(stream, 100*np.ones(self.ncoeffs,dtype='>%s'%self.format))
+            self.set_coeffs(stream, 10*np.ones(self.ncoeffs,dtype='>%s'%self.format))
 
 class EqTvg(Block):
     def __init__(self, host, name, nstreams=8, nchans=2**13):
@@ -554,7 +573,8 @@ class EqTvg(Block):
 
     def read_tvg(self):
         """ Read the test vector written to the sw bram """
-        tvg = struct.unpack('>%d%s'%(self.nchans*self.nstreams,self.format),self.read('tv',8192*8))
+        tvg = struct.unpack('>%d%s'%(self.nchans*self.nstreams, self.format),
+                            self.read('tv', self.nchans * self.nstreams))
         return tvg
 
     def initialize(self):
@@ -741,26 +761,32 @@ class Eth(Block):
 
 
 class Corr(Block):
-    def __init__(self, host, name, acc_len=61035):
+    def __init__(self, host, name, acc_len=3815):
         super(Corr, self).__init__(host,name)
         self.acc_len = acc_len
-        
-    def get_new_corr(self, antenna1, antenna2):
-        self.write_int('input_sel',(antenna1 + (antenna2 << 8)))
+        self.spec_per_acc = 8
+    
+    def wait_for_acc(self):
         cnt = self.read_uint('acc_cnt')
-
         # Wait for 2 counts to make sure we have a clean
         # integration containing only the selected antennas
-        while self.read_uint('acc_cnt') < (cnt + 2):
+        while self.read_uint('acc_cnt') < (cnt+2):
             time.sleep(0.1)
-            
-        spec = np.array(struct.unpack('>2048L',self.read('dout',8*1024)))
-        
-        return (spec[0::2]+1j*spec[1::2])/self.acc_len
+        return 1
     
-    def plot_corr(self,antenna1,antenna2,show=True,test=False):
-        import matplotlib.pyplot as plt
-        spec = self.get_new_corr(antenna1,antenna2)
+    def get_new_corr(self, pol1, pol2):
+        """
+        Mapping: [1a, 1b, 2a, 2b, 3a, 3b] : [0, 1, 2, 3, 4, 5, 6, 7]
+        """
+
+        self.write_int('input_sel',(pol1 + (pol2 << 8)))
+        self.wait_for_acc()
+        spec = np.array(struct.unpack('>2048L',self.read('dout',8*1024)))
+        return (spec[0::2]+1j*spec[1::2])/(self.acc_len*self.spec_per_acc)
+    
+    def plot_corr(self, pol1, pol2, show=False):
+        from matplotlib import pyplot as plt
+        spec = self.get_new_corr(pol1, pol2)
         f,ax = plt.subplots(2,2)
         ax[0][0].plot(spec.real)
         ax[0][0].set_title('Real')
@@ -774,8 +800,13 @@ class Corr(Block):
         if show:
             plt.show()
 
+    def show_corr_plot(self):
+        from matplotlib import pyplot as plt
+        plt.show()
+
     def set_acc_len(self,acc_len):
-        acc_len = 8192*acc_len #Convert to clks from spectra 
+        self.acc_len = acc_len
+        acc_len = 8192*acc_len  #Convert to clks from spectra 
         self.write_int('acc_len',acc_len)
 
     def initialize(self):
