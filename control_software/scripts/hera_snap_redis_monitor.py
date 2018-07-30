@@ -20,10 +20,13 @@ print fengines
 while(True):
     tick = time.time()
     for fengine in fengines:
-        stat = {}
-        stat['temp'] = fengine.fpga.transport.get_temp()
-        stat['timestamp'] = datetime.datetime.now().isoformat()
-        r.hmset("status:snap:%s" % fengine.fpga.host, stat)
+        try:
+            stat = {}
+            stat['temp'] = fengine.fpga.transport.get_temp()
+            stat['timestamp'] = datetime.datetime.now().isoformat()
+            r.hmset("status:snap:%s" % fengine.fpga.host, stat)
+        except:
+            r.hset("status:snap:%s" % fengine.fpga.host, "failed-time", datetime.datetime.now().isoformat())
     while (time.time() < (tick + LOOPDELAY)):
         time.sleep(0.5)
     

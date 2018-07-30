@@ -305,8 +305,11 @@ class Input(Block):
         for i in rms: print '%3f'%i,
         print ''
 
+    def set_input(self, i):
+        self.write_int('bits_stats_input_sel', i)
+
     def get_histogram(self, input, sum_cores=True):
-        self.write_int('bit_stats_input_sel',input)
+        self.set_input(input)
         time.sleep(0.1)
         v = np.array(struct.unpack('>512H', self.read('bit_stats_histogram_output', 512*2)))
         a = v[0:256]
@@ -781,8 +784,8 @@ class Corr(Block):
 
         self.write_int('input_sel',(pol1 + (pol2 << 8)))
         self.wait_for_acc()
-        spec = np.array(struct.unpack('>2048L',self.read('dout',8*1024)))
-        return (spec[0::2]+1j*spec[1::2])/(self.acc_len*self.spec_per_acc)
+        spec = np.array(struct.unpack('>2048l',self.read('dout',8*1024)))
+        return (spec[0::2]+1j*spec[1::2])/float(self.acc_len*self.spec_per_acc)
     
     def plot_corr(self, pol1, pol2, show=False):
         from matplotlib import pyplot as plt
