@@ -967,13 +967,295 @@ class RoachEth(Block):
         self.host.config_10gbe_core(self.name + '_%d_sw' % core_num, mac, ip, port, arp_table)
 
 class Pam(Block):
+
+    ADDR_VOLT = 0x4f
+    ADDR_ROM = 0x52
+    ADDR_SN = 0x50
+    ADDR_INA = 0x44
+    ADDR_GPIO = 0x21
+    
+    CLK_I2C_BUS = 10  # 10 kHz
+    CLK_I2C_REF = 100 # reference clk at 100 MHz
+
+    I2C_RETRY_WAIT = 0.02
+
+    SHUNT_RESISTOR = 0.1
+
+    RMS2DC_SLOPE = 27.31294863
+    RMS2DC_INTERCEPT = -55.15991678
+
     def __init__(self, host, name):
         super(Pam, self).__init__(host, name)
+
         import i2c
         import i2c_gpio
-        self.i2c = i2c.I2C(host, name)
-        self.gpio = i2c_gpio.PCF8574(self.i2c, addr=0x21)
+        import i2c_volt
+        import i2c_eeprom
+        import i2c_sn
+        import i2c_gpio
+
+        self.i2c = i2c.I2C(host, name, retry_wait=self.I2C_RETRY_WAIT)
 
     def initialize(self):
-        self.i2c.clockSpeed(10) # set i2c bus to 10 kHz
 
+        self.i2c.enable_core()
+        # set i2c bus to 10 kHz
+        self.i2c.setClock(self.CLK_I2C_BUS, self.CLK_I2C_REF)
+
+        # Attenuator
+        self.atten = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
+
+        # Current sensor
+        self.cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
+        self.cur.init()
+
+        # ID chip
+        self.sn=i2c_sn.DS28CM00(self.i2c, self.ADDR_SN)
+
+        # Power detector
+        self.pow = i2c_volt.LTC2990(self.i2c, self.ADDR_VOLT)
+        self.pow.init()
+
+        # ROM
+        self.rom=i2c_eeprom.EEP24XX64(self.i2c,ADDR_ROM)
+
+    def attenuation(self, east=None, north=None):
+        """ Get or Set East and North attenuation
+            attenuation value must be integer in range(16)
+
+            Example:
+            attenuation() # get attenuation, returns a tuple of two numbers,
+                            in which East is followed by North, e.g. (12,5)
+            attenuation(east=0,north=15) # set attenuation
+        """
+
+        if east == None and north == None:
+            # Get current attenuation
+            val=self.atten.read()
+            ve,vn=gpio2db(val)
+            return ve,vn
+        elif isinstance(east,int) and east in range(16) and \
+            isinstance(north,int) and north in range(16):
+            # Set attenuation
+            self.atten.write(db2gpio(east,north))
+        else:
+            raise ValueError('Invalid parameter.')
+
+    def shunt(self, name='i'):
+        """ Get current/voltage of the power supply
+
+            Example:
+            shunt(name='i')     # returns current in Amps
+            shunt(name='u')     # returns voltage in Volt
+        """
+            if name == 'i':
+                vshunt = ina.readVolt('shunt')
+                ishunt = vshunt * 1.0 / self.SHUNT_RESISTOR
+                return ishunt
+            elif name == 'u':
+                vbus = ina.readVolt('bus')
+                return vbus
+            else:
+                raise ValueError('Invalid parameter.')
+
+    def id(self):
+        """ Get the unique eight-byte serial number of the module
+        """
+        return self.sn.readSN()
+
+    def power(self, name='east')
+        """ Get power level of the East or North RF path
+
+            Example:
+            power(name='east')  # returns power level of east in dBm
+            power(name='north') # returns power level of north in dBm
+        """
+        if name not in ['east','north']:
+            raise ValueError('Invalid parameter.')
+
+        if name == 'east':
+            vp=self.pow.readVolt('v3')
+        elif name == 'north':
+            vp=self.pow.readVolt('v4')
+
+        assert vp>=0 and vp<=3.3
+
+        return dc2dbm(vp, self.RMS2DC_SLOPE, self.RMS2DC_INTERCEPT)
+
+    def rom(self, string=None):
+        """ Read string from ROM or write String to ROM
+
+            Example:
+            rom()               # returns a string ended with a '\0'
+            rom('hello')        # write 'hello\0' into ROM
+        """
+        if string == None:
+            return self.rom.readString()
+        else:
+            self.rom.writeString(string)
+
+
+def db2gpio(ae,an):
+    assert ae in range(0,16)
+    assert an in range(0,16)
+    val_str = '{0:08b}'.format((an << 4) + ae)
+    val = int(val_str[::-1],2)
+    return val
+
+def gpio2db(val):
+    assert val in range(0,256)
+    val_str = '{0:08b}'.format(val)[::-1]
+    an = int(val_str[0:4],2)
+    ae = int(val_str[4:8],2)
+    return ae,an
+
+def dc2dbm(val, slope, intercept):
+    res = val * slope + intercept
+    return res
+
+
+class Fem(Block):
+
+    ADDR_ACCEL = 0X69
+    ADDR_MAG = 0x0c
+    ADDR_BAR = 0x77
+    ADDR_VOLT = 0x4e
+    ADDR_ROM = 0x52
+    ADDR_TEMP = 0x40
+    ADDR_INA = 0x45
+    ADDR_GPIO = 0x20
+
+    CLK_I2C_BUS = 10  # 10 kHz
+    CLK_I2C_REF = 100 # reference clk at 100 MHz
+
+    I2C_RETRY_WAIT = 0.02
+
+    SHUNT_RESISTOR = 0.1
+
+    RMS2DC_SLOPE = 27.31294863
+    RMS2DC_INTERCEPT = -55.15991678
+
+    IMU_ORIENT = [[0,0,1],[0,1,0],[1,0,0]]
+    SWMODE = {'load':0b001,'antenna':0b111,'noise':0b000}
+
+    def __init__(self, host, name):
+        super(Fem, self).__init__(host, name)
+
+        import i2c
+        import i2c_gpio
+        import i2c_bar
+        import i2c_volt
+        import i2c_temp
+        import i2c_eeprom
+        import i2c_motion
+
+        self.i2c = i2c.I2C(host, name, retry_wait=self.I2C_RETRY_WAIT)
+
+    def initialize(self):
+
+        self.i2c.enable_core()
+        # set i2c bus to 10 kHz
+        self.i2c.setClock(self.CLK_I2C_BUS, self.CLK_I2C_REF)
+
+        # Barometer
+        self.bar = i2c_bar.MS5611_01B(self.i2c, self.ADDR_BAR)
+        self.bar.init()
+
+        # Current sensor
+        self.cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
+        self.cur.init()
+
+        # IMU
+        self.imu = i2c_motion.IMUSimple(self.i2c,self.ADDR_ACCEL,
+                                        orient=self.IMU_ORIENT)
+        self.imu.init()
+
+        # ROM
+        self.rom=i2c_eeprom.EEP24XX64(self.i2c,ADDR_ROM)
+
+        # Switch
+        self.sw = i2c_gpio.PCF8574(self.i2c,self.ADDR_GPIO)
+
+        # Temperature
+        self.temp = i2c_temp.Si7051(self.i2c, self.ADDR_TEMP)
+
+
+    def barometer(self):
+        """ Get air pressure
+
+            Example:
+            barometer()      # return pressure in kPa
+        """
+        rawt,dt = self.bar.readTemp(raw=True)
+        press = self.bar.readPress(rawt,dt)
+        return press
+
+
+    def shunt(self, name='i'):
+        """ Get current/voltage of the power supply
+
+            Example:
+            shunt(name='i')     # returns current in Amps
+            shunt(name='u')     # returns voltage in Volt
+        """
+            if name == 'i':
+                vshunt = ina.readVolt('shunt')
+                ishunt = vshunt * 1.0 / self.SHUNT_RESISTOR
+                return ishunt
+            elif name == 'u':
+                vbus = ina.readVolt('bus')
+                return vbus
+            else:
+                raise ValueError('Invalid parameter.')
+
+    def id(self):
+        """ Get the unique eight-byte serial number of the module
+        """
+        return self.temp.sn()
+
+    def imu(self):
+        """ Get pose of the FEM in the form of theta and phi
+            in spherical coordinate system
+        """
+        theta, phi = imu.pose
+        return theta, phi
+
+    def rom(self, string=None):
+        """ Read string from ROM or write String to ROM
+
+            Example:
+            rom()               # returns a string ended with a '\0'
+            rom('hello')        # write 'hello\0' into ROM
+        """
+        if string == None:
+            return self.rom.readString()
+        else:
+            self.rom.writeString(string)
+
+    def switch(self,name=None):
+        """ Switch between antenna, noise and load mode
+
+            Example:
+            switch()            # Get current mode
+            switch('antenna')   # Switch into antenna mode
+            switch('noise')     # Switch into noise mode
+            switch('load')      # Switch into load mode
+        """
+        if name == None:
+            val = self.sw.read()
+            mode = 'Unknown'
+            for key,value in self.SWMODE.iteritems():
+                if val&0b111 == value:
+                    mode = key
+                    break
+            return mode
+        elif name in self.SWMODE:
+            val = self.SWMODE[name]
+            self.sw.write(val)
+        else:
+            raise ValueError('Invalid parameter.')
+
+    def temperature(self):
+        """ Get temperature in Celcius
+        """
+        return self.temp.readTemp()
