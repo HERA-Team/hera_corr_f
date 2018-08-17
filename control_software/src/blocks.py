@@ -985,6 +985,21 @@ class Pam(Block):
     RMS2DC_INTERCEPT = -55.15991678
 
     def __init__(self, host, name):
+        """ Post Amplifier Module (PAM) digital control class
+
+            Features:
+            attenuation Digital controlled Attenuation for East and North Pol
+            shunt       Voltage and current of the power supply
+            rom         Memo
+            id          Device ID
+            power       Power level of East and North Pol
+
+        host    CasperFpga instance
+        name    Select one of the three PAMs(/Antennas) under the control of
+                a SNAP board. Recommended values are: 'i2c_ant1', 'i2c_ant2'
+                or 'i2c_ant3'. Please refer to the f-engine model for correct
+                value.
+        """
         super(Pam, self).__init__(host, name)
 
         import i2c
@@ -992,7 +1007,6 @@ class Pam(Block):
         import i2c_volt
         import i2c_eeprom
         import i2c_sn
-        import i2c_gpio
 
         self.i2c = i2c.I2C(host, name, retry_wait=self.I2C_RETRY_WAIT)
 
@@ -1139,6 +1153,24 @@ class Fem(Block):
     SWMODE = {'load':0b001,'antenna':0b111,'noise':0b000}
 
     def __init__(self, host, name):
+        """ Front End Module (FEM) digital control class
+
+            Features:
+            switch      Switch input source between antenna, noise and load
+                        mode
+            shunt       Voltage and current of the power supply
+            rom         Memo
+            id          Device ID
+            imu         Attitude of FEM
+            pressure    Air pressure inside FEM
+            temperature Temperature inside FEM
+
+        host    CasperFpga instance
+        name    Select one of the three FEMs(/Antennas) under the control of
+                a SNAP board. Recommended values are: 'i2c_ant1', 'i2c_ant2'
+                or 'i2c_ant3'. Please refer to the f-engine model for correct
+                value.
+        """
         super(Fem, self).__init__(host, name)
 
         import i2c
@@ -1180,11 +1212,11 @@ class Fem(Block):
         self.temp = i2c_temp.Si7051(self.i2c, self.ADDR_TEMP)
 
 
-    def barometer(self):
+    def pressure(self):
         """ Get air pressure
 
             Example:
-            barometer()      # return pressure in kPa
+            pressure()      # return pressure in kPa
         """
         rawt,dt = self.bar.readTemp(raw=True)
         press = self.bar.readPress(rawt,dt)
@@ -1215,7 +1247,7 @@ class Fem(Block):
 
     def imu(self):
         """ Get pose of the FEM in the form of theta and phi
-            in spherical coordinate system
+            of spherical coordinate system in degrees
         """
         theta, phi = imu.pose
         return theta, phi
