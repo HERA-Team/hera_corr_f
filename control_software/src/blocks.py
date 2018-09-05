@@ -523,7 +523,7 @@ class Eq(Block):
 
     def initialize(self):
         for stream in range(self.nstreams):
-            self.set_coeffs(stream, 10*np.ones(self.ncoeffs,dtype='>%s'%self.format))
+            self.set_coeffs(stream, 100*np.ones(self.ncoeffs,dtype='>%s'%self.format))
 
 class EqTvg(Block):
     def __init__(self, host, name, nstreams=8, nchans=2**13):
