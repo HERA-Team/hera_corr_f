@@ -1062,22 +1062,22 @@ class Pam(Block):
             shunt(name='i')     # returns current in Amps
             shunt(name='u')     # returns voltage in Volt
         """
-            if name == 'i':
-                vshunt = ina.readVolt('shunt')
-                ishunt = vshunt * 1.0 / self.SHUNT_RESISTOR
-                return ishunt
-            elif name == 'u':
-                vbus = ina.readVolt('bus')
-                return vbus
-            else:
-                raise ValueError('Invalid parameter.')
+        if name == 'i':
+            vshunt = ina.readVolt('shunt')
+            ishunt = vshunt * 1.0 / self.SHUNT_RESISTOR
+            return ishunt
+        elif name == 'u':
+            vbus = ina.readVolt('bus')
+            return vbus
+        else:
+            raise ValueError('Invalid parameter.')
 
     def id(self):
         """ Get the unique eight-byte serial number of the module
         """
         return self.sn.readSN()
 
-    def power(self, name='east')
+    def power(self, name='east'):
         """ Get power level of the East or North RF path
 
             Example:
@@ -1230,15 +1230,15 @@ class Fem(Block):
             shunt(name='i')     # returns current in Amps
             shunt(name='u')     # returns voltage in Volt
         """
-            if name == 'i':
-                vshunt = ina.readVolt('shunt')
-                ishunt = vshunt * 1.0 / self.SHUNT_RESISTOR
-                return ishunt
-            elif name == 'u':
-                vbus = ina.readVolt('bus')
-                return vbus
-            else:
-                raise ValueError('Invalid parameter.')
+        if name == 'i':
+            vshunt = ina.readVolt('shunt')
+            ishunt = vshunt * 1.0 / self.SHUNT_RESISTOR
+            return ishunt
+        elif name == 'u':
+            vbus = ina.readVolt('bus')
+            return vbus
+        else:
+            raise ValueError('Invalid parameter.')
 
     def id(self):
         """ Get the unique eight-byte serial number of the module
