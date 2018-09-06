@@ -1,4 +1,5 @@
 from hera_corr_f import SnapFengine
+import casperfpga
 import numpy as np
 import argparse 
 import time
@@ -6,7 +7,7 @@ import time
 NCHAN    = 1024
 NPOL     = 4
 NBL      = 6
-NTIME    = 1
+NTIME    = 100
 NBLTIMES = (NTIME * NBL)
 
 parser = argparse.ArgumentParser(description='Obtain cross-correlation spectra from a SNAP Board',
@@ -25,9 +26,15 @@ parser.add_argument('-v', dest='tvg', action='store_true', default=False,
                     help ='Use this flag to switch to EQ TVG outputs')
 parser.add_argument('-t', '--integration_time', type=int, default=1,
                     help='Integration time in seconds for each spectra')
-parser.add_argument('-o', type=str, default=None,
-                    help='Output file name')
+parser.add_argument('-p','--program', type=str, default=None,
+                    help='Program FPGAs with the fpgfile')
 args = parser.parse_args()
+
+    
+if args.program  is not None:
+    snap = casperfpga.CasperFpga(args.host)
+    print 'Programming %s with %s'%(args.host, args.program)
+    snap.upload_to_ram_and_program(args.program)
 
 frequencies = np.arange(NCHAN) * 250e6/NCHAN
 pols = range(NPOL)
@@ -112,6 +119,6 @@ for t in range(NTIME):
         times.append(time.time())
         data.append(np.transpose(corr))
 
-np.savez('snap_correlation_%d.npz'%(times[0]),
+np.savez('~/data/snap_correlation_%d.npz'%(times[0]),
          data=data,polarizations=pols,frequencies=frequencies,
          times=times,ant1_array=ant1_array,ant2_array=ant2_array)
