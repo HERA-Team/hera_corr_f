@@ -1002,11 +1002,11 @@ class Pam(Block):
         """
         super(Pam, self).__init__(host, name)
 
-        import i2c
-        import i2c_gpio
-        import i2c_volt
-        import i2c_eeprom
-        import i2c_sn
+        from casperfpga import i2c
+        from casperfpga import i2c_gpio
+        from casperfpga import i2c_volt
+        from casperfpga import i2c_eeprom
+        from casperfpga import i2c_sn
 
         self.i2c = i2c.I2C(host, name, retry_wait=self.I2C_RETRY_WAIT)
 
@@ -1173,13 +1173,13 @@ class Fem(Block):
         """
         super(Fem, self).__init__(host, name)
 
-        import i2c
-        import i2c_gpio
-        import i2c_bar
-        import i2c_volt
-        import i2c_temp
-        import i2c_eeprom
-        import i2c_motion
+        from casperfpga import i2c
+        from casperfpga import i2c_gpio
+        from casperfpga import i2c_bar
+        from casperfpga import i2c_volt
+        from casperfpga import i2c_temp
+        from casperfpga import i2c_eeprom
+        from casperfpga import i2c_motion
 
         self.i2c = i2c.I2C(host, name, retry_wait=self.I2C_RETRY_WAIT)
 
