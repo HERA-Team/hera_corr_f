@@ -46,23 +46,20 @@ fpgfile: '/home/hera/src/hera_corr_f/snap_fengine/outputs/snap_fengine.fpg'
 
 fengines:
 #    snap110:
-#        host_ip: '10.0.10.110'
 #        dest_port: 8511
 #        ants: [0,1,2]
 #        init: True
 #        tvg: True
 #        noise: False
 #        eth: True
-    heraNode1Snap1:
-        host_ip: 'heraNode1Snap1'
+    heraNode1Snap0:
         dest_port: 8511
         ants: [3,4,5]
         init: True
         tvg: 'ramp_pols'
         noise: False
         eth: True
-    heraNode1Snap2:
-        host_ip: 'heraNode1Snap2'
+    heraNode1Snap1:
         dest_port: 8511
         ants: [6,7,8]
         init: True
@@ -70,7 +67,6 @@ fengines:
         noise: False
         eth: True
 #    snap113:
-#        host_ip: '10.0.10.113'
 #        dest_port: 8511
 #        ants: [3,4,5]
 #        init: True
@@ -78,7 +74,6 @@ fengines:
 #        noise: False
 #        eth: True
 #    snap114:
-#        host_ip: '10.0.10.114'
 #        dest_port: 8511
 #        ants: [12,13,14]
 #        init: True
@@ -86,7 +81,6 @@ fengines:
 #        noise: False
 #        eth: True
 #    snap1:
-#        host_ip: '10.0.10.201'
 #        dest_port: 8511
 #        ants: [9,10,11]
 #        init: True
@@ -94,7 +88,6 @@ fengines:
 #        noise: False
 #        eth: True
 #    snap109:
-#        host_ip: '10.10.10.109'
 #        dest_port: 8511
 #        ants: [15,16,17]
 #        init: True

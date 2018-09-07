@@ -62,11 +62,11 @@ for host,params in xengs.items():
 for host,params in fengs.items():
 
     if args.program:
-        f = casperfpga.CasperFpga(params['host_ip'])
-        print "Programming %s with %s" % (params['host_ip'], config['fpgfile'])
+        f = casperfpga.CasperFpga(host)
+        print "Programming %s with %s" % (host, config['fpgfile'])
         f.upload_to_ram_and_program(config['fpgfile'])
 
-    fengs[host]['fengine'] = SnapFengine(params['host_ip'])
+    fengs[host]['fengine'] = SnapFengine(host)
     fengine = fengs[host]['fengine']
   
     if args.initialize:

@@ -6,14 +6,17 @@ import numpy as np
 import struct
 import collections
 import casperfpga
+import redis
 import time
 import yaml
 
 parser = argparse.ArgumentParser(description='Interact with a programmed SNAP board for testing and '\
                                  'networking. FLAGS OVERRIDE CONFIG FILE!',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('config_file',type=str,
+parser.add_argument('config_file',type=str, default=None
                     help = 'YAML configuration file with hosts and channels list')
+parser.add_argument('-r', dest='redishost', type=str, default='redishost',
+                    help ='Host servicing redis requests')
 parser.add_argument('-s', dest='sync', action='store_true', default=False,
                     help ='Use this flag to sync the F-engine(s) and Noise generators from PPS')
 parser.add_argument('-m', dest='mansync', action='store_true', default=False,
@@ -30,8 +33,16 @@ parser.add_argument('-p','--program', action='store_true', default=False,
                     help='Program FPGAs with the fpgfile specified in the config file if not programmed already')
 args = parser.parse_args()
 
-with open(args.config_file,'r') as fp:
-    config = yaml.load(fp)
+r = redis.Redis(args.redishost)
+if args.config_file is None:
+    config_str  = r.hget('snap_configuration', 'config')
+    config_time = r.hget('snap_configuration', 'upload_time')
+    print 'Using configuration from redis, uploaded at %s' % config_time
+    config = yaml.load(config_str)
+else:
+    with open(args.config_file,'r') as fp:
+        config = yaml.load(fp)
+
 fengs = config['fengines']
 xengs = config['xengines']
 
@@ -49,15 +60,25 @@ for host,params in xengs.items():
         xengs[host]['chans'] = np.arange(chanrange[0], chanrange[1])
     assert(len(params['chans'])<=384), "%s: Cannot process >384 channels."%host
 
+# Before we start manipulating boards, prevent monitoing scripts from
+# sending TFTP traffic. Expire the key after 5 minutes to lazily account for
+# issues with this script crashing.
+r.set('disable_monitoring', 1, ex=600)
+time.sleep(1)
+
 # Initialize, set input according to command line flags.
 for host,params in fengs.items():
+    # re-disable, in case we're doing something outrageous like programming
+    # a gazillion boards, which could take a looooong time.
+    r.set('disable_monitoring', 1, ex=600)
 
     if args.program:
-        f = casperfpga.CasperFpga(params['host_ip'])
-        print "Programming %s with %s" % (params['host_ip'], config['fpgfile'])
+        f = casperfpga.CasperFpga(host)
+        print "Programming %s with %s" % (host, config['fpgfile'])
         f.upload_to_ram_and_program(config['fpgfile'])
+        r.hset('snap_last_programmed', feng.host, time.ctime())
 
-    fengs[host]['fengine'] = SnapFengine(params['host_ip'])
+    fengs[host]['fengine'] = SnapFengine(host)
     fengine = fengs[host]['fengine']
   
     if args.initialize:
@@ -120,6 +141,9 @@ if args.sync:
     for fengine in fengines_list:
         fengine.sync.arm_sync()
     after_sync = time.time()
+    sync_time = int(before_sync) + 3 # Takes 3 clcok cycles to arm
+    r['feng_sync_time'] = sync_time
+    r['feng_sync_time_str'] = time.ctime(sync_time)
     print 'Syncing took %.2f seconds' % (after_sync - before_sync)
     if after_sync - before_sync > 0.5:
         print "WARNING!!!"
@@ -157,6 +181,10 @@ else:
     print '*NOT* enabling ethernet output.'
     for fengine in fengines_list:
         fengine.eth.disable_tx()
+
+
+# Re-enable the monitoring process
+r.delete('disable_monitoring')
 
 print 'Initialization complete'
 
