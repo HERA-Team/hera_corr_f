@@ -13,7 +13,7 @@ import yaml
 parser = argparse.ArgumentParser(description='Interact with a programmed SNAP board for testing and '\
                                  'networking. FLAGS OVERRIDE CONFIG FILE!',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('config_file',type=str, default=None
+parser.add_argument('--config_file', type=str, default=None,
                     help = 'YAML configuration file with hosts and channels list')
 parser.add_argument('-r', dest='redishost', type=str, default='redishost',
                     help ='Host servicing redis requests')
@@ -36,7 +36,7 @@ args = parser.parse_args()
 r = redis.Redis(args.redishost)
 if args.config_file is None:
     config_str  = r.hget('snap_configuration', 'config')
-    config_time = r.hget('snap_configuration', 'upload_time')
+    config_time = r.hget('snap_configuration', 'upload_time_str')
     print 'Using configuration from redis, uploaded at %s' % config_time
     config = yaml.load(config_str)
 else:
@@ -76,7 +76,7 @@ for host,params in fengs.items():
         f = casperfpga.CasperFpga(host)
         print "Programming %s with %s" % (host, config['fpgfile'])
         f.upload_to_ram_and_program(config['fpgfile'])
-        r.hset('snap_last_programmed', feng.host, time.ctime())
+        r.hset('snap_last_programmed', host, time.ctime())
 
     fengs[host]['fengine'] = SnapFengine(host)
     fengine = fengs[host]['fengine']
@@ -142,8 +142,8 @@ if args.sync:
         fengine.sync.arm_sync()
     after_sync = time.time()
     sync_time = int(before_sync) + 3 # Takes 3 clcok cycles to arm
-    r['feng_sync_time'] = sync_time
-    r['feng_sync_time_str'] = time.ctime(sync_time)
+    r['corr:feng_sync_time'] = sync_time
+    r['corr:feng_sync_time_str'] = time.ctime(sync_time)
     print 'Syncing took %.2f seconds' % (after_sync - before_sync)
     if after_sync - before_sync > 0.5:
         print "WARNING!!!"
