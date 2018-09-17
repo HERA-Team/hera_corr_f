@@ -63,3 +63,35 @@ def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.
     logger.info("Logger %s created..."%logger.name)
 
     return logger
+
+def snap_part_to_host_input(part):
+    """
+    Given a part string, eg. 'e2>SNP008', return the hostname of the snap board
+    and the antenna number 0-2.
+    eg, returns "heraNode1Snap2", 0
+    """
+    adc, name = part.split('>')
+    # convert the string adc (eg "e2") into a channel number 0-2
+    adc_num = int(adc[1:]) / 4.
+    # convert the name into something which should be a hostname
+    hostname = "herasnapA" + name[3:]
+    true_name, aliases, addresses = socket.gethostbyname(hostname)
+    # assume that the one we want is the last thing in the hosts file line
+    return alises[-1], adc_num
+    
+
+def cminfo_compute():
+    """
+    Use hera_cm's get_cminfo_correlator method to build a dictionary
+    of pam/fem/ant/snap mappings.
+    Requires hera_cm.
+    """
+    from hera_cm import sys_handling
+    h = sys_handling.Handling()
+    cminfo = h.get_cminfo_correlator()
+    snap_to_ant = {}
+    ant_to_snap = {}
+    for ant in cminfo['antenna_numbers']:
+        name = cminfo['antenna_name'][ant]
+        snapi_e, channel_e = snap_part_to_host_input(cminfo['correlator_inputs'][ant][0]
+        snapi_n, channel_n = snap_part_to_host_input(cminfo['correlator_inputs'][ant][1]
