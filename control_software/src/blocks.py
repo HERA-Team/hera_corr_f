@@ -5,6 +5,13 @@ import socket
 import time
 import casperfpga
 import casperfpga.snapadc
+from casperfpga import i2c
+from casperfpga import i2c_gpio
+from casperfpga import i2c_volt
+from casperfpga import i2c_eeprom
+from casperfpga import i2c_sn
+from casperfpga import i2c_bar
+from casperfpga import i2c_motion
 from scipy.linalg import hadamard #for walsh (hadamard) matrices
 logger = logging.getLogger(__name__)
 
@@ -117,7 +124,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         
 
     def initialize(self):
-        self.init(self.sample_rate, self.num_chans, self.resolution) # from the SNAPADC class
+        self.init(self.sample_rate, self.num_chans) # from the SNAPADC class
         #self.alignLineClock(mode='dual_pat')
         #self.alignFrameClock()
         ##If aligning complete, alignFrameClock should not output any warning
@@ -1002,12 +1009,6 @@ class Pam(Block):
         """
         super(Pam, self).__init__(host, name)
 
-        from casperfpga import i2c
-        from casperfpga import i2c_gpio
-        from casperfpga import i2c_volt
-        from casperfpga import i2c_eeprom
-        from casperfpga import i2c_sn
-
         self.i2c = i2c.I2C(host, name, retry_wait=self.I2C_RETRY_WAIT)
 
     def initialize(self):
@@ -1031,7 +1032,7 @@ class Pam(Block):
         self.pow.init()
 
         # ROM
-        self.rom=i2c_eeprom.EEP24XX64(self.i2c,ADDR_ROM)
+        self.rom=i2c_eeprom.EEP24XX64(self.i2c, self.ADDR_ROM)
 
     def attenuation(self, east=None, north=None):
         """ Get or Set East and North attenuation
@@ -1172,14 +1173,6 @@ class Fem(Block):
                 value.
         """
         super(Fem, self).__init__(host, name)
-
-        from casperfpga import i2c
-        from casperfpga import i2c_gpio
-        from casperfpga import i2c_bar
-        from casperfpga import i2c_volt
-        from casperfpga import i2c_temp
-        from casperfpga import i2c_eeprom
-        from casperfpga import i2c_motion
 
         self.i2c = i2c.I2C(host, name, retry_wait=self.I2C_RETRY_WAIT)
 
