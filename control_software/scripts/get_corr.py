@@ -4,12 +4,6 @@ import numpy as np
 import argparse 
 import time
 
-NCHAN    = 1024
-NPOL     = 4
-NBL      = 6
-NTIME    = 100
-NBLTIMES = (NTIME * NBL)
-
 parser = argparse.ArgumentParser(description='Obtain cross-correlation spectra from a SNAP Board',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('host', type=str, 
@@ -20,16 +14,25 @@ parser.add_argument('-m', dest='mansync', action='store_true', default=False,
                     help ='Use this flag to manually sync the F-engines with an asynchronous software trigger')
 parser.add_argument('-i', dest='initialize', action='store_true', default=False,
                     help ='Use this flag to initialize the F-engine(s)')
-parser.add_argument('-n', dest='noise', action='store_true', default=False,
+parser.add_argument('--noise', dest='noise', action='store_true', default=False,
                     help ='Use this flag to switch to Noise inputs')
-parser.add_argument('-v', dest='tvg', action='store_true', default=False,
+parser.add_argument('--tvg', dest='tvg', action='store_true', default=False,
                     help ='Use this flag to switch to EQ TVG outputs')
+parser.add_argument('-n','--num_spectra',type=int,default=10,
+                    help='Number of spectra per baseline')
 parser.add_argument('-t', '--integration_time', type=int, default=1,
                     help='Integration time in seconds for each spectra')
 parser.add_argument('-p','--program', type=str, default=None,
                     help='Program FPGAs with the fpgfile')
+parser.add_argument('-o','--output',type=str, default='.',
+                    help='Path to destination folder')
 args = parser.parse_args()
 
+NCHAN    = 1024
+NPOL     = 4
+NBL      = 6
+NTIME    = args.num_spectra
+NBLTIMES = (NTIME * NBL)
     
 if args.program  is not None:
     snap = casperfpga.CasperFpga(args.host)
@@ -119,6 +122,10 @@ for t in range(NTIME):
         times.append(time.time())
         data.append(np.transpose(corr))
 
-np.savez('~/data/snap_correlation_%d.npz'%(times[0]),
-         data=data,polarizations=pols,frequencies=frequencies,
+if args.output.endswith('/'):
+    outfilename = args.output + 'snap_correlation_%d.npz'%(times[0])
+else:
+    outfilename = args.output + '/snap_correlation_%d.npz'%(times[0])
+
+np.savez(outfilename,data=data,polarizations=pols,frequencies=frequencies,
          times=times,ant1_array=ant1_array,ant2_array=ant2_array)
