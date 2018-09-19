@@ -2,6 +2,7 @@ import numpy as np
 import logging
 import logging.handlers
 import sys
+import time
 import redis
 import json
 import socket
@@ -11,6 +12,9 @@ import struct
 A Redis-based log handler from:
 http://charlesleifer.com/blog/using-redis-pub-sub-and-irc-for-error-logging-with-python/
 '''
+
+logger = logging.getLogger(__name__)
+
 class RedisHandler(logging.Handler):
     def __init__(self, channel, conn, *args, **kwargs):
         logging.Handler.__init__(self, *args, **kwargs)
@@ -72,26 +76,57 @@ def snap_part_to_host_input(part):
     """
     adc, name = part.split('>')
     # convert the string adc (eg "e2") into a channel number 0-2
-    adc_num = int(adc[1:]) / 4.
+    adc_num = int(adc[1:]) // 4
     # convert the name into something which should be a hostname
-    hostname = "herasnapA" + name[3:]
-    true_name, aliases, addresses = socket.gethostbyname(hostname)
+    hostname = "herasnapA%d" % int(name[3:])
+    try:
+        true_name, aliases, addresses = socket.gethostbyaddr(hostname)
+    except:
+        logger.error('Failed to gethostbyname for host %s' % hostname)
     # assume that the one we want is the last thing in the hosts file line
-    return alises[-1], adc_num
+    return aliases[-1], adc_num
     
 
 def cminfo_compute():
     """
-    Use hera_cm's get_cminfo_correlator method to build a dictionary
+    Use hera_mc's get_cminfo_correlator method to build a dictionary
     of pam/fem/ant/snap mappings.
-    Requires hera_cm.
+    Requires hera_mc.
     """
-    from hera_cm import sys_handling
+    from hera_mc import sys_handling
     h = sys_handling.Handling()
     cminfo = h.get_cminfo_correlator()
     snap_to_ant = {}
     ant_to_snap = {}
     for ant in cminfo['antenna_numbers']:
-        name = cminfo['antenna_name'][ant]
+        name = cminfo['antenna_names'][ant]
         snapi_e, channel_e = snap_part_to_host_input(cminfo['correlator_inputs'][ant][0])
         snapi_n, channel_n = snap_part_to_host_input(cminfo['correlator_inputs'][ant][1])
+        ant_to_snap[ant] = {}
+        ant_to_snap[ant]['e'] = {'host': snapi_e, 'channel': channel_e}
+        ant_to_snap[ant]['n'] = {'host': snapi_n, 'channel': channel_n}
+        if snapi_e not in snap_to_ant.keys():
+            snap_to_ant[snapi_e] = ['', '', '', '', '', '']
+        snap_to_ant[snapi_e][channel_e] = name + 'E'
+        if snapi_n not in snap_to_ant.keys():
+            snap_to_ant[snapi_n] = ['', '', '', '', '', '']
+        snap_to_ant[snapi_n][channel_n] = name + 'N'
+    return snap_to_ant, ant_to_snap
+
+def write_maps_to_redis(redishost='redishost'):
+    redis_host = redis.Redis(redishost)
+    snap_to_ant, ant_to_snap = cminfo_compute()
+    redhash = {'snap_to_ant':json.dumps(snap_to_ant), 'ant_to_snap':json.dumps(ant_to_snap)}
+    redhash['update_time'] = time.time()
+    redhash['update_time_str'] = time.ctime(redhash['update_time'])
+    redis_host.hmset('corr:map', redhash)
+
+def read_maps_from_redis(redishost='redishost'):
+    redis_host = redis.Redis(redishost)
+    if not redis_host.exists('corr:map'):
+        return None
+    x = redis_host.hgetall('corr:map')
+    x['update_time'] = float(x['update_time'])
+    x['ant_to_snap'] = json.loads(x['ant_to_snap'])
+    x['snap_to_ant'] = json.loads(x['snap_to_ant'])
+    return x
