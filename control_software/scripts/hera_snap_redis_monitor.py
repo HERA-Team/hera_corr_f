@@ -3,44 +3,23 @@ import sys
 import time
 import datetime
 import argparse
-import redis
 import logging
-import yaml
-from hera_corr_f import SnapFengine
+import json
+from hera_corr_f import HeraCorrelator
 from hera_corr_f import helpers
 
 logger = helpers.add_default_log_handlers(logging.getLogger(__file__))
 
-def get_fengs():
-    """
-    Check redis for the latest config, and connect to listed ROACHs
-    returns: time of config file upload, list ofFengine instances
-    """
-    config_str  = r.hget('snap_configuration', 'config')
-    config_time = r.hget('snap_configuration', 'upload_time')
-    logger.info('Using configuration from redis, uploaded at %s' % config_time)
-    config = yaml.load(config_str)
-
-    fengines = []
-
-    for host in config['fengines'].keys():
-        try:
-            logger.info('Connecting to SNAP %s' % host)
-            fengines += [SnapFengine(host)]
-        except:
-            logger.warning('Connection to %s failed' % host)
-            pass
-
-    return config_time, fengines
-
-def get_fpga_stats():
+def get_fpga_stats(feng):
     """
     Get FPGA stats.
     returns: Dictionary of stats
     """
     stat = {}
-    stat['temp'] = fengine.fpga.transport.get_temp()
+    stat['temp'] = feng.fpga.transport.get_temp()
     stat['timestamp'] = datetime.datetime.now().isoformat()
+    stat['uptime'] = feng.sync.uptime()
+    stat['pps_count'] = feng.sync.count()
     return stat
 
 def get_pam_stats():
@@ -73,36 +52,41 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    logger.info('Connecting to Redis database on %s' % args.redishost)
-    r = redis.Redis(args.redishost)
-    
-    # Don't do anything if a script is blocking the monitor
-    while r.exists('disable_monitoring'):
-        logger.warning('Monitoring locked out. Waiting 10 seconds and retrying')
-        time.sleep(10)
-
-    upload_time, fengines = get_fengs()
-        
-    logger.info("Using F-Engines: %r" % [fengine.host for fengine in fengines])
+    corr = HeraCorrelator(redishost=args.redishost)
+    upload_time = corr.r.hget('snap_configuration', 'upload_time')
 
     while(True):
         tick = time.time()
-        while r.exists('disable_monitoring'):
+        while corr.r.exists('disable_monitoring'):
             logger.warning('Monitoring locked out. Waiting 10 seconds and retrying')
             time.sleep(10)
     
         # Check for a new configuration, and if one exists, update the Fengine list
-        if r.hget('snap_configuration', 'upload_time') > upload_time:
-            upload_time, fengines = get_fengs()
+        if corr.r.hget('snap_configuration', 'upload_time') != upload_time:
+            upload_time = corr.r.hget('snap_configuration', 'upload_time')
+            logger.info('New configuration detected. Reinitializing fengine list')
+            corr = HeraCorrelator(redishost=args.redishost)
+        
+        # Recompute the hookup every time. It's fast
+        corr.compute_hookup()
 
-        for fn, fengine in enumerate(fengines):
-            try:
-                r.hmset("status:snap:%s" % fengine.host, get_fpga_stats())
-            except:
-                logger.warning("Fengine %s failed. Reconnecting" % fengine.host)
-                r.hset("status:snap:%s" % fengine.host, "failed-time", datetime.datetime.now().isoformat())
-                # if we've failed, try reconnecting to the board:
-                fengines[n] = SnapFengine(fengine.host)
+        for ant, antval in corr.ant_to_snap.iteritems():
+            for pol, polval in antval.iteritems():
+                status_key = 'status:ant:%s:%s' % (ant, pol)
+                feng = polval['host']
+                chan = polval['channel']
+                corr.r.hmset(status_key, {'f_host':feng.host, 'host_ant_id':chan})
+                means, powers, rmss = feng.input.get_stats(sum_cores=True)
+                mean = means[chan]
+                power = powers[chan]
+                rms   = rmss[chan]
+                corr.r.hmset(status_key, {'adc_mean':mean, 'adc_power':power, 'adc_rms':rms})
+                hist_bins, hist_vals = feng.input.get_histogram(chan, sum_cores=True)
+                corr.r.hset(status_key, 'histogram', json.dumps([hist_bins.tolist(), hist_vals.tolist()]))
+                corr.r.hset(status_key, 'timestamp', datetime.datetime.now().isoformat())
+
+        for feng in corr.fengs:
+            corr.r.hmset("status:snap:%s" % feng.host, get_fpga_stats(feng))
                 
         # If executing the loop hasn't already taken longer than the loop delay time, add extra wait.
         extra_delay = args.delay - (time.time() - tick)

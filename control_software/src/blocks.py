@@ -280,7 +280,7 @@ class Input(Block):
         else:
             raise NotImplementedError('Different input selects not supported yet!')
 
-    def get_stats(self):
+    def get_stats(self, sum_cores=False):
         """
         Get the mean, RMS, and powers of
         all 12 ADC cores.
@@ -294,6 +294,10 @@ class Input(Block):
         means    = x[0::2] / 2.**16
         powers   = x[1::2] / 2.**16
         rmss     = np.sqrt(powers)
+        if sum_cores:
+            means = [(means[2*i] + means[2*i+1]) / 2. for i in range(self.nstreams/2)]
+            powers = [(powers[2*i] + powers[2*i+1]) / 2. for i in range(self.nstreams/2)]
+            rmss = np.sqrt(powers)
         return means, powers, rmss
 
     def initialize(self):
@@ -313,7 +317,7 @@ class Input(Block):
         print ''
 
     def set_input(self, i):
-        self.write_int('bits_stats_input_sel', i)
+        self.write_int('bit_stats_input_sel', i)
 
     def get_histogram(self, input, sum_cores=True):
         self.set_input(input)
