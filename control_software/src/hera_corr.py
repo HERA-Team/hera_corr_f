@@ -1,14 +1,16 @@
 import logging
 import time
+import socket
 import redis
 import yaml
-from helpers import add_default_log_handlers
+import helpers
 from hera_corr_f import SnapFengine
 
-LOGGER = add_default_log_handlers(logging.getLogger(__name__))
+LOGGER = helpers.add_default_log_handlers(logging.getLogger(__name__))
 
 class HeraCorrelator(object):
     def __init__(self, redishost='redishost', config=None, logger=LOGGER):
+        self.redishost = redishost
         self.r = redis.Redis(redishost)
         if config is None:
             config_str  = self.r.hget('snap_configuration', 'config')
@@ -24,9 +26,17 @@ class HeraCorrelator(object):
         # Instantiate CasperFpga connections to all the F-Engine.
         # TODO: this is fragile and will break if any board fails to co-operate
         self.fengs = [SnapFengine(host) for host in self.config['fengines'].keys()]
+        self.fengs_by_name = {}
+        self.fengs_by_ip = {}
+        for feng in self.fengs:
+            feng.ip = socket.gethostbyname(feng.host)
+            self.fengs_by_name[feng.host] = feng
+            self.fengs_by_ip[feng.ip] = feng
         self.logger.info('SNAPs are: %s' % ', '.join([feng.host for feng in self.fengs]))
         # Access to low level functionality
         self.fpgas = [feng.fpga for feng in self.fengs]
+        # Get antenna<->SNAP maps
+        self.compute_hookup()
 
     def program(self, bitstream=None):
         progfile = bitstream or self.config['fpgfile']
@@ -68,3 +78,29 @@ class HeraCorrelator(object):
             feng.initialize()
         self.noise_diode_disable()
         self.phase_switch_disable()
+
+    def compute_hookup(self):
+        """
+        Generate an antenna-map from antenna names to
+        Fengine instances.
+        """
+        hookup = helpers.read_maps_from_redis(self.redishost)
+        if hookup is None:
+            self.logger.error('Failed to compute antenna hookup from redis maps')
+            return
+        self.ant_to_snap = hookup['ant_to_snap']
+        self.snap_to_ant = hookup['snap_to_ant']
+        for ant in self.ant_to_snap.keys():
+            for pol in self.ant_to_snap[ant].keys():
+                host = self.ant_to_snap[ant][pol]['host']
+                self.ant_to_snap[ant][pol]['host'] = self.fengs_by_ip[socket.gethostbyname(host)]
+        # Make the snap->ant dict, but make sure the hostnames match what is expected by this classes Fengines
+        for hooked_up_snap in hookup['snap_to_ant'].keys():
+            ip = socket.gethostbyname(hooked_up_snap)
+            for feng in self.fengs:
+                if feng.ip == ip:
+                    self.snap_to_ant[feng.host] = hookup['snap_to_ant'][hooked_up_snap]
+        # Fill any unconnected SNAPs with Nones
+        for feng in self.fengs:
+            if feng.host not in self.snap_to_ant.keys():
+                self.snap_to_ant[feng.host] = [None] * 6

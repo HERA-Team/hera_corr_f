@@ -106,10 +106,10 @@ def cminfo_compute():
         ant_to_snap[ant]['e'] = {'host': snapi_e, 'channel': channel_e}
         ant_to_snap[ant]['n'] = {'host': snapi_n, 'channel': channel_n}
         if snapi_e not in snap_to_ant.keys():
-            snap_to_ant[snapi_e] = ['', '', '', '', '', '']
+            snap_to_ant[snapi_e] = [None] * 6
         snap_to_ant[snapi_e][channel_e] = name + 'E'
         if snapi_n not in snap_to_ant.keys():
-            snap_to_ant[snapi_n] = ['', '', '', '', '', '']
+            snap_to_ant[snapi_n] = [None] * 6
         snap_to_ant[snapi_n][channel_n] = name + 'N'
     return snap_to_ant, ant_to_snap
 
