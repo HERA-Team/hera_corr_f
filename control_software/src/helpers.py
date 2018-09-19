@@ -93,5 +93,5 @@ def cminfo_compute():
     ant_to_snap = {}
     for ant in cminfo['antenna_numbers']:
         name = cminfo['antenna_name'][ant]
-        snapi_e, channel_e = snap_part_to_host_input(cminfo['correlator_inputs'][ant][0]
-        snapi_n, channel_n = snap_part_to_host_input(cminfo['correlator_inputs'][ant][1]
+        snapi_e, channel_e = snap_part_to_host_input(cminfo['correlator_inputs'][ant][0])
+        snapi_n, channel_n = snap_part_to_host_input(cminfo['correlator_inputs'][ant][1])
