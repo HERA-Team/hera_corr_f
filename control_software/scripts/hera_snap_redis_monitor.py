@@ -20,6 +20,7 @@ def get_fpga_stats(feng):
     stat['timestamp'] = datetime.datetime.now().isoformat()
     stat['uptime'] = feng.sync.uptime()
     stat['pps_count'] = feng.sync.count()
+    stat['serial'] = feng.serial
     return stat
 
 def get_pam_stats():
