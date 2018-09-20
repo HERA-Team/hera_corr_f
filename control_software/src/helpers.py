@@ -76,7 +76,7 @@ def snap_part_to_host_input(part):
     """
     adc, name = part.split('>')
     # convert the string adc (eg "e2") into a channel number 0-2
-    adc_num = int(adc[1:]) // 4
+    adc_num = int(adc[1:]) // 2 # divide by 2 because ADC is in demux 2
     # convert the name into something which should be a hostname
     hostname = "herasnapA%d" % int(name[3:])
     try:
