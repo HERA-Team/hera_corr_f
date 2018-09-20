@@ -45,13 +45,6 @@ eth: False
 fpgfile: '/home/hera/src/hera_corr_f/snap_fengine/outputs/snap_fengine.fpg'
 
 fengines:
-#    snap110:
-#        dest_port: 8511
-#        ants: [0,1,2]
-#        init: True
-#        tvg: True
-#        noise: False
-#        eth: True
     heraNode1Snap0:
         dest_port: 8511
         ants: [3,4,5]
@@ -66,13 +59,13 @@ fengines:
         tvg: 'ramp_pols'
         noise: False
         eth: True
-#    snap113:
-#        dest_port: 8511
-#        ants: [3,4,5]
-#        init: True
-#        tvg: True
-#        noise: False
-#        eth: True
+    heraNode1Snap2:
+        dest_port: 8511
+        ants: [3,4,5]
+        init: True
+        tvg: True
+        noise: False
+        eth: True
 #    snap114:
 #        dest_port: 8511
 #        ants: [12,13,14]
