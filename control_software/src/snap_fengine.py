@@ -11,6 +11,12 @@ class SnapFengine(object):
     def __init__(self, host):
         self.host = host
         self.fpga = casperfpga.CasperFpga(host=host)
+        # Try and get the canonical name of the host
+        # to use as a serial number
+        try:
+            self.serial = socket.gethostbyaddr(self.host)[0]
+        except:
+            self.serial = None
 
         # blocks
         self.synth       = Synth(self.fpga, 'lmx_ctrl')
