@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 
 import argparse
-from hera_corr_f import SnapFengine
+from hera_corr_f import HeraCorrelator
+from hera_corr_f import helpers
 import numpy as np
 import struct
 import collections
@@ -9,6 +10,9 @@ import casperfpga
 import redis
 import time
 import yaml
+import logging
+
+logger = helpers.add_default_log_handlers(logging.getLogger(__name__))
 
 parser = argparse.ArgumentParser(description='Interact with a programmed SNAP board for testing and '\
                                  'networking. FLAGS OVERRIDE CONFIG FILE!',
@@ -33,173 +37,62 @@ parser.add_argument('-p','--program', action='store_true', default=False,
                     help='Program FPGAs with the fpgfile specified in the config file if not programmed already')
 args = parser.parse_args()
 
-r = redis.Redis(args.redishost)
-if args.config_file is None:
-    config_str  = r.hget('snap_configuration', 'config')
-    config_time = r.hget('snap_configuration', 'upload_time_str')
-    print 'Using configuration from redis, uploaded at %s' % config_time
-    config = yaml.load(config_str)
-else:
-    with open(args.config_file,'r') as fp:
-        config = yaml.load(fp)
+corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)
 
-fengs = config['fengines']
-xengs = config['xengines']
-
-# Check that there are only three antennas per board
-for fn,(host,params) in enumerate(fengs.items()):
-    if 'ants' in params.keys():
-        assert (len(params['ants'])==3), "%s: Number of antennas is not 3!"%host
-    else:
-        fengs[host]['ants'] = np.arange(fn,fn+3)
-
-# Check that there are only 48 channels per x-engine.
-for host,params in xengs.items():
-    if 'chan_range' in params.keys():
-        chanrange = params['chan_range']
-        xengs[host]['chans'] = np.arange(chanrange[0], chanrange[1])
-    assert(len(params['chans'])<=384), "%s: Cannot process >384 channels."%host
+if not corr.config_is_valid:
+    logger.error('Currently loaded config is invalid')
+    exit()
 
 # Before we start manipulating boards, prevent monitoing scripts from
 # sending TFTP traffic. Expire the key after 5 minutes to lazily account for
 # issues with this script crashing.
-r.set('disable_monitoring', 1, ex=600)
-time.sleep(1)
+corr.disable_monitoring(expiry=300)
+time.sleep(1) # wait for the monitor to pause
 
-# Initialize, set input according to command line flags.
-for host,params in fengs.items():
-    # re-disable, in case we're doing something outrageous like programming
-    # a gazillion boards, which could take a looooong time.
-    r.set('disable_monitoring', 1, ex=600)
+if args.program:
+    corr.program() # This should multithread the programming process.
+    if not args.initialize:
+        logger.warning('Programming but *NOT* initializing. This is unlikely to be what you want')
 
-    if args.program:
-        f = casperfpga.CasperFpga(host)
-        print "Programming %s with %s" % (host, config['fpgfile'])
-        f.upload_to_ram_and_program(config['fpgfile'])
-        r.hset('snap_last_programmed', host, time.ctime())
+if args.initialize:
+    corr.initialize()
 
-    fengs[host]['fengine'] = SnapFengine(host)
-    fengine = fengs[host]['fengine']
-  
-    if args.initialize:
-        print '%s: Initializing..'%host
-        fengine.initialize()
+if args.tvg:
+    logger.info('%s:  Enabling EQ TVGs...' % host)
+    for feng in corr.fengs:
+        feng.eq_tvg.write_freq_ramp()
+        feng.eq_tvg.tvg_enable()
 
-    if args.tvg:
-        print '%s:  Enabling EQ TVGs...'%host
-        fengine.eq_tvg.write_freq_ramp()
-        fengine.eq_tvg.tvg_enable()
-
-    if args.noise:
-        print '%s:  Setting noise TVGs...'%host
-        ## Noise Block
+if args.noise:
+    logger.info('%s:  Setting noise TVGs...' % host)
+    for feng in corr.fengs:
         seed = 23
         for stream in range(fengine.noise.nstreams): 
-            fengine.noise.set_seed(stream, seed)
-        fengine.input.use_noise()
+            feng.noise.set_seed(stream, seed)
+        feng.input.use_noise()
 
 # Now assign frequency slots to different X-engines as 
 # per the config file. A total of 32 Xengs are assumed for 
 # assigning slots- 16 for the even bank, 16 for the odd.  
 # Channels not assigned to Xengs in the config file are 
 # ignored. Following are the assumed globals:
-n_xengs = 16
-chans_per_packet = 384 # Hardcoded in firmware
-
-fengines_list = []
-for fhost, fparams in fengs.items():
-    fengine = fparams['fengine']
-    fengines_list.append(fengine)
-
-    for xhost, xparams in xengs.items():
-        if (xparams['num'] > n_xengs): 
-           raise ValueError("Cannot have more than %d X-engs!!"%n_xengs)
-        print '%s: Setting Xengine %d: '%(xhost,xparams['num']),\
-              'IP Even: %s'%xparams['even']['ip'],\
-              'IP Odd: %s'%xparams['odd']['ip']
-           
-        ip = [int(i) for i in xparams['even']['ip'].split('.')]
-        ip_even = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
-        ip = [int(i) for i in xparams['odd']['ip'].split('.')]
-        ip_odd = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
-        fengine.packetizer.assign_slot(xparams['num'], xparams['chans'], \
-                                       [ip_even,ip_odd], fengine.reorder,\
-                                       fparams['ants'][0])
-        fengine.eth.add_arp_entry(ip_even,xparams['even']['mac'])
-        fengine.eth.add_arp_entry(ip_odd,xparams['odd']['mac'])
-
-    fengine.eth.set_port(fparams['dest_port'])
+if not corr.configure_freq_slots():
+    logger.error('Configuring frequency slots failed!')
+    exit()
 
 # Sync logic. Do global sync first, and then noise generators
 # wait for a PPS to pass then arm all the boards
 if args.sync:
-    print 'Sync-ing Fengines'
-    print 'Waiting for PPS at time %.2f' % time.time()
-    fengines_list[0].sync.wait_for_sync()
-    print 'Sync passed at time %.2f' % time.time()
-    before_sync = time.time()
-    for fengine in fengines_list:
-        fengine.sync.arm_sync()
-    after_sync = time.time()
-    sync_time = int(before_sync) + 3 # Takes 3 clcok cycles to arm
-    r['corr:feng_sync_time'] = sync_time
-    r['corr:feng_sync_time_str'] = time.ctime(sync_time)
-    print 'Syncing took %.2f seconds' % (after_sync - before_sync)
-    if after_sync - before_sync > 0.5:
-        print "WARNING!!!"
-
-if args.sync:
-    print 'Sync-ing Noise generators'
-    print 'Waiting for PPS at time %.2f' % time.time()
-    fengines_list[0].sync.wait_for_sync()
-    print 'Sync passed at time %.2f' % time.time()
-    before_sync = time.time()
-    for fengine in fengines_list:
-        fengine.sync.arm_noise()
-    after_sync = time.time()
-    print 'Syncing took %.2f seconds' % (after_sync - before_sync)
-    if after_sync - before_sync > 0.5:
-        print "WARNING!!!"
-
-if args.mansync:
-    print 'Generating a software sync trigger'
-    for fengine in fengines_list:
-        fengine.sync.arm_sync()
-        fengine.sync.arm_noise()
-    for fengine in fengines_list:
-        # It takes multiple (3?) syncs to clear the mrst.
-        fengine.sync.sw_sync()
-        fengine.sync.sw_sync()
-        fengine.sync.sw_sync()
-        fengine.sync.sw_sync()
+    corr.resync(manual=args.mansync)
+    corr.sync_noise()
 
 if args.eth:
-    print 'Enabling Ethernet outputs...'
-    for fengine in fengines_list:
-        fengine.eth.enable_tx()
+    corr.enable_output()
 else:
-    print '*NOT* enabling ethernet output.'
-    for fengine in fengines_list:
-        fengine.eth.disable_tx()
+    corr.disable_output()
 
 
 # Re-enable the monitoring process
-r.delete('disable_monitoring')
+corr.enable_monitoring()
 
 print 'Initialization complete'
-
-def set_test_vector(fengine,mode):
-   if mode == 'const_ants':
-       fengine.eq_tvg.write_const_ants(equal_pols=True)
-   elif mode == 'const_pols':
-       fengine.eq_tvg.write_const_ants(equal_pols=False)
-   elif mode == 'ramp':
-       fengine.eq_tvg.write_freq_ramp(equal_pols=True)
-   elif mode == 'ramp_pols':
-       fengine.eq_tvg.write_freq_ramp(equal_pols=False)
-   else: 
-       print "Not sure what is asked for. Writing ramp to all pols."
-       fengine.eq_tvg.write_freq_ramp(equal_pols=True)
-   fengine.eq_tvg.tvg_enable()
-   return True
-

@@ -42,51 +42,18 @@ initialize: False
 eth: False
 
 # Specify a full path to an F-Engine fpg files
-fpgfile: '/home/hera/src/hera_corr_f/snap_fengine/outputs/snap_fengine.fpg'
+fpgfile: '/home/hera/src/hera_corr_f/snap_fengine/outputs/snap_fengine_2018-07-10_1618.fpg'
+
+# Destination port for SNAP data
+dest_port: 8511
 
 fengines:
     heraNode1Snap0:
-        dest_port: 8511
-        ants: [3,4,5]
-        init: True
-        tvg: 'ramp_pols'
-        noise: False
-        eth: True
+        phase_switch_index: 0
     heraNode1Snap1:
-        dest_port: 8511
-        ants: [6,7,8]
-        init: True
-        tvg: 'ramp_pols'
-        noise: False
-        eth: True
+        phase_switch_index: 0
     heraNode1Snap2:
-        dest_port: 8511
-        ants: [3,4,5]
-        init: True
-        tvg: True
-        noise: False
-        eth: True
-#    snap114:
-#        dest_port: 8511
-#        ants: [12,13,14]
-#        init: True
-#        tvg: True
-#        noise: False
-#        eth: True
-#    snap1:
-#        dest_port: 8511
-#        ants: [9,10,11]
-#        init: True
-#        tvg: True
-#        noise: False
-#        eth: True
-#    snap109:
-#        dest_port: 8511
-#        ants: [15,16,17]
-#        init: True
-#        tvg: 'ramp_pols'
-#        noise: False
-#        eth: True
+        phase_switch_index: 0
 
 # Data is sent assuming a total of 32 Xengines and 
 # a maximum of 48 channels per Xengine. If all the 
@@ -94,22 +61,16 @@ fengines:
 # are not sent anywhere.
 xengines:
     xeng0:
-        num: 0
         even:
-           ip: "10.10.10.136"
-           mac: 0x02020a140102
+           ip: "10.80.40.223"
+           mac: 0x02020a5028c5
         odd:
            ip: '0.0.0.0' #nowhere
            mac: 0x000000000000
-        chan_range: [0,384]
-
-#    xeng0:
-#        num: 0
-#        ip: "10.0.10.12"
-#        mac: 0x02020a140102
-#        chan_range: [0,48]
-#    xeng1:
-#        num: 1
-#        ip: "10.0.10.140"
-#        mac: 0x02020a140142
-#        chan_range: [256,304]
+    xeng1:
+        even:
+           ip: "10.80.40.224"
+           mac: 0x02020a5028c6
+        odd:
+           ip: '0.0.0.0' #nowhere
+           mac: 0x000000000000

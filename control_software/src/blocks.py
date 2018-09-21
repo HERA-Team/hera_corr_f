@@ -767,6 +767,10 @@ class Eth(Block):
         ipaddr = socket.inet_aton(socket.gethostbyname(self.host.host))
         self.blindwrite('sw', ipaddr, offset=0x10)
         self.set_port(self.port)
+
+    def set_source_port(self, port):
+        # see config_10gbe_core in katcp_wrapper
+        self.blindwrite('sw', struct.pack('>BBH', 0, 1, port), offset=0x20)
                         
     def print_status(self):
         rv = self.get_status()
