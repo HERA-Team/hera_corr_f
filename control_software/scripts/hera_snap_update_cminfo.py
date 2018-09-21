@@ -11,12 +11,7 @@ parser = argparse.ArgumentParser(description='Suspend snap monitors for a specif
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('-r', dest='redishost', type=str, default='redishost',
                     help ='Host servicing redis requests')
-parser.add_argument('-t', dest='suspend_mins', type=float, default=5.0,
-                    help ='Time, in minutes, for which to suspend monitor processes')
 
 args = parser.parse_args()
 
-logger.info('Connecting to redis server %s' % args.redishost)
-r = redis.Redis(args.redishost)
-
-helpers.cminfo_compute()
+helpers.write_maps_to_redis(redishost=args.redishost)
