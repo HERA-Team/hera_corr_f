@@ -73,21 +73,27 @@ if __name__ == "__main__":
 
         for ant, antval in corr.ant_to_snap.iteritems():
             for pol, polval in antval.iteritems():
-                status_key = 'status:ant:%s:%s' % (ant, pol)
-                feng = polval['host']
-                chan = polval['channel']
-                corr.r.hmset(status_key, {'f_host':feng.host, 'host_ant_id':chan})
-                means, powers, rmss = feng.input.get_stats(sum_cores=True)
-                mean = means[chan]
-                power = powers[chan]
-                rms   = rmss[chan]
-                corr.r.hmset(status_key, {'adc_mean':mean, 'adc_power':power, 'adc_rms':rms})
-                hist_bins, hist_vals = feng.input.get_histogram(chan, sum_cores=True)
-                corr.r.hset(status_key, 'histogram', json.dumps([hist_bins.tolist(), hist_vals.tolist()]))
-                corr.r.hset(status_key, 'timestamp', datetime.datetime.now().isoformat())
+                try:
+                    status_key = 'status:ant:%s:%s' % (ant, pol)
+                    feng = polval['host']
+                    chan = polval['channel']
+                    corr.r.hmset(status_key, {'f_host':feng.host, 'host_ant_id':chan})
+                    means, powers, rmss = feng.input.get_stats(sum_cores=True)
+                    mean = means[chan]
+                    power = powers[chan]
+                    rms   = rmss[chan]
+                    corr.r.hmset(status_key, {'adc_mean':mean, 'adc_power':power, 'adc_rms':rms})
+                    hist_bins, hist_vals = feng.input.get_histogram(chan, sum_cores=True)
+                    corr.r.hset(status_key, 'histogram', json.dumps([hist_bins.tolist(), hist_vals.tolist()]))
+                    corr.r.hset(status_key, 'timestamp', datetime.datetime.now().isoformat())
+                except:
+                    logger.error('Failed to get stats for ant %s pol %s (feng %s, chan %s)' % (ant, pol, feng, chan))
 
         for feng in corr.fengs:
-            corr.r.hmset("status:snap:%s" % feng.host, get_fpga_stats(feng))
+            try:
+                corr.r.hmset("status:snap:%s" % feng.host, get_fpga_stats(feng))
+            except:
+                logger.error('Failed to get stats from SNAP %s' % feng.host)
                 
         # If executing the loop hasn't already taken longer than the loop delay time, add extra wait.
         extra_delay = args.delay - (time.time() - tick)
