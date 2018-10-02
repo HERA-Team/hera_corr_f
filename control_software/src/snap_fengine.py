@@ -34,8 +34,11 @@ class SnapFengine(object):
         self.eth         = Eth(self.fpga, 'eth')
         self.corr        = Corr(self.fpga,'corr_0')
         self.phaseswitch = PhaseSwitch(self.fpga, 'phase_switch')
-        self.pams        = [Pam(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
-        self.fems        = []#[Fem(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
+        self.i2c_initialized = False
+        try:
+            self._add_i2c()
+        except:
+            pass
         
         # The order here can be important, blocks are initialized in the
         # order they appear here
@@ -55,10 +58,17 @@ class SnapFengine(object):
             self.corr,
             self.phaseswitch,
         ]
+
+    def _add_i2c(self):
+        self.pams        = [Pam(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
+        self.fems        = []#[Fem(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
         self.blocks += self.pams
         self.blocks += self.fems
+        self.i2c_initialized = True
 
     def initialize(self):
+        if not self.i2c_initialized:
+            self._add_i2c()
         for block in self.blocks:
             logger.info("Initializing block: %s" % block.name)
             block.initialize()
