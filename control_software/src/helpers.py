@@ -120,6 +120,7 @@ def write_maps_to_redis(redishost='redishost'):
     redhash['update_time'] = time.time()
     redhash['update_time_str'] = time.ctime(redhash['update_time'])
     redis_host.hmset('corr:map', redhash)
+    redis_host.client_kill()
 
 def read_maps_from_redis(redishost='redishost'):
     redis_host = redis.Redis(redishost)
