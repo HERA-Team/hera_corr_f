@@ -62,15 +62,113 @@ fengines:
 xengines:
     xeng0:
         even:
-           ip: "10.80.40.223"
+           ip: "10.80.40.197"
            mac: 0x02020a5028c5
         odd:
-           ip: '0.0.0.0' #nowhere
-           mac: 0x000000000000
+           ip: "10.80.40.206"
+           mac: 0x02020a5028ce
     xeng1:
         even:
-           ip: "10.80.40.224"
+           ip: "10.80.40.229"
+           mac: 0x02020a5028e5
+        odd:
+           ip: "10.80.40.238"
+           mac: 0x02020a5028ee
+    xeng2:
+        even:
+           ip: "10.80.40.198"
            mac: 0x02020a5028c6
         odd:
-           ip: '0.0.0.0' #nowhere
-           mac: 0x000000000000
+           ip: "10.80.40.207"
+           mac: 0x02020a5028cf
+    xeng3:
+        even:
+           ip: "10.80.40.230"
+           mac: 0x02020a5028e6
+        odd:
+           ip: "10.80.40.239"
+           mac: 0x02020a5028ef
+    xeng4:
+        even:
+           ip: "10.80.40.199"
+           mac: 0x02020a5028c7
+        odd:
+           ip: "10.80.40.208"
+           mac: 0x02020a5028d0
+    xeng5:
+        even:
+           ip: "10.80.40.231"
+           mac: 0x02020a5028e7
+        odd:
+           ip: "10.80.40.240"
+           mac: 0x02020a5028f0
+    xeng6:
+        even:
+           ip: "10.80.40.200"
+           mac: 0x02020a5028c8
+        odd:
+           ip: "10.80.40.209"
+           mac: 0x02020a5028d1
+    xeng7:
+        even:
+           ip: "10.80.40.232"
+           mac: 0x02020a5028e8
+        odd:
+           ip: "10.80.40.241"
+           mac: 0x02020a5028f1
+    xeng8:
+        even:
+           ip: "10.80.40.201"
+           mac: 0x02020a5028c9
+        odd:
+           ip: "10.80.40.210"
+           mac: 0x02020a5028d2
+    xeng9:
+        even:
+           ip: "10.80.40.233"
+           mac: 0x02020a5028e9
+        odd:
+           ip: "10.80.40.242"
+           mac: 0x02020a5028f2
+    xeng10:
+        even:
+           ip: "10.80.40.202"
+           mac: 0x02020a5028ca
+        odd:
+           ip: "10.80.40.211"
+           mac: 0x02020a5028d3
+    xeng11:
+        even:
+           ip: "10.80.40.234"
+           mac: 0x02020a5028ea
+        odd:
+           ip: "10.80.40.243"
+           mac: 0x02020a5028f3
+    xeng12:
+        even:
+           ip: "10.80.40.203"
+           mac: 0x02020a5028cb
+        odd:
+           ip: "10.80.40.212"
+           mac: 0x02020a5028d4
+    xeng13:
+        even:
+           ip: "10.80.40.235"
+           mac: 0x02020a5028eb
+        odd:
+           ip: "10.80.40.244"
+           mac: 0x02020a5028f4
+    xeng14:
+        even:
+           ip: "10.80.40.204"
+           mac: 0x02020a5028cc
+        odd:
+           ip: "10.80.40.213"
+           mac: 0x02020a5028d5
+    xeng15:
+        even:
+           ip: "10.80.40.236"
+           mac: 0x02020a5028ec
+        odd:
+           ip: "10.80.40.245"
+           mac: 0x02020a5028f5
