@@ -150,13 +150,13 @@ class HeraCorrelator(object):
             ants = self.config['fengines'][feng.host].get('ants', range(3*fn, 3*fn + 1))
             # if the user hasn't specified a source port, auto increment mod 4
             source_port = self.config['fengines'][feng.host].get('source_port', dest_port + (fn%4))
-            for xn, (xhost, xparams) in enumerate(self.config['xengines'].items()):
+            for xn, xparams in self.config['xengines'].items():
                 chan_range = xparams.get('chan_range', [xn*384, (xn+1)*384])
                 chans = range(chan_range[0], chan_range[1])
                 if (xn > n_xengs): 
                    self.logger.error("Cannot have more than %d X-engs!!" % n_xengs)
                    return False
-                self.logger.info('Setting Xengine %d: chans %d-%d: %s (even) / %s (odd)' % (xn, chans[0], chans[-1], xparams['even']['ip'], xparams['odd']['ip']))
+                self.logger.info('%s: Setting Xengine %d: chans %d-%d: %s (even) / %s (odd)' % (feng.fpga.host, xn, chans[0], chans[-1], xparams['even']['ip'], xparams['odd']['ip']))
                 ip = [int(i) for i in xparams['even']['ip'].split('.')]
                 ip_even = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
                 ip = [int(i) for i in xparams['odd']['ip'].split('.')]
