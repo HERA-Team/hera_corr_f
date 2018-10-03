@@ -129,4 +129,5 @@ def read_maps_from_redis(redishost='redishost'):
     x['update_time'] = float(x['update_time'])
     x['ant_to_snap'] = json.loads(x['ant_to_snap'])
     x['snap_to_ant'] = json.loads(x['snap_to_ant'])
+    redis_host.client_kill()
     return x
