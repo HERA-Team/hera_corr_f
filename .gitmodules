@@ -3,4 +3,4 @@
 	url = https://github.com/jack-h/mlib_devel
 [submodule "control_software/casperfpga"]
 	path = control_software/casperfpga
-	url = https://github.com/casper-astro/casperfpga
+	url = https://github.com/HERA-Team/casperfpga
