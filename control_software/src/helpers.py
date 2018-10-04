@@ -77,8 +77,9 @@ def snap_part_to_host_input(part):
     adc, name = part.split('>')
     # convert the string adc (eg "e2") into a channel number 0-2
     adc_num = int(adc[1:]) // 2 # divide by 2 because ADC is in demux 2
-    # convert the name into something which should be a hostname
-    hostname = "herasnapA%d" % int(name[3:])
+    # convert the name into something which should be a hostname.
+    # name has the form SNPA0000123. Hostnames have the form herasnapA123
+    hostname = "herasnap%s" % (name[3] + name[4:].lstrip('0'))
     try:
         true_name, aliases, addresses = socket.gethostbyaddr(hostname)
     except:
@@ -100,17 +101,21 @@ def cminfo_compute():
     ant_to_snap = {}
     for ant in cminfo['antenna_numbers']:
         name = cminfo['antenna_names'][ant]
-        snapi_e, channel_e = snap_part_to_host_input(cminfo['correlator_inputs'][ant][0])
-        snapi_n, channel_n = snap_part_to_host_input(cminfo['correlator_inputs'][ant][1])
+        e_pol = cminfo['correlator_inputs'][ant][0]
+        n_pol = cminfo['correlator_inputs'][ant][1]
         ant_to_snap[ant] = {}
-        ant_to_snap[ant]['e'] = {'host': snapi_e, 'channel': channel_e}
-        ant_to_snap[ant]['n'] = {'host': snapi_n, 'channel': channel_n}
-        if snapi_e not in snap_to_ant.keys():
-            snap_to_ant[snapi_e] = [None] * 6
-        snap_to_ant[snapi_e][channel_e] = name + 'E'
-        if snapi_n not in snap_to_ant.keys():
-            snap_to_ant[snapi_n] = [None] * 6
-        snap_to_ant[snapi_n][channel_n] = name + 'N'
+        if e_pol != 'None':
+            snapi_e, channel_e = snap_part_to_host_input(cminfo['correlator_inputs'][ant][0])
+            ant_to_snap[ant]['e'] = {'host': snapi_e, 'channel': channel_e}
+            if snapi_e not in snap_to_ant.keys():
+                snap_to_ant[snapi_e] = [None] * 6
+            snap_to_ant[snapi_e][channel_e] = name + 'E'
+        if n_pol != 'None':
+            snapi_n, channel_n = snap_part_to_host_input(cminfo['correlator_inputs'][ant][1])
+            ant_to_snap[ant]['n'] = {'host': snapi_n, 'channel': channel_n}
+            if snapi_n not in snap_to_ant.keys():
+                snap_to_ant[snapi_n] = [None] * 6
+            snap_to_ant[snapi_n][channel_n] = name + 'N'
     return snap_to_ant, ant_to_snap
 
 def write_maps_to_redis(redishost='redishost'):
@@ -120,7 +125,7 @@ def write_maps_to_redis(redishost='redishost'):
     redhash['update_time'] = time.time()
     redhash['update_time_str'] = time.ctime(redhash['update_time'])
     redis_host.hmset('corr:map', redhash)
-    redis_host.client_kill()
+    del(redis_host)
 
 def read_maps_from_redis(redishost='redishost'):
     redis_host = redis.Redis(redishost)
@@ -130,5 +135,5 @@ def read_maps_from_redis(redishost='redishost'):
     x['update_time'] = float(x['update_time'])
     x['ant_to_snap'] = json.loads(x['ant_to_snap'])
     x['snap_to_ant'] = json.loads(x['snap_to_ant'])
-    redis_host.client_kill()
+    del(redis_host)
     return x
