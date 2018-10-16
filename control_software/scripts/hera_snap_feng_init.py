@@ -58,13 +58,13 @@ if args.initialize:
     corr.initialize()
 
 if args.tvg:
-    logger.info('%s:  Enabling EQ TVGs...' % host)
+    logger.info('Enabling EQ TVGs...')
     for feng in corr.fengs:
         feng.eq_tvg.write_freq_ramp()
         feng.eq_tvg.tvg_enable()
 
 if args.noise:
-    logger.info('%s:  Setting noise TVGs...' % host)
+    logger.info('Setting noise TVGs...')
     for feng in corr.fengs:
         seed = 23
         for stream in range(fengine.noise.nstreams): 
