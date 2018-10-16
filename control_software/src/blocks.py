@@ -983,7 +983,7 @@ class RoachEth(Block):
 
 class Pam(Block):
 
-    ADDR_VOLT = 0x36
+    ADDR_VOLT = 0x4f
     ADDR_ROM = 0x52
     ADDR_SN = 0x50
     ADDR_INA = 0x44
@@ -992,13 +992,12 @@ class Pam(Block):
     CLK_I2C_BUS = 10  # 10 kHz
     CLK_I2C_REF = 100 # reference clk at 100 MHz
 
-    I2C_RETRY_WAIT = 0.005
+    I2C_RETRY_WAIT = 0.02
 
     SHUNT_RESISTOR = 0.1
 
     RMS2DC_SLOPE = 27.31294863
     RMS2DC_INTERCEPT = -55.15991678
-    COUPLER_LOSS = 9.8
 
     def __init__(self, host, name):
         """ Post Amplifier Module (PAM) digital control class
@@ -1012,8 +1011,8 @@ class Pam(Block):
 
         host    CasperFpga instance
         name    Select one of the three PAMs(/Antennas) under the control of
-                a SNAP board. Recommended values are: 'i2c_ant0', 'i2c_ant1'
-                or 'i2c_ant2'. Please refer to the f-engine model for correct
+                a SNAP board. Recommended values are: 'i2c_ant1', 'i2c_ant2'
+                or 'i2c_ant3'. Please refer to the f-engine model for correct
                 value.
         """
         super(Pam, self).__init__(host, name)
@@ -1037,7 +1036,7 @@ class Pam(Block):
         self.sn=i2c_sn.DS28CM00(self.i2c, self.ADDR_SN)
 
         # Power detector
-        self.pow = i2c_volt.MAX11644(self.i2c, self.ADDR_VOLT)
+        self.pow = i2c_volt.LTC2990(self.i2c, self.ADDR_VOLT)
         self.pow.init()
 
         # ROM
@@ -1087,28 +1086,24 @@ class Pam(Block):
         """
         return self.sn.readSN()
 
-    def power(self, name=None):
+    def power(self, name='east'):
         """ Get power level of the East or North RF path
 
             Example:
-            power(name='east')  # return power level of east in dBm
-            power(name='north') # return power level of north in dBm
-            power()             # return power level of both east and north
+            power(name='east')  # returns power level of east in dBm
+            power(name='north') # returns power level of north in dBm
         """
-        if name not in ['east','north',None]:
+        if name not in ['east','north']:
             raise ValueError('Invalid parameter.')
 
-        vp1, vp2 = self.pow.readVolt()
-        assert vp1>=0 and vp1<=3.3
-        assert vp2>=0 and vp2<=3.3
         if name == 'east':
-            return dc2dbm(vp1) + self.COUPLER_LOSS
+            vp=self.pow.readVolt('v3')
         elif name == 'north':
-            return dc2dbm(vp2) + self.COUPLER_LOSS
-        else:
-            dbm1 = dc2dbm(vp1) + self.COUPLER_LOSS
-            dbm2 = dc2dbm(vp2) + self.COUPLER_LOSS
-            return dbm1,dbm2
+            vp=self.pow.readVolt('v4')
+
+        assert vp>=0 and vp<=3.3
+
+        return dc2dbm(vp, self.RMS2DC_SLOPE, self.RMS2DC_INTERCEPT)
 
     def rom(self, string=None):
         """ Read string from ROM or write String to ROM
@@ -1123,24 +1118,21 @@ class Pam(Block):
             self.rom.writeString(string)
 
 
-def db2gpio(ae, an):
+def db2gpio(ae,an):
     assert ae in range(0,16)
     assert an in range(0,16)
-    ae = 15 - ae
-    an = 15 - an
-    val_str = '{0:08b}'.format((ae << 4) + an)
-    val = int(val_str,2)
+    val_str = '{0:08b}'.format((an << 4) + ae)
+    val = int(val_str[::-1],2)
     return val
 
 def gpio2db(val):
     assert val in range(0,256)
-    val_str = '{0:08b}'.format(val)
-    ae = int(val_str[0:4],2)
-    an = int(val_str[4:8],2)
-    return 15-ae, 15-an
+    val_str = '{0:08b}'.format(val)[::-1]
+    an = int(val_str[0:4],2)
+    ae = int(val_str[4:8],2)
+    return ae,an
 
 def dc2dbm(val, slope, intercept):
-    assert val>=0 and val<=3.3, "Input value {} out range of 0-3.3V".format(val)
     res = val * slope + intercept
     return res
 
@@ -1151,7 +1143,7 @@ class Fem(Block):
     ADDR_MAG = 0x0c
     ADDR_BAR = 0x77
     ADDR_VOLT = 0x4e
-    ADDR_ROM = 0x51
+    ADDR_ROM = 0x52
     ADDR_TEMP = 0x40
     ADDR_INA = 0x45
     ADDR_GPIO = 0x20
@@ -1166,8 +1158,8 @@ class Fem(Block):
     RMS2DC_SLOPE = 27.31294863
     RMS2DC_INTERCEPT = -55.15991678
 
-    IMU_ORIENT = [[0,0,1],[1,1,0],[-1,1,0]]
-    SWMODE = {'load':0b000,'antenna':0b110,'noise':0b001}
+    IMU_ORIENT = [[0,0,1],[0,1,0],[1,0,0]]
+    SWMODE = {'load':0b001,'antenna':0b111,'noise':0b000}
 
     def __init__(self, host, name):
         """ Front End Module (FEM) digital control class
@@ -1230,6 +1222,7 @@ class Fem(Block):
         rawt,dt = self.bar.readTemp(raw=True)
         press = self.bar.readPress(rawt,dt)
         return press
+
 
     def shunt(self, name='i'):
         """ Get current/voltage of the power supply
