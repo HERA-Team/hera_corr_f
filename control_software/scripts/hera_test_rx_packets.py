@@ -9,13 +9,21 @@ def decode_packet(packet):
     time = p[0] >> 29
     chan = (p[0] >> 16) & (2**13 - 1)
     ant  = p[0] & 0xffff
-
     return time, chan, ant, np.array(p[1:])
+
+def decode_header(packet):
+    p = struct.unpack('>Q', packet[0:8])
+    time = p[0] >> 29
+    chan = (p[0] >> 16) & (2**13 - 1)
+    ant  = p[0] & 0xffff
+    return time, chan, ant
 
 
 parser = argparse.ArgumentParser(description='Grab packets from an F-engine in '\
                                  'EQ TVG mode and check they look ok',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('-i', dest='ip', type=str, default='10.10.10.136',
+                    help = 'Socket to which to bind')
 parser.add_argument('-p', dest='port', type=int, default=8511,
                     help = 'Port to collect packets from')
 parser.add_argument('-s', dest='single_packet', action='store_true', default=False,
@@ -50,24 +58,25 @@ pol = 2
 tot_chans = 8192
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind(('10.10.10.136', args.port))
+sock.bind((args.ip, args.port))
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024*4616*128)
 
 if args.timeorder:
     payload, addr = sock.recvfrom(BUFSIZE)
-    ti, chani, anti, datai  =  decode_packet(payload)
+    ti, chani, anti = decode_header(payload)
     errorctr = 0; n=0
     while(True):
         try:
             payload, addr = sock.recvfrom(BUFSIZE)
-            time, chan, ant, data = decode_packet(payload)
-            if (ant == anti) and (chan == chani):
-                if (time-ti !=4):
-                    print "ERROR: TIME not incrementing by 1"
-                    print "ANT: %d CHAN: %d TIME: %d"%(ant,chan,time)
+            time, chan, ant  = decode_header(payload)
+            #if (ant == anti) and (chan == chani):
+            if True:
+                if (time != ti) and (time-ti !=4):
+                    print "ERROR: TIME not constant or incrementing by 4"
+                    print "ANT: %d CHAN: %d TIME: %d (was %d)"%(ant,chan,time,ti)
                     errorctr += 1
-                else: ti = time;
-            n += 1
+                ti = time;
+                n += 1
         except KeyboardInterrupt:
             print '#######################'
             print 'Grabbed %d packets' % n
