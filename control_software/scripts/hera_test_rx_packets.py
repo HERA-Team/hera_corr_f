@@ -156,7 +156,7 @@ while(True):
                     for t in range(nsamp_per_pkt):
                         offset = a * pol * chans_per_pkt * nsamp_per_pkt + t*pol + p
                         if not np.all(data[offset:offset+(pol*nsamp_per_pkt*nbytes):pol*nsamp_per_pkt] == tvg[tvg_offset:tvg_offset+nbytes]):
-                            print 'ERROR: Header and packet contents do not match! (Ant %d, Pol: %d, Sample %d, Chan %d)' % (ant, p, t, chan)
+                            print 'ERROR: Header and packet contents do not match! (Ant %d (pkt ant %d), Pol: %d, Sample %d, Chan %d)' % (ant, a, p, t, chan)
                             print 'Expected:', tvg[tvg_offset:tvg_offset+nbytes]
                             print 'Received:', data[offset:offset+(pol*nsamp_per_pkt*nbytes):pol*nsamp_per_pkt]
                             err_count += 1
