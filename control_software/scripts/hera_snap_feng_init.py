@@ -84,7 +84,7 @@ if not corr.configure_freq_slots():
 # wait for a PPS to pass then arm all the boards
 if args.sync:
     corr.resync(manual=args.mansync)
-    corr.sync_noise()
+    corr.sync_noise(manual=args.mansync)
 
 if args.eth:
     corr.enable_output()
