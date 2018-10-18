@@ -170,9 +170,10 @@ class HeraCorrelator(object):
 
     def resync(self, manual=False):
         self.logger.info('Sync-ing Fengines')
-        self.logger.info('Waiting for PPS at time %.2f' % time.time())
-        self.fengs[0].sync.wait_for_sync()
-        self.logger.info('Sync passed at time %.2f' % time.time())
+        if not manual:
+            self.logger.info('Waiting for PPS at time %.2f' % time.time())
+            self.fengs[0].sync.wait_for_sync()
+            self.logger.info('Sync passed at time %.2f' % time.time())
         before_sync = time.time()
         for feng in self.fengs:
             feng.sync.arm_sync()
@@ -191,14 +192,22 @@ class HeraCorrelator(object):
         if after_sync - before_sync > 0.5:
             self.logger.warning("It took longer than expected to arm sync!")
 
-    def sync_noise(self):
+    def sync_noise(self, manual=False):
         self.logger.info('Sync-ing noise generators')
-        self.fengs[0].sync.wait_for_sync()
-        self.logger.info('Sync passed at time %.2f' % time.time())
+        if not manual:
+            self.logger.info('Waiting for PPS at time %.2f' % time.time())
+            self.fengs[0].sync.wait_for_sync()
+            self.logger.info('Sync passed at time %.2f' % time.time())
         before_sync = time.time()
         for feng in self.fengs:
             feng.sync.arm_noise()
         after_sync = time.time()
+        if manual:
+            self.logger.warning('Using manual sync trigger')
+            for i in range(3): # takes 3 syncs to trigger
+                for feng in self.fengs:
+                    feng.sync.sw_sync()
+            sync_time = int(time.time()) # roughly
         self.logger.info('Syncing took %.2f seconds' % (after_sync - before_sync))
         if after_sync - before_sync > 0.5:
             self.logger.warning("It took longer than expected to arm sync!")
