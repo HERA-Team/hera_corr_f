@@ -150,11 +150,11 @@ while(True):
         if args.errors or args.ordererrors:
             # Check payload matches
             nbytes = chans_per_pkt
-            for ant in range(3):
+            for a in range(3):
                 for p in range(pol):
-                    tvg_offset = (ant*pol + p)*tot_chans + chan
+                    tvg_offset = (a*pol + p)*tot_chans + chan
                     for t in range(nsamp_per_pkt):
-                        offset = ant * pol * chans_per_pkt * nsamp_per_pkt + t*pol + p
+                        offset = a * pol * chans_per_pkt * nsamp_per_pkt + t*pol + p
                         if not np.all(data[offset:offset+(pol*nsamp_per_pkt*nbytes):pol*nsamp_per_pkt] == tvg[tvg_offset:tvg_offset+nbytes]):
                             print 'ERROR: Header and packet contents do not match! (Ant %d, Pol: %d, Sample %d, Chan %d)' % (ant, p, t, chan)
                             print 'Expected:', tvg[tvg_offset:tvg_offset+nbytes]
