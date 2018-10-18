@@ -62,8 +62,8 @@ if args.timeorder:
             payload, addr = sock.recvfrom(BUFSIZE)
             time, chan, ant, data = decode_packet(payload)
             if (ant == anti) and (chan == chani):
-                if (time-ti !=4):
-                    print "ERROR: TIME not incrementing by 1"
+                if (time-ti != 2*nsamp_per_pkt): #2x for even odd split
+                    print "ERROR: TIME not incrementing by %d" %(2*nsamp_per_pkt)
                     print "ANT: %d CHAN: %d TIME: %d"%(ant,chan,time)
                     errorctr += 1
                 else: ti = time;
@@ -141,13 +141,17 @@ while(True):
 
         if args.errors or args.ordererrors:
             # Check payload matches
+            nbytes = chans_per_pkt
             for ant in range(3):
-                offset = ant * chans_per_pkt * nsamp_per_pkt * pol
-                if not (data[offset] == tvg[ant*pol*tot_chans+chan]):
-                    print 'ERROR: Header and packet contents do not match!'
-                    print tvg[ant*tot_chans+chan]
-                    print data[offset:offset+8]
-                    err_count += 1
+                for p in range(pol):
+                    tvg_offset = (ant*pol + p)*tot_chans + chan
+                    for t in range(nsamp_per_pkt):
+                        offset = ant * pol * chans_per_pkt * nsamp_per_pkt + t*pol + p
+                        if not np.all(data[offset:offset+(pol*nsamp_per_pkt*nbytes):pol*nsamp_per_pkt] == tvg[tvg_offset:tvg_offset+nbytes]):
+                            print 'ERROR: Header and packet contents do not match! (Ant %d, Pol: %d, Sample %d, Chan %d)' % (ant, p, t, chan)
+                            print 'Expected:', tvg[tvg_offset:tvg_offset+nbytes]
+                            print 'Received:', data[offset:offset+(pol*nsamp_per_pkt*nbytes):pol*nsamp_per_pkt]
+                            err_count += 1
 
         if args.errors or args.chanerrors:
             # Check that you have atmost 16 unique chans
