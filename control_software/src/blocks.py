@@ -783,6 +783,7 @@ class Corr(Block):
         super(Corr, self).__init__(host,name)
         self.acc_len = acc_len
         self.spec_per_acc = 8
+        self.format='l'
     
     def wait_for_acc(self):
         cnt = self.read_uint('acc_cnt')
@@ -791,16 +792,32 @@ class Corr(Block):
         while self.read_uint('acc_cnt') < (cnt+2):
             time.sleep(0.1)
         return 1
+
+    def _read_spec(self, pol1, pol2, nowait=False):
+        self.write_int('input_sel',(pol1 + (pol2 << 8)))
+        if not nowait: self.wait_for_acc()
+        spec = np.array(struct.unpack('>2048l',self.read('dout',8*1024)))
+        spec = (spec[0::2]+1j*spec[1::2])/float(self.acc_len*self.spec_per_acc)
+        return spec
     
-    def get_new_corr(self, pol1, pol2):
+    def get_new_corr(self, pol1, pol2, nowait=False):
         """
         Mapping: [1a, 1b, 2a, 2b, 3a, 3b] : [0, 1, 2, 3, 4, 5, 6, 7]
         """
+        spec = self._read_spec(pol1, pol2, nowait=nowait)
+        if pol1==pol2:
+            return spec.real + 1j*np.zeros(len(spec))
+        else:
+            return spec
 
-        self.write_int('input_sel',(pol1 + (pol2 << 8)))
-        self.wait_for_acc()
-        spec = np.array(struct.unpack('>2048l',self.read('dout',8*1024)))
-        return (spec[0::2]+1j*spec[1::2])/float(self.acc_len*self.spec_per_acc)
+    def get_max_hold(self, pol, nowait=False):
+        """
+        Mode works only for auto correlations.
+        Mapping: [1a, 1b, 2a, 2b, 3a, 3b] : [0, 1, 2, 3, 4, 5, 6, 7]
+        """
+        spec = self._read_spec(pol, pol, nowait=nowait)
+   	return spec.imag 
+        
     
     def plot_corr(self, pol1, pol2, show=False):
         from matplotlib import pyplot as plt
