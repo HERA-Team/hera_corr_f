@@ -5,6 +5,13 @@ import socket
 import time
 import casperfpga
 import casperfpga.snapadc
+from casperfpga import i2c
+from casperfpga import i2c_gpio
+from casperfpga import i2c_volt
+from casperfpga import i2c_eeprom
+from casperfpga import i2c_sn
+from casperfpga import i2c_bar
+from casperfpga import i2c_motion
 from scipy.linalg import hadamard #for walsh (hadamard) matrices
 logger = logging.getLogger(__name__)
 
@@ -79,8 +86,7 @@ class Synth(casperfpga.synth.LMX2581):
         self.powerOn()
 
 class Adc(casperfpga.snapadc.SNAPADC):
-    def __init__(self, host, sample_rate=500, num_chans=2, resolution=8,ref=10):
-        super(Adc, self).__init__(host)
+    def __init__(self, host, sample_rate=500, num_chans=2, resolution=8, ref=10):
         casperfpga.snapadc.SNAPADC.__init__(self,host,ref=ref)
         self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
@@ -89,6 +95,34 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.sample_rate     = sample_rate
         self.resolution      = resolution
 
+    def set_gain(self, gain):
+        """
+        Set the coarse gain of the ADC. Allowed values
+        are 1, 1.25, 2, 2.5, 4, 5, 8, 10, 12.5, 16, 20, 25, 32, 50.
+        """
+        gain_map = {
+          1    : 0b0000,
+          1.25 : 0b0001,
+          2    : 0b0010,
+          2.5  : 0b0011,
+          4    : 0b0100,
+          5    : 0b0101,
+          8    : 0b0110,
+          10   : 0b0111,
+          12.5 : 0b1000,
+          16   : 0b1001,
+          20   : 0b1010,
+          25   : 0b1011,
+          32   : 0b1100,
+          50   : 0b1101
+        }
+
+        if gain not in gain_map.keys():
+            raise ValueError("Gain %f is not allowed! Only gains %s are allowed" % (gain, gain_map.keys()))
+        
+        self.adc.write((gain_map[gain]<<4) + gain_map[gain], 0x2b)
+        
+
     def initialize(self):
         self.init(self.sample_rate, self.num_chans) # from the SNAPADC class
         #self.alignLineClock(mode='dual_pat')
@@ -96,6 +130,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         ##If aligning complete, alignFrameClock should not output any warning
         self.selectADC()
         self.adc.selectInput([1,1,3,3])
+        self.set_gain(4)
 
 class Sync(Block):
     def __init__(self, host, name):
@@ -196,7 +231,7 @@ class NoiseGen(Block):
         if stream > self.nstreams:
             logger.error('Tried to get noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
             return
-        reg_name = 'seed_%d' % (stream // 4)
+        regname = 'seed_%d' % (stream // 4)
         return (self.read_uint(regname) >> (8 * stream % 4)) & 0xff
 
 
@@ -216,6 +251,7 @@ class Input(Block):
         self.USE_NOISE = 0
         self.USE_ADC   = 1
         self.USE_ZERO  = 2
+        self.INT_TIME  = 2**20 / 250.0e6
 
     def use_noise(self, stream=None):
         if stream is None:
@@ -244,7 +280,7 @@ class Input(Block):
         else:
             raise NotImplementedError('Different input selects not supported yet!')
 
-    def get_stats(self):
+    def get_stats(self, sum_cores=False):
         """
         Get the mean, RMS, and powers of
         all 12 ADC cores.
@@ -258,6 +294,10 @@ class Input(Block):
         means    = x[0::2] / 2.**16
         powers   = x[1::2] / 2.**16
         rmss     = np.sqrt(powers)
+        if sum_cores:
+            means = [(means[2*i] + means[2*i+1]) / 2. for i in range(self.nstreams/2)]
+            powers = [(powers[2*i] + powers[2*i+1]) / 2. for i in range(self.nstreams/2)]
+            rmss = np.sqrt(powers)
         return means, powers, rmss
 
     def initialize(self):
@@ -276,17 +316,22 @@ class Input(Block):
         for i in rms: print '%3f'%i,
         print ''
 
+    def set_input(self, i):
+        self.write_int('bit_stats_input_sel', i)
+
     def get_histogram(self, input, sum_cores=True):
-        v = np.array(struct.unpack('>512H', self.read('bit_stats_histogram%d_output'%input, 512*2)))
-        a = v[0::2]
-        b = v[1::2]
+        self.set_input(input)
+        time.sleep(0.1)
+        v = np.array(struct.unpack('>512H', self.read('bit_stats_histogram_output', 512*2)))
+        a = v[0:256]
+        b = v[256:512]
         a = np.roll(a, 128) # roll so that array counts -128, -127, ..., 0, ..., 126, 127
         b = np.roll(b, 128) # roll so that array counts -128, -127, ..., 0, ..., 126, 127
         vals = np.arange(-128,128)
         if sum_cores:
             return vals, a+b
         else:
-            return val, a, b
+            return vals, a, b
 
     def get_input_histogram(self, ant):
         vals, a = self.get_histogram(ant*2, sum_cores=True)
@@ -333,6 +378,16 @@ class Delay(Block):
 
     def initialize(self):
         self.write_int('delays', 0)
+
+class Rotator(Block):
+    def __init__(self, host, name):
+        super(Rotator, self).__init__(host, name)
+        
+    def disable(self):
+        self.write_int('en',0)
+
+    def initialize(self):
+        self.disable()
 
 class Pfb(Block):
     def __init__(self, host, name):
@@ -447,13 +502,14 @@ class PhaseSwitch(Block):
         self.set_delay(0)
         
 class Eq(Block):
-    def __init__(self, host, name, nstreams=6, ncoeffs=2**11):
+    def __init__(self, host, name, nstreams=8, ncoeffs=2**10):
         super(Eq, self).__init__(host, name)
         self.nstreams = nstreams
         self.ncoeffs = ncoeffs
         self.width = 16
         self.bp = 6
         self.format = 'H'#'L'
+        self.streamsize = struct.calcsize(self.format)*self.ncoeffs
 
     def set_coeffs(self, stream, coeffs):
         coeffs *= 2**self.bp
@@ -463,23 +519,29 @@ class Eq(Block):
         coeffs[coeffs>(2**self.width - 1)] = 2**self.width - 1
         coeffs = list(coeffs)
         coeffs_str = struct.pack('>%d%s' % (len(coeffs), self.format), *coeffs)
-        self.write('%d_coeffs' % stream, coeffs_str)
+        self.write('coeffs', coeffs_str, offset= self.streamsize * stream)
 
     def get_coeffs(self, stream):
-        coeffs_str = self.read('%d_coeffs' % stream, self.ncoeffs*struct.calcsize(self.format))
+        coeffs_str = self.read('coeffs', self.streamsize, offset= self.streamsize * stream)
         coeffs = np.array(struct.unpack('>%d%s' % (self.ncoeffs, self.format), coeffs_str))
         return coeffs / (2.**self.bp)
+
+    def clip_count(self):
+        return self.read_int('clip_cnt')
+
+    def print_status(self):
+        print 'Number of times input got clipped: %d'%self.clip_count()
 
     def initialize(self):
         for stream in range(self.nstreams):
             self.set_coeffs(stream, 100*np.ones(self.ncoeffs,dtype='>%s'%self.format))
 
 class EqTvg(Block):
-    def __init__(self, host, name, nstreams=3, nchans=2**11):
+    def __init__(self, host, name, nstreams=8, nchans=2**13):
         super(EqTvg, self).__init__(host, name)
         self.nstreams = nstreams
         self.nchans = nchans
-        self.format = 'Q'
+        self.format = 'B'
 
     def tvg_enable(self):
         self.write_int('tvg_en', 1)
@@ -487,22 +549,57 @@ class EqTvg(Block):
     def tvg_disable(self):
         self.write_int('tvg_en', 0)
 
-    def write_freq_ramp(self):
+    def write_const_ants(self,equal_pols=False):
+        """
+            Write a constant to all the channels of a polarization unless 
+            equal_pols is set, then a constant is written to all pols of 
+            an antenna.
+            if `equal_pols`:
+               tv[ant][pol] = ant
+            else
+               tv[ant][pol] = 2*ant + pol
+        """
+        tv = np.zeros(self.nchans*self.nstreams, dtype='>%s'%self.format)
+        if equal_pols:
+            for stream in range(self.nstreams):
+                tv[stream*self.nchans:(stream+1)*self.nchans] = stream//2
+        else:
+            for stream in range(self.nstreams):
+                tv[stream*self.nchans:(stream+1)*self.nchans] = stream
+        self.write('tv',tv.tostring())
+
+    def write_freq_ramp(self,equal_pols=False):
+        """ Write a frequency ramp to the test vector 
+            that is repeated for all antennas. 
+            equal_pols: Write the same ramp to both pols 
+            of an antenna.
+        """
         ramp = np.arange(self.nchans)
-        ramp = np.array(ramp%16384,dtype='>%s'%self.format) # tvg values are only 16 bits
-        tv = np.zeros(self.nchans, dtype='>%s'%self.format) 
-        for stream in range(self.nstreams):
-            tv += ((ramp + (self.nstreams - stream - 1)*(self.nchans)) << (16*stream))
+        ramp = np.array(ramp, dtype='>%s' %self.format) # tvg values are only 8 bits
+        tv = np.zeros(self.nchans * self.nstreams, dtype='>%s' % self.format)
+        if equal_pols:
+            for stream in range(self.nstreams):
+                tv[stream*self.nchans: (stream+1)*self.nchans] = ramp + stream//2
+        else:
+            for stream in range(self.nstreams):
+                tv[stream*self.nchans: (stream+1)*self.nchans] = ramp + stream
         self.write('tv', tv.tostring())
+
+    def read_tvg(self):
+        """ Read the test vector written to the sw bram """
+        tvg = struct.unpack('>%d%s'%(self.nchans*self.nstreams, self.format),
+                            self.read('tv', self.nchans * self.nstreams))
+        return tvg
 
     def initialize(self):
         self.tvg_disable()
         self.write_freq_ramp()
 
 class ChanReorder(Block):
-    def __init__(self, host, name, nchans):
+    def __init__(self, host, name, nchans=2**10):
         super(ChanReorder, self).__init__(host, name)
         self.nchans = nchans
+        self.format = 'L'
 
     def set_channel_order(self, order):
         """
@@ -513,91 +610,90 @@ class ChanReorder(Block):
         if len(order) != self.nchans:
             logger.Error("Tried to reorder channels, but map was the wrong length")
             return
-        order_str = struct.pack('>%dL' % self.nchans, *order)
-        self.write('reorder1_map1', order_str)
+        order_str = struct.pack('>%d%s' %(self.nchans,self.format), *order)
+        self.write('reorder3_map1', order_str)
+
+    def read_reorder(self, slot_num=None):
+        reorder = self.read('reorder3_map1',1024*4)
+        reorder = struct.unpack('>%d%s'%(self.nchans,self.format),reorder)
+        if slot_num: 
+            return reorder[slot_num*64:(slot_num*64)+(384//8)]
+        else:
+            return reorder 
 
     def reindex_channel(self, actual_index, output_index):
-        self.write_int('reorder1_map1', actual_index, word_offset=output_index)
+        self.write_int('reorder3_map1', actual_index, word_offset=output_index)
 
     def initialize(self):
         self.set_channel_order(np.arange(self.nchans))
         
 
 class Packetizer(Block):
-    def __init__(self, host, name, n_interfaces=1):
+    def __init__(self, host, name, n_time_demux=2):
         super(Packetizer, self).__init__(host, name)
-        self.n_interfaces = n_interfaces
+        self.n_time_demux = n_time_demux
+        self.n_slots = 16
 
-    def use_gpu_packing(self):
-        self.write_int('stupid_gpu_packing', 1)
+    def set_dest_ip(self, ip, slot_offset=0):
+        for time_slot in range(self.n_time_demux):
+            self.write_int('ips',ip[time_slot], word_offset=(time_slot * self.n_slots + slot_offset))
 
-    def use_fpga_packing(self):
-        self.write_int('stupid_gpu_packing', 0)
-
-    def set_dest_ips(self, ips, slot_offset=0,nants=3):
-        # works only if nants=3. Else every 4th slot is non-zero.
-        ips = np.repeat(np.array(ips), nants)
-        self.write('ips', struct.pack('>%dL' % ips.shape[0], *ips), offset=4*slot_offset*nants)
-
-    def set_ant_headers(self, ants=range(3), slot_offset=0): 
-        self.write('ants', struct.pack('>%dL' % len(ants), *ants), offset=4*slot_offset*len(ants))
+    def set_ant_header(self, ant, slot_offset=0): 
+        for time_slot in range(self.n_time_demux):
+            self.write_int('ants', ant, word_offset=(time_slot * self.n_slots + slot_offset))
         
-    def set_chan_headers(self, chans, slot_offset=0,nants=3):
-        #below works only if nants=3. Otherwise every 4th chan is not zero.
-        chans = np.repeat(np.array(chans), nants)
-        self.write('chans', struct.pack('>%dL' % chans.shape[0], *chans), offset=4*slot_offset*nants)
+    def set_chan_header(self, chan, slot_offset=0):
+        for time_slot in range(self.n_time_demux):
+            self.write_int('chans', chan, word_offset=(time_slot*self.n_slots + slot_offset))
+
 
     def initialize(self):
-        self.set_dest_ips(np.zeros(128))
-        self.set_ant_headers(np.zeros(512))
-        self.set_chan_headers(np.zeros(128))
-        self.use_fpga_packing()
+        for time_slot in range(self.n_slots):
+            self.set_dest_ip([0,0], time_slot)
+            self.set_ant_header(0, time_slot)
+            self.set_chan_header(0, time_slot)
 
-    def assign_slot(self, slot_num, chans, dest, reorder_block, ants=[0,1,2]):
+    def assign_slot(self, slot_num, chans, dests, reorder_block, ant):
         """
-        The F-engine generates 2048 channels, but can only
-        output 1536, in order to keep within the output data rate cap.
-        Each output packet contain 16 frequency channels for a single antenna.
-        There are thus effectively 96 output slots, each corresponding
-        to a block of 16 frequency channels. Each block can be filled with
-        16 arbitrary channels (they can repeat, if you want), and sent
+        The F-engine generates 8192 channels, but can only
+        output 6144(=8192 * 3/4), in order to keep within the output data rate cap.
+        Each output packet contains 384 frequency channels for a single antenna.
+        There are thus effectively 16 output slots, each corresponding
+        to a block of 384 frequency channels. Each block can be filled with
+        arbitrary channels (they can repeat, if you want), and sent
         to a particular IP address.
-        slot_num -- a value from 0 to 95 -- the slot you want to allocate
-        chans    -- an array of 16 channels, which you want to put in this slot's packet
-        dest     -- an IP integer that is the destination of this packet
+        slot_num -- a value from 0 to 15 -- the slot you want to allocate
+        chans    -- an array of 384 channels, which you want to put in this slot's packet
+        dests     -- A list of IP addresses of the odd and even X-engines for this chan range.
         reorder_block -- a ChanReorder block object, which allows the
-                         packetizer to manipulate the channel ordering of the design. Bit gross.
-        ants     -- an array of 3 antennas whose channels the slot contains.
+                         packetizer to manipulate the channel ordering of the design. Bit gross. Sorry.
+        ants     -- The antenna index of the first antenna on this board. One packet contains 3 antennas
 
-        1 slot => 16 channels, 3 antennas (3 pkts)
         """
+        NCHANS_PER_SLOT = 384
         chans = np.array(chans, dtype='>L')
-        if slot_num > 95:
-            raise ValueError("Only 95 output slots can be specified")
-        if chans.shape[0] != 16:
-            raise ValueError("Each slot must contain 16 frequency channels")
+        if slot_num > self.n_slots:
+            raise ValueError("Only %d output slots can be specified" % self.n_slots)
+        if chans.shape[0] != NCHANS_PER_SLOT:
+            raise ValueError("Each slot must contain %d frequency channels" % NCHANS_PER_SLOT)
 
-        # Since there are 2048 channels, and 16 channels per packet,
-        # there are really 128 slots, but every 4th one must be zero.
-        # The following map figures out where in the 128 slots one of the
-        # 96 valid slots should go.
-        slot128 = int(4*(slot_num//3) + slot_num%3)
+        if (type(dests) != list) or (len(dests) != self.n_time_demux):
+            raise ValueError("Packetizer requires a list of desitination IPs with %d entries" % self.n_time_demux)
 
         # Set the frequency header of this slot to be the first specified channel
-        self.set_chan_headers(chans[0:1], slot_offset=slot128)
+        self.set_chan_header(chans[0], slot_offset=slot_num)
 
         # Set the antenna header of this slot (every slot represents 3 antennas
-        self.set_ant_headers(ants=ants, slot_offset=slot128)
+        self.set_ant_header(ant=ant, slot_offset=slot_num)
 
         # Set the destination address of this slot to be the specified IP address
-        self.set_dest_ips([dest], slot_offset=slot128)
+        self.set_dest_ip(dests, slot_offset=slot_num)
 
         # set the channel orders
-        # The channels supplied need to emerge at indices slot128*16 : (slot128+1)*16
-        for cn, chan in enumerate(chans):
-            reorder_block.reindex_channel(chan, slot128*16 + cn)
-
-
+        # The channels supplied need to emerge in the first 384 channels of a block
+        # of 512 (first 192 clks of 256clks for 2 pols)
+        for cn, chan in enumerate(chans[::8]):
+            reorder_block.reindex_channel(chan//8, slot_num*64 + cn)
 
         
 class Eth(Block):
@@ -628,22 +724,28 @@ class Eth(Block):
     def get_status(self):
         stat = self.read_uint('sw_txs_ss_status')
         rv = {}
-        rv['rx_overrun'  ] =  (stat >> 0) & 1   
-        rv['rx_bad_frame'] =  (stat >> 1) & 1
-        rv['tx_of'       ] =  (stat >> 2) & 1   # Transmission FIFO overflow
-        rv['tx_afull'    ] =  (stat >> 3) & 1   # Transmission FIFO almost full
-        rv['tx_led'      ] =  (stat >> 4) & 1   # Transmission LED
-        rv['rx_led'      ] =  (stat >> 5) & 1   # Receive LED
-        rv['up'          ] =  (stat >> 6) & 1   # LED up
-        rv['eof_cnt'     ] =  (stat >> 7) & (2**25-1)
+        #rv['rx_overrun'  ] =  (stat >> 0) & 1   
+        #rv['rx_bad_frame'] =  (stat >> 1) & 1
+        #rv['tx_of'       ] =  (stat >> 2) & 1   # Transmission FIFO overflow
+        #rv['tx_afull'    ] =  (stat >> 3) & 1   # Transmission FIFO almost full
+        #rv['tx_led'      ] =  (stat >> 4) & 1   # Transmission LED
+        #rv['rx_led'      ] =  (stat >> 5) & 1   # Receive LED
+        #rv['up'          ] =  (stat >> 6) & 1   # LED up
+        #rv['eof_cnt'     ] =  (stat >> 7) & (2**25-1)
+        rv['tx_of'        ] =  self.read_uint('sw_txofctr')
+        rv['tx_full'      ] =  self.read_uint('sw_txfullctr')
+        rv['tx_err'       ] =  self.read_uint('sw_txerrctr')
+        rv['tx_vld'       ] =  self.read_uint('sw_txvldctr')
+        rv['tx_ctr'       ] =  self.read_uint('sw_txctr')
         return rv
-
+        
     def status_reset(self):
         self.change_reg_bits('ctrl', 0, 18)
         self.change_reg_bits('ctrl', 1, 18)
         self.change_reg_bits('ctrl', 0, 18)
 
     def set_port(self, port):
+        self.port = port
         self.change_reg_bits('ctrl', port, 2, 16)
 
     def reset(self):
@@ -665,6 +767,10 @@ class Eth(Block):
         ipaddr = socket.inet_aton(socket.gethostbyname(self.host.host))
         self.blindwrite('sw', ipaddr, offset=0x10)
         self.set_port(self.port)
+
+    def set_source_port(self, port):
+        # see config_10gbe_core in katcp_wrapper
+        self.blindwrite('sw', struct.pack('>BBH', 0, 1, port), offset=0x20)
                         
     def print_status(self):
         rv = self.get_status()
@@ -673,27 +779,32 @@ class Eth(Block):
 
 
 class Corr(Block):
-    def __init__(self, host, name, acc_len=2048*1e5):
+    def __init__(self, host, name, acc_len=3815):
         super(Corr, self).__init__(host,name)
         self.acc_len = acc_len
-        
-    def get_corr(self,antenna1,antenna2):
-        self.write_int('input_sel',(antenna1 + (antenna2 << 8)))
-        cnt = self.read_uint('acc_cnt')
-
-        while self.read_uint('acc_cnt') <= (cnt+1):
-            time.sleep(0.1)
-            
-        spec = np.array(struct.unpack('>4096L',self.read('dout',8*2048)))
-        
-        return (spec[0::2]+1j*spec[1::2])/self.acc_len
+        self.spec_per_acc = 8
     
-    def initialize(self):
-        self.write_int('acc_len',self.acc_len)
+    def wait_for_acc(self):
+        cnt = self.read_uint('acc_cnt')
+        # Wait for 2 counts to make sure we have a clean
+        # integration containing only the selected antennas
+        while self.read_uint('acc_cnt') < (cnt+2):
+            time.sleep(0.1)
+        return 1
+    
+    def get_new_corr(self, pol1, pol2):
+        """
+        Mapping: [1a, 1b, 2a, 2b, 3a, 3b] : [0, 1, 2, 3, 4, 5, 6, 7]
+        """
 
-    def plot_corr(self,antenna1,antenna2,show=True):
-        import matplotlib.pyplot as plt
-        spec = self.get_corr(antenna1,antenna2)
+        self.write_int('input_sel',(pol1 + (pol2 << 8)))
+        self.wait_for_acc()
+        spec = np.array(struct.unpack('>2048l',self.read('dout',8*1024)))
+        return (spec[0::2]+1j*spec[1::2])/float(self.acc_len*self.spec_per_acc)
+    
+    def plot_corr(self, pol1, pol2, show=False):
+        from matplotlib import pyplot as plt
+        spec = self.get_new_corr(pol1, pol2)
         f,ax = plt.subplots(2,2)
         ax[0][0].plot(spec.real)
         ax[0][0].set_title('Real')
@@ -702,84 +813,24 @@ class Corr(Block):
         ax[1][0].plot(np.angle(spec))
         ax[1][0].set_title('Phase')
         ax[1][1].plot(10*np.log10(np.abs(spec)))
-        ax[1][1].set_title('Power [dB]')
+        ax[1][1].set_title('Power [dB]')            
 
         if show:
             plt.show()
+
+    def show_corr_plot(self):
+        from matplotlib import pyplot as plt
+        plt.show()
+
+    def set_acc_len(self,acc_len):
+        self.acc_len = acc_len
+        acc_len = 8192*acc_len  #Convert to clks from spectra 
+        self.write_int('acc_len',acc_len)
+
+    def initialize(self):
+        self.set_acc_len(self.acc_len)
+
             
-# class Eth(Block):
-#     def __init__(self, host, name):
-#         super(Eth, self).__init__(host, name)
-#         self.tx = self.host.gbes
-#         self.port = 10000
-#         self.ipaddr = (10 << 24) + (0 << 16) + (10 << 8) + 112
-#         self.macaddr = 0x1122334455
-
-#     def set_arp_table(self, macs):
-#         """
-#         Set the ARP table with a list of MAC addresses.
-#         The list, `macs`, is passed such that the zeroth
-#         element is the MAC address of the device with
-#         IP XXX.XXX.XXX.0, and element N is the MAC
-#         address of the device with IP XXX.XXX.XXX.N
-#         """
-#         self.tx.set_arp_table(list(macs))
-#         #macs = list(macs)
-#         #macs_pack = struct.pack('>%dQ' % (len(macs)), *macs)
-#         #self.write('sw', macs_pack, offset=0x3000)
-
-#     def get_status(self):
-#         stat = self.read_uint('sw_status')
-#         self.tx.print_10gbe_core_details()
-#         # rv = {}
-#         # rv['rx_overrun'  ] =  (stat >> 0) & 1   
-#         # rv['rx_bad_frame'] =  (stat >> 1) & 1
-#         # rv['tx_of'       ] =  (stat >> 2) & 1   # Transmission FIFO overflow
-#         # rv['tx_afull'    ] =  (stat >> 3) & 1   # Transmission FIFO almost full
-#         # rv['tx_led'      ] =  (stat >> 4) & 1   # Transmission LED
-#         # rv['rx_led'      ] =  (stat >> 5) & 1   # Receive LED
-#         # rv['up'          ] =  (stat >> 6) & 1   # LED up
-#         # rv['eof_cnt'     ] =  (stat >> 7) & (2**25-1)
-#         # return rv
-
-#     def status_reset(self):
-#         self.change_reg_bits('ctrl', 0, 18)
-#         self.change_reg_bits('ctrl', 1, 18)
-#         self.change_reg_bits('ctrl', 0, 18)
-
-#     def set_port(self, port):
-#         self.change_reg_bits('ctrl', port, 2, 16)
-
-#     def reset(self):
-#         # disable core
-#         self.change_reg_bits('ctrl', 0, 1)
-#         # toggle reset
-#         self.change_reg_bits('ctrl', 0, 0)
-#         self.change_reg_bits('ctrl', 1, 0)
-#         self.change_reg_bits('ctrl', 0, 0)
-
-#     def enable_tx(self):
-#         self.change_reg_bits('ctrl', 1, 1)
-
-#     def initialize(self):
-#         ## Set IP address of the SNAP
-#         ## mac-location 0x00
-#         ## ip-location 0x10
-#         ## port-location 0x8
-#         self.tx.setup(self.macaddr,self.ipaddr,self.port)
-#         self.host.write(self.name, self.tx.mac.packed(), 0x00)
-#         self.host.write(self.name,self.tx.ip_address.packed(),0x10)
-#         value = (fpga.read_int(self.name, word_offset = 0x10)& 0xffff0000)
-#         self.host.write_int(self.name,value,word_offset=0x10)
-#         self.tx.fabric_enable()
-#         #self.blindwrite('sw', struct.pack('>L', ipaddr), offset=0x10)
-#         #self.set_port(self.port)
-                        
-#     # def print_status(self):
-#     #     rv = self.get_status()
-#     #     for key in rv.keys():
-#     #         print '%12s : %d'%(key,rv[key])
-
 class RoachInput(Block):
     def __init__(self, host, name, nstreams=32):
         super(RoachInput, self).__init__(host, name)
@@ -931,13 +982,313 @@ class RoachEth(Block):
         self.host.config_10gbe_core(self.name + '_%d_sw' % core_num, mac, ip, port, arp_table)
 
 class Pam(Block):
+
+    ADDR_VOLT = 0x4f
+    ADDR_ROM = 0x52
+    ADDR_SN = 0x50
+    ADDR_INA = 0x44
+    ADDR_GPIO = 0x21
+    
+    CLK_I2C_BUS = 10  # 10 kHz
+    CLK_I2C_REF = 100 # reference clk at 100 MHz
+
+    I2C_RETRY_WAIT = 0.02
+
+    SHUNT_RESISTOR = 0.1
+
+    RMS2DC_SLOPE = 27.31294863
+    RMS2DC_INTERCEPT = -55.15991678
+
     def __init__(self, host, name):
+        """ Post Amplifier Module (PAM) digital control class
+
+            Features:
+            attenuation Digital controlled Attenuation for East and North Pol
+            shunt       Voltage and current of the power supply
+            rom         Memo
+            id          Device ID
+            power       Power level of East and North Pol
+
+        host    CasperFpga instance
+        name    Select one of the three PAMs(/Antennas) under the control of
+                a SNAP board. Recommended values are: 'i2c_ant1', 'i2c_ant2'
+                or 'i2c_ant3'. Please refer to the f-engine model for correct
+                value.
+        """
         super(Pam, self).__init__(host, name)
-        import i2c
-        import i2c_gpio
-        self.i2c = i2c.I2C(host, name)
-        self.gpio = i2c_gpio.PCF8574(self.i2c, addr=0x21)
+
+        self.i2c = i2c.I2C(host, name, retry_wait=self.I2C_RETRY_WAIT)
 
     def initialize(self):
-        self.i2c.clockSpeed(10) # set i2c bus to 10 kHz
 
+        self.i2c.enable_core()
+        # set i2c bus to 10 kHz
+        self.i2c.setClock(self.CLK_I2C_BUS, self.CLK_I2C_REF)
+
+        # Attenuator
+        self.atten = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
+
+        # Current sensor
+        self.cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
+        self.cur.init()
+
+        # ID chip
+        self.sn=i2c_sn.DS28CM00(self.i2c, self.ADDR_SN)
+
+        # Power detector
+        self.pow = i2c_volt.LTC2990(self.i2c, self.ADDR_VOLT)
+        self.pow.init()
+
+        # ROM
+        self.rom=i2c_eeprom.EEP24XX64(self.i2c, self.ADDR_ROM)
+
+    def attenuation(self, east=None, north=None):
+        """ Get or Set East and North attenuation
+            attenuation value must be integer in range(16)
+
+            Example:
+            attenuation() # get attenuation, returns a tuple of two numbers,
+                            in which East is followed by North, e.g. (12,5)
+            attenuation(east=0,north=15) # set attenuation
+        """
+
+        if east == None and north == None:
+            # Get current attenuation
+            val=self.atten.read()
+            ve,vn=gpio2db(val)
+            return ve,vn
+        elif isinstance(east,int) and east in range(16) and \
+            isinstance(north,int) and north in range(16):
+            # Set attenuation
+            self.atten.write(db2gpio(east,north))
+        else:
+            raise ValueError('Invalid parameter.')
+
+    def shunt(self, name='i'):
+        """ Get current/voltage of the power supply
+
+            Example:
+            shunt(name='i')     # returns current in Amps
+            shunt(name='u')     # returns voltage in Volt
+        """
+        if name == 'i':
+            vshunt = ina.readVolt('shunt')
+            ishunt = vshunt * 1.0 / self.SHUNT_RESISTOR
+            return ishunt
+        elif name == 'u':
+            vbus = ina.readVolt('bus')
+            return vbus
+        else:
+            raise ValueError('Invalid parameter.')
+
+    def id(self):
+        """ Get the unique eight-byte serial number of the module
+        """
+        return self.sn.readSN()
+
+    def power(self, name='east'):
+        """ Get power level of the East or North RF path
+
+            Example:
+            power(name='east')  # returns power level of east in dBm
+            power(name='north') # returns power level of north in dBm
+        """
+        if name not in ['east','north']:
+            raise ValueError('Invalid parameter.')
+
+        if name == 'east':
+            vp=self.pow.readVolt('v3')
+        elif name == 'north':
+            vp=self.pow.readVolt('v4')
+
+        assert vp>=0 and vp<=3.3
+
+        return dc2dbm(vp, self.RMS2DC_SLOPE, self.RMS2DC_INTERCEPT)
+
+    def rom(self, string=None):
+        """ Read string from ROM or write String to ROM
+
+            Example:
+            rom()               # returns a string ended with a '\0'
+            rom('hello')        # write 'hello\0' into ROM
+        """
+        if string == None:
+            return self.rom.readString()
+        else:
+            self.rom.writeString(string)
+
+
+def db2gpio(ae,an):
+    assert ae in range(0,16)
+    assert an in range(0,16)
+    val_str = '{0:08b}'.format((an << 4) + ae)
+    val = int(val_str[::-1],2)
+    return val
+
+def gpio2db(val):
+    assert val in range(0,256)
+    val_str = '{0:08b}'.format(val)[::-1]
+    an = int(val_str[0:4],2)
+    ae = int(val_str[4:8],2)
+    return ae,an
+
+def dc2dbm(val, slope, intercept):
+    res = val * slope + intercept
+    return res
+
+
+class Fem(Block):
+
+    ADDR_ACCEL = 0X69
+    ADDR_MAG = 0x0c
+    ADDR_BAR = 0x77
+    ADDR_VOLT = 0x4e
+    ADDR_ROM = 0x52
+    ADDR_TEMP = 0x40
+    ADDR_INA = 0x45
+    ADDR_GPIO = 0x20
+
+    CLK_I2C_BUS = 10  # 10 kHz
+    CLK_I2C_REF = 100 # reference clk at 100 MHz
+
+    I2C_RETRY_WAIT = 0.02
+
+    SHUNT_RESISTOR = 0.1
+
+    RMS2DC_SLOPE = 27.31294863
+    RMS2DC_INTERCEPT = -55.15991678
+
+    IMU_ORIENT = [[0,0,1],[0,1,0],[1,0,0]]
+    SWMODE = {'load':0b001,'antenna':0b111,'noise':0b000}
+
+    def __init__(self, host, name):
+        """ Front End Module (FEM) digital control class
+
+            Features:
+            switch      Switch input source between antenna, noise and load
+                        mode
+            shunt       Voltage and current of the power supply
+            rom         Memo
+            id          Device ID
+            imu         Attitude of FEM
+            pressure    Air pressure inside FEM
+            temperature Temperature inside FEM
+
+        host    CasperFpga instance
+        name    Select one of the three FEMs(/Antennas) under the control of
+                a SNAP board. Recommended values are: 'i2c_ant1', 'i2c_ant2'
+                or 'i2c_ant3'. Please refer to the f-engine model for correct
+                value.
+        """
+        super(Fem, self).__init__(host, name)
+
+        self.i2c = i2c.I2C(host, name, retry_wait=self.I2C_RETRY_WAIT)
+
+    def initialize(self):
+
+        self.i2c.enable_core()
+        # set i2c bus to 10 kHz
+        self.i2c.setClock(self.CLK_I2C_BUS, self.CLK_I2C_REF)
+
+        # Barometer
+        self.bar = i2c_bar.MS5611_01B(self.i2c, self.ADDR_BAR)
+        self.bar.init()
+
+        # Current sensor
+        self.cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
+        self.cur.init()
+
+        # IMU
+        self.imu = i2c_motion.IMUSimple(self.i2c,self.ADDR_ACCEL,
+                                        orient=self.IMU_ORIENT)
+        self.imu.init()
+
+        # ROM
+        self.rom=i2c_eeprom.EEP24XX64(self.i2c,ADDR_ROM)
+
+        # Switch
+        self.sw = i2c_gpio.PCF8574(self.i2c,self.ADDR_GPIO)
+
+        # Temperature
+        self.temp = i2c_temp.Si7051(self.i2c, self.ADDR_TEMP)
+
+
+    def pressure(self):
+        """ Get air pressure
+
+            Example:
+            pressure()      # return pressure in kPa
+        """
+        rawt,dt = self.bar.readTemp(raw=True)
+        press = self.bar.readPress(rawt,dt)
+        return press
+
+
+    def shunt(self, name='i'):
+        """ Get current/voltage of the power supply
+
+            Example:
+            shunt(name='i')     # returns current in Amps
+            shunt(name='u')     # returns voltage in Volt
+        """
+        if name == 'i':
+            vshunt = ina.readVolt('shunt')
+            ishunt = vshunt * 1.0 / self.SHUNT_RESISTOR
+            return ishunt
+        elif name == 'u':
+            vbus = ina.readVolt('bus')
+            return vbus
+        else:
+            raise ValueError('Invalid parameter.')
+
+    def id(self):
+        """ Get the unique eight-byte serial number of the module
+        """
+        return self.temp.sn()
+
+    def imu(self):
+        """ Get pose of the FEM in the form of theta and phi
+            of spherical coordinate system in degrees
+        """
+        theta, phi = imu.pose
+        return theta, phi
+
+    def rom(self, string=None):
+        """ Read string from ROM or write String to ROM
+
+            Example:
+            rom()               # returns a string ended with a '\0'
+            rom('hello')        # write 'hello\0' into ROM
+        """
+        if string == None:
+            return self.rom.readString()
+        else:
+            self.rom.writeString(string)
+
+    def switch(self,name=None):
+        """ Switch between antenna, noise and load mode
+
+            Example:
+            switch()            # Get current mode
+            switch('antenna')   # Switch into antenna mode
+            switch('noise')     # Switch into noise mode
+            switch('load')      # Switch into load mode
+        """
+        if name == None:
+            val = self.sw.read()
+            mode = 'Unknown'
+            for key,value in self.SWMODE.iteritems():
+                if val&0b111 == value:
+                    mode = key
+                    break
+            return mode
+        elif name in self.SWMODE:
+            val = self.SWMODE[name]
+            self.sw.write(val)
+        else:
+            raise ValueError('Invalid parameter.')
+
+    def temperature(self):
+        """ Get temperature in Celcius
+        """
+        return self.temp.readTemp()

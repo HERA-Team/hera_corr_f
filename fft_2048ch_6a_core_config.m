@@ -64,41 +64,41 @@ function fft_2048ch_6a_core_config(this_block)
   if (this_block.inputTypesKnown)
     % do input type checking, dynamic output type and generic setup in this code block.
 
-    if (this_block.port('pol0_in0').width ~= 18);
-      this_block.setError('Input data type for port "pol0_in0" must have width=18.');
+    if (this_block.port('pol0_in0').width ~= 12);
+      this_block.setError('Input data type for port "pol0_in0" must have width=12.');
     end
-    if (this_block.port('pol0_in1').width ~= 18);
-      this_block.setError('Input data type for port "pol0_in1" must have width=18.');
+    if (this_block.port('pol0_in1').width ~= 12);
+      this_block.setError('Input data type for port "pol0_in1" must have width=12.');
     end
-    if (this_block.port('pol1_in0').width ~= 18);
-      this_block.setError('Input data type for port "pol1_in0" must have width=18.');
+    if (this_block.port('pol1_in0').width ~= 12);
+      this_block.setError('Input data type for port "pol1_in0" must have width=12.');
     end
-    if (this_block.port('pol1_in1').width ~= 18);
-      this_block.setError('Input data type for port "pol1_in1" must have width=18.');
+    if (this_block.port('pol1_in1').width ~= 12);
+      this_block.setError('Input data type for port "pol1_in1" must have width=12.');
     end
-    if (this_block.port('pol2_in0').width ~= 18);
-      this_block.setError('Input data type for port "pol2_in0" must have width=18.');
+    if (this_block.port('pol2_in0').width ~= 12);
+      this_block.setError('Input data type for port "pol2_in0" must have width=12.');
     end
-    if (this_block.port('pol2_in1').width ~= 18);
-      this_block.setError('Input data type for port "pol2_in1" must have width=18.');
+    if (this_block.port('pol2_in1').width ~= 12);
+      this_block.setError('Input data type for port "pol2_in1" must have width=12.');
     end
-    if (this_block.port('pol3_in0').width ~= 18);
-      this_block.setError('Input data type for port "pol3_in0" must have width=18.');
+    if (this_block.port('pol3_in0').width ~= 12);
+      this_block.setError('Input data type for port "pol3_in0" must have width=12.');
     end
-    if (this_block.port('pol3_in1').width ~= 18);
-      this_block.setError('Input data type for port "pol3_in1" must have width=18.');
+    if (this_block.port('pol3_in1').width ~= 12);
+      this_block.setError('Input data type for port "pol3_in1" must have width=12.');
     end
-    if (this_block.port('pol4_in0').width ~= 18);
-      this_block.setError('Input data type for port "pol4_in0" must have width=18.');
+    if (this_block.port('pol4_in0').width ~= 12);
+      this_block.setError('Input data type for port "pol4_in0" must have width=12.');
     end
-    if (this_block.port('pol4_in1').width ~= 18);
-      this_block.setError('Input data type for port "pol4_in1" must have width=18.');
+    if (this_block.port('pol4_in1').width ~= 12);
+      this_block.setError('Input data type for port "pol4_in1" must have width=12.');
     end
-    if (this_block.port('pol5_in0').width ~= 18);
-      this_block.setError('Input data type for port "pol5_in0" must have width=18.');
+    if (this_block.port('pol5_in0').width ~= 12);
+      this_block.setError('Input data type for port "pol5_in0" must have width=12.');
     end
-    if (this_block.port('pol5_in1').width ~= 18);
-      this_block.setError('Input data type for port "pol5_in1" must have width=18.');
+    if (this_block.port('pol5_in1').width ~= 12);
+      this_block.setError('Input data type for port "pol5_in1" must have width=12.');
     end
 
     if (this_block.port('shift').width ~= 16);

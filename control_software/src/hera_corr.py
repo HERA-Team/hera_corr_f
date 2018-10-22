@@ -1,0 +1,223 @@
+import logging
+import time
+import socket
+import redis
+import yaml
+import helpers
+from hera_corr_f import SnapFengine
+from casperfpga import utils
+
+LOGGER = helpers.add_default_log_handlers(logging.getLogger(__name__))
+
+class HeraCorrelator(object):
+    def __init__(self, redishost='redishost', config=None, logger=LOGGER):
+        self.logger = logger
+        self.redishost = redishost
+        self.r = redis.Redis(redishost)
+
+        self.get_config(config)
+
+        self.establish_connections()
+
+        # Get antenna<->SNAP maps
+        self.compute_hookup()
+        self.config_is_valid= self._verify_config()
+
+    def get_config(self, config=None):
+        if config is None:
+            config_str  = self.r.hget('snap_configuration', 'config')
+            config_time = self.r.hget('snap_configuration', 'upload_time_str')
+            self.logger.info('Using configuration from redis, uploaded at %s' % config_time)
+            self.config = yaml.load(config_str)
+        else:
+            with open(config, 'r') as fp:
+                self.config = yaml.load(fp)
+
+    def establish_connections(self):
+        # Instantiate CasperFpga connections to all the F-Engine.
+        # TODO: this is fragile and will break if any board fails to co-operate
+        self.fengs = [SnapFengine(host) for host in self.config['fengines'].keys()]
+        self.fengs_by_name = {}
+        self.fengs_by_ip = {}
+        for feng in self.fengs:
+            feng.ip = socket.gethostbyname(feng.host)
+            self.fengs_by_name[feng.host] = feng
+            self.fengs_by_ip[feng.ip] = feng
+        self.logger.info('SNAPs are: %s' % ', '.join([feng.host for feng in self.fengs]))
+        # Access to low level functionality
+        self.fpgas = [feng.fpga for feng in self.fengs]
+
+    def disable_monitoring(self, expiry=60):
+        self.r.set('disable_monitoring', 1, ex=expiry)
+
+    def enable_monitoring(self):
+        self.r.delete('disable_monitoring')
+
+    def program(self, bitstream=None):
+        progfile = bitstream or self.config['fpgfile']
+        self.logger.info('Programming all SNAPs with %s' % progfile)
+        utils.program_fpgas(self.fpgas, progfile, timeout=300.0)
+        #utils.threaded_fpga_function(self.fpgas, 300, ('upload_to_ram_and_program', (bitstream), {}))
+        self.r['corr:snap:last_programmed'] =  time.ctime()
+        
+    def phase_switch_disable(self):
+        self.logger.info('Disabling all phase switches')
+        for feng in self.fengs:
+           for stream in range(feng.phaseswitch.nstreams):
+               feng.phaseswitch.set_walsh(stream, 1, 0, 1) 
+        self.r['corr:status_phase_switch'] = 'off'
+
+    def phase_switch_enable(self):
+        self.logger.info('Enabling all phase switches')
+        for feng in self.fengs:
+           for stream in range(feng.phaseswitch.nstreams):
+               #TODO figure out what the patterns should be per antenna
+               feng.phaseswitch.set_walsh(stream, 1, 0, 1) 
+        self.r['corr:status_phase_switch'] = 'on'
+
+    def noise_diode_enable(self):
+        self.logger.info('Enabling all noise inputs')
+        for feng in self.fengs:
+           for fem in feng.fems:
+               fem.switch(name='noise')
+        self.r['corr:status_noise_diode'] = 'on'
+
+    def noise_diode_disable(self):
+        self.logger.info('Disabling all noise inputs')
+        for feng in self.fengs:
+           for fem in feng.fems:
+               fem.switch(name='antenna')
+        self.r['corr:status_noise_diode'] = 'off'
+
+    def initialize(self):
+        self.logger.info('Initializing all F-engine blocks')
+        for feng in self.fengs:
+            feng.initialize()
+        self.noise_diode_disable()
+        self.phase_switch_disable()
+
+    def compute_hookup(self):
+        """
+        Generate an antenna-map from antenna names to
+        Fengine instances.
+        """
+        hookup = helpers.read_maps_from_redis(self.redishost)
+        if hookup is None:
+            self.logger.error('Failed to compute antenna hookup from redis maps')
+            return
+        self.ant_to_snap = hookup['ant_to_snap']
+        self.snap_to_ant = hookup['snap_to_ant']
+        for ant in self.ant_to_snap.keys():
+            for pol in self.ant_to_snap[ant].keys():
+                host = self.ant_to_snap[ant][pol]['host']
+                self.ant_to_snap[ant][pol]['host'] = self.fengs_by_ip[socket.gethostbyname(host)]
+        # Make the snap->ant dict, but make sure the hostnames match what is expected by this classes Fengines
+        for hooked_up_snap in hookup['snap_to_ant'].keys():
+            ip = socket.gethostbyname(hooked_up_snap)
+            for feng in self.fengs:
+                if feng.ip == ip:
+                    self.snap_to_ant[feng.host] = hookup['snap_to_ant'][hooked_up_snap]
+        # Fill any unconnected SNAPs with Nones
+        for feng in self.fengs:
+            if feng.host not in self.snap_to_ant.keys():
+                self.snap_to_ant[feng.host] = [None] * 6
+
+    def _verify_config(self):
+        test_passed = True
+        # Check that there are only three antennas per board
+        for fn,(host,params) in enumerate(self.config['fengines'].items()):
+            if 'ants' in params.keys():
+                if len(params['ants']) != 3: 
+                    self.logger.warngin("%s: Number of antennas is not 3!" % host)
+                    test_passed = False
+        # Check that there are only 48 channels per x-engine.
+        for host,params in self.config['xengines'].items():
+            if 'chan_range' in params.keys():
+                chan_range= params['chan_range']
+                chans = np.arange(chan_range[0], chan_range[1])
+                if chans > 384:
+                    self.logger.warning("%s: Cannot process >384 channels." % host)
+                    test_passed = False
+        return test_passed
+
+    def configure_freq_slots(self):
+        n_xengs = self.config.get('n_xengs', 16)
+        chans_per_packet = self.config.get('chans_per_packet', 384) # Hardcoded in firmware
+        self.logger.info('Configuring frequency slots for %d X-engines, %d channels per packet' % (n_xengs, chans_per_packet))
+        dest_port = self.config['dest_port'] 
+        for fn, feng in enumerate(self.fengs):
+            # if the user hasn't specified antenna numbers, just increment basen on fengine number
+            ants = self.config['fengines'][feng.host].get('ants', range(3*fn, 3*fn + 1))
+            # if the user hasn't specified a source port, auto increment mod 4
+            source_port = self.config['fengines'][feng.host].get('source_port', dest_port + (fn%4))
+            for xn, xparams in self.config['xengines'].items():
+                chan_range = xparams.get('chan_range', [xn*384, (xn+1)*384])
+                chans = range(chan_range[0], chan_range[1])
+                if (xn > n_xengs): 
+                   self.logger.error("Cannot have more than %d X-engs!!" % n_xengs)
+                   return False
+                self.logger.info('%s: Setting Xengine %d: chans %d-%d: %s (even) / %s (odd)' % (feng.fpga.host, xn, chans[0], chans[-1], xparams['even']['ip'], xparams['odd']['ip']))
+                ip = [int(i) for i in xparams['even']['ip'].split('.')]
+                ip_even = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
+                ip = [int(i) for i in xparams['odd']['ip'].split('.')]
+                ip_odd = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
+                feng.packetizer.assign_slot(xn, chans, [ip_even,ip_odd], feng.reorder, ants[0])
+                feng.eth.add_arp_entry(ip_even,xparams['even']['mac'])
+                feng.eth.add_arp_entry(ip_odd,xparams['odd']['mac'])
+            feng.eth.set_source_port(source_port)
+            feng.eth.set_port(dest_port)
+        return True
+
+    def resync(self, manual=False):
+        self.logger.info('Sync-ing Fengines')
+        if not manual:
+            self.logger.info('Waiting for PPS at time %.2f' % time.time())
+            self.fengs[0].sync.wait_for_sync()
+            self.logger.info('Sync passed at time %.2f' % time.time())
+        before_sync = time.time()
+        for feng in self.fengs:
+            feng.sync.arm_sync()
+        after_sync = time.time()
+        if manual:
+            self.logger.warning('Using manual sync trigger')
+            for i in range(3): # takes 3 syncs to trigger
+                for feng in self.fengs:
+                    feng.sync.sw_sync()
+            sync_time = int(time.time()) # roughly
+        else:
+            sync_time = int(before_sync) + 1 + 3 # Takes 3 PPS pulses to arm
+        self.r['corr:feng_sync_time'] = sync_time
+        self.r['corr:feng_sync_time_str'] = time.ctime(sync_time)
+        self.logger.info('Syncing took %.2f seconds' % (after_sync - before_sync))
+        if after_sync - before_sync > 0.5:
+            self.logger.warning("It took longer than expected to arm sync!")
+
+    def sync_noise(self, manual=False):
+        self.logger.info('Sync-ing noise generators')
+        if not manual:
+            self.logger.info('Waiting for PPS at time %.2f' % time.time())
+            self.fengs[0].sync.wait_for_sync()
+            self.logger.info('Sync passed at time %.2f' % time.time())
+        before_sync = time.time()
+        for feng in self.fengs:
+            feng.sync.arm_noise()
+        after_sync = time.time()
+        if manual:
+            self.logger.warning('Using manual sync trigger')
+            for i in range(3): # takes 3 syncs to trigger
+                for feng in self.fengs:
+                    feng.sync.sw_sync()
+            sync_time = int(time.time()) # roughly
+        self.logger.info('Syncing took %.2f seconds' % (after_sync - before_sync))
+        if after_sync - before_sync > 0.5:
+            self.logger.warning("It took longer than expected to arm sync!")
+
+    def enable_output(self):
+        self.logger.info('Enabling ethernet output')
+        for feng in self.fengs:
+            feng.eth.enable_tx()
+
+    def disable_output(self):
+        self.logger.info('Disabling ethernet output')
+        for feng in self.fengs:
+            feng.eth.disable_tx()

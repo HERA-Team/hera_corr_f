@@ -30,7 +30,7 @@ virtualenv.create_environment(venv_dir)
 actfile = os.path.join(venv_dir,'bin','activate_this.py')
 execfile(actfile,dict(__file__=actfile))
 
-pip_pkgs = ['ipython','numpy','matplotlib']
+pip_pkgs = ['ipython','numpy','matplotlib','scipy','pyyaml']
 if args.pip:
     pip_pkgs = list(set(pip_pkgs+args.pip))
 

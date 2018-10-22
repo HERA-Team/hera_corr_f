@@ -2,8 +2,11 @@
 *.log
 snap_fengine/
 !snap_fengine/outputs/
+snap_fengine_test/
+!snap_fengine_test/outputs/
 .Xil/
 vivado*.jou
 vivado*.str
 slprj/
 SysgenFeatureReport.htm
+startsg.local
