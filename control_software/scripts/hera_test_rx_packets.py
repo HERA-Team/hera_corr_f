@@ -30,7 +30,7 @@ parser.add_argument('-s', dest='single_packet', action='store_true', default=Fal
                     help = 'Use this flag to print a single packet')
 parser.add_argument('-e', dest='errors', action='store_true', default=False,
                     help = 'Print all errors')
-parser.add_argument('-m',dest='mode', type=str, default='ramp_ants',
+parser.add_argument('-m',dest='mode', type=str, default='ramp_pols',
                     choices=['const_ants','const_pols','ramp_ants','ramp_pols'],
                     help='The test vector mode choosen to program the Fengine.')
 parser.add_argument('-v', dest='verbose', action='store_true', default=False,
@@ -164,7 +164,7 @@ while(True):
         if args.errors or args.chanerrors:
             # Check that you have atmost 16 unique chans
             nchans = len(np.where(chan_counter != 0)[0])
-            if nchans > 16:
+            if nchans > 384:
                 err_count += 1
         #for d in data:
         #    data_chan_counter[d] += 1
@@ -176,15 +176,14 @@ while(True):
 if args.stats:
     print 'Packet count by antenna:'
     for xn, x in enumerate(ant_counter):
-        print 'ANT %3d: %d' % (xn, x)
+        print 'ANT %3d: %d' % (3*xn, x)
     print 'Packet count by channel: from headers (from data)'
-    chan0 = np.where(chan_counter!=0)[0][0]
-    for xn, x in enumerate(chan_counter[chan0::chans_per_pkt]):
+    for xn, x in enumerate(chan_counter[0::chans_per_pkt]):
         #a0 = data_chan_counter[xn]
         #a1 = data_chan_counter[xn+2048]
         #a2 = data_chan_counter[xn+4096]
         #tot = a0+a1+a2
-        print 'CHAN %4d: %d '%(xn, x)
+        print 'CHAN %4d-%4d: %d '%(xn*chans_per_pkt, (xn+1)*chans_per_pkt-1, x)
         #(ANT0:%d, ANT1:%d, ANT2:%d TOTAL:%d)' % (xn, x, a0, a1, a2, tot)
 
 print '#######################'
