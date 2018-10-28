@@ -10,17 +10,18 @@ from casperfpga import utils
 LOGGER = helpers.add_default_log_handlers(logging.getLogger(__name__))
 
 class HeraCorrelator(object):
-    def __init__(self, redishost='redishost', config=None, logger=LOGGER):
+    def __init__(self, redishost='redishost', config=None, logger=LOGGER, passive=False):
         self.logger = logger
         self.redishost = redishost
         self.r = redis.Redis(redishost)
 
         self.get_config(config)
+        
+        if not passive:
+            self.establish_connections()
+            # Get antenna<->SNAP maps
+            self.compute_hookup()
 
-        self.establish_connections()
-
-        # Get antenna<->SNAP maps
-        self.compute_hookup()
         self.config_is_valid= self._verify_config()
 
     def get_config(self, config=None):
