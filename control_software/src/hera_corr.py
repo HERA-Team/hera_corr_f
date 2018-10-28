@@ -5,6 +5,7 @@ import redis
 import yaml
 import helpers
 from hera_corr_f import SnapFengine
+import numpy as np
 from casperfpga import utils
 
 LOGGER = helpers.add_default_log_handlers(logging.getLogger(__name__))
@@ -90,8 +91,8 @@ class HeraCorrelator(object):
         self.r['corr:status_noise_diode'] = 'off'
 
     def initialize(self):
-        self.logger.info('Initializing all F-engine blocks')
         for feng in self.fengs:
+            self.logger.info('Initializing %s'%feng.host)
             feng.initialize()
         self.noise_diode_disable()
         self.phase_switch_disable()
@@ -135,7 +136,7 @@ class HeraCorrelator(object):
             if 'chan_range' in params.keys():
                 chan_range= params['chan_range']
                 chans = np.arange(chan_range[0], chan_range[1])
-                if chans > 384:
+                if len(chans) > 384:
                     self.logger.warning("%s: Cannot process >384 channels." % host)
                     test_passed = False
         return test_passed
