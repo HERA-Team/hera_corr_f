@@ -20,12 +20,12 @@
 
 # The fpgfile that the SNAP boards have to be programmed with. 
 # Set the 'p' flag with calling the init script to program the boards.
-fpgfile: '/home/deepthi/herafengine/snap_fengine/outputs/snap_fengine_2018-06-07_0929.fpg'
+fpgfile: '/home/deepthi/herafengine/snap_fengine/outputs/snap_fengine_2018-10-27_1850.fpg'
 
 # You can sync the fengines using an external PPS signal
 # or manually using a software register. 
 # Choices: 'pps', 'manual', False (default: 'pps')
-#sync: 'pps'
+sync: 'pps'
 
 # The test vector generator can operate in multiple modes:
 # 'const_ants' : Writes a different constant value 
@@ -35,25 +35,27 @@ fpgfile: '/home/deepthi/herafengine/snap_fengine/outputs/snap_fengine_2018-06-07
 # 'ramp'       : Write the same ramp to all pols.
 # 'ramp_pols'  : Write a different ramp to each pol.
 # False        : Do not set the test vector (default) 
-#tvg: False
+tvg: True
 
 # Turn on the noise generator for testing
-#noise: False
+noise: False
 
-#initialize: False
+initialize: True
 
 # Enable transmission for all fengines
 #eth: True
+
+dest_port: 8511
 
 fengines:
 #    snap110:
 #        host_ip: '10.0.10.110'
 #        dest_port: 8511
 #        ants: [0,1,2]
-    snap111:
-        host_ip: '10.10.10.111'
-        dest_port: 8511
-        ants: [6,7,8]
+#    snap111:
+#        host_ip: '10.10.10.111'
+#        dest_port: 8511
+#        ants: [6,7,8]
 #    snap113:
 #        host_ip: '10.0.10.113'
 #        dest_port: 8511
@@ -62,28 +64,39 @@ fengines:
 #        host_ip: '10.0.10.114'
 #        dest_port: 8511
 #        ants: [12,13,14]
-    snap1:
-        host_ip: '10.10.10.201'
-        dest_port: 8511
-        ants: [9,10,11]
-#    snap109:
-#        host_ip: '10.10.10.109'
+#    snap1:
+#        host_ip: '10.10.10.201'
 #        dest_port: 8511
-#        ants: [15,16,17]
+#        ants: [9,10,11]
+    snap109:
+        host_ip: '10.10.10.109'
+        phase_switch_index: 0
+        ants: [15,16,17]
+    snapc57:
+        host_ip: '10.10.10.157'
+        phase_switch_index: 0
+        ants: [4,5,6]
 
 # Data is sent assuming a total of 32 Xengines and 
 # a maximum of 48 channels per Xengine. If all the 
 # 32 Xengines are not defined, the corresponding channels
 # are not sent anywhere.
 xengines:
-    xeng0:
-        num: 0
+    0:
         even:
-           ip: "10.10.10.136"
+           ip: "0.0.0.0"
            mac: 0x02020a140102
         odd:
            ip: '0.0.0.0' #nowhere
-           mac: 0x000000000000
+           mac: 0x02020a140102
+        chan_range: [0,384]
+    1:
+        even:
+           ip: '0.0.0.0' #nowhere
+           mac: 0x02020a140102
+        odd:
+           ip: "10.10.10.136"
+           mac: 0x02020a140102
         chan_range: [384,768]
 
 #    xeng0:

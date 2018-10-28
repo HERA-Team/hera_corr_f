@@ -3,14 +3,22 @@
 fpgfile: '/home/deepthi/herafengine/snap_fengine/outputs/snap_fengine_2018-06-07_0929.fpg'
 
 fengines:
-    snap111:
-        host_ip: '10.10.10.111'
-        dest_port: 8511
-        ant_range: [0,12]
-    snap1:
-        host_ip: '10.10.10.201'
+    snapc57:
+        host_ip: '10.10.10.157'
         dest_port: 8511
         ant_range: [48,60]
+#    snap109:
+#        host_ip: '10.10.10.109'
+#        dest_port: 8511
+#        ant_range: [0,12]
+#    snap111:
+#        host_ip: '10.10.10.111'
+#        dest_port: 8511
+#        ant_range: [0,12]
+#    snap1:
+#        host_ip: '10.10.10.201'
+#        dest_port: 8511
+#        ant_range: [48,60]
 
 # Data can be alloted to (48/num_ants_per_feng) 
 # number of X-engines. 384 channels are sent to 
