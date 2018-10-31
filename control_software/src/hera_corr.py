@@ -17,6 +17,9 @@ class HeraCorrelator(object):
         self.r = redis.Redis(redishost)
 
         self.get_config(config)
+
+        self.fengs = []
+        self.dead_fengs = []
         
         if not passive:
             self.establish_connections()
@@ -37,8 +40,18 @@ class HeraCorrelator(object):
 
     def establish_connections(self):
         # Instantiate CasperFpga connections to all the F-Engine.
-        # TODO: this is fragile and will break if any board fails to co-operate
-        self.fengs = [SnapFengine(host) for host in self.config['fengines'].keys()]
+        self.fengs = []
+        self.dead_fengs = []
+        for host in self.config['fengines'].keys():
+            try:
+                feng = SnapFengine(host)
+                if feng.fpga.is_connected():
+                    self.fengs += [feng]
+                else:
+                    self.dead_fengs += [feng]
+            except:
+                self.logger.warning("Failed to connect to board %s" % host)
+                self.dead_fengs += [feng]
         self.fengs_by_name = {}
         self.fengs_by_ip = {}
         for feng in self.fengs:
@@ -120,6 +133,7 @@ class HeraCorrelator(object):
             for feng in self.fengs:
                 if feng.ip == ip:
                     self.snap_to_ant[feng.host] = hookup['snap_to_ant'][hooked_up_snap]
+                    feng.ants = self.snap_to_ant[feng.host]
         # Fill any unconnected SNAPs with Nones
         for feng in self.fengs:
             if feng.host not in self.snap_to_ant.keys():
