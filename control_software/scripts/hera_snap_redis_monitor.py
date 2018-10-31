@@ -21,6 +21,7 @@ def get_fpga_stats(feng):
     stat['uptime'] = feng.sync.uptime()
     stat['pps_count'] = feng.sync.count()
     stat['serial'] = feng.serial
+    stat['pmb_alert'] = feng.fpga.read_uint('pmbus_alert')
     return stat
 
 def get_pam_stats():
@@ -50,11 +51,11 @@ if __name__ == "__main__":
                         help ='Host servicing redis requests')
     parser.add_argument('-d', dest='delay', type=float, default=10.0,
                         help ='Seconds between polling loops')
-
     args = parser.parse_args()
 
     corr = HeraCorrelator(redishost=args.redishost)
     upload_time = corr.r.hget('snap_configuration', 'upload_time')
+    corr.compute_hookup()
 
     while(True):
         tick = time.time()
@@ -69,7 +70,7 @@ if __name__ == "__main__":
             corr = HeraCorrelator(redishost=args.redishost)
         
         # Recompute the hookup every time. It's fast
-        corr.compute_hookup()
+        #corr.compute_hookup()
 
         for ant, antval in corr.ant_to_snap.iteritems():
             for pol, polval in antval.iteritems():

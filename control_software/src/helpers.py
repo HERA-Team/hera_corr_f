@@ -119,21 +119,21 @@ def cminfo_compute():
     return snap_to_ant, ant_to_snap
 
 def write_maps_to_redis(redishost='redishost'):
-    redis_host = redis.Redis(redishost)
+    if isinstance(redishost, str):
+        redishost = redis.Redis(redishost)
     snap_to_ant, ant_to_snap = cminfo_compute()
     redhash = {'snap_to_ant':json.dumps(snap_to_ant), 'ant_to_snap':json.dumps(ant_to_snap)}
     redhash['update_time'] = time.time()
     redhash['update_time_str'] = time.ctime(redhash['update_time'])
-    redis_host.hmset('corr:map', redhash)
-    del(redis_host)
+    redishost.hmset('corr:map', redhash)
 
 def read_maps_from_redis(redishost='redishost'):
-    redis_host = redis.Redis(redishost)
-    if not redis_host.exists('corr:map'):
+    if isinstance(redishost, str):
+        redishost = redis.Redis(redishost)
+    if not redishost.exists('corr:map'):
         return None
-    x = redis_host.hgetall('corr:map')
+    x = redishost.hgetall('corr:map')
     x['update_time'] = float(x['update_time'])
     x['ant_to_snap'] = json.loads(x['ant_to_snap'])
     x['snap_to_ant'] = json.loads(x['snap_to_ant'])
-    del(redis_host)
     return x

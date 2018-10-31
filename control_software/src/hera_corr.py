@@ -48,9 +48,10 @@ class HeraCorrelator(object):
                 if feng.fpga.is_connected():
                     self.fengs += [feng]
                 else:
+                    self.logger.warning("Board %s is not connected" % host)
                     self.dead_fengs += [feng]
             except:
-                self.logger.warning("Failed to connect to board %s" % host)
+                self.logger.warning("Exception whilst connecting to board %s" % host)
                 self.dead_fengs += [feng]
         self.fengs_by_name = {}
         self.fengs_by_ip = {}
@@ -116,7 +117,7 @@ class HeraCorrelator(object):
         Generate an antenna-map from antenna names to
         Fengine instances.
         """
-        hookup = helpers.read_maps_from_redis(self.redishost)
+        hookup = helpers.read_maps_from_redis(self.r)
         if hookup is None:
             self.logger.error('Failed to compute antenna hookup from redis maps')
             return
