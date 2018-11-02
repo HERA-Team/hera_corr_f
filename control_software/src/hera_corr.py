@@ -98,7 +98,7 @@ class HeraCorrelator(object):
         # Don't forget to actually add the new F-engines!
         self.fengs += new_fengs
 
-    def delare_feng_dead(self, feng):
+    def declare_feng_dead(self, feng):
         """
         Delare the Fengine `feng` dead. Remove it from the active list
         of connected boards. Add it to the list of dead boards if it's not there
