@@ -1,89 +1,95 @@
 #!/usr/env python
-import os
 from hera_corr_f import SnapFengine
+from hera_corr_f import HeraCorrelator
 from hera_corr_f import helpers
-import redis
 import logging
+import redis
 import numpy as np
 import argparse 
 import time
+import os
 
-logger = helpers.add_default_log_handlers(logging.getLogger(__file__))
+def get_corr_output(feng, ant1, ant2, int_time=10):
 
-parser = argparse.ArgumentParser(description='Obtain cross-correlation spectra from a SNAP Board',
-                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('host', type=str, 
-                    help='Host boards to collect data from')
-parser.add_argument('-r', dest='redishost', type=str, default='redishost',
-                    help ='Host servicing redis requests')
-parser.add_argument('--noise', dest='noise', action='store_true', default=False,
-                    help ='Use this flag to switch to Noise inputs')
-parser.add_argument('--tvg', dest='tvg', action='store_true', default=False,
-                    help ='Use this flag to switch to EQ TVG outputs')
-parser.add_argument('-n','--num_spectra',type=int,default=10,
-                    help='Number of spectra per baseline')
-parser.add_argument('-t', '--integration_time', type=int, default=1,
-                    help='Integration time in seconds for each spectra')
-parser.add_argument('-o','--output',type=str, default='.',
-                    help='Path to destination folder')
-args = parser.parse_args()
+    # Set integration length
+    acc_len = (int_time*250e6)/(8192*feng.corr.spec_per_acc)
+    if not np.isclose(acc_len, feng.corr.get_acc_len()):
+        feng.corr.set_acc_len(acc_len)
 
-NCHAN    = 1024
-NPOL     = 4
-NBL      = 6
-NTIME    = args.num_spectra
-NBLTIMES = (NTIME * NBL)
+    ant1*= 2; ant2*= 2;
+    corr = []; times = []
+    for i in range(4):
+        corr.append(feng.corr.get_new_corr(ant1+i%2, (ant2+(i//2+i%2)%2)))
+        times.append(time.time())
     
-r = redis.Redis(args.redishost)
-r.set('disable_monitoring', 1, ex=60)
-time.sleep(2)
+    return {'times':times,'data':corr}
+    
 
-frequencies = np.arange(NCHAN) * 250e6/NCHAN
-pols = range(NPOL)
-ant1_array=np.array([[0,0,0,1,1,2] for t in range(NTIME)]).astype(int).flatten()
-ant2_array=np.array([[0,1,2,1,2,2] for t in range(NTIME)]).astype(int).flatten()
-antenna_pairs = ([[0,0],[0,1],[0,2],[1,1],[1,2],[2,2]])
+if __name__ == "__main__":
 
-fengine = SnapFengine(args.host)
+    logger = helpers.add_default_log_handlers(logging.getLogger(__name__))
 
-if args.tvg:
-    logger.info('%s:  Enabling EQ TVGs...'%args.host)
-    fengine.eq_tvg.write_const_ants()
-    fengine.eq_tvg.tvg_enable()
+    parser = argparse.ArgumentParser(description='Obtain cross-correlation spectra from a SNAP Board',
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('host', type=str, 
+                        help='Host boards to collect data from')
+    parser.add_argument('-r', dest='redishost', type=str, default='redishost',
+                        help ='Host servicing redis requests')
+    parser.add_argument('--noise', dest='noise', action='store_true', default=False,
+                        help ='Use this flag to switch to Noise inputs')
+    parser.add_argument('--tvg', dest='tvg', action='store_true', default=False,
+                        help ='Use this flag to switch to EQ TVG outputs')
+    parser.add_argument('-n','--num_spectra',type=int,default=10,
+                        help='Number of spectra per baseline')
+    parser.add_argument('-t', '--integration_time', type=int, default=1,
+                        help='Integration time in seconds for each spectra')
+    parser.add_argument('-o','--output',type=str, default='.',
+                        help='Path to destination folder')
+    args = parser.parse_args()
 
-if args.noise:
-    logger.info('%s:  Setting noise TVGs...'%args.host)
-    ## Noise Block
-    seed = 23
-    for stream in range(fengine.noise.nstreams): 
-        fengine.noise.set_seed(stream, seed)
-    fengine.input.use_noise()
+    if args.tvg:
+        logger.info('%s:  Enabling EQ TVGs...'%args.host)
+        fengine.eq_tvg.write_const_ants()
+        fengine.eq_tvg.tvg_enable()
+    
+    if args.noise:
+        logger.info('%s:  Setting noise TVGs...'%args.host)
+        ## Noise Block
+        seed = 23
+        for stream in range(fengine.noise.nstreams): 
+            fengine.noise.set_seed(stream, seed)
+        fengine.input.use_noise()
+    
+        
+    r = redis.Redis(args.redishost)
+    r.set('disable_monitoring', 1, ex=60)
+    logger.warning('Disabling the monitoring. Use poco option in monitoring if you want both.')
+    time.sleep(2)
+    
+    NCHAN    = 1024
+    NPOL     = 4
 
-# Set integration length
-acc_len = (args.integration_time * 500e6)/(8192*8*2) 
-# convert to spectra (/8192), accumulations (/2)
-# TODO: Don't understand the empirical factor of 2
+    frequencies = np.arange(NCHAN) * 250e6/NCHAN
+    pols = range(NPOL)
+    ant1_array=np.array([[0,0,0,1,1,2] for t in range(args.num_spectra)]).astype(int).flatten()
+    ant2_array=np.array([[0,1,2,1,2,2] for t in range(args.num_spectra)]).astype(int).flatten()
+    antenna_pairs = ([[0,0],[0,1],[0,2],[1,1],[1,2],[2,2]])
 
-times = []
-data = []
-# Start integrating and collecting data
-for t in range(NTIME):
-    for a1, a2 in antenna_pairs:
-        r.set('disable_monitoring', 1, ex=60)
-        logger.info('Getting baseline pair: (%d, %d)..'%(a1,a2))
-        a1*= 2; a2*= 2;
-        corr = [] 
-        corr.append(fengine.corr.get_new_corr(a1, a2)) #xx
-        times.append(time.time())
-        corr.append(fengine.corr.get_new_corr(a1+1, a2+1)) #yy
-        times.append(time.time())
-        corr.append(fengine.corr.get_new_corr(a1,   a2+1)) #xy
-        times.append(time.time())
-        corr.append(fengine.corr.get_new_corr(a1+1, a2)) #yx
-        times.append(time.time())
-        data.append(np.transpose(corr))
+    fengine = SnapFengine(args.host)
+    
+    times = []
+    data = []
+    # Start integrating and collecting data
+    for n in range(args.num_spectra):
+        for a1, a2 in antenna_pairs:
+            r.set('disable_monitoring', 1, ex=60)
+            logger.info('Getting baseline pair: (%d, %d)..'%(a1,a2))
+            c = get_corr_output(fengine,a1,a2,args.integration_time) 
+            times.append(c['times'])
+            data.append(np.transpose(c['data']))
+    times = np.concatenate(times)
 
-outfilename = os.path.join(args.output, 'snap_correlation_%d.npz'%(times[0]))
-logger.info('Output written to %s'%outfilename)
-np.savez(outfilename,data=data,polarizations=pols,frequencies=frequencies,
-         times=times,ant1_array=ant1_array,ant2_array=ant2_array)
+    outfilename = os.path.join(args.output, 'snap_correlation_%d.npz'%(times[0]))
+    logger.info('Writing output to file: %s'%outfilename)
+    np.savez(outfilename,data=data,polarizations=pols,frequencies=frequencies,
+             times=times,ant1_array=ant1_array,ant2_array=ant2_array)

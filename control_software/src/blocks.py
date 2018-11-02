@@ -839,6 +839,9 @@ class Corr(Block):
         from matplotlib import pyplot as plt
         plt.show()
 
+    def get_acc_len(self):
+        return self.read_int('acc_len')
+
     def set_acc_len(self,acc_len):
         self.acc_len = acc_len
         acc_len = 8192*acc_len  #Convert to clks from spectra 
