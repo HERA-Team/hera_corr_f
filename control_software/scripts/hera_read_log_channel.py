@@ -16,8 +16,6 @@ args = parser.parse_args()
 print('Connecting to redis server %s' % args.redishost)
 r = redis.Redis(args.redishost)
 
-r = redis.Redis('redishost')
-
 ps = r.pubsub()
 
 ps.subscribe('log-channel')

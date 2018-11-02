@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class SnapFengine(object):
     def __init__(self, host):
         self.host = host
-        self.fpga = casperfpga.CasperFpga(host=host)
+        self.fpga = casperfpga.CasperFpga(host=host, transport=casperfpga.TapcpTransport)
         # Try and get the canonical name of the host
         # to use as a serial number
         try:
@@ -39,6 +39,8 @@ class SnapFengine(object):
             self._add_i2c()
         except:
             pass
+
+        self.ants = [None] * 6 # An attribute to store the antenna names of this board's inputs
         
         # The order here can be important, blocks are initialized in the
         # order they appear here

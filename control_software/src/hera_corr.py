@@ -17,6 +17,12 @@ class HeraCorrelator(object):
         self.r = redis.Redis(redishost)
 
         self.get_config(config)
+
+        # Lists of connected SnapFengine objects
+        self.fengs = []
+        # Dictionary of {hostname: time (float)} where keys are hostnames
+        # of dead boards and time entries are unix times when the host was declared dead
+        self.dead_fengs = {}
         
         if not passive:
             self.establish_connections()
@@ -37,8 +43,19 @@ class HeraCorrelator(object):
 
     def establish_connections(self):
         # Instantiate CasperFpga connections to all the F-Engine.
-        # TODO: this is fragile and will break if any board fails to co-operate
-        self.fengs = [SnapFengine(host) for host in self.config['fengines'].keys()]
+        self.fengs = []
+        self.dead_fengs = {}
+        for host in self.config['fengines'].keys():
+            try:
+                feng = SnapFengine(host)
+                if feng.fpga.is_connected():
+                    self.fengs += [feng]
+                else:
+                    self.logger.warning("Board %s is not connected" % host)
+                    self.dead_fengs[host] = time.time()
+            except:
+                self.logger.warning("Exception whilst connecting to board %s" % host)
+                self.dead_fengs[host] = time.time()
         self.fengs_by_name = {}
         self.fengs_by_ip = {}
         for feng in self.fengs:
@@ -46,8 +63,73 @@ class HeraCorrelator(object):
             self.fengs_by_name[feng.host] = feng
             self.fengs_by_ip[feng.ip] = feng
         self.logger.info('SNAPs are: %s' % ', '.join([feng.host for feng in self.fengs]))
-        # Access to low level functionality
-        self.fpgas = [feng.fpga for feng in self.fengs]
+
+    def reestablish_dead_connections(self, age=0.0):
+        """
+        Try to reconnect to all boards in `self.dead_fengs`,
+        if the board was declared dead more than `age` seconds ago.
+        Is non-disruptive to connected boards.
+        """
+        t_thresh = time.time() - age # Try to connect to boards which were declared dead before this time
+        self.logger.info("Trying to re-establish connections to fengines dead before %s" % time.ctime(t_thresh))
+        new_fengs = []
+        for host, deadtime in self.dead_fengs.iteritems():
+            if deadtime > t_thresh:
+                self.logger.info("Ignoring host %s, which was only declared dead %d seconds ago" % (time.time() - deadtime))
+                continue
+            try:
+                feng = SnapFengine(host)
+                if feng.fpga.is_connected():
+                    new_fengs += [feng]
+                    self.dead_fengs.pop(host)
+                else:
+                    self.logger.warning("Tried to reconnect to host %s and failed" % host)
+            except:
+                self.logger.warning("Tried to reconnect to host %s and failed" % host)
+
+        for feng in new_fengs:
+            feng.ip = socket.gethostbyname(feng.host)
+            self.fengs_by_name[feng.host] = feng
+            self.fengs_by_ip[feng.ip] = feng
+        
+        if len(new_fengs) > 0:
+            self.logger.info('Re-established connections to SNAPs : %s' % ', '.join([feng.host for feng in new_fengs]))
+
+        # Don't forget to actually add the new F-engines!
+        self.fengs += new_fengs
+
+    def delare_feng_dead(self, feng):
+        """
+        Delare the Fengine `feng` dead. Remove it from the active list
+        of connected boards. Add it to the list of dead boards if it's not there
+        already. `feng` can either be a SnapFengine object (i.e., an entry from self.fengs)
+        or a hostname.
+        """
+        deadfeng = None
+        # if `feng` is a string, find the object corresponding to the SNAP with that hostname
+        if isinstance(feng, str):
+            self.logger.info("Trying to declare SNAP %s dead" % feng)
+            for f in self.fengs:
+                if f.host == feng:
+                    deadfeng = f
+            if deadfeng is None:
+                self.logger.warning("Couldn't find SNAP %s by hostname" % feng)
+                return
+        # If `feng` is a SnapFengine instance, check it's known
+        else:
+            if feng not in self.fengs:
+                self.logger.warning("Couldn't find SNAP %s by object match" % feng.host)
+                return
+            deadfeng = feng
+
+        # If the SnapFengine instance has been found. Remove it from the active SNAP list
+        try:
+            self.fengs.remove(deadfeng)
+        except ValueError:
+            # Shouldn't be able to error here -- we've already checked the SNAP is there
+            self.logger("Tried to declare %s dead but couldn't remove it" % deadfeng.host)
+
+        self.dead_fengs[host] = time.time()
 
     def disable_monitoring(self, expiry=60):
         self.r.set('disable_monitoring', 1, ex=expiry)
@@ -58,8 +140,7 @@ class HeraCorrelator(object):
     def program(self, bitstream=None):
         progfile = bitstream or self.config['fpgfile']
         self.logger.info('Programming all SNAPs with %s' % progfile)
-        utils.program_fpgas(self.fpgas, progfile, timeout=300.0)
-        #utils.threaded_fpga_function(self.fpgas, 300, ('upload_to_ram_and_program', (bitstream), {}))
+        utils.program_fpgas([feng.fpga for feng in self.fengs], progfile, timeout=300.0)
         self.r['corr:snap:last_programmed'] =  time.ctime()
         
     def phase_switch_disable(self):
@@ -103,7 +184,7 @@ class HeraCorrelator(object):
         Generate an antenna-map from antenna names to
         Fengine instances.
         """
-        hookup = helpers.read_maps_from_redis(self.redishost)
+        hookup = helpers.read_maps_from_redis(self.r)
         if hookup is None:
             self.logger.error('Failed to compute antenna hookup from redis maps')
             return
@@ -112,13 +193,15 @@ class HeraCorrelator(object):
         for ant in self.ant_to_snap.keys():
             for pol in self.ant_to_snap[ant].keys():
                 host = self.ant_to_snap[ant][pol]['host']
-                self.ant_to_snap[ant][pol]['host'] = self.fengs_by_ip[socket.gethostbyname(host)]
+                if host in self.fengs_by_name:
+                    self.ant_to_snap[ant][pol]['host'] = self.fengs_by_ip[socket.gethostbyname(host)]
         # Make the snap->ant dict, but make sure the hostnames match what is expected by this classes Fengines
         for hooked_up_snap in hookup['snap_to_ant'].keys():
             ip = socket.gethostbyname(hooked_up_snap)
             for feng in self.fengs:
                 if feng.ip == ip:
                     self.snap_to_ant[feng.host] = hookup['snap_to_ant'][hooked_up_snap]
+                    feng.ants = self.snap_to_ant[feng.host]
         # Fill any unconnected SNAPs with Nones
         for feng in self.fengs:
             if feng.host not in self.snap_to_ant.keys():
