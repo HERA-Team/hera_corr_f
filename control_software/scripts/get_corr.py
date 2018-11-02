@@ -1,11 +1,15 @@
 #!/usr/env python
 import os
 from hera_corr_f import SnapFengine
+from hera_corr_f import HeraCorrelator
+from hera_corr_f import helpers
 import redis
 import casperfpga
 import numpy as np
 import argparse 
 import time
+
+logger = helpers.add_default_log_handlers(logging.getLogger(__name__))
 
 parser = argparse.ArgumentParser(description='Obtain cross-correlation spectra from a SNAP Board',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -33,6 +37,7 @@ NBLTIMES = (NTIME * NBL)
     
 r = redis.Redis(args.redishost)
 r.set('disable_monitoring', 1, ex=60)
+logger.warning('Disabling the monitoring. Use poco option in monitoring if you want both.')
 time.sleep(2)
 
 frequencies = np.arange(NCHAN) * 250e6/NCHAN
@@ -44,12 +49,12 @@ antenna_pairs = ([[0,0],[0,1],[0,2],[1,1],[1,2],[2,2]])
 fengine = SnapFengine(args.host)
 
 if args.tvg:
-    print '%s:  Enabling EQ TVGs...'%args.host
+    logger.info('%s:  Enabling EQ TVGs...'%args.host)
     fengine.eq_tvg.write_const_ants()
     fengine.eq_tvg.tvg_enable()
 
 if args.noise:
-    print '%s:  Setting noise TVGs...'%args.host
+    logger.info('%s:  Setting noise TVGs...'%args.host)
     ## Noise Block
     seed = 23
     for stream in range(fengine.noise.nstreams): 
@@ -67,7 +72,7 @@ data = []
 for t in range(NTIME):
     for a1, a2 in antenna_pairs:
         r.set('disable_monitoring', 1, ex=60)
-        print 'Getting baseline pair: (%d, %d)..'%(a1,a2)
+        logger.info('Getting baseline pair: (%d, %d)..'%(a1,a2))
         a1*= 2; a2*= 2;
         corr = [] 
         corr.append(fengine.corr.get_new_corr(a1, a2)) #xx
@@ -81,6 +86,6 @@ for t in range(NTIME):
         data.append(np.transpose(corr))
 
 outfilename = os.path.join(args.output, 'snap_correlation_%d.npz'%(times[0]))
-
+logger.info('Writing output to file: %s'%outfilename)
 np.savez(outfilename,data=data,polarizations=pols,frequencies=frequencies,
          times=times,ant1_array=ant1_array,ant2_array=ant2_array)
