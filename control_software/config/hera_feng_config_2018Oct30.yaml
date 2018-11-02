@@ -67,6 +67,7 @@ xengines:
         odd:
            ip: "10.80.40.206"
            mac: 0x02020a5028ce
+        chan_range: [1536, 1920]
     1:
         even:
            ip: "10.80.40.229"
@@ -74,6 +75,7 @@ xengines:
         odd:
            ip: "10.80.40.238"
            mac: 0x02020a5028ee
+        chan_range: [1920, 2304]
     2:
         even:
            ip: "10.80.40.198"
@@ -81,6 +83,7 @@ xengines:
         odd:
            ip: "10.80.40.207"
            mac: 0x02020a5028cf
+        chan_range: [2304, 2688]
     3:
         even:
            ip: "10.80.40.230"
@@ -88,6 +91,7 @@ xengines:
         odd:
            ip: "10.80.40.239"
            mac: 0x02020a5028ef
+        chan_range: [2688, 3072]
     4:
         even:
            ip: "10.80.40.199"
@@ -95,6 +99,7 @@ xengines:
         odd:
            ip: "10.80.40.208"
            mac: 0x02020a5028d0
+        chan_range: [3072, 3456]
     5:
         even:
            ip: "10.80.40.231"
@@ -102,6 +107,7 @@ xengines:
         odd:
            ip: "10.80.40.240"
            mac: 0x02020a5028f0
+        chan_range: [3456, 3840]
     6:
         even:
            ip: "10.80.40.200"
@@ -109,6 +115,7 @@ xengines:
         odd:
            ip: "10.80.40.209"
            mac: 0x02020a5028d1
+        chan_range: [3840, 4224]
     7:
         even:
            ip: "10.80.40.232"
@@ -116,6 +123,7 @@ xengines:
         odd:
            ip: "10.80.40.241"
            mac: 0x02020a5028f1
+        chan_range: [4224, 4608]
     8:
         even:
            ip: "10.80.40.201"
@@ -123,6 +131,7 @@ xengines:
         odd:
            ip: "10.80.40.210"
            mac: 0x02020a5028d2
+        chan_range: [4608, 4992]
     9:
         even:
            ip: "10.80.40.233"
@@ -130,6 +139,7 @@ xengines:
         odd:
            ip: "10.80.40.242"
            mac: 0x02020a5028f2
+        chan_range: [4992, 5376]
     10:
         even:
            ip: "10.80.40.202"
@@ -137,6 +147,7 @@ xengines:
         odd:
            ip: "10.80.40.211"
            mac: 0x02020a5028d3
+        chan_range: [5376, 5760]
     11:
         even:
            ip: "10.80.40.234"
@@ -144,6 +155,7 @@ xengines:
         odd:
            ip: "10.80.40.243"
            mac: 0x02020a5028f3
+        chan_range: [5760, 6144]
     12:
         even:
            ip: "10.80.40.203"
@@ -151,6 +163,7 @@ xengines:
         odd:
            ip: "10.80.40.212"
            mac: 0x02020a5028d4
+        chan_range: [6144, 6528]
     13:
         even:
            ip: "10.80.40.235"
@@ -158,6 +171,7 @@ xengines:
         odd:
            ip: "10.80.40.244"
            mac: 0x02020a5028f4
+        chan_range: [6528, 6912]
     14:
         even:
            ip: "10.80.40.204"
@@ -165,6 +179,7 @@ xengines:
         odd:
            ip: "10.80.40.213"
            mac: 0x02020a5028d5
+        chan_range: [6912, 7296]
     15:
         even:
            ip: "10.80.40.236"
@@ -172,3 +187,4 @@ xengines:
         odd:
            ip: "10.80.40.245"
            mac: 0x02020a5028f5
+        chan_range: [7296, 7680]
