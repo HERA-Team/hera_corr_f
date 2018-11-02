@@ -63,9 +63,6 @@ def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.
     redis_handler.setLevel(bglevel)
     redis_handler.setFormatter(formatter)
     logger.addHandler(redis_handler)
-
-    logger.info("Logger %s created..."%logger.name)
-
     return logger
 
 def snap_part_to_host_input(part):
