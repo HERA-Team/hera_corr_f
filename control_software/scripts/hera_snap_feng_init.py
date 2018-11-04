@@ -83,6 +83,7 @@ if not corr.configure_freq_slots():
 # Sync logic. Do global sync first, and then noise generators
 # wait for a PPS to pass then arm all the boards
 if args.sync:
+    corr.sync.change_period(9*8*7*6*5*4*3*2 * 4096)
     corr.resync(manual=args.mansync)
     corr.sync_noise(manual=args.mansync)
 

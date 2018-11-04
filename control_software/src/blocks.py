@@ -156,7 +156,7 @@ class Sync(Block):
         Change the period of the sync pulse
         """
         self.host.write_int('timebase_sync_period',period)
-        print "Changed period to %.2f"%period
+        logger.info("Changed sync period to %.2f"%period)
 
     def count(self):
         """
