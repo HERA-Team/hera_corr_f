@@ -1,8 +1,7 @@
 #! /usr/bin/env python
 
 import argparse
-from hera_corr_f import HeraCorrelator
-from hera_corr_f import helpers
+from hera_corr_f import HeraCorrelator, helpers, __version__
 import numpy as np
 import struct
 import collections
@@ -42,6 +41,21 @@ corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)
 if not corr.config_is_valid:
     logger.error('Currently loaded config is invalid')
     exit()
+
+# Write the parameters this script used to redis
+init_time = time.time()
+corr.r.hmset('init_configuration', {
+    'hera_corr_f_version' : __version__,
+    'init_args' : args,
+    'init_time' : init_time,
+    'init_time_str' : time.ctime(init_time),
+    'config' : corr.config_str,
+    'config_time' : corr.config_time,
+    'config_time_str' : corr.config_time_str,
+    'config_name' : corr.config_name,
+    'md5'    : corr.config_hash,
+    }
+)
 
 # Before we start manipulating boards, prevent monitoing scripts from
 # sending TFTP traffic. Expire the key after 5 minutes to lazily account for

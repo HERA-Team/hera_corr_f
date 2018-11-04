@@ -4,6 +4,7 @@ import socket
 import redis
 import yaml
 import helpers
+import hashlib
 from hera_corr_f import SnapFengine
 import numpy as np
 from casperfpga import utils
@@ -33,13 +34,20 @@ class HeraCorrelator(object):
 
     def get_config(self, config=None):
         if config is None:
-            config_str  = self.r.hget('snap_configuration', 'config')
-            config_time = self.r.hget('snap_configuration', 'upload_time_str')
-            self.logger.info('Using configuration from redis, uploaded at %s' % config_time)
-            self.config = yaml.load(config_str)
+            self.config_str  = self.r.hget('snap_configuration', 'config')
+            self.config_name = self.r.hget('snap_configuration', 'name')
+            self.config_hash = self.r.hget('snap_configuration', 'md5')
+            self.config_time  = float(self.r.hget('snap_configuration', 'upload_time'))
+            self.config_time_str  = self.r.hget('snap_configuration', 'upload_time_str')
+            self.logger.info('Using configuration from redis, uploaded at %s' % self.config_time_str)
         else:
             with open(config, 'r') as fp:
-                self.config = yaml.load(fp)
+                self.config_str = fp.read()
+            self.config_name = config
+            self.config_hash = hashlib.md5(self.config_str).hexdigest()
+            self.config_time = time.time()
+            self.config_time_str = time.ctime(self.config_time)
+        self.config = yaml.load(self.config_str)
 
     def establish_connections(self):
         # Instantiate CasperFpga connections to all the F-Engine.
