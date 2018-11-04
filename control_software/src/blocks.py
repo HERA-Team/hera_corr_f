@@ -844,6 +844,7 @@ class Corr(Block):
         return self.read_int('acc_len')
 
     def set_acc_len(self,acc_len):
+        assert isinstance(acc_len, int), "Cannot set accumulation length to type %r" % type(acc_len)
         self.acc_len = acc_len
         acc_len = 8192*acc_len  #Convert to clks from spectra 
         self.write_int('acc_len',acc_len)
