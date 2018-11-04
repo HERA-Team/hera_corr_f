@@ -129,7 +129,7 @@ class HeraCorrelator(object):
             # Shouldn't be able to error here -- we've already checked the SNAP is there
             self.logger("Tried to declare %s dead but couldn't remove it" % deadfeng.host)
 
-        self.dead_fengs[host] = time.time()
+        self.dead_fengs[deadfeng.host] = time.time()
 
     def disable_monitoring(self, expiry=60):
         self.r.set('disable_monitoring', 1, ex=expiry)
