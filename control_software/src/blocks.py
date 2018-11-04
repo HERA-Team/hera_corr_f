@@ -5,6 +5,7 @@ import socket
 import time
 import casperfpga
 import casperfpga.snapadc
+import helpers
 from casperfpga import i2c
 from casperfpga import i2c_gpio
 from casperfpga import i2c_volt
@@ -13,12 +14,12 @@ from casperfpga import i2c_sn
 from casperfpga import i2c_bar
 from casperfpga import i2c_motion
 from scipy.linalg import hadamard #for walsh (hadamard) matrices
-logger = logging.getLogger(__name__)
 
 # Block Classes
 class Block(object):
-    def __init__(self, host, name):
+    def __init__(self, host, name, logger=None):
         self.host = host #casperfpga object
+        self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + "(%s:%s)" % (host.host, name)))
         self.name = name
         if (name is None) or (name == ''):
             self.prefix = ''
@@ -156,7 +157,7 @@ class Sync(Block):
         Change the period of the sync pulse
         """
         self.host.write_int('timebase_sync_period',period)
-        logger.info("Changed sync period to %.2f"%period)
+        self.logger.info("Changed sync period to %.2f"%period)
 
     def count(self):
         """
@@ -216,10 +217,10 @@ class NoiseGen(Block):
         Set the seed of the noise generator for a given stream.
         """
         if stream > self.nstreams:
-            logger.error('Tried to set noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
+            self.logger.error('Tried to set noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
             return
         if seed > 255:
-            logger.error('Seed value is an 8-bit integer. It cannot be %d' % seed)
+            self.logger.error('Seed value is an 8-bit integer. It cannot be %d' % seed)
             return
         regname = 'seed_%d' % (stream // 4)
         self.change_reg_bits(regname, seed, 8 * (stream % 4), 8)
@@ -229,7 +230,7 @@ class NoiseGen(Block):
         Get the seed of the noise generator for a given stream.
         """
         if stream > self.nstreams:
-            logger.error('Tried to get noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
+            self.logger.error('Tried to get noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
             return
         regname = 'seed_%d' % (stream // 4)
         return (self.read_uint(regname) >> (8 * stream % 4)) & 0xff
@@ -373,7 +374,7 @@ class Delay(Block):
 
     def set_delay(self, stream, delay):
         if stream > self.nstreams:
-            logger.error('Tried to set delay for stream %d > nstreams (%d)' % (stream, self.nstreams))
+            self.logger.error('Tried to set delay for stream %d > nstreams (%d)' % (stream, self.nstreams))
         self.write_int(change_reg_bits(self.host.read_uint('delays'), delay, 4*stream, 4))
 
     def initialize(self):
@@ -514,7 +515,7 @@ class Eq(Block):
     def set_coeffs(self, stream, coeffs):
         coeffs *= 2**self.bp
         if np.any(coeffs > (2**self.width - 1)):
-            logger.warning("Some coefficients out of range")
+            self.logger.warning("Some coefficients out of range")
         # saturate coefficients
         coeffs[coeffs>(2**self.width - 1)] = 2**self.width - 1
         coeffs = list(coeffs)
@@ -608,7 +609,7 @@ class ChanReorder(Block):
         """
         order = list(order)
         if len(order) != self.nchans:
-            logger.Error("Tried to reorder channels, but map was the wrong length")
+            self.logger.Error("Tried to reorder channels, but map was the wrong length")
             return
         order_str = struct.pack('>%d%s' %(self.nchans,self.format), *order)
         self.write('reorder3_map1', order_str)
@@ -917,7 +918,7 @@ class RoachDelay(Block):
 
     def set_delay(self, stream, delay):
         if stream > self.nstreams:
-            logger.error('Tried to set delay for stream %d > nstreams (%d)' % (stream, self.nstreams))
+            self.logger.error('Tried to set delay for stream %d > nstreams (%d)' % (stream, self.nstreams))
         delay_reg = stream // 4
         reg_pos   = stream % 4
         self.change_reg_bits('%d' % delay_reg, delay, 8*reg_pos, 8)

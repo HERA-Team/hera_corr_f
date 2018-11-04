@@ -1,15 +1,15 @@
 import logging
+import helpers
 import numpy as np
 import struct
 import time
 import casperfpga
 from blocks import *
-logger = logging.getLogger(__name__)
-
 
 class SnapFengine(object):
-    def __init__(self, host):
+    def __init__(self, host, logger=None):
         self.host = host
+        self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + "(%s)" % host))
         self.fpga = casperfpga.CasperFpga(host=host, transport=casperfpga.TapcpTransport)
         # Try and get the canonical name of the host
         # to use as a serial number
@@ -72,6 +72,6 @@ class SnapFengine(object):
         if not self.i2c_initialized:
             self._add_i2c()
         for block in self.blocks:
-            logger.info("Initializing block: %s" % block.name)
+            self.logger.info("Initializing block: %s" % block.name)
             block.initialize()
 
