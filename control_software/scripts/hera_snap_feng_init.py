@@ -98,7 +98,8 @@ if not corr.configure_freq_slots():
 # wait for a PPS to pass then arm all the boards
 if args.sync:
     for feng in corr.fengs:
-        feng.sync.change_period(9*8*7*6*5*4*3*2 * 4096)
+        #feng.sync.change_period(9*8*7*6*5*4*3*2 * 4096)
+        feng.sync.change_period(0)
     corr.resync(manual=args.mansync)
     corr.sync_noise(manual=args.mansync)
 
