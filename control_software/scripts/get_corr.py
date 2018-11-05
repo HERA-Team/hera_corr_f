@@ -12,7 +12,8 @@ import os
 def get_corr_output(feng, ant1, ant2, int_time=10):
 
     # Set integration length
-    acc_len = (int_time*250e6)/(8192*feng.corr.spec_per_acc)
+    acc_len = int((int_time*250e6)/(8192*feng.corr.spec_per_acc))
+    # it is a warning sign when you're using isclose to compare integers!
     if not np.isclose(acc_len, feng.corr.get_acc_len()):
         feng.corr.set_acc_len(acc_len)
 
