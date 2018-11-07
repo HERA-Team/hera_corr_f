@@ -244,13 +244,13 @@ class HeraCorrelator(object):
         dest_port = self.config['dest_port'] 
         for fn, feng in enumerate(self.fengs):
             # Update redis to reflect current assignments
-            self.r.hset("snap_ants", feng.host, feng.ant_indices)
+            self.r.hset("corr:snap_ants", feng.host, feng.ant_indices)
             # if the user hasn't specified a source port, auto increment mod 4
             source_port = self.config['fengines'][feng.host].get('source_port', dest_port + (fn%4))
             for xn, xparams in self.config['xengines'].items():
                 chan_range = xparams.get('chan_range', [xn*384, (xn+1)*384])
                 chans = range(chan_range[0], chan_range[1])
-                self.r.hset("xeng_chans", xn, chans)
+                self.r.hset("corr:xeng_chans", xn, chans)
                 if (xn > n_xengs): 
                    self.logger.error("Cannot have more than %d X-engs!!" % n_xengs)
                    return False
