@@ -53,9 +53,13 @@ class HeraCorrelator(object):
         # Instantiate CasperFpga connections to all the F-Engine.
         self.fengs = []
         self.dead_fengs = {}
+        ant_index = 0
         for host in self.config['fengines'].keys():
+            ant_indices = self.config['fengines'][host].get('ants', range(ant_index, ant_index + 3))
+            ant_index += 3
+            self.logger.info("Setting Feng %s antenna indices to %s" % (host, ant_indices))
             try:
-                feng = SnapFengine(host)
+                feng = SnapFengine(host, ant_indices=ant_indices)
                 if feng.fpga.is_connected():
                     self.fengs += [feng]
                 else:
@@ -239,13 +243,14 @@ class HeraCorrelator(object):
         self.logger.info('Configuring frequency slots for %d X-engines, %d channels per packet' % (n_xengs, chans_per_packet))
         dest_port = self.config['dest_port'] 
         for fn, feng in enumerate(self.fengs):
-            # if the user hasn't specified antenna numbers, just increment basen on fengine number
-            ants = self.config['fengines'][feng.host].get('ants', range(3*fn, 3*fn + 1))
+            # Update redis to reflect current assignments
+            self.r.hset("snap_ants", feng.host, feng.ant_indices)
             # if the user hasn't specified a source port, auto increment mod 4
             source_port = self.config['fengines'][feng.host].get('source_port', dest_port + (fn%4))
             for xn, xparams in self.config['xengines'].items():
                 chan_range = xparams.get('chan_range', [xn*384, (xn+1)*384])
                 chans = range(chan_range[0], chan_range[1])
+                self.r.hset("xeng_chans", xn, chans)
                 if (xn > n_xengs): 
                    self.logger.error("Cannot have more than %d X-engs!!" % n_xengs)
                    return False
@@ -254,7 +259,7 @@ class HeraCorrelator(object):
                 ip_even = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
                 ip = [int(i) for i in xparams['odd']['ip'].split('.')]
                 ip_odd = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
-                feng.packetizer.assign_slot(xn, chans, [ip_even,ip_odd], feng.reorder, ants[0])
+                feng.packetizer.assign_slot(xn, chans, [ip_even,ip_odd], feng.reorder, feng.ant_indices[0])
                 feng.eth.add_arp_entry(ip_even,xparams['even']['mac'])
                 feng.eth.add_arp_entry(ip_odd,xparams['odd']['mac'])
             feng.eth.set_source_port(source_port)

@@ -50,10 +50,13 @@ dest_port: 8511
 fengines:
     heraNode1Snap0:
         phase_switch_index: 0
+        ants: [0, 1, 2]
     heraNode1Snap1:
         phase_switch_index: 0
+        ants: [3, 4, 5]
     heraNode1Snap2:
         phase_switch_index: 0
+        ants: [6, 7, 8]
 
 # Data is sent assuming a total of 32 Xengines and 
 # a maximum of 48 channels per Xengine. If all the 

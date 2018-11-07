@@ -7,7 +7,7 @@ import casperfpga
 from blocks import *
 
 class SnapFengine(object):
-    def __init__(self, host, logger=None):
+    def __init__(self, host, ant_indices=None, logger=None):
         self.host = host
         self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + "(%s)" % host))
         self.fpga = casperfpga.CasperFpga(host=host, transport=casperfpga.TapcpTransport)
@@ -41,6 +41,7 @@ class SnapFengine(object):
             pass
 
         self.ants = [None] * 6 # An attribute to store the antenna names of this board's inputs
+        self.ant_indices = ant_indices or range(3) # An attribute to store the antenna numbers used in packet headers
         
         # The order here can be important, blocks are initialized in the
         # order they appear here
