@@ -20,7 +20,7 @@
 
 # The fpgfile that the SNAP boards have to be programmed with. 
 # Set the 'p' flag with calling the init script to program the boards.
-fpgfile: '/home/deepthi/herafengine/snap_fengine/outputs/snap_fengine_2018-10-27_1850.fpg'
+fpgfile: '/home/deepthi/herafengine/snap_fengine/outputs/snap_fengine_2018-11-02_1606.fpg'
 
 # You can sync the fengines using an external PPS signal
 # or manually using a software register. 

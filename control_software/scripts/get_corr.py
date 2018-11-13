@@ -11,16 +11,19 @@ import os
 
 def get_corr_output(feng, ant1, ant2, int_time=10):
 
+    feng.corr.set_input(ant1*2,ant2*2)
+    feng.wait_for_acc()
     # Set integration length
-    acc_len = int((int_time*250e6)/(8192*feng.corr.spec_per_acc))
-    # it is a warning sign when you're using isclose to compare integers!
-    if not np.isclose(acc_len, feng.corr.get_acc_len()):
+    acc_len = int((int_time*250e6)/(8*feng.corr.nchans*feng.corr.spec_per_acc))
+    if not acc_len == feng.corr.get_acc_len():
         feng.corr.set_acc_len(acc_len)
 
     ant1*= 2; ant2*= 2;
     corr = []; times = []
+    time.sleep(1)
     for i in range(4):
-        corr.append(feng.corr.get_new_corr(ant1+i%2, (ant2+(i//2+i%2)%2)))
+        feng.corr.set_input(ant1+i%2, (ant2+(i//2+i%2)%2))
+        corr.append(feng.corr.read_bram())
         times.append(time.time())
     
     return {'times':times,'data':corr}

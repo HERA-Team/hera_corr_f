@@ -782,41 +782,54 @@ class Eth(Block):
 class Corr(Block):
     def __init__(self, host, name, acc_len=3815):
         super(Corr, self).__init__(host,name)
+        self.nchans = 1024
         self.acc_len = acc_len
         self.spec_per_acc = 8
         self.format='l'
-    
+   
+    def set_input(self, pol1, pol2):
+        self.write_int('input_sel',(pol1 + (pol2<<8)))
+ 
     def wait_for_acc(self):
         cnt = self.read_uint('acc_cnt')
-        # Wait for 2 counts to make sure we have a clean
-        # integration containing only the selected antennas
-        while self.read_uint('acc_cnt') < (cnt+2):
-            time.sleep(0.1)
+        while self.read_uint('acc_cnt') < (cnt+1):
+            continue
         return 1
 
-    def _read_spec(self, pol1, pol2, nowait=False):
-        self.write_int('input_sel',(pol1 + (pol2 << 8)))
-        if not nowait: self.wait_for_acc()
+    def read_bram(self):
+        """ 
+        Outputs the contents of the BRAM. If you want a 
+        fresh accumulation use get_new_corr(pol1, pol2) instead.
+
+        """
+        self.wait_for_acc()
         spec = np.array(struct.unpack('>2048l',self.read('dout',8*1024)))
         spec = (spec[0::2]+1j*spec[1::2])
         return spec
     
-    def get_new_corr(self, pol1, pol2, nowait=False):
+    def get_new_corr(self, pol1, pol2):
         """
-        Mapping: [1a, 1b, 2a, 2b, 3a, 3b] : [0, 1, 2, 3, 4, 5, 6, 7]
+        Get a new correlation with the given inputs.
+        Input Pol Mapping: [1a, 1b, 2a, 2b, 3a, 3b] : [0, 1, 2, 3, 4, 5, 6, 7]
+        Returns: visibility of shape(1024,)
+
         """
-        spec = self._read_spec(pol1, pol2, nowait=nowait)/float(self.acc_len*self.spec_per_acc)
+        self.set_input(pol1,pol2)
+        self.wait_for_acc()      # Wait two acc_len for new spectra to load
+        spec = self.read_bram()/float(self.acc_len*self.spec_per_acc)
         if pol1==pol2:
             return spec.real + 1j*np.zeros(len(spec))
         else:
             return spec
 
-    def get_max_hold(self, pol, nowait=False):
+    def get_max_hold(self, pol):
         """
         Mode works only for auto correlations.
         Mapping: [1a, 1b, 2a, 2b, 3a, 3b] : [0, 1, 2, 3, 4, 5, 6, 7]
         """
-        spec = self._read_spec(pol, pol, nowait=nowait)/float(self.spec_per_acc)
+        self.set_input(pol,pol)
+        self.wait_for_acc()
+        spec = self.read_bram()/float(self.spec_per_acc)
    	return spec.imag 
         
     
