@@ -55,8 +55,8 @@ if not acc_len == feng.corr.get_acc_len():
     feng.corr.set_acc_len(acc_len)
 
 first_run = 1
-logger.info('Getting baseline pair: (%d, %d)..'%(0,0))
 feng.corr.set_input(0,0)
+feng.corr.wait_for_acc()
 
 while(True):
     try:
@@ -65,11 +65,18 @@ while(True):
         # Start integrating and collecting data
         for n in range(args.num_spectra):
             c = []
-            for a1, a2 in np.roll(cycle_pols,-2):
-                feng.corr.set_input(a1,a2)
-                logger.info('Getting baseline pair: (%d, %d)..'%(a1,a2))
-                c.append(feng.corr.read_bram())
+            for idx in range(len(cycle_pols)):
+                a1,a2 = cycle_pols[idx]
+                next_a1, next_a2 = cycle_pols[(idx+1)%len(cycle_pols)]
+                feng.corr.set_input(next_a1, next_a2)
+                bram = feng.corr.read_bram()
+                logger.info('Getting baseline pair: (%d, %d)..'%(a1,a2)) 
                 times.append(time.time())
+                if a1 == a2:
+                   bram.imag = 0; bram.real = bram.real/float(feng.corr.acc_len*feng.corr.spec_per_acc)
+                else:
+                   bram = bram/float(feng.corr.acc_len*feng.corr.spec_per_acc)  
+                c.append(bram)
             data.append(np.transpose(c))
         
         outfilename = os.path.join(args.output, 'snap_correlation_%d.npz'%(times[0]))
