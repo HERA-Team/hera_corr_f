@@ -14,6 +14,7 @@ class TestCorrBlock(unittest.TestCase):
         self.cycle_pols = [(0,0),(1,1),(0,1),(0,2),(1,3),(0,3),(1,2),
                            (0,4),(1,5),(0,5),(1,4),(2,2),(3,3),(2,3),
                            (2,4),(3,5),(2,5),(3,4),(4,4),(5,5),(4,5)]
+        self.cycle_auto = [(0,0), (1,1), (2,2), (3,3), (4,4), (5,5)]
 
     def signed_int(self,x):
         """Return two's complement interpretation 
@@ -48,8 +49,15 @@ class TestCorrBlock(unittest.TestCase):
             corr = self.feng.corr.get_new_corr(p1,p2)
             tspec = self.gen_tvg_pol(p1)*np.conj(self.gen_tvg_pol(p2))
             tspec = np.sum(tspec.reshape(-1,8), axis=1)
-            self.assertTrue(np.all(np.isclose(tspec.imag, corr.imag)))
+            self.assertTrue(np.all(tspec.imag == corr.imag))
 
+    def test_max_hold(self):
+        for (p1,p2) in self.cycle_auto:
+            mxhld = self.feng.corr.get_max_hold(p1)
+            tspec = self.gen_tvg_pol(p1)*np.conj(self.gen_tvg_pol(p2))
+            tspec = np.sum(tspec.reshape(-1,8), axis=1)
+            self.assertTrue(np.all(tspec.real == mxhld))
+ 
     
 
 if __name__ == '__main__':

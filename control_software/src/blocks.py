@@ -829,7 +829,7 @@ class Corr(Block):
         """
         self.set_input(pol,pol)
         self.wait_for_acc()
-        spec = self.read_bram()/float(self.spec_per_acc)
+        spec = self.read_bram()
    	return spec.imag 
         
     
