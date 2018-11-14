@@ -44,9 +44,7 @@ ant1_array=np.array([[0,0,0,1,1,2] for t in range(args.num_spectra)]).astype(int
 ant2_array=np.array([[0,1,2,1,2,2] for t in range(args.num_spectra)]).astype(int).flatten()
 
 # Mapping: 1x,1y,2x,2y,3x,3y = 0,1,2,3,4,5
-cycle_pols = [(0,0),(1,1),(0,1),(0,2),(1,3),(0,3),(1,2),
-              (0,4),(1,5),(0,5),(1,4),(2,2),(3,3),(2,3),
-              (2,4),(3,5),(2,5),(3,4),(4,4),(5,5),(4,5)]
+cycle_pols = [(0,0),(1,1),(2,2),(3,3),(4,4),(5,5)]
 
 acc_len = int((args.integration_time*250e6)/\
               (8*feng.corr.nchans*feng.corr.spec_per_acc))
@@ -61,11 +59,10 @@ Nfiles = 0
 
 while(Nfiles < args.files):
     try:
-        times = []
-        data = []
+        times = []; avg = []; max_hold = []
         # Start integrating and collecting data
         for n in range(args.num_spectra):
-            c = []
+            cmxhld = []; cavg = []
             for idx in range(len(cycle_pols)):
                 a1,a2 = cycle_pols[idx]
                 next_a1, next_a2 = cycle_pols[(idx+1)%len(cycle_pols)]
@@ -73,18 +70,17 @@ while(Nfiles < args.files):
                 bram = feng.corr.read_bram()
                 logger.info('Getting baseline pair: (%d, %d)..'%(a1,a2)) 
                 times.append(time.time())
-                if a1 == a2:
-                   bram.imag = 0; bram.real = bram.real/float(feng.corr.acc_len*feng.corr.spec_per_acc)
-                else:
-                   bram = bram/float(feng.corr.acc_len*feng.corr.spec_per_acc)  
-                c.append(bram)
-            data.append(np.transpose(c))
+                # Get avg
+                bram.real = bram.real/float(feng.corr.acc_len*feng.corr.spec_per_acc)
+                cavg.append(bram.real); cmxhld.append(bram.imag)
+            avg.append(np.transpose(cavg))
+            max_hold.append(np.transpose(cmxhld))
         
         outfilename = os.path.join(args.output, 'snap_correlation_%d.npz'%(times[0]))
         logger.info('Writing output to file: %s'%outfilename)
-        np.savez(outfilename, source=args.host, data=data,\
-                 polarizations=pols,frequencies=fqs,\
-                 times=times,ant1_array=ant1_array,ant2_array=ant2_array)
+        np.savez(outfilename, source=args.host, average=avg,\
+                 max_hold=max_hold, polarizations=pols, frequencies=fqs,\
+                 times=times, ant1_array=ant1_array, ant2_array=ant2_array)
         Nfiles += 1
  
     except KeyboardInterrupt:
