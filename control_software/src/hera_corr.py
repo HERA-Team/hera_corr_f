@@ -210,11 +210,14 @@ class HeraCorrelator(object):
                     self.ant_to_snap[ant][pol]['host'] = self.fengs_by_ip[socket.gethostbyname(host)]
         # Make the snap->ant dict, but make sure the hostnames match what is expected by this classes Fengines
         for hooked_up_snap in hookup['snap_to_ant'].keys():
-            ip = socket.gethostbyname(hooked_up_snap)
-            for feng in self.fengs:
-                if feng.ip == ip:
-                    self.snap_to_ant[feng.host] = hookup['snap_to_ant'][hooked_up_snap]
-                    feng.ants = self.snap_to_ant[feng.host]
+            try:
+                ip = socket.gethostbyname(hooked_up_snap)
+                for feng in self.fengs:
+                    if feng.ip == ip:
+                        self.snap_to_ant[feng.host] = hookup['snap_to_ant'][hooked_up_snap]
+                        feng.ants = self.snap_to_ant[feng.host]
+            except socket.gaierror:
+                self.logger.warning("Failed to get hostname for SNAP %s" % hooked_up_snap)
         # Fill any unconnected SNAPs with Nones
         for feng in self.fengs:
             if feng.host not in self.snap_to_ant.keys():
