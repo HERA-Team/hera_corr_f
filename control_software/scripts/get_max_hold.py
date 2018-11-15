@@ -76,7 +76,7 @@ while(Nfiles < args.files):
             avg.append(np.transpose(cavg))
             max_hold.append(np.transpose(cmxhld))
         
-        outfilename = os.path.join(args.output, 'snap_correlation_%d.npz'%(times[0]))
+        outfilename = os.path.join(args.output, 'snap_max_hold_%d.npz'%(times[0]))
         logger.info('Writing output to file: %s'%outfilename)
         np.savez(outfilename, source=args.host, average=avg,\
                  max_hold=max_hold, polarizations=pols, frequencies=fqs,\
