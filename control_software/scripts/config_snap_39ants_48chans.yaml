@@ -1,0 +1,35 @@
+fengines:
+    snap110:
+        udp_port: 8511
+        ant_range: [0,3]
+#    snap111:
+#        udp_port: 8512
+#        ant_range: [30,60]
+#    snap113:
+#        udp_port: 8513
+#        ant_range: [60,90]
+#    snap114:
+#        udp_port: 8514
+#        ant_range: [90,120]
+#    snap1:
+#        udp_port: 8515
+#        ant_range: [120,150]
+#    snap109:
+#        udp_port: 8516
+#        ant_range: [150,180]
+xengines:
+    xeng0:
+        num: 0
+        ip: "10.0.10.136"
+        mac: 0x000743102ee8
+        chan_range: [0,48]
+#    xeng0:
+#        num: 0
+#        ip: "10.0.10.12"
+#        mac: 0x02020a140102
+#        chan_range: [0,48]
+#    xeng1:
+#        num: 1
+#        ip: "10.0.10.140"
+#        mac: 0x02020a140142
+#        chan_range: [256,304]
