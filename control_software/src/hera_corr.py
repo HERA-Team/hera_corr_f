@@ -161,7 +161,7 @@ class HeraCorrelator(object):
         for feng in self.fengs:
            for stream in range(feng.phaseswitch.nstreams):
                feng.phaseswitch.set_walsh(stream, 1, 0, 1) 
-        self.r['corr:status_phase_switch'] = 'off'
+        self.r.hmset('corr:status_phase_switch', {'state':'off', 'time':time.time()})
 
     def phase_switch_enable(self):
         self.logger.info('Enabling all phase switches')
@@ -169,21 +169,21 @@ class HeraCorrelator(object):
            for stream in range(feng.phaseswitch.nstreams):
                #TODO figure out what the patterns should be per antenna
                feng.phaseswitch.set_walsh(stream, 1, 0, 1) 
-        self.r['corr:status_phase_switch'] = 'on'
+        self.r.hmset('corr:status_phase_switch', {'state':'on', 'time':time.time()})
 
     def noise_diode_enable(self):
         self.logger.info('Enabling all noise inputs')
         for feng in self.fengs:
            for fem in feng.fems:
                fem.switch(name='noise')
-        self.r['corr:status_noise_diode'] = 'on'
+        self.r.hmset('corr:status_noise_diode', {'state':'on', 'time':time.time()})
 
     def noise_diode_disable(self):
         self.logger.info('Disabling all noise inputs')
         for feng in self.fengs:
            for fem in feng.fems:
                fem.switch(name='antenna')
-        self.r['corr:status_noise_diode'] = 'off'
+        self.r.hmset('corr:status_noise_diode', {'state':'off', 'time':time.time()})
 
     def initialize(self):
         for feng in self.fengs:
