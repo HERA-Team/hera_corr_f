@@ -161,7 +161,7 @@ class HeraCorrelator(object):
         for feng in self.fengs:
            for stream in range(feng.phaseswitch.nstreams):
                feng.phaseswitch.set_walsh(stream, 1, 0, 1) 
-        self.r['corr:status_phase_switch'] = 'off'
+        self.r.hmset('corr:status_phase_switch', {'state':'off', 'time':time.time()})
 
     def phase_switch_enable(self):
         self.logger.info('Enabling all phase switches')
@@ -169,21 +169,21 @@ class HeraCorrelator(object):
            for stream in range(feng.phaseswitch.nstreams):
                #TODO figure out what the patterns should be per antenna
                feng.phaseswitch.set_walsh(stream, 1, 0, 1) 
-        self.r['corr:status_phase_switch'] = 'on'
+        self.r.hmset('corr:status_phase_switch', {'state':'on', 'time':time.time()})
 
     def noise_diode_enable(self):
         self.logger.info('Enabling all noise inputs')
         for feng in self.fengs:
            for fem in feng.fems:
                fem.switch(name='noise')
-        self.r['corr:status_noise_diode'] = 'on'
+        self.r.hmset('corr:status_noise_diode', {'state':'on', 'time':time.time()})
 
     def noise_diode_disable(self):
         self.logger.info('Disabling all noise inputs')
         for feng in self.fengs:
            for fem in feng.fems:
                fem.switch(name='antenna')
-        self.r['corr:status_noise_diode'] = 'off'
+        self.r.hmset('corr:status_noise_diode', {'state':'off', 'time':time.time()})
 
     def initialize(self):
         for feng in self.fengs:
@@ -207,14 +207,20 @@ class HeraCorrelator(object):
             for pol in self.ant_to_snap[ant].keys():
                 host = self.ant_to_snap[ant][pol]['host']
                 if host in self.fengs_by_name:
-                    self.ant_to_snap[ant][pol]['host'] = self.fengs_by_ip[socket.gethostbyname(host)]
+                    try:
+                        self.ant_to_snap[ant][pol]['host'] = self.fengs_by_ip[socket.gethostbyname(host)]
+                    except socket.gaierror:
+                        self.logger.warning("Failed to get hostname for SNAP %s" % host)
         # Make the snap->ant dict, but make sure the hostnames match what is expected by this classes Fengines
         for hooked_up_snap in hookup['snap_to_ant'].keys():
-            ip = socket.gethostbyname(hooked_up_snap)
-            for feng in self.fengs:
-                if feng.ip == ip:
-                    self.snap_to_ant[feng.host] = hookup['snap_to_ant'][hooked_up_snap]
-                    feng.ants = self.snap_to_ant[feng.host]
+            try:
+                ip = socket.gethostbyname(hooked_up_snap)
+                for feng in self.fengs:
+                    if feng.ip == ip:
+                        self.snap_to_ant[feng.host] = hookup['snap_to_ant'][hooked_up_snap]
+                        feng.ants = self.snap_to_ant[feng.host]
+            except socket.gaierror:
+                self.logger.warning("Failed to get hostname for SNAP %s" % hooked_up_snap)
         # Fill any unconnected SNAPs with Nones
         for feng in self.fengs:
             if feng.host not in self.snap_to_ant.keys():
