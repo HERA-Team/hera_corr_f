@@ -15,6 +15,7 @@ import logging
 import redis
 import time, os
 import cPickle as cp
+from collections import OrderedDict
 import sys
 
 logger = helpers.add_default_log_handlers(logging.getLogger(__name__))
@@ -46,8 +47,8 @@ feng = SnapFengine(args.host)
 
 # Get antenna numbers from database
 corr.compute_hookup()
-#ants = corr.snap_to_ant[args.host]
-ants = [u'HH0N', u'HH0E', u'HH1N', u'HH1E', u'HH12N', u'HH12E']
+ants = corr.snap_to_ant[args.host]
+#ants = [u'HH0N', u'HH0E', u'HH1N', u'HH1E', u'HH12N', u'HH12E']
 
 fqs = np.arange(feng.corr.nchans) * 250e6/feng.corr.nchans
 pols = range(4)
@@ -55,10 +56,10 @@ ant1_array=np.array([[0,0,0,1,1,2] for t in range(args.num_spectra)]).astype(int
 ant2_array=np.array([[0,1,2,1,2,2] for t in range(args.num_spectra)]).astype(int).flatten()
 
 # Mapping: 1x,1y,2x,2y,3x,3y = 0,1,2,3,4,5
-cycle_pols = {'XX': [(0,0),(0,2),(0,4),(2,2),(2,4),(4,4)],
-              'YY': [(1,1),(1,3),(1,5),(3,3),(3,5),(5,5)],
-              'XY': [(0,1),(0,3),(0,5),(2,3),(2,5),(4,5)],
-              'YX': [(1,0),(1,2),(1,4),(3,2),(3,4),(5,4)]}
+cycle_pols = OrderedDict({'XX': [(0,0),(0,2),(0,4),(2,2),(2,4),(4,4)],
+                          'YY': [(1,1),(1,3),(1,5),(3,3),(3,5),(5,5)],
+                          'XY': [(0,1),(0,3),(0,5),(2,3),(2,5),(4,5)],
+                          'YX': [(1,0),(1,2),(1,4),(3,2),(3,4),(5,4)]})
 
 acc_len = int((args.integration_time*250e6)/\
               (8*feng.corr.nchans*feng.corr.spec_per_acc))
@@ -66,8 +67,6 @@ if not acc_len == feng.corr.get_acc_len():
     feng.corr.set_acc_len(acc_len)
 
 first_run = 1
-logger.info('Getting baseline pair: (%d, %d)..'%(0,0))
-feng.corr.set_input(0,0)
 
 fqs = np.linspace(0,250,num=1024)*1e6
 
@@ -75,12 +74,14 @@ fqs = np.linspace(0,250,num=1024)*1e6
 while(True):
     try:
         for pol,bls in cycle_pols.items():
+            feng.corr.set_input(bls[0][0],bls[0][1])
+            feng.corr.wait_for_acc()
             times = []; poco = []
             for n in range(args.num_spectra):
                 c = []
                 for idx in range(len(bls)):
                     a1,a2 = bls[idx]
-                    next_a1, next_a2 = bls[(idx+1)%len(cycle_pols)]
+                    next_a1, next_a2 = bls[(idx+1)%len(bls)]
                     feng.corr.set_input(next_a1, next_a2)
                     bram = feng.corr.read_bram()
                     logger.info('Getting baseline pair: (%d, %d)..'%(a1,a2)) 
@@ -88,7 +89,7 @@ while(True):
                     if a1 == a2:
                        bram.imag = 0; bram.real = bram.real/float(feng.corr.acc_len*feng.corr.spec_per_acc)
                     else:
-                       bram = bram/float(feng.corr.acc_len*feng.corr.spec_per_acc)  
+                       bram = bram/float(feng.corr.acc_len*feng.corr.spec_per_acc)
                     c.append(bram)
                 poco.append(np.transpose(c))
 
@@ -138,10 +139,10 @@ while(True):
             data.ant_2_array = np.asarray([str(a)[2:-1] for a in data.ant_2_array]).astype(int)
 
             # Get antenna locations from hera_mc database
-            #mh = Handling()
-            #info = mh.get_cminfo_correlator()
-            with open('cminfo.cp','r') as fp:
-                info = cp.load(fp)
+            mh = Handling()
+            info = mh.get_cminfo_correlator()
+            #with open('cminfo.cp','r') as fp:
+            #    info = cp.load(fp)
 
             #set telescope data
             lla = (np.radians(info['cofa_lat']), np.radians(info['cofa_lon']), info['cofa_alt'])
@@ -171,7 +172,10 @@ while(True):
                 data.zenith_dec[tnum] = zenith_altaz.dec.degree
 
             # Other header
-            data.phase_type= 'drift'
+            data.phase_type= 'phased' #'drift'
+            data.phase_center_dec = 0.0
+            data.phase_center_ra = 0.0
+            data.phase_center_epoch = 2000.0
             data.history = 'SNAP poco data file'
             data.object_name = 'DRIFT'
             data.instrument = 'SNAP'
