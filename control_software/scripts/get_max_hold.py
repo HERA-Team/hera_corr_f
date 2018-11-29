@@ -9,7 +9,7 @@ import logging
 import argparse
 import os
 
-logger = helpers.add_default_log_handlers(logging.getLogger(__name__))
+logger = helpers.add_default_log_handlers(logging.getLogger(__name__), fglevel=logging.NOTSET)
 
 parser = argparse.ArgumentParser(description='Obtain cross-correlation spectra from a SNAP Board',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -40,11 +40,9 @@ feng = SnapFengine(args.host)
 
 fqs = np.arange(feng.corr.nchans) * 250e6/feng.corr.nchans
 pols = range(4)
-ant1_array=np.array([[0,0,0,1,1,2] for t in range(args.num_spectra)]).astype(int).flatten()
-ant2_array=np.array([[0,1,2,1,2,2] for t in range(args.num_spectra)]).astype(int).flatten()
 
 # Mapping: 1x,1y,2x,2y,3x,3y = 0,1,2,3,4,5
-cycle_pols = [(0,0),(1,1),(2,2),(3,3),(4,4),(5,5)]
+cycle_pols = [(0,0),(1,1)]#,(2,2),(3,3),(4,4),(5,5)]
 
 acc_len = int((args.integration_time*250e6)/\
               (8*feng.corr.nchans*feng.corr.spec_per_acc))
@@ -56,6 +54,7 @@ feng.corr.set_input(0,0)
 feng.corr.wait_for_acc()
 
 Nfiles = 0
+recorded_pols =[]
 
 while(Nfiles < args.files):
     try:
@@ -63,8 +62,9 @@ while(Nfiles < args.files):
         # Start integrating and collecting data
         for n in range(args.num_spectra):
             cmxhld = []; cavg = []
-            for idx in range(len(cycle_pols)):
+            for idx in range(len(cycle_pols[:2])):
                 a1,a2 = cycle_pols[idx]
+                recorded_pols.append((a1,a2))
                 next_a1, next_a2 = cycle_pols[(idx+1)%len(cycle_pols)]
                 feng.corr.set_input(next_a1, next_a2)
                 bram = feng.corr.read_bram()
@@ -76,31 +76,38 @@ while(Nfiles < args.files):
             avg.append(np.transpose(cavg))
             max_hold.append(np.transpose(cmxhld))
         
+        ant1_array = [a[0] for a in recorded_pols]
+        ant2_array = [a[1] for a in recorded_pols]
         outfilename = os.path.join(args.output, 'snap_max_hold_%d.npz'%(times[0]))
         logger.info('Writing output to file: %s'%outfilename)
         np.savez(outfilename, source=args.host, average=avg,\
                  max_hold=max_hold, polarizations=pols, frequencies=fqs,\
                  times=times, ant1_array=ant1_array, ant2_array=ant2_array)
         Nfiles += 1
+        #time.sleep(900)
  
     except KeyboardInterrupt:
         logger.info('Manually interrupted')
         logger.info('Last file written: %s'%outfilename)
         break
 
-    except:
-        logger.info('Will try again in two minutes')
-        time.sleep(120); cnt = 0
-        while cnt < 20:
-            try: 
-                feng = SnapFengine(args.host)
-                if feng.fpga.is_connected(): break
-            except: 
-                logger.info('Still cannot connect. Wait two more minutes')
-                time.sleep(60)
-                cnt += 1
-                continue
-        if cnt>=20: 
-           logger.error('Tried 20 times. Done.')
-           exit()
-        else: continue
+#    except:
+#        logger.info('Will try again in two minutes')
+#        logger.info('Last file written: %s'%outfilename)
+#        break
+#
+#    except:
+#        logger.info('Will try again in two minutes')
+#        time.sleep(120); cnt = 0
+#        print 'Entering loop trying'
+#        while cnt < 20:
+#            try:
+#                print cnt
+#                feng = SnapFengine(args.host)
+#                if feng.fpga.is_connected(): 
+#                    print 'Got connection!'
+#                    break
+#            except: 
+#                logger.info('Still cannot connect. Wait one more minute')
+#                time.sleep(60)
+#                cnt += 1

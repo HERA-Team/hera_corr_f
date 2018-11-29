@@ -129,7 +129,7 @@ while(True):
             data.polarization_array = np.array([polstr2num(pol)]).astype(int)
             
             # Integration time (including dead time)
-            data.integration_time = np.array([times[1]-times[0] for _ in range(data.Ntimes)])
+            data.integration_time = times[1]-times[0]
    
             # Antenna numbers 
             data.ant_1_array = [ants[pair[0]] for pair in bls]*args.num_spectra

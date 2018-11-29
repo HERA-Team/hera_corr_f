@@ -793,7 +793,7 @@ class Corr(Block):
     def wait_for_acc(self):
         cnt = self.read_uint('acc_cnt')
         while self.read_uint('acc_cnt') < (cnt+1):
-            continue
+            time.sleep(0.1)
         return 1
 
     def read_bram(self):
