@@ -81,7 +81,7 @@ def get_poco_output(feng,redishost):
 def print_ant_log_messages(corr):
     for ant, antval in corr.ant_to_snap.iteritems():
         for pol, polval in antval.iteritems():
-            host = polval['host']
+            host = polval['host'].host # the dictionary contains FEngine instances
             chan = polval['channel']
             # Skip if the antenna is associated with a board we can't reach
             if polval['host'] in corr.dead_fengs.keys():
