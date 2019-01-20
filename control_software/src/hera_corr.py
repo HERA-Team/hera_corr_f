@@ -84,7 +84,6 @@ class HeraCorrelator(object):
         Is non-disruptive to connected boards.
         """
         t_thresh = time.time() - age # Try to connect to boards which were declared dead before this time
-        self.logger.info("Trying to re-establish connections to fengines dead before %s" % time.ctime(t_thresh))
         new_fengs = []
         for host, deadtime in self.dead_fengs.iteritems():
             if deadtime > t_thresh:
