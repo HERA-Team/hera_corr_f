@@ -162,6 +162,9 @@ if __name__ == "__main__":
                         fail_count[feng.host] = 0
 
         for feng in corr.fengs:
+            # Skip if the fengine is associated with a board we can't reach
+            if feng.host in corr.dead_fengs.keys():
+                continue
             try:
                 corr.r.hmset("status:snap:%s" % feng.host, get_fpga_stats(feng))
                 fail_count[feng.host] = 0
@@ -176,8 +179,10 @@ if __name__ == "__main__":
 
         # If the retry period has been exceeded, try to reconnect to dead boards:
         if time.time() > (retry_tick + args.retrytime):
-            corr.reestablish_dead_connections()
-            retry_tick = time.time()
+            if len(corr.dead_fengs) > 0:
+                logger.info('Trying to reconnect to dead boards')
+                corr.reestablish_dead_connections()
+                retry_tick = time.time()
                 
         # If executing the loop hasn't already taken longer than the loop delay time, add extra wait.
         extra_delay = args.delay - (time.time() - tick)
