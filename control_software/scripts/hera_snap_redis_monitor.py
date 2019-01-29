@@ -153,6 +153,8 @@ if __name__ == "__main__":
                         
                     # If this was all successful, reset the fail counter
                     fail_count[feng.host] = 0
+                except KeyboardInterrupt:
+                    exit()
                 except:
                     logger.error('Failed to get stats for ant %s pol %s (feng %s, chan %s)' % (ant, pol, feng.host, chan))
                     count = fail_count.get(feng.host, 0)
@@ -170,6 +172,8 @@ if __name__ == "__main__":
             try:
                 corr.r.hmset("status:snap:%s" % feng.host, get_fpga_stats(feng))
                 fail_count[feng.host] = 0
+            except KeyboardInterrupt:
+                exit()
             except:
                 logger.error('Failed to get stats from SNAP %s' % feng.host)
                 count = fail_count.get(feng.host, 0)
