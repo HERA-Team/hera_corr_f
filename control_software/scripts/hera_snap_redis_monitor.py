@@ -9,7 +9,7 @@ from hera_corr_f import HeraCorrelator
 from hera_corr_f import helpers
 
 logger = helpers.add_default_log_handlers(logging.getLogger(__file__))
-FAIL_COUNT_LIMIT = 20
+FAIL_COUNT_LIMIT = 5
 
 def get_fpga_stats(feng):
     """
@@ -131,13 +131,13 @@ if __name__ == "__main__":
 
         for ant, antval in corr.ant_to_snap.iteritems():
             for pol, polval in antval.iteritems():
+                status_key = 'status:ant:%s:%s' % (ant, pol)
+                feng = polval['host']
+                chan = polval['channel']
                 # Skip if the antenna is associated with a board we can't reach
-                if polval['host'] in corr.dead_fengs.keys():
+                if feng in corr.dead_fengs.keys():
                     continue
                 try:
-                    status_key = 'status:ant:%s:%s' % (ant, pol)
-                    feng = polval['host']
-                    chan = polval['channel']
                     corr.r.hmset(status_key, {'f_host':feng.host, 'host_ant_id':chan})
                     means, powers, rmss = feng.input.get_stats(sum_cores=True)
                     mean = means[chan]
@@ -148,7 +148,8 @@ if __name__ == "__main__":
                     corr.r.hset(status_key, 'histogram', json.dumps([hist_bins.tolist(), hist_vals.tolist()]))
                     corr.r.hset(status_key, 'timestamp', datetime.datetime.now().isoformat())
 
-                    if args.poco: get_poco_output(feng,corr.r)
+                    if args.poco:
+                        get_poco_output(feng,corr.r)
                         
                     # If this was all successful, reset the fail counter
                     fail_count[feng.host] = 0
@@ -156,6 +157,7 @@ if __name__ == "__main__":
                     logger.error('Failed to get stats for ant %s pol %s (feng %s, chan %s)' % (ant, pol, feng.host, chan))
                     count = fail_count.get(feng.host, 0)
                     fail_count[feng.host] = count + 1
+                    logger.info('New fail count for SNAP %s is %d' % (feng.host, fail_count[feng.host]))
                     if fail_count[feng.host] > FAIL_COUNT_LIMIT:
                         logger.error('Declaring board %s bad' % feng.host)
                         corr.declare_feng_dead(feng)
@@ -172,6 +174,7 @@ if __name__ == "__main__":
                 logger.error('Failed to get stats from SNAP %s' % feng.host)
                 count = fail_count.get(feng.host, 0)
                 fail_count[feng.host] = count + 1
+                logger.info('New fail count for SNAP %s is %d' % (feng.host, fail_count[feng.host]))
                 if fail_count[feng.host] > FAIL_COUNT_LIMIT:
                     logger.error('Declaring board %s bad' % feng.host)
                     corr.declare_feng_dead(feng)
