@@ -175,10 +175,12 @@ if __name__ == "__main__":
             except KeyboardInterrupt:
                 exit()
             except:
-                logger.error('Failed to get stats from SNAP %s' % feng.host)
                 count = fail_count.get(feng.host, 0)
                 fail_count[feng.host] = count + 1
-                logger.info('New fail count for SNAP %s is %d' % (feng.host, fail_count[feng.host]))
+                # Issue warnings only if this is the second (or more) consecutive failure.
+                if fail_count[feng.host] > 1:
+                    logger.warning('Failed to get stats from SNAP %s' % feng.host)
+                    logger.info('New fail count for SNAP %s is %d' % (feng.host, fail_count[feng.host]))
                 if fail_count[feng.host] > FAIL_COUNT_LIMIT:
                     logger.error('Declaring board %s bad' % feng.host)
                     corr.declare_feng_dead(feng)
