@@ -1018,10 +1018,10 @@ class RoachEth(Block):
 
 class Pam(Block):
 
-    ADDR_VOLT = 0x4f
-    ADDR_ROM = 0x52
-    ADDR_SN = 0x50
-    ADDR_INA = 0x44
+    ADDR_VOLT = 0x36
+    ADDR_ROM  = 0x52
+    ADDR_SN   = 0x50
+    ADDR_INA  = 0x44
     ADDR_GPIO = 0x21
     
     CLK_I2C_BUS = 10  # 10 kHz
@@ -1071,7 +1071,7 @@ class Pam(Block):
         self.sn=i2c_sn.DS28CM00(self.i2c, self.ADDR_SN)
 
         # Power detector
-        self.pow = i2c_volt.LTC2990(self.i2c, self.ADDR_VOLT)
+        self.pow = i2c_volt.MAX11644(self.i2c, self.ADDR_VOLT)
         self.pow.init()
 
         # ROM
@@ -1128,17 +1128,18 @@ class Pam(Block):
             power(name='east')  # returns power level of east in dBm
             power(name='north') # returns power level of north in dBm
         """
+        LOSS = 9.8
         if name not in ['east','north']:
             raise ValueError('Invalid parameter.')
 
         if name == 'east':
-            vp=self.pow.readVolt('v3')
+            vp=self.pow.readVolt('AIN0')
         elif name == 'north':
-            vp=self.pow.readVolt('v4')
+            vp=self.pow.readVolt('AIN1')
 
         assert vp>=0 and vp<=3.3
 
-        return dc2dbm(vp, self.RMS2DC_SLOPE, self.RMS2DC_INTERCEPT)
+        return dc2dbm(vp, self.RMS2DC_SLOPE, self.RMS2DC_INTERCEPT) + LOSS
 
     def rom(self, string=None):
         """ Read string from ROM or write String to ROM
