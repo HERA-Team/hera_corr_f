@@ -85,7 +85,7 @@ class HeraCorrelator(object):
         """
         t_thresh = time.time() - age # Try to connect to boards which were declared dead before this time
         new_fengs = []
-        for host, deadtime in self.dead_fengs.iteritems():
+        for host, deadtime in self.dead_fengs.items():
             if deadtime > t_thresh:
                 self.logger.info("Ignoring host %s, which was only declared dead %d seconds ago" % (time.time() - deadtime))
                 continue
