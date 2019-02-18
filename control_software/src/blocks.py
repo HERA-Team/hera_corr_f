@@ -1061,21 +1061,21 @@ class Pam(Block):
         self.i2c.setClock(self.CLK_I2C_BUS, self.CLK_I2C_REF)
 
         # Attenuator
-        self.atten = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
+        self._atten = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
 
         # Current sensor
-        self.cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
-        self.cur.init()
+        self._cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
+        self._cur.init()
 
         # ID chip
-        self.sn=i2c_sn.DS28CM00(self.i2c, self.ADDR_SN)
+        self._sn=i2c_sn.DS28CM00(self.i2c, self.ADDR_SN)
 
         # Power detector
-        self.pow = i2c_volt.MAX11644(self.i2c, self.ADDR_VOLT)
-        self.pow.init()
+        self._pow = i2c_volt.MAX11644(self.i2c, self.ADDR_VOLT)
+        self._pow.init()
 
         # ROM
-        self.rom=i2c_eeprom.EEP24XX64(self.i2c, self.ADDR_ROM)
+        self._rom=i2c_eeprom.EEP24XX64(self.i2c, self.ADDR_ROM)
 
     def attenuation(self, east=None, north=None):
         """ Get or Set East and North attenuation
@@ -1089,13 +1089,13 @@ class Pam(Block):
 
         if east == None and north == None:
             # Get current attenuation
-            val=self.atten.read()
+            val=self._atten.read()
             ve,vn=gpio2db(val)
             return ve,vn
         elif isinstance(east,int) and east in range(16) and \
             isinstance(north,int) and north in range(16):
             # Set attenuation
-            self.atten.write(db2gpio(east,north))
+            self._atten.write(db2gpio(east,north))
         else:
             raise ValueError('Invalid parameter.')
 
@@ -1119,7 +1119,7 @@ class Pam(Block):
     def id(self):
         """ Get the unique eight-byte serial number of the module
         """
-        return self.sn.readSN()
+        return self._sn.readSN()
 
     def power(self, name='east'):
         """ Get power level of the East or North RF path
@@ -1133,9 +1133,9 @@ class Pam(Block):
             raise ValueError('Invalid parameter.')
 
         if name == 'east':
-            vp=self.pow.readVolt('AIN0')
+            vp=self._pow.readVolt('AIN0')
         elif name == 'north':
-            vp=self.pow.readVolt('AIN1')
+            vp=self._pow.readVolt('AIN1')
 
         assert vp>=0 and vp<=3.3
 
@@ -1149,9 +1149,9 @@ class Pam(Block):
             rom('hello')        # write 'hello\0' into ROM
         """
         if string == None:
-            return self.rom.readString()
+            return self._rom.readString()
         else:
-            self.rom.writeString(string)
+            self._rom.writeString(string)
 
 
 def db2gpio(ae,an):
