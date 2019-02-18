@@ -5,7 +5,7 @@ import datetime
 import argparse
 import logging
 import json
-from hera_corr_f import HeraCorrelator
+from hera_corr_f import HeraCorrelator, SnapFengine
 from hera_corr_f import helpers
 
 logger = helpers.add_default_log_handlers(logging.getLogger(__file__))
@@ -86,9 +86,12 @@ def print_ant_log_messages(corr):
                 logger.warning("Won't get data from Ant %s, Pol %s because host %s is dead" % (ant, pol, polval['host']))
                 continue
             else:
-                host = polval['host'].host # the dictionary contains FEngine instances
-                chan = polval['channel']
-                logger.info("Expecting data from Ant %s, Pol %s from host %s input %d" % (ant, pol, host, chan))
+                if isinstance(polval['host'], SnapFengine):
+                    host = polval['host'].host # the dictionary contains FEngine instances
+                    chan = polval['channel']
+                    logger.info("Expecting data from Ant %s, Pol %s from host %s input %d" % (ant, pol, host, chan))
+                else:
+                    logger.warning("Failed to find F-Engine %s associated with ant/pol %s/%s" % (polval['host'], ant, pol))
 
 if __name__ == "__main__":
     
@@ -136,6 +139,10 @@ if __name__ == "__main__":
                 chan = polval['channel']
                 # Skip if the antenna is associated with a board we can't reach
                 if feng in corr.dead_fengs.keys():
+                    continue
+                # Skip if the antenna doesn't have a valid Snap connection. This happens
+                # if an antenna references a SNAP that doesn't exist in the system
+                if not isinstance(feng, SnapFengine):
                     continue
                 try:
                     corr.r.hmset(status_key, {'f_host':feng.host, 'host_ant_id':chan})
