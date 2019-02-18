@@ -35,6 +35,9 @@ class SnapFengine(object):
         self.corr        = Corr(self.fpga,'corr_0')
         self.phaseswitch = PhaseSwitch(self.fpga, 'phase_switch')
         self.i2c_initialized = False
+        # The I2C devices mess with FPGA registers
+        # when instantiated. This fails if the board
+        # isn't programmed yet, so run it in a try block.
         try:
             self._add_i2c()
         except:
@@ -65,6 +68,9 @@ class SnapFengine(object):
     def _add_i2c(self):
         self.pams        = [Pam(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
         self.fems        = []#[Fem(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
+        # Need to initialize the Pams to get access to their methods.
+        for pam in self.pams:
+            pam.initialize()
         self.blocks += self.pams
         self.blocks += self.fems
         self.i2c_initialized = True
