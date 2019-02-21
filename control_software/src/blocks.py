@@ -1170,10 +1170,8 @@ class Pam(Block):
         an = int(val_str[4:8],2)
         return 15-ae, 15-an
 
-    def _dc2dbm(self, val):
+    def _dc2dbm(self, val, slope, intercept):
         assert val>=0 and val<=3.3, "Input value {} out range of 0-3.3V".format(val)
-        slope = 27.31294863
-        intercept = -55.15991678
         res = val * slope + intercept
         return res
 
