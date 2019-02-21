@@ -1154,7 +1154,7 @@ class Pam(Block):
             self._rom.writeString(string)
 
 
-    def _db2gpio(ae,an):
+    def _db2gpio(self, ae, an):
         assert ae in range(0,16)
         assert an in range(0,16)
         ae = 15 - ae
