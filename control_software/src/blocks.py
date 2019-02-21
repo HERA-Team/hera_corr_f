@@ -1090,7 +1090,7 @@ class Pam(Block):
         if east == None and north == None:
             # Get current attenuation
             val=self._atten.read()
-            ve,vn=gpio2db(val)
+            ve,vn=self._gpio2db(val)
             return ve,vn
         elif isinstance(east,int) and east in range(16) and \
             isinstance(north,int) and north in range(16):
@@ -1139,7 +1139,7 @@ class Pam(Block):
 
         assert vp>=0 and vp<=3.3
 
-        return dc2dbm(vp, self.RMS2DC_SLOPE, self.RMS2DC_INTERCEPT) + LOSS
+        return self._dc2dbm(vp, self.RMS2DC_SLOPE, self.RMS2DC_INTERCEPT) + LOSS
 
     def rom(self, string=None):
         """ Read string from ROM or write String to ROM
@@ -1163,17 +1163,19 @@ class Pam(Block):
         val = int(val_str[::-1],2)
         return val
 
-def gpio2db(val):
-    assert val in range(0,256)
-    val_str = '{0:08b}'.format(val)[::-1]
-    an = int(val_str[0:4],2)
-    ae = int(val_str[4:8],2)
-    return ae,an
+    def _gpio2db(self, val):
+        assert val in range(0,256)
+        val_str = '{0:08b}'.format(val)
+        ae = int(val_str[0:4],2)
+        an = int(val_str[4:8],2)
+        return 15-ae, 15-an
 
-def dc2dbm(val, slope, intercept):
-    res = val * slope + intercept
-    return res
-
+    def _dc2dbm(self, val):
+        assert val>=0 and val<=3.3, "Input value {} out range of 0-3.3V".format(val)
+        slope = 27.31294863
+        intercept = -55.15991678
+        res = val * slope + intercept
+        return res
 
 class Fem(Block):
 
