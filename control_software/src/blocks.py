@@ -1159,8 +1159,8 @@ class Pam(Block):
         assert an in range(0,16)
         ae = 15 - ae
         an = 15 - an
-        val_str = '{0:08b}'.format((an << 4) + ae)
-        val = int(val_str[::-1],2)
+        val_str = '{0:08b}'.format((ae << 4) + an)
+        val = int(val_str,2)
         return val
 
     def _gpio2db(self, val):
