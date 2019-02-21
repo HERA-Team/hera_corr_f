@@ -1095,7 +1095,7 @@ class Pam(Block):
         elif isinstance(east,int) and east in range(16) and \
             isinstance(north,int) and north in range(16):
             # Set attenuation
-            self._atten.write(db2gpio(east,north))
+            self._atten.write(self._db2gpio(east,north))
         else:
             raise ValueError('Invalid parameter.')
 
@@ -1154,12 +1154,14 @@ class Pam(Block):
             self._rom.writeString(string)
 
 
-def db2gpio(ae,an):
-    assert ae in range(0,16)
-    assert an in range(0,16)
-    val_str = '{0:08b}'.format((an << 4) + ae)
-    val = int(val_str[::-1],2)
-    return val
+    def _db2gpio(ae,an):
+        assert ae in range(0,16)
+        assert an in range(0,16)
+        ae = 15 - ae
+        an = 15 - an
+        val_str = '{0:08b}'.format((an << 4) + ae)
+        val = int(val_str[::-1],2)
+        return val
 
 def gpio2db(val):
     assert val in range(0,256)
