@@ -98,8 +98,11 @@ def cminfo_compute():
     ant_to_snap = {}
     for antn, ant in enumerate(cminfo['antenna_numbers']):
         name = cminfo['antenna_names'][antn]
-        e_pol = cminfo['correlator_inputs'][antn][0]
-        n_pol = cminfo['correlator_inputs'][antn][1]
+        for pol in cminfo['correlator_inputs'][antn]:
+            if pol.startswith('e'):
+                e_pol = pol
+            if pol.startswith('n'):
+                n_pol = pol
         ant_to_snap[ant] = {}
         if e_pol != 'None':
             snapi_e, channel_e = snap_part_to_host_input(cminfo['correlator_inputs'][antn][0])
