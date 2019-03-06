@@ -18,18 +18,29 @@ parser.add_argument('--config_file', type=str, default=None,
                     help = 'YAML configuration file with hosts and channels list')
 parser.add_argument('-r', dest='redishost', type=str, default='redishost',
                     help ='Host servicing redis requests')
+parser.add_argument('--rms', dest='rms', type=float, default=3.,
+                    help ='Target RMS after quantization')
 args = parser.parse_args()
 
 corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)
 
 for feng in corr.fengs:
-    for pn, pam in enumerate(feng.pams):
-        ants = feng.ants[2*pn : 2*pn + 2]
-        try:
-            pow_e = pam.power('east')
-            pow_n = pam.power('north')
-        except AssertionError:
-            logger.error("Failed to read power from antenna %s. Skipping EQ" % ants)
+    for pn, pol in enumerate(feng.ants):
+        if pol is None:
             continue
-        att_e, att_n = pam.attenuation()
-        print "Antenna %s power: N: %.2f (attenuation %d dB) E: %.2f (attenuation %d dB)" % (ants, pow_n, att_n, pow_e, att_e)
+        print "%s: %s:" % (feng.host, pol)
+        spec = feng.corr.get_new_corr(pn, pn).real
+        print spec[700:710]
+        median = np.median(spec)
+        print median
+        if median == 0.:
+            continue
+        mean = spec[spec < 2*median].mean()
+        print mean
+        amp = np.sqrt(mean / 2.)
+        print amp
+        scale = args.rms / amp
+        print scale
+        feng.eq.set_coeffs(pn, scale * feng.eq.get_coeffs(pn))
+        
+        

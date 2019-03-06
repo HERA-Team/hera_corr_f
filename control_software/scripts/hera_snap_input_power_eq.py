@@ -18,8 +18,10 @@ parser.add_argument('--config_file', type=str, default=None,
                     help = 'YAML configuration file with hosts and channels list')
 parser.add_argument('-r', dest='redishost', type=str, default='redishost',
                     help ='Host servicing redis requests')
-parser.add_argument('-t', dest='targetpower', type=float, default=-13.,
-                    help ='Target ADC power in dBm')
+parser.add_argument('-e', dest='etargetpower', type=float, default=-13.,
+                    help ='Target ADC power for E-pol in dBm')
+parser.add_argument('-n', dest='ntargetpower', type=float, default=-13.,
+                    help ='Target ADC power for N-pol in dBm')
 args = parser.parse_args()
 
 corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)
@@ -37,10 +39,9 @@ for feng in corr.fengs:
             logger.error("Failed to read power from antenna %s. Skipping EQ" % ants)
             continue
         
-        print "Antenna %s power: %.2f" % (ants[0], pow_e)
-        print "Antenna %s power: %.2f" % (ants[1], pow_n)
-        req_attn_e = int(pow_e - args.targetpower)
-        req_attn_n = int(pow_n - args.targetpower)
+        print "Antenna %s power: N: %.2f E: %.2f" % (ants, pow_n, pow_e)
+        req_attn_e = int(pow_e - args.etargetpower)
+        req_attn_n = int(pow_n - args.ntargetpower)
         if req_attn_e > 15:
             req_attn_e = 15
         elif req_attn_e < 0:
@@ -49,12 +50,10 @@ for feng in corr.fengs:
             req_attn_n = 15
         elif req_attn_n < 0:
             req_attn_n = 0
-        print "%s:%d Setting attenuation of antenna %s to (%d, %d)" % (feng.host, pn, ants, req_attn_e, req_attn_n)
+        print "%s:%d Setting attenuation of antenna %s to (E,N):(%d, %d)" % (feng.host, pn, ants, req_attn_e, req_attn_n)
         pam.attenuation(req_attn_e, req_attn_n)
         rb_attn_e, rb_attn_n = pam.attenuation()
         if rb_attn_e != req_attn_e:
             logger.error("Requested E attenuation %d but read back %d" % (req_attn_e, rb_attn_e))
         if rb_attn_n != req_attn_n:
             logger.error("Requested E attenuation %d but read back %d" % (req_attn_n, rb_attn_n))
-           
-        
