@@ -45,8 +45,7 @@ class HeraCorrelator(object):
             kwargs (dict): keyword arguments to pass to the underlying method
             timeout (float): Timeout in seconds
         returns:
-            list of return values from the underlying method, ordered in the same
-            order as self.fengs
+            dictionary of return values from the underlying method. Keys are f-engine hostnames.
             If *any* fengines fail to return before timeout, then this method returns None
         """
         # If all fengs are dead, leave.
@@ -76,13 +75,26 @@ class HeraCorrelator(object):
         if not hasattr(instances[0], method):
             return None
 
+        rv = {} # return value dictionary
         # Check if the method is callable. If so, call
         # if not, just get the attribute for all FEngines in a single-threaded manner
         if not callable(getattr(instances[0], method)):
-            return [instance.__getattribute__(method) for instance in instances]
+            for instance in instances:
+                if isinstance(instance.host, basestring):
+                    rv[instance.host] = instance.__getattribute__(method)
+                else:
+                    rv[instance.host.host] = instance.__getattribute__(method)
+            return rv
         else:
             try:
-                return utils.threaded_fpga_function(instances, timeout, (method, args, kwargs))
+                x = utils.threaded_fpga_function(instances, timeout, (method, args, kwargs))
+                for x, val in x.iteritems():
+                    if not isinstance(x, basestring):
+                        host = x.host
+                    else:
+                        host = x
+                    rv[host] = val
+                return rv
             except RuntimeError:
                 return None
 
