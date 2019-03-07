@@ -184,12 +184,101 @@ class HeraCorrelator(object):
                fem.switch(name='antenna')
         self.r.hmset('corr:status_noise_diode', {'state':'off', 'time':time.time()})
 
+    def get_ant_snap_chan(self, ant, pol):
+        """
+        Get the input number and SnapFengine object for a given ant, pol.
+ 
+        Inputs:
+           ant: Antenna string. Eg. '0', for HH0
+           pol: String polarization -- 'e' or 'n'
+        Returns:
+           (snap_instance [SnapFengine], channel_num [int])
+        """
+        assert isinstance(ant, basestring), "`ant` input should be a string"
+        assert isinstance(pol, basestring), "`pol` input should be a string"
+        pol = pol.lower()
+        assert pol in ['e', 'n'], "`pol` input should be 'e' or 'n'"
+        if ant not in self.ant_to_snap.keys():
+            self.logger.warning("Tried to find antenna %s but it is not on a known SNAP" % ant)
+            return None, None
+        if pol not in self.ant_to_snap[ant]:
+            self.logger.warning("Tried to find antenna %s:%s but it is not on a known SNAP" % (ant, pol))
+            return None, None
+        x = self.ant_to_snap[ant][pol]
+        return x['host'], x['channel']
+
+    def set_eq(self, ant, pol, eq=None):
+        """
+        Set the EQ coefficients of Antenna `ant`, polarization `pol` to
+        a constant or vector `eq`.
+        Inputs:
+           ant: Antenna string. Eg. '0', for HH0
+           pol: String polarization -- 'e' or 'n'
+            eq: Float/Int coefficients. If a single number, all coefficients will be
+                set to this value. If a vector, each entry is one coefficient.
+                If None, an attempt will be made to load coefficients from redis.
+        """
+        snap, chan = self.get_ant_snap_chan(ant, pol)
+        if snap is None:
+            self.logger.warning("Tried to set EQ for an antenna we don't recognize!")
+            return
+        else:
+            if eq is None:
+               # Try to reload coefficients from redis
+               self.logger.debug("Trying to set coeffs for Ant %s%s from redis" % (ant, pol))
+               redval = self.r.hgetall("eq:ant:%s:%s" % (ant, pol))
+               if redval != {}:
+                   self.logger.debug("Loading coeffs from time %s" % (time.ctime(float(redval['time']))))
+                   coeffs = np.array(json.loads(redval['values']))
+                   self.set_eq(ant, pol, coeffs)
+                   return
+               # If there are no coeffs in redis. Look at whatever is actually loaded and update redis
+               else:
+                   self.logger.debug("Failed to find coefficients in redis!")
+                   coeffs = self.get_eq(ant, pol, update_redis=True)
+                   return
+            elif not isinstance(eq, np.ndarray):
+                try:
+                    eq = np.ones(snap.eq.ncoeffs) * eq
+                except:
+                    self.logger.error("Couldn't understand EQ coefficients!")
+                    return
+            snap.eq.set_coeffs(chan, eq)
+            self.get_eq(ant, pol, update_redis=True)
+            
+
+    def get_eq(self, ant, pol, update_redis=False):
+        """
+        Get the EQ coefficients of Antenna `ant`, polarization `pol`.
+        Optionally update the coefficients stored in redis
+        Inputs:
+           ant: Antenna string. Eg. '0', for HH0
+           pol: String polarization -- 'e' or 'n'
+           update_redis: Boolean. If True, update this antennas redis eq vector key
+        Returns:
+           Current EQ vector (numpy.array)
+        """
+        snap, chan = self.get_ant_snap_chan(ant, pol)
+        if snap is not None:
+            coeffs = snap.eq.get_coeffs(chan)
+        if update_redis:
+            self.r.hmset('eq:ant:%s:%s' % (ant, pol), {'values':json.dumps(coeffs.tolist()), 'time':time.time()})
+
+    def _initialize_all_eq(self):
+        for feng in self.fengs:
+            for antpol in feng.ants:
+                if antpol is not None:
+                   ant, pol = helpers.hera_antpol_to_ant_pol(antpol)
+                   print ant, pol
+                   self.set_eq(str(ant), pol)
+
     def initialize(self):
         for feng in self.fengs:
             self.logger.info('Initializing %s'%feng.host)
             feng.initialize()
         self.noise_diode_disable()
         self.phase_switch_disable()
+        self._initialize_all_eq()
 
     def compute_hookup(self):
         """

@@ -118,6 +118,12 @@ def cminfo_compute():
             snap_to_ant[snapi_n][channel_n] = name + 'N'
     return snap_to_ant, ant_to_snap
 
+def hera_antpol_to_ant_pol(antpol):
+    antpol = antpol.lower().lstrip('h')
+    pol = antpol[-1]
+    ant = int(antpol[:-1])
+    return ant, pol
+
 def write_maps_to_redis(redishost='redishost'):
     if isinstance(redishost, str):
         redishost = redis.Redis(redishost)

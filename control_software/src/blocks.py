@@ -516,6 +516,8 @@ class Eq(Block):
         coeffs *= 2**self.bp
         if np.any(coeffs > (2**self.width - 1)):
             self.logger.warning("Some coefficients out of range")
+        # Make integer
+        coeffs = np.array(coeffs, dtype=np.int64)
         # saturate coefficients
         coeffs[coeffs>(2**self.width - 1)] = 2**self.width - 1
         coeffs = list(coeffs)
