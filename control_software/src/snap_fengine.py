@@ -3,6 +3,7 @@ import helpers
 import numpy as np
 import struct
 import time
+import datetime
 import casperfpga
 from blocks import *
 
@@ -81,4 +82,18 @@ class SnapFengine(object):
         for block in self.blocks:
             self.logger.info("Initializing block: %s" % block.name)
             block.initialize()
+
+    def get_fpga_stats(self):
+        """
+        Get FPGA stats.
+        returns: Dictionary of stats
+        """
+        stat = {}
+        stat['temp'] = self.fpga.transport.get_temp()
+        stat['timestamp'] = datetime.datetime.now().isoformat()
+        stat['uptime'] = self.sync.uptime()
+        stat['pps_count'] = self.sync.count()
+        stat['serial'] = self.serial
+        stat['pmb_alert'] = self.fpga.read_uint('pmbus_alert')
+        return stat
 
