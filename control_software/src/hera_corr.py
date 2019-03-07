@@ -207,6 +207,59 @@ class HeraCorrelator(object):
         x = self.ant_to_snap[ant][pol]
         return x['host'], x['channel']
 
+    def set_pam_attenuation(self, ant, pol, val=None):
+        """
+        Set the PAM attenuation of Antenna `ant`, polarization `pol` to
+        `val` dB.
+        Inputs:
+           ant: Antenna string. Eg. '0', for HH0
+           pol: String polarization -- 'e' or 'n'
+           val: Int attenuation value.
+                If None, an attempt will be made to load previous value from redis.
+        """
+        snap, chan = self.get_ant_snap_chan(ant, pol)
+        if snap is None:
+            self.logger.warning("Tried to set EQ for an antenna we don't recognize!")
+            return
+        else:
+            if val is None:
+               # Try to reload coefficients from redis
+               self.logger.debug("Trying to set PAM attenuation for Ant %s%s from redis" % (ant, pol))
+               redval = self.r.hgetall("atten:ant:%s:%s" % (ant, pol))
+               if redval != {}:
+                   self.logger.debug("Loading attenuation from time %s" % (time.ctime(float(redval['time']))))
+                   self.set_pam_attenuation(ant, pol, int(redval['value']))
+                   return
+               # If there are no coeffs in redis. Look at whatever is actually loaded and update redis
+               else:
+                   self.logger.debug("Failed to find attenuation value in redis!")
+                   val = self.get_pam_attenuation(ant, pol, update_redis=True)
+                   return
+            snap.pams[chan//2].attenuation(val)
+            self.get_pam_attenuation(ant, pol, update_redis=True)
+
+    def get_pam_attenuation(self, ant, pol, update_redis=False):
+        """
+        Get the PAM attenuation values of Antenna `ant`, polarization `pol`.
+        Optionally update the coefficients stored in redis
+        Inputs:
+           ant: Antenna string. Eg. '0', for HH0
+           pol: String polarization -- 'e' or 'n'
+           update_redis: Boolean. If True, update this antennas redis PAM attenkey
+        Returns:
+           Current attenuation value (int)
+        """
+        snap, chan = self.get_ant_snap_chan(ant, pol)
+        if snap is not None:
+            val_e, val_n = snap.pams[chan//2].attenuation()
+            if pol.lower() == 'e':
+                val = val_e
+            else:
+                val = val_n
+        if update_redis:
+            self.r.hmset('atten:ant:%s:%s' % (ant, pol), {'value': str(val), 'time':time.time()})
+
+
     def set_eq(self, ant, pol, eq=None):
         """
         Set the EQ coefficients of Antenna `ant`, polarization `pol` to
@@ -271,6 +324,7 @@ class HeraCorrelator(object):
                    ant, pol = helpers.hera_antpol_to_ant_pol(antpol)
                    print ant, pol
                    self.set_eq(str(ant), pol)
+                   self.set_pam_attenuation(str(ant), pol)
 
     def initialize(self):
         for feng in self.fengs:
