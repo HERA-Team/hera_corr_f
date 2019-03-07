@@ -413,8 +413,8 @@ class HeraCorrelator(object):
         for feng in self.fengs:
             for antpol in feng.ants:
                 if antpol is not None:
+                   self.logger.info("Initializing EQ for %s" % antpol)
                    ant, pol = helpers.hera_antpol_to_ant_pol(antpol)
-                   print ant, pol
                    self.set_eq(str(ant), pol)
                    self.set_pam_attenuation(str(ant), pol)
 
