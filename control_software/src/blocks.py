@@ -1079,21 +1079,33 @@ class Pam(Block):
         # ROM
         self._rom=i2c_eeprom.EEP24XX64(self.i2c, self.ADDR_ROM)
 
-    def attenuation(self, east=None, north=None):
-        """ Get or Set East and North attenuation
+    def get_attenuation(self):
+        """ Get East and North attenuation
+            returns: (east attenuation (dB, int), north attenuation (dB, int)
+        """
+
+        val=self._atten.read()
+        ve,vn=self._gpio2db(val)
+        return ve,vn
+
+    def set_attenuation(self, east=None, north=None):
+        """ Set East and North attenuation in dB
             attenuation value must be integer in range(16)
 
             Example:
-            attenuation() # get attenuation, returns a tuple of two numbers,
-                            in which East is followed by North, e.g. (12,5)
-            attenuation(east=0,north=15) # set attenuation
+            attenuation(east=0,north=15)
+            attenuation(east=12)
+            
+            If only one pol is specified, a read is issued to
+            figure out what the other value should be.
         """
-
-        if east == None and north == None:
+        if (east is None) or (north is None):
             # Get current attenuation
             val=self._atten.read()
             ve,vn=self._gpio2db(val)
-            return ve,vn
+            ve = east or ve
+            vn = north or vn
+            self.set_attenuation(east=ve, north=vn)
         elif isinstance(east,int) and east in range(16) and \
             isinstance(north,int) and north in range(16):
             # Set attenuation

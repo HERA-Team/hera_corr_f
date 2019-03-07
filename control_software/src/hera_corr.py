@@ -33,6 +33,59 @@ class HeraCorrelator(object):
 
         self.config_is_valid= self._verify_config()
 
+    def do_for_all_f(self, method, block=None, block_index=None, args=(), kwargs={}, timeout=10):
+        """
+        Call `method` against all F-Engine instances.
+        inputs:
+            method (str): Method to call
+            block (str or None): What block should the method call -- eg SnapFengine.`block`.`method`(...).
+                         Use None to indicate that the call is against the SnapFengine instance directly
+            block_index (int): Use to specify an index if the SnapFengine.`block` attribute is a list
+            args (tuple): positional arguments to pass to the underlying method
+            kwargs (dict): keyword arguments to pass to the underlying method
+            timeout (float): Timeout in seconds
+        returns:
+            list of return values from the underlying method, ordered in the same
+            order as self.fengs
+            If *any* fengines fail to return before timeout, then this method returns None
+        """
+        # If all fengs are dead, leave.
+        if len(self.fengs) == 0:
+            return []
+        # Look for the block we're calling methods against
+        # If block is None, we're calling against SnapFengine objects. If it's a string,
+        # we're calling against some block class
+        # TODO: We only check the first instance, and assume the others are the same
+        if block is None:
+            instances = self.fengs
+        else:
+            if not hasattr(self.fengs[0], block):
+                return None
+            instances = [getattr(f, block) for f in self.fengs]
+        # If the instances are themselves lists, demand the user specify a block index
+        #TODO just checking the first entry
+        if isinstance(instances[0], list):
+            if block_index is None:
+                self.logger.error("Instances of block %s are lists, but no block_index was specified!" % block)
+                return None
+            else:
+                temp = [instance[block_index] for instance in instances]
+                instances = temp
+        
+        # Check that the method is an attribute (may or may not be callable)
+        if not hasattr(instances[0], method):
+            return None
+
+        # Check if the method is callable. If so, call
+        # if not, just get the attribute for all FEngines in a single-threaded manner
+        if not callable(getattr(instances[0], method)):
+            return [instance.__getattribute__(method) for instance in instances]
+        else:
+            try:
+                return utils.threaded_fpga_function(instances, timeout, (method, args, kwargs))
+            except RuntimeError:
+                return None
+
     def get_config(self, config=None):
         if config is None:
             self.config_str  = self.r.hget('snap_configuration', 'config')
@@ -217,6 +270,7 @@ class HeraCorrelator(object):
            val: Int attenuation value.
                 If None, an attempt will be made to load previous value from redis.
         """
+        pol = pol.lower()
         snap, chan = self.get_ant_snap_chan(ant, pol)
         if snap is None:
             self.logger.warning("Tried to set EQ for an antenna we don't recognize!")
@@ -227,7 +281,7 @@ class HeraCorrelator(object):
                self.logger.debug("Trying to set PAM attenuation for Ant %s%s from redis" % (ant, pol))
                redval = self.r.hgetall("atten:ant:%s:%s" % (ant, pol))
                if redval != {}:
-                   self.logger.debug("Loading attenuation from time %s" % (time.ctime(float(redval['time']))))
+                   self.logger.debug("Loading attenuation of %ddB from time %s" % (int(redval['value']),time.ctime(float(redval['time']))))
                    self.set_pam_attenuation(ant, pol, int(redval['value']))
                    return
                # If there are no coeffs in redis. Look at whatever is actually loaded and update redis
@@ -235,7 +289,10 @@ class HeraCorrelator(object):
                    self.logger.debug("Failed to find attenuation value in redis!")
                    val = self.get_pam_attenuation(ant, pol, update_redis=True)
                    return
-            snap.pams[chan//2].attenuation(val)
+            if pol == 'e':
+                snap.pams[chan//2].set_attenuation(east=val)
+            else:
+                snap.pams[chan//2].set_attenuation(north=val)
             self.get_pam_attenuation(ant, pol, update_redis=True)
 
     def get_pam_attenuation(self, ant, pol, update_redis=False):
@@ -251,7 +308,7 @@ class HeraCorrelator(object):
         """
         snap, chan = self.get_ant_snap_chan(ant, pol)
         if snap is not None:
-            val_e, val_n = snap.pams[chan//2].attenuation()
+            val_e, val_n = snap.pams[chan//2].get_attenuation()
             if pol.lower() == 'e':
                 val = val_e
             else:
