@@ -11,19 +11,6 @@ from hera_corr_f import helpers
 logger = helpers.add_default_log_handlers(logging.getLogger(__file__))
 FAIL_COUNT_LIMIT = 5
 
-def get_fpga_stats(feng):
-    """
-    Get FPGA stats.
-    returns: Dictionary of stats
-    """
-    stat = {}
-    stat['temp'] = feng.fpga.transport.get_temp()
-    stat['timestamp'] = datetime.datetime.now().isoformat()
-    stat['uptime'] = feng.sync.uptime()
-    stat['pps_count'] = feng.sync.count()
-    stat['serial'] = feng.serial
-    stat['pmb_alert'] = feng.fpga.read_uint('pmbus_alert')
-    return stat
 
 def get_pam_stats():
     """
@@ -105,7 +92,16 @@ if __name__ == "__main__":
                         help='Upload pocket correlator output to redis')
     parser.add_argument('-D', dest='retrytime', type=float, default=300.0,
                         help ='Seconds between reconnection attempts to dead boards')
+    parser.add_argument('-l', dest='loglevel', type=str, default="INFO",
+                        help ='Log level. DEBUG / INFO / WARNING / ERROR')
     args = parser.parse_args()
+
+    if args.loglevel not in ["DEBUG", "INFO", "WARNING", "ERROR"]:
+        logger.error("I don't undestand log level %s" % args.loglevel)
+    else:
+        for handler in logger.handlers:
+            handler.setLevel(getattr(logging, args.loglevel))
+       
 
     corr = HeraCorrelator(redishost=args.redishost)
     upload_time = corr.r.hget('snap_configuration', 'upload_time')
@@ -113,7 +109,6 @@ if __name__ == "__main__":
 
     retry_tick = time.time()
     script_redis_key = "status:script:%s" % __file__
-    fail_count = {} # Track board failures to decide when to declare a board dead
     while(True):
         tick = time.time()
         corr.r.set(script_redis_key, "alive", ex=max(60, args.delay * 2))
@@ -132,67 +127,34 @@ if __name__ == "__main__":
         # Recompute the hookup every time. It's fast
         corr.compute_hookup()
 
-        for ant, antval in corr.ant_to_snap.iteritems():
-            for pol, polval in antval.iteritems():
+        # Get antenna stats
+        input_stats = corr.do_for_all_f("get_stats", block="input", kwargs={"sum_cores" : True})
+        histograms = []
+        for i in range(6):
+            histograms += [corr.do_for_all_f("get_histogram", block="input", args=(i,), kwargs={"sum_cores" : True})]
+       
+        for key, val in input_stats.iteritems():
+            antpols = corr.fengs_by_name[key].ants
+            means, powers, rmss = val
+            for antn, antpol in enumerate(antpols):
+                # Don't report inputs which aren't connected
+                if antpol is None:
+                    continue
+                ant, pol = helpers.hera_antpol_to_ant_pol(antpol)
                 status_key = 'status:ant:%s:%s' % (ant, pol)
-                feng = polval['host']
-                chan = polval['channel']
-                # Skip if the antenna is associated with a board we can't reach
-                if feng in corr.dead_fengs.keys():
-                    continue
-                # Skip if the antenna doesn't have a valid Snap connection. This happens
-                # if an antenna references a SNAP that doesn't exist in the system
-                if not isinstance(feng, SnapFengine):
-                    continue
-                try:
-                    corr.r.hmset(status_key, {'f_host':feng.host, 'host_ant_id':chan})
-                    means, powers, rmss = feng.input.get_stats(sum_cores=True)
-                    mean = means[chan]
-                    power = powers[chan]
-                    rms   = rmss[chan]
-                    corr.r.hmset(status_key, {'adc_mean':mean, 'adc_power':power, 'adc_rms':rms})
-                    hist_bins, hist_vals = feng.input.get_histogram(chan, sum_cores=True)
-                    corr.r.hset(status_key, 'histogram', json.dumps([hist_bins.tolist(), hist_vals.tolist()]))
-                    corr.r.hset(status_key, 'timestamp', datetime.datetime.now().isoformat())
-
-                    if args.poco:
-                        get_poco_output(feng,corr.r)
-                        
-                    # If this was all successful, reset the fail counter
-                    fail_count[feng.host] = 0
-                except KeyboardInterrupt:
-                    exit()
-                except:
-                    logger.error('Failed to get stats for ant %s pol %s (feng %s, chan %s)' % (ant, pol, feng.host, chan))
-                    count = fail_count.get(feng.host, 0)
-                    fail_count[feng.host] = count + 1
-                    logger.info('New fail count for SNAP %s is %d' % (feng.host, fail_count[feng.host]))
-                    if fail_count[feng.host] > FAIL_COUNT_LIMIT:
-                        logger.error('Declaring board %s bad' % feng.host)
-                        corr.declare_feng_dead(feng)
-                        fail_count[feng.host] = 0
-
-        for feng in corr.fengs:
-            # Skip if the fengine is associated with a board we can't reach
-            if feng.host in corr.dead_fengs.keys():
-                continue
-            try:
-                corr.r.hmset("status:snap:%s" % feng.host, get_fpga_stats(feng))
-                fail_count[feng.host] = 0
-            except KeyboardInterrupt:
-                exit()
-            except:
-                count = fail_count.get(feng.host, 0)
-                fail_count[feng.host] = count + 1
-                # Issue warnings only if this is the second (or more) consecutive failure.
-                if fail_count[feng.host] > 1:
-                    logger.warning('Failed to get stats from SNAP %s' % feng.host)
-                    logger.info('New fail count for SNAP %s is %d' % (feng.host, fail_count[feng.host]))
-                if fail_count[feng.host] > FAIL_COUNT_LIMIT:
-                    logger.error('Declaring board %s bad' % feng.host)
-                    corr.declare_feng_dead(feng)
-                    fail_count[feng.host] = 0
-
+                mean  = means[antn]
+                power = powers[antn]
+                rms   = rmss[antn]
+                corr.r.hmset(status_key, {'adc_mean':mean, 'adc_power':power, 'adc_rms':rms})
+                hist_bins, hist_vals = histograms[antn][key]
+                corr.r.hset(status_key, 'histogram', json.dumps([hist_bins.tolist(), hist_vals.tolist()]))
+                corr.r.hset(status_key, 'timestamp', datetime.datetime.now().isoformat())
+            
+        # Get FPGA stats
+        fpga_stats = corr.do_for_all_f("get_fpga_stats")
+        for key, val in fpga_stats.iteritems():
+            corr.r.hmset("status:snap:%s" % key, val) 
+        
         # If the retry period has been exceeded, try to reconnect to dead boards:
         if time.time() > (retry_tick + args.retrytime):
             if len(corr.dead_fengs) > 0:
@@ -203,4 +165,5 @@ if __name__ == "__main__":
         # If executing the loop hasn't already taken longer than the loop delay time, add extra wait.
         extra_delay = args.delay - (time.time() - tick)
         if extra_delay > 0:
+            logger.debug("Sleeping for %.2f seconds" % extra_delay)
             time.sleep(extra_delay)
