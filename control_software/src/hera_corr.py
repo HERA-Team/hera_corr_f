@@ -33,7 +33,7 @@ class HeraCorrelator(object):
 
         self.config_is_valid= self._verify_config()
 
-    def do_for_all_f(self, method, block=None, block_index=None, args=(), kwargs={}, timeout=10):
+    def do_for_all_f(self, method, block=None, block_index=None, args=(), kwargs={}, timeout=3, dead_count_threshold=3):
         """
         Call `method` against all F-Engine instances.
         inputs:
@@ -44,6 +44,7 @@ class HeraCorrelator(object):
             args (tuple): positional arguments to pass to the underlying method
             kwargs (dict): keyword arguments to pass to the underlying method
             timeout (float): Timeout in seconds
+            dead_count_threshold (int): Number of failed connection attempts allowed before declaring an F-Engine dead. Set to None to skip error tracking
         returns:
             dictionary of return values from the underlying method. Keys are f-engine hostnames.
             If *any* fengines fail to return before timeout, then this method returns None
@@ -84,7 +85,6 @@ class HeraCorrelator(object):
                     rv[instance.host] = instance.__getattribute__(method)
                 else:
                     rv[instance.host.host] = instance.__getattribute__(method)
-            return rv
         else:
             try:
                 x = utils.threaded_fpga_function(instances, timeout, (method, args, kwargs))
@@ -94,9 +94,20 @@ class HeraCorrelator(object):
                     else:
                         host = x
                     rv[host] = val
-                return rv
             except RuntimeError:
                 return None
+
+        if dead_count_threshold is not None:
+            # count dead engines
+            for feng in self.fengs:
+                if feng.host not in rv.keys():
+                    feng.error_count += 1
+                else:
+                    feng.error_count = 0
+                if feng.error_count > dead_count_threshold:
+                    self.logger.warning("Declaring %s dead after %d errors" % (feng.host, feng.error_count))
+                    self.declare_feng_dead(feng) 
+        return rv
 
     def get_config(self, config=None):
         if config is None:
@@ -128,6 +139,7 @@ class HeraCorrelator(object):
                 feng = SnapFengine(host, ant_indices=ant_indices)
                 if feng.fpga.is_connected():
                     self.fengs += [feng]
+                    feng.error_count = 0
                 else:
                     self.logger.warning("Board %s is not connected" % host)
                     self.dead_fengs[host] = time.time()
@@ -158,6 +170,7 @@ class HeraCorrelator(object):
                 feng = SnapFengine(host)
                 if feng.fpga.is_connected():
                     new_fengs += [feng]
+                    feng.error_count = 0
                     self.dead_fengs.pop(host)
                 else:
                     self.logger.warning("Tried to reconnect to host %s and failed" % host)
@@ -214,11 +227,21 @@ class HeraCorrelator(object):
     def enable_monitoring(self):
         self.r.delete('disable_monitoring')
 
-    def program(self, bitstream=None):
+    def program(self, bitstream=None, unprogrammed_only=True):
         progfile = bitstream or self.config['fpgfile']
         self.logger.info('Programming all SNAPs with %s' % progfile)
-        utils.program_fpgas([feng.fpga for feng in self.fengs], progfile, timeout=300.0)
-        self.r['corr:snap:last_programmed'] =  time.ctime()
+        if unprogrammed_only:
+            to_be_programmed = []
+            for feng in self.fengs:
+                if 'adc16_controller' not in feng.fpga.listdev():
+                    to_be_programmed += [feng]
+            if len(to_be_programmed) == 0:
+                return
+        else:
+            to_be_programmed = self.fengs
+        utils.program_fpgas([f.fpga for f in to_be_programmed], progfile, timeout=300.0)
+        for f in to_be_programmed:
+            self.r.hset('status:snap:%s' % f.host, 'last_programmed', time.ctime())
         
     def phase_switch_disable(self):
         self.logger.info('Disabling all phase switches')
