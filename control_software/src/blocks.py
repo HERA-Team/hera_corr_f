@@ -1146,14 +1146,17 @@ class Pam(Block):
         if name not in ['east','north']:
             raise ValueError('Invalid parameter.')
 
-        if name == 'east':
-            vp=self._pow.readVolt('AIN0')
-        elif name == 'north':
-            vp=self._pow.readVolt('AIN1')
+        try:
+            if name == 'east':
+                vp=self._pow.readVolt('AIN0')
+            elif name == 'north':
+                vp=self._pow.readVolt('AIN1')
 
-        assert vp>=0 and vp<=3.3
+            assert vp>=0 and vp<=3.3
 
-        return self._dc2dbm(vp, self.RMS2DC_SLOPE, self.RMS2DC_INTERCEPT) + LOSS
+            return self._dc2dbm(vp, self.RMS2DC_SLOPE, self.RMS2DC_INTERCEPT) + LOSS
+        except AssertionError:
+            return None
 
     def rom(self, string=None):
         """ Read string from ROM or write String to ROM

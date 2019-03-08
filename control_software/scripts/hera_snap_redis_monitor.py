@@ -132,6 +132,13 @@ if __name__ == "__main__":
         histograms = []
         for i in range(6):
             histograms += [corr.do_for_all_f("get_histogram", block="input", args=(i,), kwargs={"sum_cores" : True})]
+        pam_east_powers = []
+        pam_north_powers = []
+        pam_attens = []
+        for i in range(3):
+            pam_east_powers += [corr.do_for_all_f("power", block="pams", block_index=i, kwargs={"name":"east"})]
+            pam_north_powers += [corr.do_for_all_f("power", block="pams", block_index=i, kwargs={"name":"north"})]
+            pam_attens += [corr.do_for_all_f("get_attenuation", block="pams", block_index=i)]
        
         for key, val in input_stats.iteritems():
             antpols = corr.fengs_by_name[key].ants
@@ -145,10 +152,33 @@ if __name__ == "__main__":
                 mean  = means[antn]
                 power = powers[antn]
                 rms   = rmss[antn]
-                corr.r.hmset(status_key, {'adc_mean':mean, 'adc_power':power, 'adc_rms':rms})
-                hist_bins, hist_vals = histograms[antn][key]
-                corr.r.hset(status_key, 'histogram', json.dumps([hist_bins.tolist(), hist_vals.tolist()]))
-                corr.r.hset(status_key, 'timestamp', datetime.datetime.now().isoformat())
+                redis_vals = {'adc_mean':mean, 'adc_power':power, 'adc_rms':rms}
+                try:
+                    hist_bins, hist_vals = histograms[antn][key]
+                    redis_vals['histogram'] = json.dumps([hist_bins.tolist(), hist_vals.tolist()])
+                except:
+                    redis_vals['histogram'] = None
+                if pol == 'e':
+                    try:
+                        redis_vals['pam_power'] = pam_east_powers[antn][key]
+                    except:
+                        redis_vals['pam_power'] = None
+                else:
+                    try:
+                        redis_vals['pam_power'] = pam_north_powers[antn][key]
+                    except:
+                        redis_vals['pam_power'] = None
+                try:
+                    atten_e, atten_n = pam_attens[antn][key]
+                    if pol == 'e':
+                        atten = atten_e
+                    else:
+                        atten = atten_n 
+                    redis_vals['pam_atten'] = atten
+                except:
+                    redis_vals['pam_atten'] = None
+                redis_vals['timestamp'] = datetime.datetime.now().isoformat()
+                corr.r.hmset(status_key, redis_vals)
             
         # Get FPGA stats
         fpga_stats = corr.do_for_all_f("get_fpga_stats")
