@@ -5,8 +5,7 @@ import datetime
 import argparse
 import logging
 import json
-from hera_corr_f import HeraCorrelator, SnapFengine
-from hera_corr_f import helpers
+from hera_corr_f import HeraCorrelator, SnapFengine, __version__, __package__, helpers
 
 logger = helpers.add_default_log_handlers(logging.getLogger(__file__))
 FAIL_COUNT_LIMIT = 5
@@ -126,6 +125,9 @@ if __name__ == "__main__":
         
         # Recompute the hookup every time. It's fast
         corr.compute_hookup()
+
+        # load this module's version into redis
+        corr.r.hmset('version:%s' % __package__, {'version':__version__, 'timestamp':datetime.datetime.now().isoformat})
 
         # Get antenna stats
         input_stats = corr.do_for_all_f("get_stats", block="input", kwargs={"sum_cores" : True})
