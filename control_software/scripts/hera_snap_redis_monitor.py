@@ -162,9 +162,9 @@ if __name__ == "__main__":
                     redis_vals['histogram'] = None
                 try:
                     coeffs = eq_coeffs[antn][key]
-                    redis_vals['eq'] = json.dumps(coeffs.tolist())
+                    redis_vals['eq_coeffs'] = json.dumps(coeffs.tolist())
                 except:
-                    redis_vals['eq'] = None
+                    redis_vals['eq_coeffs'] = None
                 if pol == 'e':
                     try:
                         redis_vals['pam_power'] = pam_east_powers[antn][key]
