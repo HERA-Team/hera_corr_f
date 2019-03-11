@@ -130,8 +130,10 @@ if __name__ == "__main__":
         # Get antenna stats
         input_stats = corr.do_for_all_f("get_stats", block="input", kwargs={"sum_cores" : True})
         histograms = []
+        eq_coeffs = []
         for i in range(6):
             histograms += [corr.do_for_all_f("get_histogram", block="input", args=(i,), kwargs={"sum_cores" : True})]
+            eq_coeffs += [corr.do_for_all_f("get_coeffs", block="eq", args=(i,))]
         pam_east_powers = []
         pam_north_powers = []
         pam_attens = []
@@ -158,6 +160,11 @@ if __name__ == "__main__":
                     redis_vals['histogram'] = json.dumps([hist_bins.tolist(), hist_vals.tolist()])
                 except:
                     redis_vals['histogram'] = None
+                try:
+                    coeffs = eq_coeffs[antn][key]
+                    redis_vals['eq'] = json.dumps(coeffs.tolist())
+                except:
+                    redis_vals['eq'] = None
                 if pol == 'e':
                     try:
                         redis_vals['pam_power'] = pam_east_powers[antn][key]
