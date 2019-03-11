@@ -127,7 +127,7 @@ if __name__ == "__main__":
         corr.compute_hookup()
 
         # load this module's version into redis
-        corr.r.hmset('version:%s' % __package__, {'version':__version__, 'timestamp':datetime.datetime.now().isoformat})
+        corr.r.hmset('version:%s' % __package__, {'version':__version__, 'timestamp':datetime.datetime.now().isoformat()})
 
         # Get antenna stats
         input_stats = corr.do_for_all_f("get_stats", block="input", kwargs={"sum_cores" : True})
