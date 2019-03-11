@@ -51,7 +51,7 @@ class HeraCorrelator(object):
         """
         # If all fengs are dead, leave.
         if len(self.fengs) == 0:
-            return []
+            return {}
         # Look for the block we're calling methods against
         # If block is None, we're calling against SnapFengine objects. If it's a string,
         # we're calling against some block class
