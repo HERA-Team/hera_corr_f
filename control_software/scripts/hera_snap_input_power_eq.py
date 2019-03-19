@@ -30,12 +30,15 @@ for feng in corr.fengs:
     for pn, pam in enumerate(feng.pams):
         ants = feng.ants[2*pn : 2*pn + 2]
         # Start by setting attenuation to zero
-        pam.attenuation(0, 0)
+        pam.set_attenuation(0, 0)
         time.sleep(0.1) # no idea if this is necessary
         try:
             pow_e = pam.power('east')
             pow_n = pam.power('north')
         except AssertionError:
+            logger.error("Failed to read power from antenna %s. Skipping EQ" % ants)
+            continue
+        if (pow_e is None) or (pow_n is None):
             logger.error("Failed to read power from antenna %s. Skipping EQ" % ants)
             continue
         
@@ -51,8 +54,8 @@ for feng in corr.fengs:
         elif req_attn_n < 0:
             req_attn_n = 0
         print "%s:%d Setting attenuation of antenna %s to (E,N):(%d, %d)" % (feng.host, pn, ants, req_attn_e, req_attn_n)
-        pam.attenuation(req_attn_e, req_attn_n)
-        rb_attn_e, rb_attn_n = pam.attenuation()
+        pam.set_attenuation(req_attn_e, req_attn_n)
+        rb_attn_e, rb_attn_n = pam.get_attenuation()
         if rb_attn_e != req_attn_e:
             logger.error("Requested E attenuation %d but read back %d" % (req_attn_e, rb_attn_e))
         if rb_attn_n != req_attn_n:
