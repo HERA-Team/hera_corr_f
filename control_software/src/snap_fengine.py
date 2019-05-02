@@ -8,10 +8,13 @@ import casperfpga
 from blocks import *
 
 class SnapFengine(object):
-    def __init__(self, host, ant_indices=None, logger=None):
+    def __init__(self, host, ant_indices=None, logger=None, redishost='redishost'):
         self.host = host
         self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + "(%s)" % host))
-        self.fpga = casperfpga.CasperFpga(host=host, transport=casperfpga.TapcpTransport)
+        if redishost is None:
+            self.fpga = casperfpga.CasperFpga(host=host, transport=casperfpga.TapcpTransport)
+        else:
+            self.fpga = casperfpga.CasperFpga(host=host, redishost=redishost, transport=casperfpga.RedisTapcpTransport)
         # Try and get the canonical name of the host
         # to use as a serial number
         try:
