@@ -88,6 +88,16 @@ class Synth(casperfpga.synth.LMX2581):
 
 class Adc(casperfpga.snapadc.SNAPADC):
     def __init__(self, host, sample_rate=500, num_chans=2, resolution=8, ref=10):
+        """
+        Instantiate an ADC block.
+        
+        Inputs:
+           host (casperfpga.Casperfpga): Host FPGA
+           sample_rate (float): Sample rate in MS/s
+           num_chans (int): Number of channels per ADC chip. Valid values are 1, 2, or 4.
+           resolution (int): Bit resolution of the ADC. Valid values are 8, 12.
+           ref (float): Reference frequency (in MHz) from which ADC clock is derived. If None, an external sampling clock must be used.
+        """
         casperfpga.snapadc.SNAPADC.__init__(self,host,ref=ref)
         self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
@@ -125,6 +135,9 @@ class Adc(casperfpga.snapadc.SNAPADC):
         
 
     def initialize(self):
+        """
+        Initialize the configuration of the ADC chip.
+        """
         self.init(self.sample_rate, self.num_chans) # from the SNAPADC class
         #self.alignLineClock(mode='dual_pat')
         #self.alignFrameClock()
@@ -203,6 +216,9 @@ class Sync(Block):
         print 'Sync block: %s: Count : %d' % (self.name, self.count())
 
     def initialize(self):
+        """
+        Initialize this block. Set sync period to 0.
+        """
         self.write_int('arm', 0)
         #self.change_period(2**16 * 9*7*6*5*3)
         self.change_period(0)
@@ -247,6 +263,14 @@ class NoiseGen(Block):
 
 class Input(Block):
     def __init__(self, host, name, nstreams=6):
+        """
+        Instantiate an input contol block.
+        
+        Inputs:
+            host (casperfpga.CasperFpga): Host FPGA object
+            name (string): Name (in simulink) of this block
+            nstreams (int): Number of streams this block handles
+        """
         super(Input, self).__init__(host, name)
         self.nstreams = nstreams
         self.USE_NOISE = 0
@@ -255,6 +279,11 @@ class Input(Block):
         self.INT_TIME  = 2**20 / 250.0e6
 
     def use_noise(self, stream=None):
+        """
+        Switch input to internal noise source.
+        Inputs:
+            stream (int): Which stream to switch. If None, switch all.
+        """
         if stream is None:
             v = 0
             for stream in range(self.nstreams):
@@ -264,6 +293,11 @@ class Input(Block):
             raise NotImplementedError('Different input selects not supported yet!')
 
     def use_adc(self, stream=None):
+        """
+        Switch input to ADC.
+        Inputs:
+            stream (int): Which stream to switch. If None, switch all.
+        """
         if stream is None:
             v = 0
             for stream in range(self.nstreams):
@@ -273,6 +307,11 @@ class Input(Block):
             raise NotImplementedError('Different input selects not supported yet!')
 
     def use_zero(self, stream=None):
+        """
+        Switch input to zeros.
+        Inputs:
+            stream (int): Which stream to switch. If None, switch all.
+        """
         if stream is None:
             v = 0
             for stream in range(self.nstreams):
@@ -285,7 +324,10 @@ class Input(Block):
         """
         Get the mean, RMS, and powers of
         all 12 ADC cores.
-        returns: means, powers, rmss
+        Inputs:
+            sum_cores (Boolean): If True, combine interleaved samples. If False, return stats for each of 12 ADC cores.
+        Returns:
+            means, powers, rmss. Each is a numpy array with one entry per input. (Or 12 entries if sum_cores=False)
         """
         self.write_int('rms_enable', 1)
         time.sleep(0.01)
@@ -302,6 +344,9 @@ class Input(Block):
         return means, powers, rmss
 
     def initialize(self):
+        """
+        Switch to ADCs. Begin computing stats.
+         """
         self.use_adc()
         self.write_int('rms_enable', 1)
 
@@ -318,9 +363,31 @@ class Input(Block):
         print ''
 
     def set_input(self, i):
+        """
+        Set input of histogram block.
+        Inputs:
+            i (int): Stream number to select.
+        """
         self.write_int('bit_stats_input_sel', i)
 
     def get_histogram(self, input, sum_cores=True):
+        """
+        Get a histogram for an ADC input.
+        Inputs:
+            input (int): ADC input from which to get data.
+            sum_cores (Boolean): If True, compute one histogram from both A & B ADC cores. If False, compute separate histograms.
+
+        Returns:
+            If sum_cores is True:
+                vals, hist
+                    vals (numpy array): histogram bin centers
+                    hist (numpy array): histogram data
+            If sum_cores is False:
+                vals, hist_a, hist_b
+                    vals (numpy array): histogram bin centers
+                    hist_a (numpy array): histogram data for "A" cores
+                    hist_b (numpy array): histogram data for "B" cores
+        """
         self.set_input(input)
         time.sleep(0.1)
         v = np.array(struct.unpack('>512H', self.read('bit_stats_histogram_output', 512*2)))
@@ -334,14 +401,33 @@ class Input(Block):
         else:
             return vals, a, b
 
-    def get_input_histogram(self, ant):
-        vals, a = self.get_histogram(ant*2, sum_cores=True)
-        vals, b = self.get_histogram(ant*2 + 1, sum_cores=True)
+    def get_input_histogram(self, antpol):
+        """
+        Get a histgram for a given antpol, summing over all interleaving
+        Input:
+            ant (int): Antpol number (zero-indexed)
+        Returns:
+            vals, hist
+                vals (numpy array): histogram bin centers
+                hist (numpy array): histogram data
+        """
+        
+        vals, a = self.get_histogram(antpol*2, sum_cores=True)
+        vals, b = self.get_histogram(antpol*2 + 1, sum_cores=True)
         return vals, a+b
 
     def get_all_histograms(self):
+        """
+        Get histograms for all antpols, summing over all interleaving
+        Input:
+            antpol (int): Antpol number (zero-indexed)
+        Returns:
+            vals, hist
+                vals (numpy array): histogram bin centers
+                hist (numpy array): histogram data
+        """
         out = np.zeros([self.nstreams, 256])
-        for stream in range(self.nstreams/4):
+        for stream in range(self.nstreams/2):
             x, out[stream,:] = self.get_input_histogram(stream)
         return x, out
 
@@ -369,15 +455,33 @@ class Input(Block):
 
 class Delay(Block):
     def __init__(self, host, name, nstreams=6):
+        """
+        Instantiate a delay contol block.
+        
+        Inputs:
+            host (casperfpga.CasperFpga): Host FPGA object
+            name (string): Name (in simulink) of this block
+            nstreams (int): Number of streams this block handles
+        """
         super(Delay, self).__init__(host, name)
         self.nstreams = nstreams
 
     def set_delay(self, stream, delay):
+        """
+        Insert a delay to a given input stream.
+
+        Inputs:
+            stream (int): Which antpol to delay.
+            delay (int): Number of FPGA clock cycles of delay to insert.
+        """
         if stream > self.nstreams:
             self.logger.error('Tried to set delay for stream %d > nstreams (%d)' % (stream, self.nstreams))
         self.write_int(change_reg_bits(self.host.read_uint('delays'), delay, 4*stream, 4))
 
     def initialize(self):
+        """
+        Initialize all delays to 0.
+        """
         self.write_int('delays', 0)
 
 class Rotator(Block):
@@ -504,6 +608,15 @@ class PhaseSwitch(Block):
         
 class Eq(Block):
     def __init__(self, host, name, nstreams=8, ncoeffs=2**10):
+        """
+        Instantiate an EQ block
+        
+        Inputs:
+            host (casperfpga.CasperFpga): Host FPGA object
+            name (string): Name (in simulink) of this block
+            nstreams (int): Number of streams this block handles
+            ncoeffs (int): Number of coefficients per input stream
+        """
         super(Eq, self).__init__(host, name)
         self.nstreams = nstreams
         self.ncoeffs = ncoeffs
@@ -513,6 +626,14 @@ class Eq(Block):
         self.streamsize = struct.calcsize(self.format)*self.ncoeffs
 
     def set_coeffs(self, stream, coeffs):
+        """
+        Set the coefficients for a data stream. Clipping and saturation will be applied before
+        loading.
+        
+        Inputs
+           stream (int): Which stream to manipulate
+           coeffs (list or numpy array): Coefficients to load.
+        """
         coeffs *= 2**self.bp
         if np.any(coeffs > (2**self.width - 1)):
             self.logger.warning("Some coefficients out of range")
@@ -521,21 +642,36 @@ class Eq(Block):
         # saturate coefficients
         coeffs[coeffs>(2**self.width - 1)] = 2**self.width - 1
         coeffs = list(coeffs)
+        assert len(coeffs) == self.ncoeffs, "Length of provided coefficient vector should be %d" % self.ncoeffs
         coeffs_str = struct.pack('>%d%s' % (len(coeffs), self.format), *coeffs)
         self.write('coeffs', coeffs_str, offset= self.streamsize * stream)
 
     def get_coeffs(self, stream):
+        """
+        Get the coefficients currently loaded. Reads the actual coefficients from the board.
+        Inputs:
+            stream (int): Stream index to query
+        Returns
+            numpy array of `self.ncoeffs` coefficients currently being applied to this stream.
+        """
         coeffs_str = self.read('coeffs', self.streamsize, offset= self.streamsize * stream)
         coeffs = np.array(struct.unpack('>%d%s' % (self.ncoeffs, self.format), coeffs_str))
         return coeffs / (2.**self.bp)
 
     def clip_count(self):
-        return self.read_int('clip_cnt')
+        """
+        Get the total number of times any samples have clipped, since last sync.
+        """
+        return self.read_uint('clip_cnt')
 
     def print_status(self):
         print 'Number of times input got clipped: %d'%self.clip_count()
 
     def initialize(self):
+        """
+        Initialize block, setting coefficients to some nominally sane value.
+        Currently, this is 100.0
+        """
         for stream in range(self.nstreams):
             self.set_coeffs(stream, 100*np.ones(self.ncoeffs,dtype='>%s'%self.format))
 
@@ -783,6 +919,15 @@ class Eth(Block):
 
 class Corr(Block):
     def __init__(self, host, name, acc_len=3815):
+        """
+        Instantiate an correlation block, which allows correlation
+        of pairs of inputs to be computed.
+        
+        Inputs:
+            host (casperfpga.CasperFpga): Host FPGA object
+            name (string): Name (in simulink) of this block
+            acc_len (int): Number of spectra to accumulate
+        """
         super(Corr, self).__init__(host,name)
         self.nchans = 1024
         self.acc_len = acc_len
@@ -790,9 +935,15 @@ class Corr(Block):
         self.format='l'
    
     def set_input(self, pol1, pol2):
+        """
+        Set correlation inputs to `pol1`, `pol2`
+        """
         self.write_int('input_sel',(pol1 + (pol2<<8)))
  
     def wait_for_acc(self):
+        """
+        Wait for a new accumulation to complete.
+        """
         cnt = self.read_uint('acc_cnt')
         while self.read_uint('acc_cnt') < (cnt+1):
             time.sleep(0.1)
@@ -800,9 +951,11 @@ class Corr(Block):
 
     def read_bram(self):
         """ 
-        Outputs the contents of the BRAM. If you want a 
+        Waits for the next accumulation to complete and then
+        outputs the contents of the results BRAM. If you want a 
         fresh accumulation use get_new_corr(pol1, pol2) instead.
-
+        Returns:
+            complex numpy array containing cross-correlation spectra
         """
         self.wait_for_acc()
         spec = np.array(struct.unpack('>2048l',self.read('dout',8*1024)))
@@ -812,8 +965,10 @@ class Corr(Block):
     def get_new_corr(self, pol1, pol2):
         """
         Get a new correlation with the given inputs.
+        Flushes a correlation after setting inputs, to prevent any contaminated results.
         Input Pol Mapping: [1a, 1b, 2a, 2b, 3a, 3b] : [0, 1, 2, 3, 4, 5, 6, 7]
-        Returns: visibility of shape(1024,)
+        Returns: complex nump array of shape(1024,), containing cross-correlation spectra
+                 with accumulation length divided out.
 
         """
         self.set_input(pol1,pol2)
@@ -856,9 +1011,16 @@ class Corr(Block):
         plt.show()
 
     def get_acc_len(self):
-        return self.read_int('acc_len')
+        """
+        Get the currently loaded accumulation length.
+        """
+        self.acc_len = self.read_int('acc_len')
+        return self.acc_len
 
     def set_acc_len(self,acc_len):
+        """
+        Set the number of spectra to accumulate to `acc_len`
+        """
         assert isinstance(acc_len, int), "Cannot set accumulation length to type %r" % type(acc_len)
         self.acc_len = acc_len
         acc_len = 8192*acc_len  #Convert to clks from spectra 

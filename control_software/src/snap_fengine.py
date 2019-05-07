@@ -14,7 +14,7 @@ class SnapFengine(object):
         if redishost is None:
             self.fpga = casperfpga.CasperFpga(host=host, transport=casperfpga.TapcpTransport)
         else:
-            self.fpga = casperfpga.CasperFpga(host=host, redishost=redishost, transport=casperfpga.RedisTapcpTransport)
+            self.fpga = casperfpga.CasperFpga(host=host, redishost=redishost, transport=casperfpga.RedisTapcpTransport, timeout=0.1)
         # Try and get the canonical name of the host
         # to use as a serial number
         try:
