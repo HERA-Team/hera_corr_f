@@ -13,7 +13,7 @@ from casperfpga import utils
 LOGGER = helpers.add_default_log_handlers(logging.getLogger(__name__))
 
 class HeraCorrelator(object):
-    def __init__(self, redishost='redishost', config=None, logger=LOGGER, passive=False):
+    def __init__(self, redishost='redishost', config=None, logger=LOGGER, passive=False, use_redis=True):
         self.logger = logger
         self.redishost = redishost
         self.r = redis.Redis(redishost)
@@ -27,7 +27,7 @@ class HeraCorrelator(object):
         self.dead_fengs = {}
         
         if not passive:
-            self.establish_connections()
+            self.establish_connections(use_redis=use_redis)
             # Get antenna<->SNAP maps
             self.compute_hookup()
 
@@ -126,7 +126,7 @@ class HeraCorrelator(object):
             self.config_time_str = time.ctime(self.config_time)
         self.config = yaml.load(self.config_str)
 
-    def establish_connections(self):
+    def establish_connections(self, use_redis=True):
         # Instantiate CasperFpga connections to all the F-Engine.
         self.fengs = []
         self.dead_fengs = {}
@@ -136,7 +136,10 @@ class HeraCorrelator(object):
             ant_index += 3
             self.logger.info("Setting Feng %s antenna indices to %s" % (host, ant_indices))
             try:
-                feng = SnapFengine(host, ant_indices=ant_indices)
+                if use_redis:
+                    feng = SnapFengine(host, ant_indices=ant_indices, redishost=self.redishost)
+                else:
+                    feng = SnapFengine(host, ant_indices=ant_indices)
                 if feng.fpga.is_connected():
                     self.fengs += [feng]
                     feng.error_count = 0
