@@ -361,6 +361,9 @@ class HeraCorrelator(object):
         if snap is None:
             self.logger.warning("Tried to set EQ for an antenna we don't recognize!")
             return
+        elif not isinstance(snap, SnapFengine):
+            self.logger.warning("Tried to set EQ for an antenna whose SNAP can't be reached!")
+            return
         else:
             if val is None:
                # Try to reload coefficients from redis
@@ -393,7 +396,13 @@ class HeraCorrelator(object):
            Current attenuation value (int)
         """
         snap, chan = self.get_ant_snap_chan(ant, pol)
-        if snap is not None:
+        if snap is None:
+            self.logger.warning("Tried to set EQ for an antenna we don't recognize!")
+            return
+        elif not isinstance(snap, SnapFengine):
+            self.logger.warning("Tried to set EQ for an antenna whose SNAP can't be reached!")
+            return
+        else:
             val_e, val_n = snap.pams[chan//2].get_attenuation()
             if pol.lower() == 'e':
                 val = val_e
@@ -401,6 +410,7 @@ class HeraCorrelator(object):
                 val = val_n
         if update_redis:
             self.r.hmset('atten:ant:%s:%s' % (ant, pol), {'value': str(val), 'time':time.time()})
+        return val
 
 
     def set_eq(self, ant, pol, eq=None):
@@ -417,6 +427,9 @@ class HeraCorrelator(object):
         snap, chan = self.get_ant_snap_chan(ant, pol)
         if snap is None:
             self.logger.warning("Tried to set EQ for an antenna we don't recognize!")
+            return
+        elif not isinstance(snap, SnapFengine):
+            self.logger.warning("Tried to set EQ for an antenna whose SNAP can't be reached!")
             return
         else:
             if eq is None:
@@ -455,10 +468,17 @@ class HeraCorrelator(object):
            Current EQ vector (numpy.array)
         """
         snap, chan = self.get_ant_snap_chan(ant, pol)
-        if snap is not None:
+        if snap is None:
+            self.logger.warning("Tried to set EQ for an antenna we don't recognize!")
+            return
+        elif not isinstance(snap, SnapFengine):
+            self.logger.warning("Tried to set EQ for an antenna whose SNAP can't be reached!")
+            return
+        else:
             coeffs = snap.eq.get_coeffs(chan)
         if update_redis:
             self.r.hmset('eq:ant:%s:%s' % (ant, pol), {'values':json.dumps(coeffs.tolist()), 'time':time.time()})
+        return coeffs
 
     def _initialize_all_eq(self):
         """
