@@ -38,14 +38,6 @@ class SnapFengine(object):
         self.eth         = Eth(self.fpga, 'eth')
         self.corr        = Corr(self.fpga,'corr_0')
         self.phaseswitch = PhaseSwitch(self.fpga, 'phase_switch')
-        self.i2c_initialized = False
-        # The I2C devices mess with FPGA registers
-        # when instantiated. This fails if the board
-        # isn't programmed yet, so run it in a try block.
-        try:
-            self._add_i2c()
-        except:
-            pass
 
         self.ants = [None] * 6 # An attribute to store the antenna names of this board's inputs
         self.ant_indices = ant_indices or range(3) # An attribute to store the antenna numbers used in packet headers
@@ -68,6 +60,15 @@ class SnapFengine(object):
             self.corr,
             self.phaseswitch,
         ]
+
+        self.i2c_initialized = False
+        # The I2C devices mess with FPGA registers
+        # when instantiated. This fails if the board
+        # isn't programmed yet, so run it in a try block.
+        try:
+            self._add_i2c()
+        except:
+            pass
 
     def _add_i2c(self):
         self.pams        = [Pam(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
