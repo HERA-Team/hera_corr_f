@@ -14,6 +14,15 @@ LOGGER = helpers.add_default_log_handlers(logging.getLogger(__name__))
 
 class HeraCorrelator(object):
     def __init__(self, redishost='redishost', config=None, logger=LOGGER, passive=False, use_redis=True):
+        """
+        Instantiate a HeraCorrelator instance.
+        optional inputs:
+            redishost (str): Hostname (or IP address) or redis database.
+            config (str): Path to configuration file. If None, config will be grabbed from redis.
+            logger (logging.Logger): Logging object this class will use.
+            passive (Boolean): If True, won't connect to SNAPs. If False, will establish SNAP connections and check the connected boards are alive.
+            use_redis (Boolean): If True, will use a redis proxy (at `redishost`) for talking to SNAP boards, rather than direct TFTP.
+        """
         self.logger = logger
         self.redishost = redishost
         self.r = redis.Redis(redishost)
@@ -110,6 +119,11 @@ class HeraCorrelator(object):
         return rv
 
     def get_config(self, config=None):
+        """
+        Parse a configuration file.
+        inputs:
+            config (str): Path to configuration file. If None, a configuration will be pulled from redis.
+        """
         if config is None:
             self.config_str  = self.r.hget('snap_configuration', 'config')
             self.config_name = self.r.hget('snap_configuration', 'name')
@@ -127,6 +141,11 @@ class HeraCorrelator(object):
         self.config = yaml.load(self.config_str)
 
     def establish_connections(self, use_redis=True):
+        """
+        Connect to SNAP boards listed in the current configuration.
+        inputs:
+            use_redis (Boolean): If True, will use a redis proxy for talking to SNAPs. If False, will attempt a direct TFTP connection.
+        """
         # Instantiate CasperFpga connections to all the F-Engine.
         self.fengs = []
         self.dead_fengs = {}
@@ -225,12 +244,29 @@ class HeraCorrelator(object):
         self.dead_fengs[deadfeng.host] = time.time()
 
     def disable_monitoring(self, expiry=60):
+        """
+        Set the "disable_monitoring" key in redis. Hopefully other processes will respect this
+        key and stop monitoring. Useful if you are going to hammer the TFTP connection and don't
+        want interference from the monitoring loop.
+        Inputs:
+            expiry (float): Period (in seconds) for which the monitoring loop should be disabled.
+        """
         self.r.set('disable_monitoring', 1, ex=expiry)
 
     def enable_monitoring(self):
+        """
+        Delete the "disable_monitoring" key in redis.
+        """
         self.r.delete('disable_monitoring')
 
     def program(self, bitstream=None, unprogrammed_only=True):
+        """
+        Program SNAPs.
+        Inputs:
+            bitstream (str): Path to fpgfile to program. If None, the bitstream described in the current configuration will be used.
+            unprogrammed_only (Boolean): If True, only program boards which aren't yet programmed. Current state is determined by a lazy
+                                         check for the "adc16_controller" register. If it exists, the board is deemed programmed.
+        """
         progfile = bitstream or self.config['fpgfile']
         self.logger.info('Programming all SNAPs with %s' % progfile)
         if unprogrammed_only:
@@ -247,6 +283,9 @@ class HeraCorrelator(object):
             self.r.hset('status:snap:%s' % f.host, 'last_programmed', time.ctime())
         
     def phase_switch_disable(self):
+        """
+        Disable all phase switches.
+        """
         self.logger.info('Disabling all phase switches')
         for feng in self.fengs:
            for stream in range(feng.phaseswitch.nstreams):
@@ -254,6 +293,9 @@ class HeraCorrelator(object):
         self.r.hmset('corr:status_phase_switch', {'state':'off', 'time':time.time()})
 
     def phase_switch_enable(self):
+        """
+        Enable all phase switches.
+        """
         self.logger.info('Enabling all phase switches')
         for feng in self.fengs:
            for stream in range(feng.phaseswitch.nstreams):
@@ -262,6 +304,9 @@ class HeraCorrelator(object):
         self.r.hmset('corr:status_phase_switch', {'state':'on', 'time':time.time()})
 
     def noise_diode_enable(self):
+        """
+        Enable all noise switches.
+        """
         self.logger.info('Enabling all noise inputs')
         for feng in self.fengs:
            for fem in feng.fems:
@@ -269,6 +314,9 @@ class HeraCorrelator(object):
         self.r.hmset('corr:status_noise_diode', {'state':'on', 'time':time.time()})
 
     def noise_diode_disable(self):
+        """
+        Disable all noise switches.
+        """
         self.logger.info('Disabling all noise inputs')
         for feng in self.fengs:
            for fem in feng.fems:
@@ -402,7 +450,7 @@ class HeraCorrelator(object):
         Inputs:
            ant: Antenna string. Eg. '0', for HH0
            pol: String polarization -- 'e' or 'n'
-           update_redis: Boolean. If True, update this antennas redis eq vector key
+           update_redis: Boolean. If True, update this antenna's redis eq vector key
         Returns:
            Current EQ vector (numpy.array)
         """
@@ -413,6 +461,9 @@ class HeraCorrelator(object):
             self.r.hmset('eq:ant:%s:%s' % (ant, pol), {'values':json.dumps(coeffs.tolist()), 'time':time.time()})
 
     def _initialize_all_eq(self):
+        """
+        Initialize PAM attenuation and SNAP EQ settings to the values currently held in redis.
+        """
         for feng in self.fengs:
             for antpol in feng.ants:
                 if antpol is not None:
@@ -422,6 +473,13 @@ class HeraCorrelator(object):
                    self.set_pam_attenuation(str(ant), pol)
 
     def initialize(self):
+        """
+        Initialize all F-Engines.
+
+        1. Initialize F-Eengine blocks.
+        2. Disable noise/phase switches
+        3. Return PAM attenuation and digital EQ to last known state.
+        """
         for feng in self.fengs:
             self.logger.info('Initializing %s'%feng.host)
             feng.initialize()
@@ -465,6 +523,11 @@ class HeraCorrelator(object):
                 self.snap_to_ant[feng.host] = [None] * 6
 
     def _verify_config(self):
+        """
+        Do some basic sanity checking on the currently loaded config.
+        Returns:
+            Bool : True if tests pass, False otherwise.
+        """
         test_passed = True
         # Check that there are only three antennas per board
         for fn,(host,params) in enumerate(self.config['fengines'].items()):
@@ -483,6 +546,9 @@ class HeraCorrelator(object):
         return test_passed
 
     def configure_freq_slots(self):
+        """
+        Configure F-Engine destination packet slots.
+        """
         n_xengs = self.config.get('n_xengs', 16)
         chans_per_packet = self.config.get('chans_per_packet', 384) # Hardcoded in firmware
         self.logger.info('Configuring frequency slots for %d X-engines, %d channels per packet' % (n_xengs, chans_per_packet))
@@ -512,6 +578,12 @@ class HeraCorrelator(object):
         return True
 
     def resync(self, manual=False):
+        """
+        Resynchronize boards to PPS.
+        
+        Inputs:
+            manual (Boolean): True if you want to synchronize on a software trigger. False (default) to sync on an external PPS.
+        """
         self.logger.info('Sync-ing Fengines')
         if not manual:
             self.logger.info('Waiting for PPS at time %.2f' % time.time())
@@ -536,6 +608,12 @@ class HeraCorrelator(object):
             self.logger.warning("It took longer than expected to arm sync!")
 
     def sync_noise(self, manual=False):
+        """
+        Resynchronize internal noise generators to PPS.
+        
+        Inputs:
+            manual (Boolean): True if you want to synchronize on a software trigger. False (default) to sync on an external PPS.
+        """
         self.logger.info('Sync-ing noise generators')
         if not manual:
             self.logger.info('Waiting for PPS at time %.2f' % time.time())
@@ -556,11 +634,17 @@ class HeraCorrelator(object):
             self.logger.warning("It took longer than expected to arm sync!")
 
     def enable_output(self):
+        """
+        Enable all ethernet outputs.
+        """
         self.logger.info('Enabling ethernet output')
         for feng in self.fengs:
             feng.eth.enable_tx()
 
     def disable_output(self):
+        """
+        Disable all ethernet outputs.
+        """
         self.logger.info('Disabling ethernet output')
         for feng in self.fengs:
             feng.eth.disable_tx()
