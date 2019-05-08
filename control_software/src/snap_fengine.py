@@ -14,7 +14,7 @@ class SnapFengine(object):
         if redishost is None:
             self.fpga = casperfpga.CasperFpga(host=host, transport=casperfpga.TapcpTransport)
         else:
-            self.fpga = casperfpga.CasperFpga(host=host, redishost=redishost, transport=casperfpga.RedisTapcpTransport, timeout=0.1)
+            self.fpga = casperfpga.CasperFpga(host=host, redishost=redishost, transport=casperfpga.RedisTapcpTransport)
         # Try and get the canonical name of the host
         # to use as a serial number
         try:
@@ -68,7 +68,7 @@ class SnapFengine(object):
         try:
             self._add_i2c()
         except:
-            pass
+            self.logger.exception("Failed to register I2C")
 
     def _add_i2c(self):
         self.pams        = [Pam(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
