@@ -949,7 +949,7 @@ class Corr(Block):
             time.sleep(0.1)
         return 1
 
-    def read_bram(self):
+    def read_bram(self, flush_vacc=True):
         """ 
         Waits for the next accumulation to complete and then
         outputs the contents of the results BRAM. If you want a 
@@ -957,12 +957,13 @@ class Corr(Block):
         Returns:
             complex numpy array containing cross-correlation spectra
         """
-        self.wait_for_acc()
+        if flush_vacc:
+            self.wait_for_acc()
         spec = np.array(struct.unpack('>2048l',self.read('dout',8*1024)))
         spec = (spec[0::2]+1j*spec[1::2])
         return spec
     
-    def get_new_corr(self, pol1, pol2):
+    def get_new_corr(self, pol1, pol2, flush_vacc=True):
         """
         Get a new correlation with the given inputs.
         Flushes a correlation after setting inputs, to prevent any contaminated results.
@@ -972,7 +973,8 @@ class Corr(Block):
 
         """
         self.set_input(pol1,pol2)
-        self.wait_for_acc()      # Wait two acc_len for new spectra to load
+        if flush_vacc:
+            self.wait_for_acc()      # Wait two acc_len for new spectra to load
         spec = self.read_bram()/float(self.acc_len*self.spec_per_acc)
         if pol1==pol2:
             return spec.real + 1j*np.zeros(len(spec))
