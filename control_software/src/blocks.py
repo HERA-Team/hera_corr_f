@@ -1012,7 +1012,7 @@ class Corr(Block):
 
     def get_acc_len(self):
         """
-        Get the currently loaded accumulation length.
+        Get the currently loaded accumulation length. In FPGA clocks
         """
         self.acc_len = self.read_int('acc_len')
         return self.acc_len
@@ -1023,7 +1023,7 @@ class Corr(Block):
         """
         assert isinstance(acc_len, int), "Cannot set accumulation length to type %r" % type(acc_len)
         self.acc_len = acc_len
-        acc_len = 8192*acc_len  #Convert to clks from spectra 
+        acc_len = 1024*acc_len  #Convert to clks from spectra. See Firmware for reasoning behind 1024
         self.write_int('acc_len',acc_len)
 
     def initialize(self):
