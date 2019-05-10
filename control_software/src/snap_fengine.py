@@ -68,7 +68,7 @@ class SnapFengine(object):
         try:
             self._add_i2c()
         except:
-            self.logger.exception("Failed to register I2C")
+            self.logger.warning("Failed to register I2C")
 
     def _add_i2c(self):
         self.pams        = [Pam(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
