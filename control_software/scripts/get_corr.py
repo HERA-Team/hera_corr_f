@@ -21,6 +21,8 @@ parser.add_argument('-n','--num_spectra',type=int,default=10,
                     help='Number of spectra per file')
 parser.add_argument('-t', '--integration_time', type=int, default=1,
                     help='Integration time in seconds for each spectra')
+parser.add_argument('-c','--cc', nargs=2, action='append', type=int, default=None,
+                    help='List of cross-correlations. None defaults to all.')
 parser.add_argument('-o','--output',type=str, default='.',
                     help='Path to destination folder')
 parser.add_argument('-f','--files',type=int,default=2**64,
@@ -44,9 +46,12 @@ ant1_array=np.array([[0,0,0,1,1,2] for t in range(args.num_spectra)]).astype(int
 ant2_array=np.array([[0,1,2,1,2,2] for t in range(args.num_spectra)]).astype(int).flatten()
 
 # Mapping: 1x,1y,2x,2y,3x,3y = 0,1,2,3,4,5
-cycle_pols = [(0,0),(1,1),(0,1),(0,2),(1,3),(0,3),(1,2),
-              (0,4),(1,5),(0,5),(1,4),(2,2),(3,3),(2,3),
-              (2,4),(3,5),(2,5),(3,4),(4,4),(5,5),(4,5)]
+if args.cc is None:
+    cycle_pols = [(0,0),(1,1),(0,1),(0,2),(1,3),(0,3),(1,2),
+                  (0,4),(1,5),(0,5),(1,4),(2,2),(3,3),(2,3),
+                  (2,4),(3,5),(2,5),(3,4),(4,4),(5,5),(4,5)]
+else:
+    cycle_pols = args.cc
 
 acc_len = int((args.integration_time*250e6)/\
               (8*feng.corr.nchans*feng.corr.spec_per_acc))
