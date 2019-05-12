@@ -25,7 +25,7 @@ parser.add_argument('-c','--cc', nargs=2, action='append', type=int, default=Non
                     help='List of cross-correlations. None defaults to all.')
 parser.add_argument('-o','--output',type=str, default='.',
                     help='Path to destination folder')
-parser.add_argument('-f','--files',type=int,default=2**64,
+parser.add_argument('-f','--files',type=int, default=1,
                     help='Total number of files to write. Runs until KeyboardInterrupt otherwise.')
 args = parser.parse_args()
 
@@ -53,8 +53,7 @@ if args.cc is None:
 else:
     cycle_pols = args.cc
 
-acc_len = int((args.integration_time*250e6)/\
-              (8*feng.corr.nchans*feng.corr.spec_per_acc))
+acc_len = int(args.integration_time*250e6 // (feng.corr.nchans*feng.corr.spec_per_acc))
 if not acc_len == feng.corr.get_acc_len():
     feng.corr.set_acc_len(acc_len)
 
