@@ -573,6 +573,8 @@ class HeraCorrelator(object):
         chans_per_packet = self.config.get('chans_per_packet', 384) # Hardcoded in firmware
         self.logger.info('Configuring frequency slots for %d X-engines, %d channels per packet' % (n_xengs, chans_per_packet))
         dest_port = self.config['dest_port'] 
+        self.r.delete("corr:snap_ants")
+        self.r.delete("corr:xeng_chans")
         for fn, feng in enumerate(self.fengs):
             # Update redis to reflect current assignments
             self.r.hset("corr:snap_ants", feng.host, json.dumps(feng.ant_indices))
