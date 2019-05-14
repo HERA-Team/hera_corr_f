@@ -48,16 +48,16 @@ fpgfile: '/home/hera/src/hera_corr_f/snap_fengine/outputs/snap_fengine_2018-11-1
 dest_port: 8511
 
 fengines:
-    heraNode1Snap0:
+    heraNode0Snap0:
         phase_switch_index: 0
         ants: [0, 1, 2]
-    heraNode1Snap1:
+    heraNode0Snap1:
         phase_switch_index: 0
         ants: [3, 4, 5]
-    heraNode1Snap2:
+    heraNode0Snap2:
         phase_switch_index: 0
         ants: [6, 7, 8]
-    heraNode1Snap3:
+    heraNode0Snap3:
         phase_switch_index: 0
         ants: [9, 10, 11]
 
