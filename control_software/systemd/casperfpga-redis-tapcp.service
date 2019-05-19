@@ -1,0 +1,22 @@
+# Configuration file for systemd that keeps the HERA SNAP redis <-> tftpy
+# gateway running
+#
+# Copy this file to /etc/systemd/system/. Then run
+# `systemctl enable casperfpga-redis-tapcp and `systemctl start casperfpga-redis-tapcp`.
+#
+# This service is meant to be run on hera-snap-head.
+
+[Unit]
+Description=HERA SNAP redis-tftp daemon
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=60
+User=hera
+Group=hera
+ExecStart=/home/hera/.venv/bin/casperfpga_redis_tapcp_daemon.py
+
+[Install]
+WantedBy=multi-user.target
+

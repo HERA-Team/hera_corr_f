@@ -1,16 +1,20 @@
 import logging
+import helpers
 import numpy as np
 import struct
 import time
+import datetime
 import casperfpga
 from blocks import *
-logger = logging.getLogger(__name__)
-
 
 class SnapFengine(object):
-    def __init__(self, host):
+    def __init__(self, host, ant_indices=None, logger=None, redishost='redishost'):
         self.host = host
-        self.fpga = casperfpga.CasperFpga(host=host)
+        self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + "(%s)" % host))
+        if redishost is None:
+            self.fpga = casperfpga.CasperFpga(host=host, transport=casperfpga.TapcpTransport)
+        else:
+            self.fpga = casperfpga.CasperFpga(host=host, redishost=redishost, transport=casperfpga.RedisTapcpTransport)
         # Try and get the canonical name of the host
         # to use as a serial number
         try:
@@ -34,11 +38,9 @@ class SnapFengine(object):
         self.eth         = Eth(self.fpga, 'eth')
         self.corr        = Corr(self.fpga,'corr_0')
         self.phaseswitch = PhaseSwitch(self.fpga, 'phase_switch')
-        self.i2c_initialized = False
-        try:
-            self._add_i2c()
-        except:
-            pass
+
+        self.ants = [None] * 6 # An attribute to store the antenna names of this board's inputs
+        self.ant_indices = ant_indices or range(3) # An attribute to store the antenna numbers used in packet headers
         
         # The order here can be important, blocks are initialized in the
         # order they appear here
@@ -59,9 +61,21 @@ class SnapFengine(object):
             self.phaseswitch,
         ]
 
+        self.i2c_initialized = False
+        # The I2C devices mess with FPGA registers
+        # when instantiated. This fails if the board
+        # isn't programmed yet, so run it in a try block.
+        try:
+            self._add_i2c()
+        except:
+            self.logger.warning("Failed to register I2C")
+
     def _add_i2c(self):
         self.pams        = [Pam(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
         self.fems        = []#[Fem(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
+        # Need to initialize the Pams to get access to their methods.
+        for pam in self.pams:
+            pam.initialize()
         self.blocks += self.pams
         self.blocks += self.fems
         self.i2c_initialized = True
@@ -70,6 +84,20 @@ class SnapFengine(object):
         if not self.i2c_initialized:
             self._add_i2c()
         for block in self.blocks:
-            logger.info("Initializing block: %s" % block.name)
+            self.logger.info("Initializing block: %s" % block.name)
             block.initialize()
+
+    def get_fpga_stats(self):
+        """
+        Get FPGA stats.
+        returns: Dictionary of stats
+        """
+        stat = {}
+        stat['temp'] = self.fpga.transport.get_temp()
+        stat['timestamp'] = datetime.datetime.now().isoformat()
+        stat['uptime'] = self.sync.uptime()
+        stat['pps_count'] = self.sync.count()
+        stat['serial'] = self.serial
+        stat['pmb_alert'] = self.fpga.read_uint('pmbus_alert')
+        return stat
 

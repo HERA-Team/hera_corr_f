@@ -9,20 +9,28 @@ def decode_packet(packet):
     time = p[0] >> 29
     chan = (p[0] >> 16) & (2**13 - 1)
     ant  = p[0] & 0xffff
-
     return time, chan, ant, np.array(p[1:])
+
+def decode_header(packet):
+    p = struct.unpack('>Q', packet[0:8])
+    time = p[0] >> 29
+    chan = (p[0] >> 16) & (2**13 - 1)
+    ant  = p[0] & 0xffff
+    return time, chan, ant
 
 
 parser = argparse.ArgumentParser(description='Grab packets from an F-engine in '\
                                  'EQ TVG mode and check they look ok',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('-i', dest='ip', type=str, default='10.10.10.136',
+                    help = 'Socket to which to bind')
 parser.add_argument('-p', dest='port', type=int, default=8511,
                     help = 'Port to collect packets from')
 parser.add_argument('-s', dest='single_packet', action='store_true', default=False,
                     help = 'Use this flag to print a single packet')
 parser.add_argument('-e', dest='errors', action='store_true', default=False,
                     help = 'Print all errors')
-parser.add_argument('-m',dest='mode', type=str, default='ramp_ants',
+parser.add_argument('-m',dest='mode', type=str, default='ramp_pols',
                     choices=['const_ants','const_pols','ramp_ants','ramp_pols'],
                     help='The test vector mode choosen to program the Fengine.')
 parser.add_argument('-v', dest='verbose', action='store_true', default=False,
@@ -50,24 +58,24 @@ pol = 2
 tot_chans = 8192
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind(('10.10.10.136', args.port))
+sock.bind((args.ip, args.port))
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 1024*4616*128)
 
 if args.timeorder:
     payload, addr = sock.recvfrom(BUFSIZE)
-    ti, chani, anti, datai  =  decode_packet(payload)
+    ti, chani, anti = decode_header(payload)
     errorctr = 0; n=0
     while(True):
         try:
             payload, addr = sock.recvfrom(BUFSIZE)
-            time, chan, ant, data = decode_packet(payload)
+            time, chan, ant  = decode_header(payload)
             if (ant == anti) and (chan == chani):
                 if (time-ti != 2*nsamp_per_pkt): #2x for even odd split
                     print "ERROR: TIME not incrementing by %d" %(2*nsamp_per_pkt)
                     print "ANT: %d CHAN: %d TIME: %d"%(ant,chan,time)
                     errorctr += 1
-                else: ti = time;
-            n += 1
+                ti = time;
+                n += 1
         except KeyboardInterrupt:
             print '#######################'
             print 'Grabbed %d packets' % n
@@ -142,13 +150,13 @@ while(True):
         if args.errors or args.ordererrors:
             # Check payload matches
             nbytes = chans_per_pkt
-            for ant in range(3):
+            for a in range(3):
                 for p in range(pol):
-                    tvg_offset = (ant*pol + p)*tot_chans + chan
+                    tvg_offset = (a*pol + p)*tot_chans + chan
                     for t in range(nsamp_per_pkt):
-                        offset = ant * pol * chans_per_pkt * nsamp_per_pkt + t*pol + p
+                        offset = a * pol * chans_per_pkt * nsamp_per_pkt + t*pol + p
                         if not np.all(data[offset:offset+(pol*nsamp_per_pkt*nbytes):pol*nsamp_per_pkt] == tvg[tvg_offset:tvg_offset+nbytes]):
-                            print 'ERROR: Header and packet contents do not match! (Ant %d, Pol: %d, Sample %d, Chan %d)' % (ant, p, t, chan)
+                            print 'ERROR: Header and packet contents do not match! (Ant %d (pkt ant %d), Pol: %d, Sample %d, Chan %d)' % (ant, a, p, t, chan)
                             print 'Expected:', tvg[tvg_offset:tvg_offset+nbytes]
                             print 'Received:', data[offset:offset+(pol*nsamp_per_pkt*nbytes):pol*nsamp_per_pkt]
                             err_count += 1
@@ -156,7 +164,7 @@ while(True):
         if args.errors or args.chanerrors:
             # Check that you have atmost 16 unique chans
             nchans = len(np.where(chan_counter != 0)[0])
-            if nchans > 16:
+            if nchans > 384:
                 err_count += 1
         #for d in data:
         #    data_chan_counter[d] += 1
@@ -168,15 +176,14 @@ while(True):
 if args.stats:
     print 'Packet count by antenna:'
     for xn, x in enumerate(ant_counter):
-        print 'ANT %3d: %d' % (xn, x)
+        print 'ANT %3d: %d' % (3*xn, x)
     print 'Packet count by channel: from headers (from data)'
-    chan0 = np.where(chan_counter!=0)[0][0]
-    for xn, x in enumerate(chan_counter[chan0::chans_per_pkt]):
+    for xn, x in enumerate(chan_counter[0::chans_per_pkt]):
         #a0 = data_chan_counter[xn]
         #a1 = data_chan_counter[xn+2048]
         #a2 = data_chan_counter[xn+4096]
         #tot = a0+a1+a2
-        print 'CHAN %4d: %d '%(xn, x)
+        print 'CHAN %4d-%4d: %d '%(xn*chans_per_pkt, (xn+1)*chans_per_pkt-1, x)
         #(ANT0:%d, ANT1:%d, ANT2:%d TOTAL:%d)' % (xn, x, a0, a1, a2, tot)
 
 print '#######################'

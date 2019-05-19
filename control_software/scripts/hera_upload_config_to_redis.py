@@ -8,6 +8,7 @@ import sys
 import redis
 import argparse
 import time
+import hashlib
 
 parser = argparse.ArgumentParser(description='Config file to upload to redis',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -22,4 +23,7 @@ r = redis.Redis(args.redishost)
 
 with open(args.config_file, 'r') as fh:
     upload_time = time.time()
-    r.hmset('snap_configuration', {'config':fh.read(), 'upload_time':upload_time, 'upload_time_str':time.ctime(upload_time)})
+    config = fh.read()
+    md5 = hashlib.md5(config).hexdigest()
+    r.hmset('snap_configuration', {'config':config, 'md5':md5, 'name':fh.name,
+                                   'upload_time':upload_time, 'upload_time_str':time.ctime(upload_time)})

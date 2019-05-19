@@ -7,7 +7,7 @@ from hera_corr_f import helpers
 
 logger = helpers.add_default_log_handlers(logging.getLogger(__file__))
 
-parser = argparse.ArgumentParser(description='Suspend snap monitors for a specified time period',
+parser = argparse.ArgumentParser(description='Query the CM database for hookup mappings and write to redis',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('-r', dest='redishost', type=str, default='redishost',
                     help ='Host servicing redis requests')

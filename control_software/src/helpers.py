@@ -63,9 +63,6 @@ def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.
     redis_handler.setLevel(bglevel)
     redis_handler.setFormatter(formatter)
     logger.addHandler(redis_handler)
-
-    logger.info("Logger %s created..."%logger.name)
-
     return logger
 
 def snap_part_to_host_input(part):
@@ -99,41 +96,50 @@ def cminfo_compute():
     cminfo = h.get_cminfo_correlator()
     snap_to_ant = {}
     ant_to_snap = {}
-    for ant in cminfo['antenna_numbers']:
-        name = cminfo['antenna_names'][ant]
-        e_pol = cminfo['correlator_inputs'][ant][0]
-        n_pol = cminfo['correlator_inputs'][ant][1]
+    for antn, ant in enumerate(cminfo['antenna_numbers']):
+        name = cminfo['antenna_names'][antn]
+        for pol in cminfo['correlator_inputs'][antn]:
+            if pol.startswith('e'):
+                e_pol = pol
+            if pol.startswith('n'):
+                n_pol = pol
         ant_to_snap[ant] = {}
         if e_pol != 'None':
-            snapi_e, channel_e = snap_part_to_host_input(cminfo['correlator_inputs'][ant][0])
+            snapi_e, channel_e = snap_part_to_host_input(cminfo['correlator_inputs'][antn][0])
             ant_to_snap[ant]['e'] = {'host': snapi_e, 'channel': channel_e}
             if snapi_e not in snap_to_ant.keys():
                 snap_to_ant[snapi_e] = [None] * 6
             snap_to_ant[snapi_e][channel_e] = name + 'E'
         if n_pol != 'None':
-            snapi_n, channel_n = snap_part_to_host_input(cminfo['correlator_inputs'][ant][1])
+            snapi_n, channel_n = snap_part_to_host_input(cminfo['correlator_inputs'][antn][1])
             ant_to_snap[ant]['n'] = {'host': snapi_n, 'channel': channel_n}
             if snapi_n not in snap_to_ant.keys():
                 snap_to_ant[snapi_n] = [None] * 6
             snap_to_ant[snapi_n][channel_n] = name + 'N'
     return snap_to_ant, ant_to_snap
 
+def hera_antpol_to_ant_pol(antpol):
+    antpol = antpol.lower().lstrip('h')
+    pol = antpol[-1]
+    ant = int(antpol[:-1])
+    return ant, pol
+
 def write_maps_to_redis(redishost='redishost'):
-    redis_host = redis.Redis(redishost)
+    if isinstance(redishost, str):
+        redishost = redis.Redis(redishost)
     snap_to_ant, ant_to_snap = cminfo_compute()
     redhash = {'snap_to_ant':json.dumps(snap_to_ant), 'ant_to_snap':json.dumps(ant_to_snap)}
     redhash['update_time'] = time.time()
     redhash['update_time_str'] = time.ctime(redhash['update_time'])
-    redis_host.hmset('corr:map', redhash)
-    del(redis_host)
+    redishost.hmset('corr:map', redhash)
 
 def read_maps_from_redis(redishost='redishost'):
-    redis_host = redis.Redis(redishost)
-    if not redis_host.exists('corr:map'):
+    if isinstance(redishost, str):
+        redishost = redis.Redis(redishost)
+    if not redishost.exists('corr:map'):
         return None
-    x = redis_host.hgetall('corr:map')
+    x = redishost.hgetall('corr:map')
     x['update_time'] = float(x['update_time'])
     x['ant_to_snap'] = json.loads(x['ant_to_snap'])
     x['snap_to_ant'] = json.loads(x['snap_to_ant'])
-    del(redis_host)
     return x

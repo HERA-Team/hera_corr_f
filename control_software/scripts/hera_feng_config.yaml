@@ -1,0 +1,78 @@
+# For each fengine, specify the host ip address (host_ip), port (host_port),
+# the antenna numbers it is processing (ants). The following booleans can also be set- 
+# if it needs to be initialized (init), if you want to set noise (noise), 
+# or test vector (tvg) input and if you want it to # send data over ethernet (eth).
+# If a specific boolean task needs to be implemented on all fengines, you can pass 
+# it to the init script as a flag.
+# NB: If fengine antennas are not specified, they will be alloted according the order in 
+# which they are presented here.
+fengines:
+    snap110:
+        host_ip: '10.0.10.110'
+        host_port: 8511
+        ants: [0,1,2]
+        init: True
+        tvg: True
+        noise: False
+        eth: True
+    snap111:
+        host_ip: '10.0.10.111'
+        udp_port: 8511
+        ants: [6,7,8]
+        init: True
+        tvg: True
+        noise: False
+        eth: True
+    snap113:
+        host_ip: '10.0.10.113'
+        udp_port: 8511
+        ants: [3,4,5]
+        init: True
+        tvg: True
+        noise: False
+        eth: True
+    snap114:
+        host_ip: '10.0.10.114'
+        host_port: 8511
+        ants: [12,13,14]
+        init: True
+        tvg: True
+        noise: False
+        eth: True
+    snap1:
+        host_ip: '10.0.10.201'
+        host_port: 8511
+        ants: [9,10,11]
+        init: True
+        tvg: True
+        noise: False
+        eth: True
+    snap109:
+        host_ip: '10.0.10.109'
+        host_port: 8511
+        ants: [15,16,17]
+        init: True
+        tvg: True
+        noise: False
+        eth: True
+
+# Data is sent assuming a total of 32 Xengines and 
+# a maximum of 48 channels per Xengine. If all the 
+# 32 Xengines are not defined, the corresponding channels
+# are not sent anywhere.
+xengines:
+    xeng0:
+        num: 0
+        ip: "10.0.10.136"
+        mac: 0x000743102ee8
+        chan_range: [0,48]
+#    xeng0:
+#        num: 0
+#        ip: "10.0.10.12"
+#        mac: 0x02020a140102
+#        chan_range: [0,48]
+#    xeng1:
+#        num: 1
+#        ip: "10.0.10.140"
+#        mac: 0x02020a140142
+#        chan_range: [256,304]
