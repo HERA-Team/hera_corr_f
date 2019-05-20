@@ -72,10 +72,12 @@ class SnapFengine(object):
 
     def _add_i2c(self):
         self.pams        = [Pam(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
-        self.fems        = []#[Fem(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
-        # Need to initialize the Pams to get access to their methods.
+        self.fems        = [Fem(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
+        # Need to initialize the FEMs/PAMs to get access to their methods.
         for pam in self.pams:
             pam.initialize()
+        for fem in self.fems:
+            fem.initialize()
         self.blocks += self.pams
         self.blocks += self.fems
         self.i2c_initialized = True

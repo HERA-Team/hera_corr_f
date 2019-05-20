@@ -12,23 +12,129 @@ logger = helpers.add_default_log_handlers(logging.getLogger(__file__))
 FAIL_COUNT_LIMIT = 5
 
 
-def get_pam_stats():
+def get_all_pam_stats(corr):
     """
     Get PAM stats.
     returns: Dictionary of dictionaries
-    dict[key1][key2] = value
-    where key1 is an antenna name, key2 is a stat type (eg. Power)
+    dict[key1][key2][key3] = value
+    where key1 is an antenna name, key2 is a polarization, key3 is a stat type (eg. "pam_power")
     """
-    pass
+    rv = {}
+    sensors = {}
+    sensors["pam_east_powers"]  = []
+    sensors["pam_north_powers"] = []
+    sensors["pam_attens"]       = []
+    sensors["pam_voltages"]     = []
+    sensors["pam_currents"]     = []
+    sensors["pam_ids"]          = []
+    for i in range(3):
+        sensors["pam_east_powers"]  += [corr.do_for_all_f("power", block="pams", block_index=i, kwargs={"name":"east"})]
+        sensors["pam_north_powers"] += [corr.do_for_all_f("power", block="pams", block_index=i, kwargs={"name":"north"})]
+        sensors["pam_attens"]       += [corr.do_for_all_f("get_attenuation", block="pams", block_index=i)]
+        sensors["pam_voltages"]     += [corr.do_for_all_f("shunt", block="pams", block_index=i, kwargs={"name":"u"})]
+        sensors["pam_currents"]     += [corr.do_for_all_f("shunt", block="pams", block_index=i, kwargs={"name":"i"})]
+        sensors["pam_ids"]          += [corr.do_for_all_f("id", block="pams", block_index=i)]
+    
+    for feng in corr.fengs:
+        for antn, antpol in enumerate(feng.ants):
+            if antpol is None:
+                continue
+            try:
+               host = feng.host
+            except:
+               continue
+            ant, pol = helpers.hera_antpol_to_ant_pol(antpol)
+            if ant not in rv.keys():
+                rv[ant] = {"e":{}, "n":{}}
 
-def get_fem_stats():
+            if pol == "e":
+                try:
+                    rv[ant][pol]["pam_power"] = sensors[host]["pam_east_powers"][antn]
+                except KeyError:
+                    rv[ant][pol]["pam_power"] = None
+                try:
+                    rv[ant][pol]["pam_atten"] = sensors[host]["pam_attens"][antn][0]
+                except KeyError:
+                    rv[ant][pol]["pam_atten"] = None
+            elif pol == "n":
+                try:
+                    rv[ant][pol]["pam_power"] = sensors[host]["pam_north_powers"][antn]
+                except KeyError:
+                    rv[ant][pol]["pam_power"] = None
+                try:
+                    rv[ant][pol]["pam_atten"] = sensors[host]["pam_attens"][antn][1]
+                except KeyError:
+                    rv[ant][pol]["pam_atten"] = None
+            
+            try:
+                rv[ant][pol]["pam_voltage"] = sensors[host]["pam_voltages"][antn]
+            except KeyError:
+                rv[ant][pol]["pam_voltage"] = None
+            try:
+                rv[ant][pol]["pam_current"] = sensors[host]["pam_currents"][antn]
+            except KeyError:
+                rv[ant][pol]["pam_current"] = None
+            try:
+                rv[ant][pol]["pam_id"] = sensors[host]["pam_ids"][antn]
+            except KeyError:
+                rv[ant][pol]["pam_id"] = None
+    return rv
+
+def get_all_fem_stats(corr):
     """
     Get FEM stats.
     returns: Dictionary of dictionaries
-    dict[key1][key2] = value
-    where key1 is an antenna name, key2 is a stat type (eg. Power)
+    dict[key1][key2][key3] = value
+    where key1 is an antenna name, key2 is a polarization, key3 is a stat type (eg. "fem_power")
     """
-    pass
+    rv = {}
+    sensors = {}
+    sensors["fem_switches"] = []
+    sensors["fem_temps"]    = []
+    sensors["fem_currents"] = []
+    sensors["fem_voltages"] = []
+    sensors["fem_ids"]      = []
+    for i in range(3):
+        sensors["fem_switches"] += [corr.do_for_all_f("switch", block="fems", block_index=i)]
+        sensors["fem_temps"]    += [corr.do_for_all_f("temperature", block="fems", block_index=i)]
+        sensors["fem_currents"] += [corr.do_for_all_f("shunt", block="fems", block_index=i, kwargs={"name":"i"})]
+        sensors["fem_voltages"] += [corr.do_for_all_f("shunt", block="fems", block_index=i, kwargs={"name":"u"})]
+        sensors["fem_ids"]      += [corr.do_for_all_f("id", block="fems", block_index=i)]
+    
+    for feng in corr.fengs:
+        for antn, antpol in enumerate(feng.ants):
+            if antpol is None:
+                continue
+            try:
+               host = feng.host
+            except:
+               continue
+            ant, pol = helpers.hera_antpol_to_ant_pol(antpol)
+            if ant not in rv.keys():
+                rv[ant] = {"e":{}, "n":{}}
+
+            try:
+                rv[ant][pol]["fem_switch"] = sensors[host]["fem_switches"][antn]
+            except KeyError:
+                rv[ant][pol]["fem_switch"] = None
+            try:
+                rv[ant][pol]["fem_temp"] = sensors[host]["fem_temps"][antn]
+            except KeyError:
+                rv[ant][pol]["fem_temp"] = None
+            try:
+                rv[ant][pol]["fem_current"] = sensors[host]["fem_currents"][antn]
+            except KeyError:
+                rv[ant][pol]["fem_current"] = None
+            try:
+                rv[ant][pol]["fem_voltage"] = sensors[host]["fem_voltages"][antn]
+            except KeyError:
+                rv[ant][pol]["fem_voltage"] = None
+            try:
+                rv[ant][pol]["fem_id"] = sensors[host]["fem_ids"][antn]
+            except KeyError:
+                rv[ant][pol]["fem_id"] = None
+    return rv
+
 
 def get_poco_output(feng,redishost):
     """
@@ -137,13 +243,9 @@ if __name__ == "__main__":
         for i in range(6):
             histograms += [corr.do_for_all_f("get_histogram", block="input", args=(i,), kwargs={"sum_cores" : True})]
             eq_coeffs += [corr.do_for_all_f("get_coeffs", block="eq", args=(i,))]
-        pam_east_powers = []
-        pam_north_powers = []
-        pam_attens = []
-        for i in range(3):
-            pam_east_powers += [corr.do_for_all_f("power", block="pams", block_index=i, kwargs={"name":"east"})]
-            pam_north_powers += [corr.do_for_all_f("power", block="pams", block_index=i, kwargs={"name":"north"})]
-            pam_attens += [corr.do_for_all_f("get_attenuation", block="pams", block_index=i)]
+        # Get FEM/PAM sensor values
+        fem_stats = get_all_fem_stats(corr)
+        pam_stats = get_all_pam_stats(corr)
        
         for key, val in input_stats.iteritems():
             antpols = corr.fengs_by_name[key].ants
@@ -168,25 +270,8 @@ if __name__ == "__main__":
                     redis_vals['eq_coeffs'] = json.dumps(coeffs.tolist())
                 except:
                     redis_vals['eq_coeffs'] = None
-                if pol == 'e':
-                    try:
-                        redis_vals['pam_power'] = pam_east_powers[antn][key]
-                    except:
-                        redis_vals['pam_power'] = None
-                else:
-                    try:
-                        redis_vals['pam_power'] = pam_north_powers[antn][key]
-                    except:
-                        redis_vals['pam_power'] = None
-                try:
-                    atten_e, atten_n = pam_attens[antn][key]
-                    if pol == 'e':
-                        atten = atten_e
-                    else:
-                        atten = atten_n 
-                    redis_vals['pam_atten'] = atten
-                except:
-                    redis_vals['pam_atten'] = None
+                redis_vals.update(pam_stats[ant][pol])
+                redis_vals.update(fem_stats[ant][pol])
                 redis_vals['timestamp'] = datetime.datetime.now().isoformat()
                 corr.r.hmset(status_key, redis_vals)
             
