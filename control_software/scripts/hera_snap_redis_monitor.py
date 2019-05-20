@@ -47,35 +47,36 @@ def get_all_pam_stats(corr):
             if ant not in rv.keys():
                 rv[ant] = {"e":{}, "n":{}}
 
+            block_index = antn // 2
             if pol == "e":
                 try:
-                    rv[ant][pol]["pam_power"] = sensors[host]["pam_east_powers"][antn]
+                    rv[ant][pol]["pam_power"] = sensors["pam_east_powers"][block_index][host]
                 except KeyError:
                     rv[ant][pol]["pam_power"] = None
                 try:
-                    rv[ant][pol]["pam_atten"] = sensors[host]["pam_attens"][antn][0]
+                    rv[ant][pol]["pam_atten"] = sensors["pam_attens"][block_index][host][0]
                 except KeyError:
                     rv[ant][pol]["pam_atten"] = None
             elif pol == "n":
                 try:
-                    rv[ant][pol]["pam_power"] = sensors[host]["pam_north_powers"][antn]
+                    rv[ant][pol]["pam_power"] = sensors["pam_north_powers"][block_index][host]
                 except KeyError:
                     rv[ant][pol]["pam_power"] = None
                 try:
-                    rv[ant][pol]["pam_atten"] = sensors[host]["pam_attens"][antn][1]
+                    rv[ant][pol]["pam_atten"] = sensors["pam_attens"][block_index][host][1]
                 except KeyError:
                     rv[ant][pol]["pam_atten"] = None
             
             try:
-                rv[ant][pol]["pam_voltage"] = sensors[host]["pam_voltages"][antn]
+                rv[ant][pol]["pam_voltage"] = sensors["pam_voltages"][block_index][host]
             except KeyError:
                 rv[ant][pol]["pam_voltage"] = None
             try:
-                rv[ant][pol]["pam_current"] = sensors[host]["pam_currents"][antn]
+                rv[ant][pol]["pam_current"] = sensors["pam_currents"][block_index][host]
             except KeyError:
                 rv[ant][pol]["pam_current"] = None
             try:
-                rv[ant][pol]["pam_id"] = sensors[host]["pam_ids"][antn]
+                rv[ant][pol]["pam_id"] = sensors["pam_ids"][block_index][host]
             except KeyError:
                 rv[ant][pol]["pam_id"] = None
     return rv
@@ -113,24 +114,25 @@ def get_all_fem_stats(corr):
             if ant not in rv.keys():
                 rv[ant] = {"e":{}, "n":{}}
 
+            block_index = antn // 2
             try:
-                rv[ant][pol]["fem_switch"] = sensors[host]["fem_switches"][antn]
+                rv[ant][pol]["fem_switch"] = sensors["fem_switches"][block_index][host]
             except KeyError:
                 rv[ant][pol]["fem_switch"] = None
             try:
-                rv[ant][pol]["fem_temp"] = sensors[host]["fem_temps"][antn]
+                rv[ant][pol]["fem_temp"] = sensors["fem_temps"][block_index][host]
             except KeyError:
                 rv[ant][pol]["fem_temp"] = None
             try:
-                rv[ant][pol]["fem_current"] = sensors[host]["fem_currents"][antn]
+                rv[ant][pol]["fem_current"] = sensors["fem_currents"][block_index][host]
             except KeyError:
                 rv[ant][pol]["fem_current"] = None
             try:
-                rv[ant][pol]["fem_voltage"] = sensors[host]["fem_voltages"][antn]
+                rv[ant][pol]["fem_voltage"] = sensors["fem_voltages"][block_index][host]
             except KeyError:
                 rv[ant][pol]["fem_voltage"] = None
             try:
-                rv[ant][pol]["fem_id"] = sensors[host]["fem_ids"][antn]
+                rv[ant][pol]["fem_id"] = sensors["fem_ids"][block_index][host]
             except KeyError:
                 rv[ant][pol]["fem_id"] = None
     return rv
