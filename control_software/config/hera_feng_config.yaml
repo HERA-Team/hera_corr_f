@@ -57,9 +57,9 @@ fengines:
     heraNode0Snap2:
         phase_switch_index: 0
         ants: [6, 7, 8]
-    heraNode0Snap3:
-        phase_switch_index: 0
-        ants: [9, 10, 11]
+    #heraNode0Snap3:
+    #    phase_switch_index: 0
+    #    ants: [9, 10, 11]
     heraNode9Snap0:
         phase_switch_index: 0
         ants: [12, 13, 14]
