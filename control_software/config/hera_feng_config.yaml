@@ -57,9 +57,21 @@ fengines:
     heraNode0Snap2:
         phase_switch_index: 0
         ants: [6, 7, 8]
-    heraNode0Snap3:
+    #heraNode0Snap3:
+    #    phase_switch_index: 0
+    #    ants: [9, 10, 11]
+    heraNode9Snap0:
         phase_switch_index: 0
-        ants: [9, 10, 11]
+        ants: [12, 13, 14]
+    heraNode9Snap1:
+        phase_switch_index: 0
+        ants: [15, 16, 17]
+    heraNode9Snap2:
+        phase_switch_index: 0
+        ants: [18, 19, 20]
+    heraNode9Snap3:
+        phase_switch_index: 0
+        ants: [21, 22, 23]
 
 # Data is sent assuming a total of 32 Xengines and 
 # a maximum of 48 channels per Xengine. If all the 

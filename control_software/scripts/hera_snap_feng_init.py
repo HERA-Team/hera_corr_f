@@ -36,6 +36,10 @@ parser.add_argument('-p','--program', action='store_true', default=False,
                     help='Program FPGAs with the fpgfile specified in the config file if not programmed already')
 parser.add_argument('--noredistapcp', action='store_false',
                     help='Don\'t use the redis-based SNAP comms protocol')
+parser.add_argument('-P','--forceprogram', action='store_true', default=False,
+                    help='Program FPGAs with the fpgfile specified in the config file irrespective of whether they are programmed already')
+parser.add_argument('--nomultithread', action='store_true', default=False,
+                    help='Don\'t multithread initialization')
 args = parser.parse_args()
 
 corr = HeraCorrelator(redishost=args.redishost, config=args.config_file, use_redis=args.noredistapcp)
@@ -65,27 +69,26 @@ corr.r.hmset('init_configuration', {
 corr.disable_monitoring(expiry=300)
 time.sleep(1) # wait for the monitor to pause
 
-if args.program:
-    corr.program() # This should multithread the programming process.
+if args.program or args.forceprogram:
+    corr.program(unprogrammed_only=(not args.forceprogram)) # This should multithread the programming process.
     if not args.initialize:
         logger.warning('Programming but *NOT* initializing. This is unlikely to be what you want')
 
 if args.initialize:
-    corr.initialize()
+    corr.disable_output()
+    corr.initialize(multithread=(not args.nomultithread))
 
 if args.tvg:
     logger.info('Enabling EQ TVGs...')
-    for feng in corr.fengs:
-        feng.eq_tvg.write_freq_ramp()
-        feng.eq_tvg.tvg_enable()
+    corr.do_for_all_f("write_freq_ramp", block="eq_tvg")
+    corr.do_for_all_f("tvg_enable", block="eq_tvg")
 
 if args.noise:
     logger.info('Setting noise TVGs...')
-    for feng in corr.fengs:
-        seed = 23
-        for stream in range(fengine.noise.nstreams): 
-            feng.noise.set_seed(stream, seed)
-        feng.input.use_noise()
+    seed = 23
+    for stream in range(fengine.noise.nstreams): 
+        corr.do_for_all_f("set_seed", block="noise", args=[stream, seed])
+    corr.do_for_all_f("use_noise", block="input")
 
 # Now assign frequency slots to different X-engines as 
 # per the config file. A total of 32 Xengs are assumed for 
@@ -99,9 +102,8 @@ if not corr.configure_freq_slots():
 # Sync logic. Do global sync first, and then noise generators
 # wait for a PPS to pass then arm all the boards
 if args.sync:
-    for feng in corr.fengs:
-        #feng.sync.change_period(9*8*7*6*5*4*3*2 * 4096)
-        feng.sync.change_period(0)
+    corr.disable_output()
+    corr.do_for_all_f("change_period", block="sync", args=[0])
     corr.resync(manual=args.mansync)
     corr.sync_noise(manual=args.mansync)
 

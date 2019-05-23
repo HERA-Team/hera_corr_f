@@ -13,6 +13,7 @@ from casperfpga import i2c_eeprom
 from casperfpga import i2c_sn
 from casperfpga import i2c_bar
 from casperfpga import i2c_motion
+from casperfpga import i2c_temp
 from scipy.linalg import hadamard #for walsh (hadamard) matrices
 
 # Block Classes
@@ -76,18 +77,21 @@ class Block(object):
 
 class Synth(casperfpga.synth.LMX2581):
     def __init__(self, host, name):
-         super(Synth, self).__init__(host, name)
+        super(Synth, self).__init__(host, name)
+        self.host = host 
 
     def initialize(self):
         """
         Seem to have to do this if reference
         was not present when board was powered up(?)
         """
-        self.powerOff()
-        self.powerOn()
+        #Ed. This seems to break things?
+        #self.powerOff()
+        #self.powerOn()
+        pass
 
 class Adc(casperfpga.snapadc.SNAPADC):
-    def __init__(self, host, sample_rate=500, num_chans=2, resolution=8, ref=10):
+    def __init__(self, host, sample_rate=500, num_chans=2, resolution=8, ref=10, logger=None):
         """
         Instantiate an ADC block.
         
@@ -98,6 +102,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
            resolution (int): Bit resolution of the ADC. Valid values are 8, 12.
            ref (float): Reference frequency (in MHz) from which ADC clock is derived. If None, an external sampling clock must be used.
         """
+        self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + "(%s:%s)" % (host.host, "SNAP_adc")))
         casperfpga.snapadc.SNAPADC.__init__(self,host,ref=ref)
         self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
@@ -105,6 +110,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.clock_divide    = 1
         self.sample_rate     = sample_rate
         self.resolution      = resolution
+        self.host = host # the SNAPADC class doesn't directly expose this
 
     def set_gain(self, gain):
         """
@@ -138,7 +144,16 @@ class Adc(casperfpga.snapadc.SNAPADC):
         """
         Initialize the configuration of the ADC chip.
         """
-        self.init(self.sample_rate, self.num_chans) # from the SNAPADC class
+        n_retries = 3
+        for i in range(n_retries):
+            if self.init(self.sample_rate, self.num_chans) == self.SUCCESS:
+                if i == 0:
+                    self.logger.info("ADC configured OK")
+                if i > 0:
+                    self.logger.warning("ADC took %d attempts to configure" % (i+1))
+                break
+            if i == n_retries - 1:
+                self.logger.error("ADC failed to configure after %d attempts" % (i+1))
         #self.alignLineClock(mode='dual_pat')
         #self.alignFrameClock()
         ##If aligning complete, alignFrameClock should not output any warning
@@ -1226,27 +1241,17 @@ class Pam(Block):
         # set i2c bus to 10 kHz
         self.i2c.setClock(self.CLK_I2C_BUS, self.CLK_I2C_REF)
 
-        # Attenuator
-        self._atten = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
-
-        # Current sensor
-        self._cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
-        self._cur.init()
-
-        # ID chip
-        self._sn=i2c_sn.DS28CM00(self.i2c, self.ADDR_SN)
-
-        # Power detector
-        self._pow = i2c_volt.MAX11644(self.i2c, self.ADDR_VOLT)
-        self._pow.init()
-
-        # ROM
-        self._rom=i2c_eeprom.EEP24XX64(self.i2c, self.ADDR_ROM)
-
     def get_attenuation(self):
         """ Get East and North attenuation
             returns: (east attenuation (dB, int), north attenuation (dB, int)
         """
+        if not hasattr(self, "_atten"):
+            try:
+                # Attenuator
+                self._atten = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
+            except:
+                self.logger.warning("Failed to initialize I2C attenuator")
+                return None, None
 
         val=self._atten.read()
         ve,vn=self._gpio2db(val)
@@ -1263,6 +1268,13 @@ class Pam(Block):
             If only one pol is specified, a read is issued to
             figure out what the other value should be.
         """
+        if not hasattr(self, "_atten"):
+            try:
+                # Attenuator
+                self._atten = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
+            except:
+                self.logger.warning("Failed to initialize I2C attenuator")
+
         if (east is None) or (north is None):
             # Get current attenuation
             val=self._atten.read()
@@ -1284,12 +1296,21 @@ class Pam(Block):
             shunt(name='i')     # returns current in Amps
             shunt(name='u')     # returns voltage in Volt
         """
+        if not hasattr(self, "_cur"):
+            try:
+                # Current sensor
+                self._cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
+                self._cur.init()
+            except:
+                self.logger.warning("Failed to initialize I2C current sensor")
+                return None
+
         if name == 'i':
-            vshunt = ina.readVolt('shunt')
+            vshunt = self._cur.readVolt('shunt')
             ishunt = vshunt * 1.0 / self.SHUNT_RESISTOR
             return ishunt
         elif name == 'u':
-            vbus = ina.readVolt('bus')
+            vbus = self._cur.readVolt('bus')
             return vbus
         else:
             raise ValueError('Invalid parameter.')
@@ -1297,6 +1318,14 @@ class Pam(Block):
     def id(self):
         """ Get the unique eight-byte serial number of the module
         """
+        if not hasattr(self, "_id"):
+            try:
+                # ID chip
+                self._sn=i2c_sn.DS28CM00(self.i2c, self.ADDR_SN)
+            except:
+                self.logger.warning("Failed to initialize I2C ID chip")
+                return None
+
         return self._sn.readSN()
 
     def power(self, name='east'):
@@ -1306,6 +1335,14 @@ class Pam(Block):
             power(name='east')  # returns power level of east in dBm
             power(name='north') # returns power level of north in dBm
         """
+        if not hasattr(self, "_pow"):
+            try:
+                # Power detector
+                self._pow = i2c_volt.MAX11644(self.i2c, self.ADDR_VOLT)
+                self._pow.init()
+            except:
+                self.logger.warning("Failed to initialize I2C power sensor")
+                return None
         LOSS = 9.8
         if name not in ['east','north']:
             raise ValueError('Invalid parameter.')
@@ -1329,6 +1366,13 @@ class Pam(Block):
             rom()               # returns a string ended with a '\0'
             rom('hello')        # write 'hello\0' into ROM
         """
+        if not hasattr(self, "_rom"):
+            try:
+                # ROM
+                self._rom=i2c_eeprom.EEP24XX64(self.i2c, self.ADDR_ROM)
+            except:
+                self.logger.warning("Failed to initialize I2C ROM")
+                return None
         if string == None:
             return self._rom.readString()
         else:
@@ -1404,32 +1448,9 @@ class Fem(Block):
         self.i2c = i2c.I2C(host, name, retry_wait=self.I2C_RETRY_WAIT)
 
     def initialize(self):
-
         self.i2c.enable_core()
         # set i2c bus to 10 kHz
         self.i2c.setClock(self.CLK_I2C_BUS, self.CLK_I2C_REF)
-
-        # Barometer
-        self.bar = i2c_bar.MS5611_01B(self.i2c, self.ADDR_BAR)
-        self.bar.init()
-
-        # Current sensor
-        self.cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
-        self.cur.init()
-
-        # IMU
-        self.imu = i2c_motion.IMUSimple(self.i2c,self.ADDR_ACCEL,
-                                        orient=self.IMU_ORIENT)
-        self.imu.init()
-
-        # ROM
-        self.rom=i2c_eeprom.EEP24XX64(self.i2c,ADDR_ROM)
-
-        # Switch
-        self.sw = i2c_gpio.PCF8574(self.i2c,self.ADDR_GPIO)
-
-        # Temperature
-        self.temp = i2c_temp.Si7051(self.i2c, self.ADDR_TEMP)
 
 
     def pressure(self):
@@ -1438,8 +1459,16 @@ class Fem(Block):
             Example:
             pressure()      # return pressure in kPa
         """
-        rawt,dt = self.bar.readTemp(raw=True)
-        press = self.bar.readPress(rawt,dt)
+        if not hasattr(self, "_bar"):
+            try:
+                # Barometer
+                self._bar = i2c_bar.MS5611_01B(self.i2c, self.ADDR_BAR)
+                self._bar.init()
+            except:
+                self.logger.warning("Failed to initialize I2C barometer")
+                return None
+        rawt,dt = self._bar.readTemp(raw=True)
+        press = self._bar.readPress(rawt,dt)
         return press
 
 
@@ -1450,12 +1479,20 @@ class Fem(Block):
             shunt(name='i')     # returns current in Amps
             shunt(name='u')     # returns voltage in Volt
         """
+        if not hasattr(self, "_cur"):
+            try:
+                # Current sensor
+                self._cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
+                self._cur.init()
+            except:
+                self.logger.warning("Failed to initialize I2C current sensor")
+                return None
         if name == 'i':
-            vshunt = ina.readVolt('shunt')
+            vshunt = self._cur.readVolt('shunt')
             ishunt = vshunt * 1.0 / self.SHUNT_RESISTOR
             return ishunt
         elif name == 'u':
-            vbus = ina.readVolt('bus')
+            vbus = self._cur.readVolt('bus')
             return vbus
         else:
             raise ValueError('Invalid parameter.')
@@ -1463,13 +1500,29 @@ class Fem(Block):
     def id(self):
         """ Get the unique eight-byte serial number of the module
         """
-        return self.temp.sn()
+        if not hasattr(self, "_temp"):
+            try:
+                # Temperature
+                self._temp = i2c_temp.Si7051(self.i2c, self.ADDR_TEMP)
+            except:
+                self.logger.warning("Failed to initialize I2C temperature sensor")
+                return None
+        return self._temp.sn()
 
     def imu(self):
         """ Get pose of the FEM in the form of theta and phi
             of spherical coordinate system in degrees
         """
-        theta, phi = imu.pose
+        if not hasattr(self, "_imu"):
+            try:
+                # IMU
+                self._imu = i2c_motion.IMUSimple(self.i2c,self.ADDR_ACCEL,
+                                                orient=self.IMU_ORIENT)
+                self._imu.init()
+            except:
+                self.logger.warning("Failed to initialize I2C IMU")
+                return None, None
+        theta, phi = self._imu.pose
         return theta, phi
 
     def rom(self, string=None):
@@ -1479,6 +1532,13 @@ class Fem(Block):
             rom()               # returns a string ended with a '\0'
             rom('hello')        # write 'hello\0' into ROM
         """
+        if not hasattr(self, "_rom"):
+            try:
+                # ROM
+                self._rom=i2c_eeprom.EEP24XX64(self.i2c,self.ADDR_ROM)
+            except:
+                self.logger.warning("Failed to initialize I2C ROM")
+                return None
         if string == None:
             return self.rom.readString()
         else:
@@ -1493,8 +1553,15 @@ class Fem(Block):
             switch('noise')     # Switch into noise mode
             switch('load')      # Switch into load mode
         """
+        if not hasattr(self, "_sw"):
+            try:
+                # Switch
+                self._sw = i2c_gpio.PCF8574(self.i2c,self.ADDR_GPIO)
+            except:
+                self.logger.warning("Failed to initialize I2C RF switch")
+                return None
         if name == None:
-            val = self.sw.read()
+            val = self._sw.read()
             mode = 'Unknown'
             for key,value in self.SWMODE.iteritems():
                 if val&0b111 == value:
@@ -1503,11 +1570,18 @@ class Fem(Block):
             return mode
         elif name in self.SWMODE:
             val = self.SWMODE[name]
-            self.sw.write(val)
+            self._sw.write(val)
         else:
             raise ValueError('Invalid parameter.')
 
     def temperature(self):
         """ Get temperature in Celcius
         """
-        return self.temp.readTemp()
+        if not hasattr(self, "_temp"):
+            try:
+                # Temperature
+                self._temp = i2c_temp.Si7051(self.i2c, self.ADDR_TEMP)
+            except:
+                self.logger.warning("Failed to initialize I2C temperature sensor")
+                return None
+        return self._temp.readTemp()
