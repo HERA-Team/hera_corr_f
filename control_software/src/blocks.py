@@ -77,18 +77,21 @@ class Block(object):
 
 class Synth(casperfpga.synth.LMX2581):
     def __init__(self, host, name):
-         super(Synth, self).__init__(host, name)
+        super(Synth, self).__init__(host, name)
+        self.host = host 
 
     def initialize(self):
         """
         Seem to have to do this if reference
         was not present when board was powered up(?)
         """
-        self.powerOff()
-        self.powerOn()
+        #Ed. This seems to break things?
+        #self.powerOff()
+        #self.powerOn()
+        pass
 
 class Adc(casperfpga.snapadc.SNAPADC):
-    def __init__(self, host, sample_rate=500, num_chans=2, resolution=8, ref=10):
+    def __init__(self, host, sample_rate=500, num_chans=2, resolution=8, ref=10, logger=None):
         """
         Instantiate an ADC block.
         
@@ -99,6 +102,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
            resolution (int): Bit resolution of the ADC. Valid values are 8, 12.
            ref (float): Reference frequency (in MHz) from which ADC clock is derived. If None, an external sampling clock must be used.
         """
+        self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + "(%s:%s)" % (host.host, "SNAP_adc")))
         casperfpga.snapadc.SNAPADC.__init__(self,host,ref=ref)
         self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
@@ -106,6 +110,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.clock_divide    = 1
         self.sample_rate     = sample_rate
         self.resolution      = resolution
+        self.host = host # the SNAPADC class doesn't directly expose this
 
     def set_gain(self, gain):
         """
@@ -141,12 +146,14 @@ class Adc(casperfpga.snapadc.SNAPADC):
         """
         n_retries = 3
         for i in range(n_retries):
-            if self.init(self.sample_rate, self.num_chans) == 0:
+            if self.init(self.sample_rate, self.num_chans) == self.SUCCESS:
+                if i == 0:
+                    self.logger.info("ADC configured OK")
                 if i > 0:
-                    self.logger.warning("ADC took %d attempts to configure" % i+1)
+                    self.logger.warning("ADC took %d attempts to configure" % (i+1))
                 break
-                if i == n_retries - 1:
-                    self.logger.error("ADC failed to configure after %d attempts" % i+1)
+            if i == n_retries - 1:
+                self.logger.error("ADC failed to configure after %d attempts" % (i+1))
         #self.alignLineClock(mode='dual_pat')
         #self.alignFrameClock()
         ##If aligning complete, alignFrameClock should not output any warning
