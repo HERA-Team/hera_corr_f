@@ -73,6 +73,7 @@ if args.program or args.forceprogram:
         logger.warning('Programming but *NOT* initializing. This is unlikely to be what you want')
 
 if args.initialize:
+    corr.disable_output()
     corr.initialize(multithread=(not args.nomultithread))
 
 if args.tvg:
@@ -99,6 +100,7 @@ if not corr.configure_freq_slots():
 # Sync logic. Do global sync first, and then noise generators
 # wait for a PPS to pass then arm all the boards
 if args.sync:
+    corr.disable_output()
     corr.do_for_all_f("change_period", block="sync", args=[0])
     corr.resync(manual=args.mansync)
     corr.sync_noise(manual=args.mansync)
