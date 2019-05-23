@@ -42,13 +42,13 @@ initialize: False
 eth: False
 
 # Specify a full path to an F-Engine fpg files
-fpgfile: '/home/jackh/src/hera_corr_f/snap_fengine/outputs/snap_fengine_2018-10-09_1611.fpg'
+fpgfile: '/home/jackh/src/hera_corr_f/snap_fengine/outputs/snap_fengine_2018-11-13_1236.fpg'
 
 # Destination port for SNAP data
 dest_port: 8511
 
 fengines:
-    herasnapC57:
+    herasnapC12:
         phase_switch_index: 0
 
 # Data is sent assuming a total of 32 Xengines and 
@@ -58,8 +58,8 @@ fengines:
 xengines:
     0:
         even:
-           ip: "10.10.10.136"
-           mac: 0x02020a140102
+           ip: "10.10.10.5"
+           mac: 0xf452147e9492
         odd:
            ip: "0.0.0.0"
            mac: 0x02020a5028ce

@@ -34,9 +34,11 @@ parser.add_argument('-e', dest='eth', action='store_true', default=False,
                     help ='Use this flag to switch on the Ethernet outputs')
 parser.add_argument('-p','--program', action='store_true', default=False,
                     help='Program FPGAs with the fpgfile specified in the config file if not programmed already')
+parser.add_argument('--noredistapcp', action='store_false',
+                    help='Don\'t use the redis-based SNAP comms protocol')
 args = parser.parse_args()
 
-corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)
+corr = HeraCorrelator(redishost=args.redishost, config=args.config_file, use_redis=args.noredistapcp)
 
 if not corr.config_is_valid:
     logger.error('Currently loaded config is invalid')

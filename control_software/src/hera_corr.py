@@ -158,7 +158,7 @@ class HeraCorrelator(object):
                 if use_redis:
                     feng = SnapFengine(host, ant_indices=ant_indices, redishost=self.redishost)
                 else:
-                    feng = SnapFengine(host, ant_indices=ant_indices)
+                    feng = SnapFengine(host, ant_indices=ant_indices, redishost=None)
                 if feng.fpga.is_connected():
                     self.fengs += [feng]
                     feng.error_count = 0
