@@ -91,8 +91,8 @@ def cminfo_compute():
     of pam/fem/ant/snap mappings.
     Requires hera_mc.
     """
-    from hera_mc import sys_handling
-    h = sys_handling.Handling()
+    from hera_mc import cm_sysutils 
+    h = cm_sysutils.Handling()
     cminfo = h.get_cminfo_correlator()
     snap_to_ant = {}
     ant_to_snap = {}

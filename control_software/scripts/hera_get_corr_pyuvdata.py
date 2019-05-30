@@ -6,7 +6,7 @@ import pyuvdata.utils as utils
 from astropy.time import Time
 from astropy.coordinates import SkyCoord, EarthLocation, AltAz
 import astropy.units as u
-from hera_mc.sys_handling import Handling
+from hera_mc.cm_sysutils import Handling
 from hera_mc import cm_utils
 from hera_corr_f import SnapFengine
 from hera_corr_f import HeraCorrelator
