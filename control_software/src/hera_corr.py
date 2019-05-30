@@ -567,7 +567,7 @@ class HeraCorrelator(object):
         for fn,(host,params) in enumerate(self.config['fengines'].items()):
             if 'ants' in params.keys():
                 if len(params['ants']) != 3: 
-                    self.logger.warngin("%s: Number of antennas is not 3!" % host)
+                    self.logger.warning("%s: Number of antennas is not 3!" % host)
                     test_passed = False
         # Check that there are only 48 channels per x-engine.
         for host,params in self.config['xengines'].items():
