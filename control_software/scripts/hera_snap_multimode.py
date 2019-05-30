@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import argparse
-from hera_corr_f import HeraCorrelator, helpers, __version__
+from hera_corr_f import SnapFengine, HeraCorrelator, helpers, __version__
 import numpy as np
 import struct
 import collections
@@ -38,9 +38,18 @@ parser.add_argument('-P','--forceprogram', action='store_true', default=False,
                     help='Program FPGAs with the fpgfile specified in the config file irrespective of whether they are programmed already')
 parser.add_argument('--nomultithread', action='store_true', default=False,
                     help='Don\'t multithread initialization')
+parser.add_argument('--noredistapcp', action='store_true', default=False,
+                    help='Don\'t use the redis-based SNAP comms protocol')
 args = parser.parse_args()
 
-corr = HeraCorrelator(redishost=args.redishost, config=args.config_file, use_redis=args.noredistapcp)
+corr = HeraCorrelator(redishost=args.redishost, config=args.config_file, use_redis=(not args.noredistapcp))
+
+# Before we start manipulating boards, prevent monitoing scripts from
+# sending TFTP traffic. Expire the key after 5 minutes to lazily account for
+# issues with this script crashing.
+corr.disable_monitoring(expiry=300)
+time.sleep(1) # wait for the monitor to pause
+
 
 with open(args.config_file,'r') as fp:
     config = yaml.load(fp)
@@ -58,9 +67,9 @@ Nants = 0
 for host,params in fengs.items():
     ant_range = params['ants']
     fengs[host]['ant_list'] = np.arange(ant_range[0],ant_range[1])
-    assert (len(params['ant_list'])<=48), 
+    assert (len(params['ant_list'])<=48),\
            "%s: Cannot allocate more than 48 antennas!"%host
-    assert (len(params['ant_list'])%3 == 0), 
+    assert (len(params['ant_list'])%3 == 0),\
            "%s: Number of antennas should be a multiple of 3"%host
     if (len(params['ant_list'])>Nants): Nants = len(params['ant_list'])
 
@@ -68,7 +77,7 @@ for host,params in fengs.items():
 for host,params in xengs.items():
     chanrange = params['chan_range']
     xengs[host]['chans'] = np.arange(chanrange[0], chanrange[1])
-    assert(len(params['chans'])<=384), 
+    assert(len(params['chans'])<=384),\
           "%s: Cannot process >384 channels."%host
 
 # For N antennas per board, you can only 
@@ -77,7 +86,7 @@ n_xengs = 48/Nants
 chans_per_packet = 384 # Hardcoded in firmware
 
 # Check that there are only n_xengs specified
-assert (len(xengs.keys()) > n_xengs),
+assert (len(xengs.keys()) <= n_xengs),\
        "Cannot have more than %d X-engs!!"%n_xengs
 
 # Initialize, set input according to command line flags.
@@ -110,15 +119,12 @@ if args.noise:
 # ignored.
 
 fengines_list = []
-for fhost, fparams in fengs.items():
-    fengine = SnapFengine(fhost)
-    fengines_list.append(fengine)
-
-    print 'Setting Antenna indices for fengine: %s .... '%fhost
+for fengine, fparams in zip(corr.fengs, fengs.values()):
+    print 'Setting Antenna indices for fengine: %s .... '%fengine.host
     fengine.packetizer.initialize()
     fengine.reorder.initialize()
 
-    ant_list = fparams['ants'].reshape(-1,3)
+    ant_list = fparams['ant_list'].reshape(-1,3)
 
     for xhost, xparams in xengs.items():
         ip = [int(i) for i in xparams['even']['ip'].split('.')]
@@ -129,7 +135,8 @@ for fhost, fparams in fengs.items():
             slot_num = xhost*ant_list.shape[0] + a 
             print 'Slot_num: %d\t'%slot_num,
             print 'Ants: ', ant_list[a], 
-            print '\tChans: ', xparams['chans'][0:8]
+            print '\tChans: ', xparams['chans'][0:4],
+            print '\t...', xparams['chans'][-5:]
             fengine.packetizer.assign_slot(slot_num, xparams['chans'], \
                                            [ip_even,ip_odd], fengine.reorder,\
                                            ant_list[a][0])
