@@ -89,6 +89,9 @@ class SnapFengine(object):
             self.logger.info("Initializing block: %s" % block.name)
             block.initialize()
 
+    def is_initialized(self):
+        return self.i2c_initialized
+
     def get_fpga_stats(self):
         """
         Get FPGA stats.

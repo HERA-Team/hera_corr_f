@@ -24,8 +24,11 @@ parser.add_argument('-s', dest='sync', action='store_true', default=False,
                     help ='Use this flag to sync the F-engine(s) and Noise generators from PPS')
 parser.add_argument('-m', dest='mansync', action='store_true', default=False,
                     help ='Use this flag to manually sync the F-engines with an asynchronous software trigger')
-parser.add_argument('-i', dest='initialize', action='store_true', default=False,
-                    help ='Use this flag to initialize the F-engine(s)')
+group_init = parser.add_mutually_exclusive_group()
+group_init.add_argument('-i', dest='fast_initialize', action='store_true', default=None,
+                    help ='Use this flag to initialize the uninitialized F-engine(s)')
+group_init.add_argument('-I', dest='fast_initialize', action='store_false', default=None,
+                    help ='Use this flag to initialize all F-engine(s)')
 parser.add_argument('-t', dest='tvg', action='store_true', default=False,
                     help ='Use this flag to switch to EQ TVG outputs')
 parser.add_argument('-n', dest='noise', action='store_true', default=False,
@@ -71,12 +74,12 @@ time.sleep(1) # wait for the monitor to pause
 
 if args.program or args.forceprogram:
     corr.program(unprogrammed_only=(not args.forceprogram)) # This should multithread the programming process.
-    if not args.initialize:
+    if args.initialize is None:
         logger.warning('Programming but *NOT* initializing. This is unlikely to be what you want')
 
-if args.initialize:
+if args.fast_initialize is not None:
     corr.disable_output()
-    corr.initialize(multithread=(not args.nomultithread))
+    corr.initialize(multithread=(not args.nomultithread), uninitialized_only=args.fast_initialize)
 
 if args.tvg:
     logger.info('Enabling EQ TVGs...')
