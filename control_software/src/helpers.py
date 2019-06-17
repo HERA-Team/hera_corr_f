@@ -54,7 +54,7 @@ class HeraMCHandler(logging.Handler):
             
             
     
-def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.INFO, bglevel=logging.INFO, include_mc=True, mc_level=logging.WARNING):
+def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.INFO, bglevel=logging.INFO, include_mc=False, mc_level=logging.WARNING):
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
 
@@ -78,6 +78,7 @@ def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.
             logger.addHandler(mc_handler)
         except:
             logger.warn("Failed to add HERA MC log handler")
+            logger.exception(sys.exc_info()[0])
 
     redis_host = redis.Redis(redishostname, socket_timeout=1)
     try:
