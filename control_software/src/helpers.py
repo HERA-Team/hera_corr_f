@@ -13,6 +13,8 @@ http://charlesleifer.com/blog/using-redis-pub-sub-and-irc-for-error-logging-with
 '''
 
 logger = logging.getLogger(__name__)
+NOTIFY = logging.INFO + 1
+logging.addLevelName(NOTIFY, "NOTIFY")
 
 class RedisHandler(logging.Handler):
     def __init__(self, channel, conn, *args, **kwargs):
@@ -52,9 +54,12 @@ class HeraMCHandler(logging.Handler):
         logtime = self.Time(time.time(), format="unix")
         self.session.add_subsystem_error(logtime, self.subsystem, severity, message)
             
+def log_notify(log, message=None):
+    msg = message or "%s starting on %s" % (log.name, socket.gethostname())
+    log.log(NOTIFY, msg)
             
     
-def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.INFO, bglevel=logging.INFO, include_mc=False, mc_level=logging.WARNING):
+def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.INFO, bglevel=NOTIFY, include_mc=False, mc_level=logging.WARNING):
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
 

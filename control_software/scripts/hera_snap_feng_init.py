@@ -42,6 +42,7 @@ def main():
     args = parser.parse_args()
 
     logger = helpers.add_default_log_handlers(logging.getLogger(__file__))
+    helpers.log_notify(logger) # send a NOTIFY level message that this script has started
     
     corr = HeraCorrelator(redishost=args.redishost, config=args.config_file, use_redis=args.noredistapcp)
     
