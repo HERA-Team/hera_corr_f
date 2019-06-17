@@ -42,9 +42,7 @@ class HeraMCHandler(logging.Handler):
         self.Time = Time
         logging.Handler.__init__(self, *args, **kwargs)
         self.subsystem = subsystem
-        parser = mc.get_mc_argument_parser()
-        args = parser.parse_args()
-        db = mc.connect_to_mc_db(args)
+        db = mc.connect_to_mc_db(None)
         self.session = db.sessionmaker()
 
     def emit(self, record):
