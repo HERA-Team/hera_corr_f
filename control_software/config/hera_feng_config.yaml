@@ -42,7 +42,8 @@ initialize: False
 eth: False
 
 # Specify a full path to an F-Engine fpg files
-fpgfile: '/home/hera/src/hera_corr_f/snap_fengine/outputs/snap_fengine_2018-11-13_1236.fpg'
+# or redis:<fpg filename> if the fpg file has been uploaded to redis
+fpgfile: 'redis:snap_fengine_2018-11-13_1236.fpg'
 
 # Destination port for SNAP data
 dest_port: 8511
