@@ -1,4 +1,5 @@
 import logging
+import os
 import time
 import socket
 import redis
@@ -267,8 +268,20 @@ class HeraCorrelator(object):
             unprogrammed_only (Boolean): If True, only program boards which aren't yet programmed. Current state is determined by a lazy
                                          check for the "adc16_controller" register. If it exists, the board is deemed programmed.
         """
+        TEMP_BITSTREAM_STORE = "/tmp/"
         progfile = bitstream or self.config['fpgfile']
         self.logger.info('Programming all SNAPs with %s' % progfile)
+        if progfile.startswith("redis:"):
+            progfile = progfile.split(":")[-1]
+            try:
+                bitstream = self.r.hget("fpg:%s" % progfile, "fpg")
+            except KeyError:
+                self.logger.error("FPG file %s not available in redis. Cannot program" % progfile)
+                return
+            progfile = os.path.join(TEMP_BITSTREAM_STORE, progfile)
+            with open(progfile, "wb") as fh:
+                fh.write(bitstream)
+            
         if unprogrammed_only:
             to_be_programmed = []
             for feng in self.fengs:
