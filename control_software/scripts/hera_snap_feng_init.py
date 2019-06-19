@@ -45,6 +45,10 @@ def main():
     helpers.log_notify(logger) # send a NOTIFY level message that this script has started
     
     corr = HeraCorrelator(redishost=args.redishost, config=args.config_file, use_redis=args.noredistapcp)
+
+    if len(corr.fengs) == 0:
+        logger.error("No F-Engines are connected. Is the power off?")
+        exit()
     
     if not corr.config_is_valid:
         logger.error('Currently loaded config is invalid')
