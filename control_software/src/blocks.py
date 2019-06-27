@@ -1582,6 +1582,6 @@ class Fem(Block):
                 # Temperature
                 self._temp = i2c_temp.Si7051(self.i2c, self.ADDR_TEMP)
             except:
-                self.logger.warning("Failed to initialize I2C temperature sensor")
+                self.logger.info("Failed to initialize I2C temperature sensor")
                 return None
         return self._temp.readTemp()
