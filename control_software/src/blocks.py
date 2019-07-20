@@ -35,7 +35,7 @@ class Block(object):
         Eg, take "Argh, I'm broken" and replace it with
         "eq_tvg - Argh I'm broken"
         """
-        prefix = "%s - " % name
+        prefix = "%s - " % self.name
         return prefix + msg
 
     def _debug(self, msg, *args, **kwargs):
