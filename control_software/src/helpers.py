@@ -16,6 +16,8 @@ logger = logging.getLogger(__name__)
 NOTIFY = logging.INFO + 1
 logging.addLevelName(NOTIFY, "NOTIFY")
 
+IS_INITIALIZED_ATTR = "_hera_has_default_handlers"
+
 class RedisHandler(logging.Handler):
     def __init__(self, channel, conn, *args, **kwargs):
         logging.Handler.__init__(self, *args, **kwargs)
@@ -60,6 +62,10 @@ def log_notify(log, message=None):
             
     
 def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.INFO, bglevel=NOTIFY, include_mc=False, mc_level=logging.WARNING):
+    if getattr(logger, IS_INITIALIZED_ATTR, False):
+        return logger
+    setattr(logger, IS_INITIALIZED_ATTR, True)
+
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
 
@@ -85,7 +91,7 @@ def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.
             logger.warn("Failed to add HERA MC log handler")
             logger.exception(sys.exc_info()[0])
 
-    redis_host = redis.Redis(redishostname, socket_timeout=1)
+    redis_host = redis.StrictRedis(redishostname, socket_timeout=1)
     try:
         redis_host.ping()
     except redis.ConnectionError:
