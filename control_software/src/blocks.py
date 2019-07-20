@@ -197,12 +197,12 @@ class Adc(casperfpga.snapadc.SNAPADC):
         for i in range(n_retries):
             if self.init(self.sample_rate, self.num_chans) == self.SUCCESS:
                 if i == 0:
-                    self._info("ADC configured OK")
+                    self.logger.info("ADC configured OK")
                 if i > 0:
-                    self._warning("ADC took %d attempts to configure" % (i+1))
+                    self.logger.warning("ADC took %d attempts to configure" % (i+1))
                 break
             if i == n_retries - 1:
-                self._error("ADC failed to configure after %d attempts" % (i+1))
+                self.logger.error("ADC failed to configure after %d attempts" % (i+1))
         #self.alignLineClock(mode='dual_pat')
         #self.alignFrameClock()
         ##If aligning complete, alignFrameClock should not output any warning
