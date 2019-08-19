@@ -272,8 +272,16 @@ if __name__ == "__main__":
                     redis_vals['eq_coeffs'] = json.dumps(coeffs.tolist())
                 except:
                     redis_vals['eq_coeffs'] = None
-                redis_vals.update(pam_stats[ant][pol])
-                redis_vals.update(fem_stats[ant][pol])
+                try:
+                    redis_vals.update(pam_stats[ant][pol])
+                except KeyError:
+                    # if a SNAP died between getting input stats (which is the dictionary we are looping over)
+                    # and getting pam/fem stats, the appropriate PAM/FEM keys may not exist
+                    pass
+                try:
+                    redis_vals.update(fem_stats[ant][pol])
+                except KeyError:
+                    pass
                 redis_vals['timestamp'] = datetime.datetime.now().isoformat()
                 corr.r.hmset(status_key, redis_vals)
             
