@@ -82,6 +82,15 @@ class SnapFengine(object):
         self.blocks += self.fems
         self.i2c_initialized = True
 
+    def is_programmed(self):
+        """
+        Lazy check to see if a board is programmed.
+        Check for the "adc16_controller" register. If it exists, the board is deemed programmed.
+        Returns:
+            True if programmed, False otherwise
+        """
+        return 'adc16_controller' in self.fpga.listdev()
+
     def initialize(self):
         if not self.i2c_initialized:
             self._add_i2c()

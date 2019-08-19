@@ -294,7 +294,7 @@ if __name__ == "__main__":
         if time.time() > (retry_tick + args.retrytime):
             if len(corr.dead_fengs) > 0:
                 logger.info('Trying to reconnect to dead boards')
-                corr.reestablish_dead_connections()
+                corr.reestablish_dead_connections(programmed_only=True)
                 retry_tick = time.time()
                 
         # If executing the loop hasn't already taken longer than the loop delay time, add extra wait.

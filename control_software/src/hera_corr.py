@@ -184,7 +184,7 @@ class HeraCorrelator(object):
             self.fengs_by_ip[feng.ip] = feng
         self.logger.info('SNAPs are: %s' % ', '.join([feng.host for feng in self.fengs]))
 
-    def reestablish_dead_connections(self, age=0.0):
+    def reestablish_dead_connections(self, age=0.0, programmed_only=False):
         """
         Try to reconnect to all boards in `self.dead_fengs`,
         if the board was declared dead more than `age` seconds ago.
@@ -199,9 +199,12 @@ class HeraCorrelator(object):
             try:
                 feng = SnapFengine(host)
                 if feng.fpga.is_connected():
-                    new_fengs += [feng]
-                    feng.error_count = 0
-                    self.dead_fengs.pop(host)
+                    if (not programmed_only) or (programmed_only and feng.is_programmed()):
+                        new_fengs += [feng]
+                        feng.error_count = 0
+                        self.dead_fengs.pop(host)
+                    else:
+                        self.logger.warning("Tried to reconnect to host %s. It is alive but not programmed." % host)
                 else:
                     self.logger.warning("Tried to reconnect to host %s and failed" % host)
             except:
@@ -272,8 +275,7 @@ class HeraCorrelator(object):
         Program SNAPs.
         Inputs:
             bitstream (str): Path to fpgfile to program. If None, the bitstream described in the current configuration will be used.
-            unprogrammed_only (Boolean): If True, only program boards which aren't yet programmed. Current state is determined by a lazy
-                                         check for the "adc16_controller" register. If it exists, the board is deemed programmed.
+            unprogrammed_only (Boolean): If True, only program boards which aren't yet programmed.
         """
         TEMP_BITSTREAM_STORE = "/tmp/"
         progfile = bitstream or self.config['fpgfile']
@@ -292,7 +294,7 @@ class HeraCorrelator(object):
         if unprogrammed_only:
             to_be_programmed = []
             for feng in self.fengs:
-                if 'adc16_controller' not in feng.fpga.listdev():
+                if not feng.is_programmed():
                     to_be_programmed += [feng]
             if len(to_be_programmed) == 0:
                 self.logger.info("Skipping programming because all boards seem ready")
