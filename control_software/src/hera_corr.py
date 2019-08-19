@@ -43,7 +43,7 @@ class HeraCorrelator(object):
 
         self.config_is_valid= self._verify_config()
 
-    def do_for_all_f(self, method, block=None, block_index=None, args=(), kwargs={}, timeout=3, dead_count_threshold=3):
+    def do_for_all_f(self, method, block=None, block_index=None, args=(), kwargs={}, timeout=3, dead_count_threshold=3, check_programmed=False):
         """
         Call `method` against all F-Engine instances.
         inputs:
@@ -55,6 +55,7 @@ class HeraCorrelator(object):
             kwargs (dict): keyword arguments to pass to the underlying method
             timeout (float): Timeout in seconds
             dead_count_threshold (int): Number of failed connection attempts allowed before declaring an F-Engine dead. Set to None to skip error tracking
+            check_programmed (bool): Set to True to call against only programmed F-Engines
         returns:
             dictionary of return values from the underlying method. Keys are f-engine hostnames.
             If *any* fengines fail to return before timeout, then this method returns None
@@ -67,11 +68,17 @@ class HeraCorrelator(object):
         # we're calling against some block class
         # TODO: We only check the first instance, and assume the others are the same
         if block is None:
-            instances = self.fengs
+            if not check_programmed:
+                instances = self.fengs
+            else:
+                instances = [feng for feng in self.fengs if feng.is_programmed()]
         else:
             if not hasattr(self.fengs[0], block):
                 return None
-            instances = [getattr(f, block) for f in self.fengs]
+            if not check_programmed:
+                instances = [getattr(f, block) for f in self.fengs]
+            else:
+                instances = [getattr(f, block) for f in self.fengs if f.is_programmed()]
         # If the instances are themselves lists, demand the user specify a block index
         #TODO just checking the first entry
         if isinstance(instances[0], list):
