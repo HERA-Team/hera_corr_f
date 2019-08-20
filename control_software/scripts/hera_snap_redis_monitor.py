@@ -242,9 +242,12 @@ if __name__ == "__main__":
         input_stats = corr.do_for_all_f("get_stats", block="input", kwargs={"sum_cores" : True})
         histograms = []
         eq_coeffs = []
+        autocorrs = []
         for i in range(6):
             histograms += [corr.do_for_all_f("get_histogram", block="input", args=(i,), kwargs={"sum_cores" : True})]
             eq_coeffs += [corr.do_for_all_f("get_coeffs", block="eq", args=(i,))]
+            autocorrs += [corr.do_for_all_f("get_new_corr", block="corr", args=(i,i))]
+
         # Get FEM/PAM sensor values
         fem_stats = get_all_fem_stats(corr)
         pam_stats = get_all_pam_stats(corr)
@@ -267,6 +270,10 @@ if __name__ == "__main__":
                     redis_vals['histogram'] = json.dumps([hist_bins.tolist(), hist_vals.tolist()])
                 except:
                     redis_vals['histogram'] = None
+                try:
+                    redis_vals['autocorrelation'] = json.dumps(autocorrs[antn][key].real.tolist())
+                except:
+                    redis_vals['autocorrelation'] = None
                 try:
                     coeffs = eq_coeffs[antn][key]
                     redis_vals['eq_coeffs'] = json.dumps(coeffs.tolist())
