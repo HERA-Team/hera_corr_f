@@ -10,13 +10,16 @@ import logging
 import argparse
 import os
 import json
+import yaml
 
 logger = helpers.add_default_log_handlers(logging.getLogger(__name__), fglevel=logging.NOTSET)
 
 parser = argparse.ArgumentParser(description='Obtain cross-correlation spectra from a SNAP Board',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('host', type=str, 
-                    help='Host boards to collect data from')
+parser.add_argument('host',type=str,
+                    help='Host board to program')
+#parser.add_argument('config_file', type=str, 
+#                    help='Configuration yaml file with hostboards and pols')
 parser.add_argument('-r', dest='redishost', type=str, default='redishost',
                     help ='Host servicing redis requests')
 parser.add_argument('-n','--num_spectra',type=int,default=10,
@@ -34,7 +37,12 @@ corr.r.set('disable_monitoring', 1, ex=60)
 logger.warning('Disabling the monitoring.')
 time.sleep(2)
 
-feng = SnapFengine(args.host)
+#with open(args.config_file,'r') as fp:
+#    config = yaml.safe_load(fp)
+
+#feng = {}
+#for host in config.keys():
+#    feng[host] = SnapFengine(args.host)
 
 # Get antenna numbers from database
 #corr.compute_hookup()

@@ -1,4 +1,3 @@
-import numpy as np
 import logging
 import logging.handlers
 import sys
@@ -14,6 +13,10 @@ http://charlesleifer.com/blog/using-redis-pub-sub-and-irc-for-error-logging-with
 '''
 
 logger = logging.getLogger(__name__)
+NOTIFY = logging.INFO + 1
+logging.addLevelName(NOTIFY, "NOTIFY")
+
+IS_INITIALIZED_ATTR = "_hera_has_default_handlers"
 
 class RedisHandler(logging.Handler):
     def __init__(self, channel, conn, *args, **kwargs):
@@ -35,8 +38,34 @@ class RedisHandler(logging.Handler):
             self.redis_conn.publish(self.channel, 'UnicodeDecodeError on emit!')
         except redis.RedisError:
             pass
+
+class HeraMCHandler(logging.Handler):
+    def __init__(self, subsystem, *args, **kwargs):
+        from hera_mc import mc
+        from astropy.time import Time
+        self.Time = Time
+        logging.Handler.__init__(self, *args, **kwargs)
+        self.subsystem = subsystem
+        db = mc.connect_to_mc_db(None)
+        self.session = db.sessionmaker()
+
+    def emit(self, record):
+        # Re-code level because HeraMC logs 1 as most severe, and python logging calls critical:50, debug:10
+        severity = max(1, 100 / record.levelno)
+        message = self.format(record)
+        logtime = self.Time(time.time(), format="unix")
+        self.session.add_subsystem_error(logtime, self.subsystem, severity, message)
+            
+def log_notify(log, message=None):
+    msg = message or "%s starting on %s" % (log.name, socket.gethostname())
+    log.log(NOTIFY, msg)
+            
     
-def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.INFO, bglevel=logging.INFO):
+def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.INFO, bglevel=NOTIFY, include_mc=False, mc_level=logging.WARNING):
+    if getattr(logger, IS_INITIALIZED_ATTR, False):
+        return logger
+    setattr(logger, IS_INITIALIZED_ATTR, True)
+
     logger.setLevel(logging.DEBUG)
     logger.propagate = False
 
@@ -52,7 +81,17 @@ def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.
     syslog_handler.setFormatter(formatter)
     logger.addHandler(syslog_handler)
 
-    redis_host = redis.Redis(redishostname, socket_timeout=1)
+    if include_mc:
+        try:
+            mc_handler = HeraMCHandler("correlator")
+            mc_handler.setLevel(mc_level)
+            mc_handler.setFormatter(formatter)
+            logger.addHandler(mc_handler)
+        except:
+            logger.warn("Failed to add HERA MC log handler")
+            logger.exception(sys.exc_info()[0])
+
+    redis_host = redis.StrictRedis(redishostname, socket_timeout=1)
     try:
         redis_host.ping()
     except redis.ConnectionError:
@@ -91,8 +130,8 @@ def cminfo_compute():
     of pam/fem/ant/snap mappings.
     Requires hera_mc.
     """
-    from hera_mc import sys_handling
-    h = sys_handling.Handling()
+    from hera_mc import cm_sysutils 
+    h = cm_sysutils.Handling()
     cminfo = h.get_cminfo_correlator()
     snap_to_ant = {}
     ant_to_snap = {}

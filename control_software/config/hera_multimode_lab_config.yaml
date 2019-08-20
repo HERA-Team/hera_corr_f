@@ -1,0 +1,40 @@
+fpgfile: '/home/hera/src/hera_corr_f/snap_fengine/outputs/snap_fengine_2018-06-07_0929.fpg'
+
+dest_port: 8511
+
+sync: 'pps'
+
+noise: False
+
+initialize: False
+
+eth: False
+
+tvg: False
+
+# A maximum of 48 antennas can be alloted to each F-Engine.
+# The number of antennas should be a multiple of 3.
+fengines:
+    snapc12:
+        phase_switch_index: 0
+        ants: [0,48]
+
+# The X-Engines in a design.
+# The maximum number of X-Engines is 16.
+# Each X-engine accepts 384 channels.
+# Only channels defined here will be sent out by F-Engines. Other
+# channels are not sent anywhere.
+
+# Data can be alloted to (48/num_ants_per_feng) 
+# number of X-engines. 384 channels are sent to 
+# each Xeng specified.
+
+xengines:
+    0:
+        even:
+           ip: "10.10.10.5"
+           mac: 0xf452147e9492
+        odd:
+           ip: "0.0.0.0"
+           mac: 0x02020a5028ce
+        chan_range: [1536, 1920]

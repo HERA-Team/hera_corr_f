@@ -1,4 +1,5 @@
 import logging
+import os
 import time
 import socket
 import redis
@@ -42,7 +43,7 @@ class HeraCorrelator(object):
 
         self.config_is_valid= self._verify_config()
 
-    def do_for_all_f(self, method, block=None, block_index=None, args=(), kwargs={}, timeout=3, dead_count_threshold=3):
+    def do_for_all_f(self, method, block=None, block_index=None, args=(), kwargs={}, timeout=3, dead_count_threshold=3, check_programmed=False):
         """
         Call `method` against all F-Engine instances.
         inputs:
@@ -54,6 +55,7 @@ class HeraCorrelator(object):
             kwargs (dict): keyword arguments to pass to the underlying method
             timeout (float): Timeout in seconds
             dead_count_threshold (int): Number of failed connection attempts allowed before declaring an F-Engine dead. Set to None to skip error tracking
+            check_programmed (bool): Set to True to call against only programmed F-Engines
         returns:
             dictionary of return values from the underlying method. Keys are f-engine hostnames.
             If *any* fengines fail to return before timeout, then this method returns None
@@ -66,11 +68,17 @@ class HeraCorrelator(object):
         # we're calling against some block class
         # TODO: We only check the first instance, and assume the others are the same
         if block is None:
-            instances = self.fengs
+            if not check_programmed:
+                instances = self.fengs
+            else:
+                instances = [feng for feng in self.fengs if feng.is_programmed()]
         else:
             if not hasattr(self.fengs[0], block):
                 return None
-            instances = [getattr(f, block) for f in self.fengs]
+            if not check_programmed:
+                instances = [getattr(f, block) for f in self.fengs]
+            else:
+                instances = [getattr(f, block) for f in self.fengs if f.is_programmed()]
         # If the instances are themselves lists, demand the user specify a block index
         #TODO just checking the first entry
         if isinstance(instances[0], list):
@@ -158,7 +166,7 @@ class HeraCorrelator(object):
                 if use_redis:
                     feng = SnapFengine(host, ant_indices=ant_indices, redishost=self.redishost)
                 else:
-                    feng = SnapFengine(host, ant_indices=ant_indices)
+                    feng = SnapFengine(host, ant_indices=ant_indices, redishost=None)
                 if feng.fpga.is_connected():
                     self.fengs += [feng]
                     feng.error_count = 0
@@ -166,7 +174,7 @@ class HeraCorrelator(object):
                     self.logger.warning("Board %s is not connected" % host)
                     self.dead_fengs[host] = time.time()
             except:
-                self.logger.warning("Exception whilst connecting to board %s" % host)
+                self.logger.exception("Exception whilst connecting to board %s" % host)
                 self.dead_fengs[host] = time.time()
         self.fengs_by_name = {}
         self.fengs_by_ip = {}
@@ -176,7 +184,7 @@ class HeraCorrelator(object):
             self.fengs_by_ip[feng.ip] = feng
         self.logger.info('SNAPs are: %s' % ', '.join([feng.host for feng in self.fengs]))
 
-    def reestablish_dead_connections(self, age=0.0):
+    def reestablish_dead_connections(self, age=0.0, programmed_only=False):
         """
         Try to reconnect to all boards in `self.dead_fengs`,
         if the board was declared dead more than `age` seconds ago.
@@ -191,9 +199,12 @@ class HeraCorrelator(object):
             try:
                 feng = SnapFengine(host)
                 if feng.fpga.is_connected():
-                    new_fengs += [feng]
-                    feng.error_count = 0
-                    self.dead_fengs.pop(host)
+                    if (not programmed_only) or (programmed_only and feng.is_programmed()):
+                        new_fengs += [feng]
+                        feng.error_count = 0
+                        self.dead_fengs.pop(host)
+                    else:
+                        self.logger.warning("Tried to reconnect to host %s. It is alive but not programmed." % host)
                 else:
                     self.logger.warning("Tried to reconnect to host %s and failed" % host)
             except:
@@ -264,20 +275,33 @@ class HeraCorrelator(object):
         Program SNAPs.
         Inputs:
             bitstream (str): Path to fpgfile to program. If None, the bitstream described in the current configuration will be used.
-            unprogrammed_only (Boolean): If True, only program boards which aren't yet programmed. Current state is determined by a lazy
-                                         check for the "adc16_controller" register. If it exists, the board is deemed programmed.
+            unprogrammed_only (Boolean): If True, only program boards which aren't yet programmed.
         """
+        TEMP_BITSTREAM_STORE = "/tmp/"
         progfile = bitstream or self.config['fpgfile']
         self.logger.info('Programming all SNAPs with %s' % progfile)
+        if progfile.startswith("redis:"):
+            progfile = progfile.split(":")[-1]
+            try:
+                bitstream = self.r.hget("fpg:%s" % progfile, "fpg")
+            except KeyError:
+                self.logger.error("FPG file %s not available in redis. Cannot program" % progfile)
+                return
+            progfile = os.path.join(TEMP_BITSTREAM_STORE, progfile)
+            with open(progfile, "wb") as fh:
+                fh.write(bitstream)
+            
         if unprogrammed_only:
             to_be_programmed = []
             for feng in self.fengs:
-                if 'adc16_controller' not in feng.fpga.listdev():
+                if not feng.is_programmed():
                     to_be_programmed += [feng]
             if len(to_be_programmed) == 0:
+                self.logger.info("Skipping programming because all boards seem ready")
                 return
         else:
             to_be_programmed = self.fengs
+        self.logger.info("Actually programming %s" % ([f.host for f in self.fengs]))
         utils.program_fpgas([f.fpga for f in to_be_programmed], progfile, timeout=300.0)
         for f in to_be_programmed:
             self.r.hset('status:snap:%s' % f.host, 'last_programmed', time.ctime())
@@ -492,17 +516,29 @@ class HeraCorrelator(object):
                    self.set_eq(str(ant), pol)
                    self.set_pam_attenuation(str(ant), pol)
 
-    def initialize(self):
+    def initialize(self, multithread=True, timeout=120):
         """
         Initialize all F-Engines.
 
         1. Initialize F-Eengine blocks.
         2. Disable noise/phase switches
         3. Return PAM attenuation and digital EQ to last known state.
+
+        If `multithread` is True, the underlying code will to use
+        this class's `do_for_all_f` method to intialize everyone.
+        In this case, the `timeout` parameter specifies (in seconds)
+        how long the threads should wait before timing out.
+        NB: initialization takes about 30 seconds if things are going well,
+        and longer if individual transactions fail and have to be retried.
         """
-        for feng in self.fengs:
-            self.logger.info('Initializing %s'%feng.host)
-            feng.initialize()
+        if not multithread:
+            for feng in self.fengs:
+                self.logger.info('Initializing %s'%feng.host)
+                feng.initialize()
+        else:
+            self.logger.info('Initializing all hosts using multithreading')
+            self.do_for_all_f("initialize", timeout=timeout)
+        #TODO multithread these:
         self.noise_diode_disable()
         self.phase_switch_disable()
         self._initialize_all_eq()
@@ -553,7 +589,7 @@ class HeraCorrelator(object):
         for fn,(host,params) in enumerate(self.config['fengines'].items()):
             if 'ants' in params.keys():
                 if len(params['ants']) != 3: 
-                    self.logger.warngin("%s: Number of antennas is not 3!" % host)
+                    self.logger.warning("%s: Number of antennas is not 3!" % host)
                     test_passed = False
         # Check that there are only 48 channels per x-engine.
         for host,params in self.config['xengines'].items():
@@ -565,7 +601,7 @@ class HeraCorrelator(object):
                     test_passed = False
         return test_passed
 
-    def configure_freq_slots(self):
+    def configure_freq_slots(self, multithread=True):
         """
         Configure F-Engine destination packet slots.
         """
@@ -573,28 +609,42 @@ class HeraCorrelator(object):
         chans_per_packet = self.config.get('chans_per_packet', 384) # Hardcoded in firmware
         self.logger.info('Configuring frequency slots for %d X-engines, %d channels per packet' % (n_xengs, chans_per_packet))
         dest_port = self.config['dest_port'] 
-        for fn, feng in enumerate(self.fengs):
-            # Update redis to reflect current assignments
-            self.r.hset("corr:snap_ants", feng.host, json.dumps(feng.ant_indices))
-            # if the user hasn't specified a source port, auto increment mod 4
-            source_port = self.config['fengines'][feng.host].get('source_port', dest_port + (fn%4))
-            for xn, xparams in self.config['xengines'].items():
-                chan_range = xparams.get('chan_range', [xn*384, (xn+1)*384])
-                chans = range(chan_range[0], chan_range[1])
-                self.r.hset("corr:xeng_chans", xn, json.dumps(chans))
-                if (xn > n_xengs): 
-                   self.logger.error("Cannot have more than %d X-engs!!" % n_xengs)
-                   return False
+        self.r.delete("corr:snap_ants")
+        self.r.delete("corr:xeng_chans")
+        for xn, xparams in self.config['xengines'].items():
+            chan_range = xparams.get('chan_range', [xn*384, (xn+1)*384])
+            chans = range(chan_range[0], chan_range[1])
+            self.r.hset("corr:xeng_chans", xn, json.dumps(chans))
+            if (xn > n_xengs): 
+               self.logger.error("Cannot have more than %d X-engs!!" % n_xengs)
+               return False
+            ip = [int(i) for i in xparams['even']['ip'].split('.')]
+            ip_even = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
+            ip = [int(i) for i in xparams['odd']['ip'].split('.')]
+            ip_odd = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
+
+            for fn, feng in enumerate(self.fengs):
                 self.logger.info('%s: Setting Xengine %d: chans %d-%d: %s (even) / %s (odd)' % (feng.fpga.host, xn, chans[0], chans[-1], xparams['even']['ip'], xparams['odd']['ip']))
-                ip = [int(i) for i in xparams['even']['ip'].split('.')]
-                ip_even = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
-                ip = [int(i) for i in xparams['odd']['ip'].split('.')]
-                ip_odd = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
-                feng.packetizer.assign_slot(xn, chans, [ip_even,ip_odd], feng.reorder, feng.ant_indices[0])
-                feng.eth.add_arp_entry(ip_even,xparams['even']['mac'])
-                feng.eth.add_arp_entry(ip_odd,xparams['odd']['mac'])
-            feng.eth.set_source_port(source_port)
-            feng.eth.set_port(dest_port)
+                # Update redis to reflect current assignments
+                self.r.hset("corr:snap_ants", feng.host, json.dumps(feng.ant_indices))
+                # if the user hasn't specified a source port, auto increment mod 4
+                source_port = self.config['fengines'][feng.host].get('source_port', dest_port + (fn%4))
+                if not multithread:
+                    # if not multithreading use the original packetizer method, which is known good.
+                    feng.packetizer.assign_slot(xn, chans, [ip_even,ip_odd], feng.reorder, feng.ant_indices[0])
+                    feng.eth.add_arp_entry(ip_even,xparams['even']['mac'])
+                    feng.eth.add_arp_entry(ip_odd,xparams['odd']['mac'])
+            else:
+                self.do_for_all_f("assign_slot", args=[xn, chans, [ip_even,ip_odd]])
+                self.do_for_all_f("add_arp_entry", block="eth", args=[ip_even, xparams['even']['mac']])
+                self.do_for_all_f("add_arp_entry", block="eth", args=[ip_odd, xparams['odd']['mac']])
+        if not multithread:
+            for fn, feng in enumerate(self.fengs):
+                feng.eth.set_source_port(source_port)
+                feng.eth.set_port(dest_port)
+        else:
+            self.do_for_all_f("set_source_port", block="eth", args=[source_port])
+            self.do_for_all_f("set_port", block="eth", args=[dest_port])
         return True
 
     def resync(self, manual=False):

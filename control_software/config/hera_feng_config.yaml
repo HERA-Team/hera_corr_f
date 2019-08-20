@@ -42,25 +42,49 @@ initialize: False
 eth: False
 
 # Specify a full path to an F-Engine fpg files
-fpgfile: '/home/hera/src/hera_corr_f/snap_fengine/outputs/snap_fengine_2018-11-13_1236.fpg'
+# or redis:<fpg filename> if the fpg file has been uploaded to redis
+fpgfile: 'redis:snap_fengine_2018-11-13_1236.fpg'
 
 # Destination port for SNAP data
 dest_port: 8511
 
 fengines:
-    heraNode1Snap0:
+    heraNode0Snap0:
         phase_switch_index: 0
         ants: [0, 1, 2]
-    heraNode1Snap1:
+    heraNode0Snap1:
         phase_switch_index: 0
         ants: [3, 4, 5]
-    heraNode1Snap2:
+    heraNode0Snap2:
         phase_switch_index: 0
         ants: [6, 7, 8]
-    heraNode1Snap3:
+    #heraNode0Snap3:
+    #    phase_switch_index: 0
+    #    ants: [9, 10, 11]
+    heraNode9Snap0:
         phase_switch_index: 0
-        ants: [9, 10, 11]
-
+        ants: [12, 13, 14]
+    heraNode9Snap1:
+        phase_switch_index: 0
+        ants: [15, 16, 17]
+    heraNode9Snap2:
+        phase_switch_index: 0
+        ants: [18, 19, 20]
+    heraNode9Snap3:
+        phase_switch_index: 0
+        ants: [21, 22, 23]
+    heraNode8Snap0:
+        phase_switch_index: 0
+        ants: [24, 25, 26]
+    heraNode8Snap1:
+        phase_switch_index: 0
+        ants: [27, 28, 29]
+    heraNode8Snap2:
+        phase_switch_index: 0
+        ants: [30, 31, 32]
+    heraNode8Snap3:
+        phase_switch_index: 0
+        ants: [33, 34, 35] 
 # Data is sent assuming a total of 32 Xengines and 
 # a maximum of 48 channels per Xengine. If all the 
 # 32 Xengines are not defined, the corresponding channels

@@ -13,18 +13,67 @@ from casperfpga import i2c_eeprom
 from casperfpga import i2c_sn
 from casperfpga import i2c_bar
 from casperfpga import i2c_motion
+from casperfpga import i2c_temp
 from scipy.linalg import hadamard #for walsh (hadamard) matrices
 
 # Block Classes
 class Block(object):
     def __init__(self, host, name, logger=None):
         self.host = host #casperfpga object
-        self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + "(%s:%s)" % (host.host, name)))
+        # One logger per host. Multiple blocks share the same logger.
+        # Multiple hosts should *not* share the same logger, since we can multithread over hosts.
+        self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + "%s" % (host.host)))
         self.name = name
         if (name is None) or (name == ''):
             self.prefix = ''
         else:
             self.prefix = name + '_'
+
+    def _prefix_log(self, msg):
+        """
+        Take a log message, and prefix it with "<block> - ".
+        Eg, take "Argh, I'm broken" and replace it with
+        "eq_tvg - Argh I'm broken"
+        """
+        prefix = "%s - " % self.name
+        return prefix + msg
+
+    def _debug(self, msg, *args, **kwargs):
+        self.logger.debug(self._prefix_log(msg), *args, **kwargs)
+
+    def _info(self, msg, *args, **kwargs):
+        self.logger.info(self._prefix_log(msg), *args, **kwargs)
+
+    def _warning(self, msg, *args, **kwargs):
+        self.logger.warning(self._prefix_log(msg), *args, **kwargs)
+
+    def _error(self, msg, *args, **kwargs):
+        self.logger.error(self._prefix_log(msg), *args, **kwargs)
+
+    def _critical(self, msg, *args, **kwargs):
+        self.logger.critical(self._prefix_log(msg), *args, **kwargs)
+
+    def _exception(self, msg, *args, **kwargs):
+        self.logger.exception(self._prefix_log(msg), *args, **kwargs)
+
+    def print_status(self):
+        """
+        Individual blocks should override this
+        method to print some useful information.
+        """
+        pass
+
+    def initialize(self):
+        """
+        Individual blocks should override this
+        method to configure themselves appropriately
+        """
+
+    def listdev(self):
+        """
+        return a list of all register names within
+        the block.
+        """
     
     def print_status(self):
         """
@@ -75,19 +124,23 @@ class Block(object):
         self.write_int(reg, new_val)
 
 class Synth(casperfpga.synth.LMX2581):
-    def __init__(self, host, name):
-         super(Synth, self).__init__(host, name)
+    def __init__(self, host, name, logger=None):
+        self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + "%s" % (host.host)))
+        super(Synth, self).__init__(host, name)
+        self.host = host 
 
     def initialize(self):
         """
         Seem to have to do this if reference
         was not present when board was powered up(?)
         """
-        self.powerOff()
-        self.powerOn()
+        #Ed. This seems to break things?
+        #self.powerOff()
+        #self.powerOn()
+        pass
 
 class Adc(casperfpga.snapadc.SNAPADC):
-    def __init__(self, host, sample_rate=500, num_chans=2, resolution=8, ref=10):
+    def __init__(self, host, sample_rate=500, num_chans=2, resolution=8, ref=10, logger=None):
         """
         Instantiate an ADC block.
         
@@ -98,6 +151,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
            resolution (int): Bit resolution of the ADC. Valid values are 8, 12.
            ref (float): Reference frequency (in MHz) from which ADC clock is derived. If None, an external sampling clock must be used.
         """
+        self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + "%s" % (host.host)))
         casperfpga.snapadc.SNAPADC.__init__(self,host,ref=ref)
         self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
@@ -105,6 +159,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.clock_divide    = 1
         self.sample_rate     = sample_rate
         self.resolution      = resolution
+        self.host = host # the SNAPADC class doesn't directly expose this
 
     def set_gain(self, gain):
         """
@@ -138,7 +193,16 @@ class Adc(casperfpga.snapadc.SNAPADC):
         """
         Initialize the configuration of the ADC chip.
         """
-        self.init(self.sample_rate, self.num_chans) # from the SNAPADC class
+        n_retries = 3
+        for i in range(n_retries):
+            if self.init(self.sample_rate, self.num_chans) == self.SUCCESS:
+                if i == 0:
+                    self.logger.info("ADC configured OK")
+                if i > 0:
+                    self.logger.warning("ADC took %d attempts to configure" % (i+1))
+                break
+            if i == n_retries - 1:
+                self.logger.error("ADC failed to configure after %d attempts" % (i+1))
         #self.alignLineClock(mode='dual_pat')
         #self.alignFrameClock()
         ##If aligning complete, alignFrameClock should not output any warning
@@ -147,8 +211,8 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.set_gain(4)
 
 class Sync(Block):
-    def __init__(self, host, name):
-        super(Sync, self).__init__(host, name)
+    def __init__(self, host, name, logger=None):
+        super(Sync, self).__init__(host, name, logger)
         self.OFFSET_ARM_SYNC  = 0
         self.OFFSET_ARM_NOISE = 1
         self.OFFSET_SW_SYNC   = 4
@@ -170,7 +234,7 @@ class Sync(Block):
         Change the period of the sync pulse
         """
         self.host.write_int('timebase_sync_period',period)
-        self.logger.info("Changed sync period to %.2f"%period)
+        self._info("Changed sync period to %.2f"%period)
 
     def count(self):
         """
@@ -224,8 +288,8 @@ class Sync(Block):
         self.change_period(0)
 
 class NoiseGen(Block):
-    def __init__(self, host, name, nstreams=6):
-        super(NoiseGen, self).__init__(host, name)
+    def __init__(self, host, name, nstreams=6, logger=None):
+        super(NoiseGen, self).__init__(host, name, logger)
         self.nstreams = nstreams
 
     def set_seed(self, stream, seed):
@@ -233,10 +297,10 @@ class NoiseGen(Block):
         Set the seed of the noise generator for a given stream.
         """
         if stream > self.nstreams:
-            self.logger.error('Tried to set noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
+            self._error('Tried to set noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
             return
         if seed > 255:
-            self.logger.error('Seed value is an 8-bit integer. It cannot be %d' % seed)
+            self._error('Seed value is an 8-bit integer. It cannot be %d' % seed)
             return
         regname = 'seed_%d' % (stream // 4)
         self.change_reg_bits(regname, seed, 8 * (stream % 4), 8)
@@ -246,7 +310,7 @@ class NoiseGen(Block):
         Get the seed of the noise generator for a given stream.
         """
         if stream > self.nstreams:
-            self.logger.error('Tried to get noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
+            self._error('Tried to get noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
             return
         regname = 'seed_%d' % (stream // 4)
         return (self.read_uint(regname) >> (8 * stream % 4)) & 0xff
@@ -262,7 +326,7 @@ class NoiseGen(Block):
        
 
 class Input(Block):
-    def __init__(self, host, name, nstreams=6):
+    def __init__(self, host, name, nstreams=6, logger=None):
         """
         Instantiate an input contol block.
         
@@ -271,7 +335,7 @@ class Input(Block):
             name (string): Name (in simulink) of this block
             nstreams (int): Number of streams this block handles
         """
-        super(Input, self).__init__(host, name)
+        super(Input, self).__init__(host, name, logger)
         self.nstreams = nstreams
         self.USE_NOISE = 0
         self.USE_ADC   = 1
@@ -454,7 +518,7 @@ class Input(Block):
         
 
 class Delay(Block):
-    def __init__(self, host, name, nstreams=6):
+    def __init__(self, host, name, nstreams=6, logger=None):
         """
         Instantiate a delay contol block.
         
@@ -463,7 +527,7 @@ class Delay(Block):
             name (string): Name (in simulink) of this block
             nstreams (int): Number of streams this block handles
         """
-        super(Delay, self).__init__(host, name)
+        super(Delay, self).__init__(host, name, logger)
         self.nstreams = nstreams
 
     def set_delay(self, stream, delay):
@@ -475,7 +539,7 @@ class Delay(Block):
             delay (int): Number of FPGA clock cycles of delay to insert.
         """
         if stream > self.nstreams:
-            self.logger.error('Tried to set delay for stream %d > nstreams (%d)' % (stream, self.nstreams))
+            self._error('Tried to set delay for stream %d > nstreams (%d)' % (stream, self.nstreams))
         self.write_int(change_reg_bits(self.host.read_uint('delays'), delay, 4*stream, 4))
 
     def initialize(self):
@@ -485,8 +549,8 @@ class Delay(Block):
         self.write_int('delays', 0)
 
 class Rotator(Block):
-    def __init__(self, host, name):
-        super(Rotator, self).__init__(host, name)
+    def __init__(self, host, name, logger=None):
+        super(Rotator, self).__init__(host, name, logger)
         
     def disable(self):
         self.write_int('en',0)
@@ -495,8 +559,8 @@ class Rotator(Block):
         self.disable()
 
 class Pfb(Block):
-    def __init__(self, host, name):
-        super(Pfb, self).__init__(host, name)
+    def __init__(self, host, name, logger=None):
+        super(Pfb, self).__init__(host, name, logger)
         self.SHIFT_OFFSET = 0
         self.SHIFT_WIDTH  = 12
         self.PRESHIFT_OFFSET = 12
@@ -522,8 +586,8 @@ class Pfb(Block):
         self.rst_stats()
 
 class PhaseSwitch(Block):
-    def __init__(self, host, name, nstreams=6, depth=2**12, periodbase=2**13):
-        super(PhaseSwitch, self).__init__(host, name)
+    def __init__(self, host, name, nstreams=6, depth=2**12, periodbase=2**13, logger=None):
+        super(PhaseSwitch, self).__init__(host, name, logger)
         self.nstreams = nstreams
         self.depth = depth           # number of brams steps in a period
         self.periodbase = periodbase # number of clock cycles in one bram step
@@ -607,7 +671,7 @@ class PhaseSwitch(Block):
         self.set_delay(0)
         
 class Eq(Block):
-    def __init__(self, host, name, nstreams=8, ncoeffs=2**10):
+    def __init__(self, host, name, nstreams=8, ncoeffs=2**10, logger=None):
         """
         Instantiate an EQ block
         
@@ -617,7 +681,7 @@ class Eq(Block):
             nstreams (int): Number of streams this block handles
             ncoeffs (int): Number of coefficients per input stream
         """
-        super(Eq, self).__init__(host, name)
+        super(Eq, self).__init__(host, name, logger)
         self.nstreams = nstreams
         self.ncoeffs = ncoeffs
         self.width = 16
@@ -636,7 +700,7 @@ class Eq(Block):
         """
         coeffs *= 2**self.bp
         if np.any(coeffs > (2**self.width - 1)):
-            self.logger.warning("Some coefficients out of range")
+            self._warning("Some coefficients out of range")
         # Make integer
         coeffs = np.array(coeffs, dtype=np.int64)
         # saturate coefficients
@@ -676,8 +740,8 @@ class Eq(Block):
             self.set_coeffs(stream, 100*np.ones(self.ncoeffs,dtype='>%s'%self.format))
 
 class EqTvg(Block):
-    def __init__(self, host, name, nstreams=8, nchans=2**13):
-        super(EqTvg, self).__init__(host, name)
+    def __init__(self, host, name, nstreams=8, nchans=2**13, logger=None):
+        super(EqTvg, self).__init__(host, name, logger)
         self.nstreams = nstreams
         self.nchans = nchans
         self.format = 'B'
@@ -735,8 +799,8 @@ class EqTvg(Block):
         self.write_freq_ramp()
 
 class ChanReorder(Block):
-    def __init__(self, host, name, nchans=2**10):
-        super(ChanReorder, self).__init__(host, name)
+    def __init__(self, host, name, nchans=2**10, logger=None):
+        super(ChanReorder, self).__init__(host, name, logger)
         self.nchans = nchans
         self.format = 'L'
 
@@ -768,8 +832,8 @@ class ChanReorder(Block):
         
 
 class Packetizer(Block):
-    def __init__(self, host, name, n_time_demux=2):
-        super(Packetizer, self).__init__(host, name)
+    def __init__(self, host, name, n_time_demux=2, logger=None):
+        super(Packetizer, self).__init__(host, name, logger)
         self.n_time_demux = n_time_demux
         self.n_slots = 16
 
@@ -836,8 +900,8 @@ class Packetizer(Block):
 
         
 class Eth(Block):
-    def __init__(self, host, name, port=10000):
-        super(Eth, self).__init__(host, name)
+    def __init__(self, host, name, port=10000, logger=None):
+        super(Eth, self).__init__(host, name, logger)
         self.port = port
 
     def set_arp_table(self, macs):
@@ -918,7 +982,7 @@ class Eth(Block):
 
 
 class Corr(Block):
-    def __init__(self, host, name, acc_len=3815):
+    def __init__(self, host, name, acc_len=3815, logger=None):
         """
         Instantiate an correlation block, which allows correlation
         of pairs of inputs to be computed.
@@ -928,7 +992,7 @@ class Corr(Block):
             name (string): Name (in simulink) of this block
             acc_len (int): Number of spectra to accumulate
         """
-        super(Corr, self).__init__(host,name)
+        super(Corr, self).__init__(host, name, logger)
         self.nchans = 1024
         self.acc_len = acc_len
         self.spec_per_acc = 8
@@ -1033,8 +1097,8 @@ class Corr(Block):
 
             
 class RoachInput(Block):
-    def __init__(self, host, name, nstreams=32):
-        super(RoachInput, self).__init__(host, name)
+    def __init__(self, host, name, nstreams=32, logger=None):
+        super(RoachInput, self).__init__(host, name, logger)
         self.nstreams  = nstreams
         self.nregs     = nstreams // 8
         self.nstreams_per_reg = 8
@@ -1091,14 +1155,14 @@ class RoachInput(Block):
         print self.get_stats()
 
 class RoachDelay(Block):
-    def __init__(self, host, name, nstreams=6):
-        super(RoachDelay, self).__init__(host, name)
+    def __init__(self, host, name, nstreams=6, logger=None):
+        super(RoachDelay, self).__init__(host, name, logger)
         self.nstreams = nstreams
         self.nregs = nstreams // 4
 
     def set_delay(self, stream, delay):
         if stream > self.nstreams:
-            self.logger.error('Tried to set delay for stream %d > nstreams (%d)' % (stream, self.nstreams))
+            self._error('Tried to set delay for stream %d > nstreams (%d)' % (stream, self.nstreams))
         delay_reg = stream // 4
         reg_pos   = stream % 4
         self.change_reg_bits('%d' % delay_reg, delay, 8*reg_pos, 8)
@@ -1108,8 +1172,8 @@ class RoachDelay(Block):
             self.write_int('%d' % i, 0)
 
 class RoachPfb(Block):
-    def __init__(self, host, name):
-        super(RoachPfb, self).__init__(host, name)
+    def __init__(self, host, name, logger=None):
+        super(RoachPfb, self).__init__(host, name, logger)
         self.host = host
         self.SHIFT_OFFSET = 0
         self.SHIFT_WIDTH  = 11
@@ -1127,8 +1191,8 @@ class RoachPfb(Block):
         self.host.write_int('fft_shift', 0)
 
 class RoachEth(Block):
-    def __init__(self, host, name, port=10000):
-        super(RoachEth, self).__init__(host, name)
+    def __init__(self, host, name, port=10000, logger=None):
+        super(RoachEth, self).__init__(host, name, logger)
         self.port = port
 
     def set_arp_table(self, macs):
@@ -1200,7 +1264,7 @@ class Pam(Block):
     RMS2DC_SLOPE = 27.31294863
     RMS2DC_INTERCEPT = -55.15991678
 
-    def __init__(self, host, name):
+    def __init__(self, host, name, logger=None):
         """ Post Amplifier Module (PAM) digital control class
 
             Features:
@@ -1216,7 +1280,7 @@ class Pam(Block):
                 or 'i2c_ant3'. Please refer to the f-engine model for correct
                 value.
         """
-        super(Pam, self).__init__(host, name)
+        super(Pam, self).__init__(host, name, logger)
 
         self.i2c = i2c.I2C(host, name, retry_wait=self.I2C_RETRY_WAIT)
 
@@ -1226,27 +1290,17 @@ class Pam(Block):
         # set i2c bus to 10 kHz
         self.i2c.setClock(self.CLK_I2C_BUS, self.CLK_I2C_REF)
 
-        # Attenuator
-        self._atten = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
-
-        # Current sensor
-        self._cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
-        self._cur.init()
-
-        # ID chip
-        self._sn=i2c_sn.DS28CM00(self.i2c, self.ADDR_SN)
-
-        # Power detector
-        self._pow = i2c_volt.MAX11644(self.i2c, self.ADDR_VOLT)
-        self._pow.init()
-
-        # ROM
-        self._rom=i2c_eeprom.EEP24XX64(self.i2c, self.ADDR_ROM)
-
     def get_attenuation(self):
         """ Get East and North attenuation
             returns: (east attenuation (dB, int), north attenuation (dB, int)
         """
+        if not hasattr(self, "_atten"):
+            try:
+                # Attenuator
+                self._atten = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
+            except:
+                self._warning("Failed to initialize I2C attenuator")
+                return None, None
 
         val=self._atten.read()
         ve,vn=self._gpio2db(val)
@@ -1263,6 +1317,13 @@ class Pam(Block):
             If only one pol is specified, a read is issued to
             figure out what the other value should be.
         """
+        if not hasattr(self, "_atten"):
+            try:
+                # Attenuator
+                self._atten = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
+            except:
+                self._warning("Failed to initialize I2C attenuator")
+
         if (east is None) or (north is None):
             # Get current attenuation
             val=self._atten.read()
@@ -1284,12 +1345,21 @@ class Pam(Block):
             shunt(name='i')     # returns current in Amps
             shunt(name='u')     # returns voltage in Volt
         """
+        if not hasattr(self, "_cur"):
+            try:
+                # Current sensor
+                self._cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
+                self._cur.init()
+            except:
+                self._warning("Failed to initialize I2C current sensor")
+                return None
+
         if name == 'i':
-            vshunt = ina.readVolt('shunt')
+            vshunt = self._cur.readVolt('shunt')
             ishunt = vshunt * 1.0 / self.SHUNT_RESISTOR
             return ishunt
         elif name == 'u':
-            vbus = ina.readVolt('bus')
+            vbus = self._cur.readVolt('bus')
             return vbus
         else:
             raise ValueError('Invalid parameter.')
@@ -1297,6 +1367,14 @@ class Pam(Block):
     def id(self):
         """ Get the unique eight-byte serial number of the module
         """
+        if not hasattr(self, "_id"):
+            try:
+                # ID chip
+                self._sn=i2c_sn.DS28CM00(self.i2c, self.ADDR_SN)
+            except:
+                self._warning("Failed to initialize I2C ID chip")
+                return None
+
         return self._sn.readSN()
 
     def power(self, name='east'):
@@ -1306,6 +1384,14 @@ class Pam(Block):
             power(name='east')  # returns power level of east in dBm
             power(name='north') # returns power level of north in dBm
         """
+        if not hasattr(self, "_pow"):
+            try:
+                # Power detector
+                self._pow = i2c_volt.MAX11644(self.i2c, self.ADDR_VOLT)
+                self._pow.init()
+            except:
+                self._warning("Failed to initialize I2C power sensor")
+                return None
         LOSS = 9.8
         if name not in ['east','north']:
             raise ValueError('Invalid parameter.')
@@ -1329,6 +1415,13 @@ class Pam(Block):
             rom()               # returns a string ended with a '\0'
             rom('hello')        # write 'hello\0' into ROM
         """
+        if not hasattr(self, "_rom"):
+            try:
+                # ROM
+                self._rom=i2c_eeprom.EEP24XX64(self.i2c, self.ADDR_ROM)
+            except:
+                self._warning("Failed to initialize I2C ROM")
+                return None
         if string == None:
             return self._rom.readString()
         else:
@@ -1380,7 +1473,7 @@ class Fem(Block):
     IMU_ORIENT = [[0,0,1],[0,1,0],[1,0,0]]
     SWMODE = {'load':0b001,'antenna':0b111,'noise':0b000}
 
-    def __init__(self, host, name):
+    def __init__(self, host, name, logger=None):
         """ Front End Module (FEM) digital control class
 
             Features:
@@ -1399,37 +1492,14 @@ class Fem(Block):
                 or 'i2c_ant3'. Please refer to the f-engine model for correct
                 value.
         """
-        super(Fem, self).__init__(host, name)
+        super(Fem, self).__init__(host, name, logger)
 
         self.i2c = i2c.I2C(host, name, retry_wait=self.I2C_RETRY_WAIT)
 
     def initialize(self):
-
         self.i2c.enable_core()
         # set i2c bus to 10 kHz
         self.i2c.setClock(self.CLK_I2C_BUS, self.CLK_I2C_REF)
-
-        # Barometer
-        self.bar = i2c_bar.MS5611_01B(self.i2c, self.ADDR_BAR)
-        self.bar.init()
-
-        # Current sensor
-        self.cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
-        self.cur.init()
-
-        # IMU
-        self.imu = i2c_motion.IMUSimple(self.i2c,self.ADDR_ACCEL,
-                                        orient=self.IMU_ORIENT)
-        self.imu.init()
-
-        # ROM
-        self.rom=i2c_eeprom.EEP24XX64(self.i2c,ADDR_ROM)
-
-        # Switch
-        self.sw = i2c_gpio.PCF8574(self.i2c,self.ADDR_GPIO)
-
-        # Temperature
-        self.temp = i2c_temp.Si7051(self.i2c, self.ADDR_TEMP)
 
 
     def pressure(self):
@@ -1438,8 +1508,16 @@ class Fem(Block):
             Example:
             pressure()      # return pressure in kPa
         """
-        rawt,dt = self.bar.readTemp(raw=True)
-        press = self.bar.readPress(rawt,dt)
+        if not hasattr(self, "_bar"):
+            try:
+                # Barometer
+                self._bar = i2c_bar.MS5611_01B(self.i2c, self.ADDR_BAR)
+                self._bar.init()
+            except:
+                self._warning("Failed to initialize I2C barometer")
+                return None
+        rawt,dt = self._bar.readTemp(raw=True)
+        press = self._bar.readPress(rawt,dt)
         return press
 
 
@@ -1450,12 +1528,20 @@ class Fem(Block):
             shunt(name='i')     # returns current in Amps
             shunt(name='u')     # returns voltage in Volt
         """
+        if not hasattr(self, "_cur"):
+            try:
+                # Current sensor
+                self._cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
+                self._cur.init()
+            except:
+                self._warning("Failed to initialize I2C current sensor")
+                return None
         if name == 'i':
-            vshunt = ina.readVolt('shunt')
+            vshunt = self._cur.readVolt('shunt')
             ishunt = vshunt * 1.0 / self.SHUNT_RESISTOR
             return ishunt
         elif name == 'u':
-            vbus = ina.readVolt('bus')
+            vbus = self._cur.readVolt('bus')
             return vbus
         else:
             raise ValueError('Invalid parameter.')
@@ -1463,13 +1549,29 @@ class Fem(Block):
     def id(self):
         """ Get the unique eight-byte serial number of the module
         """
-        return self.temp.sn()
+        if not hasattr(self, "_temp"):
+            try:
+                # Temperature
+                self._temp = i2c_temp.Si7051(self.i2c, self.ADDR_TEMP)
+            except:
+                self._info("Failed to initialize I2C temperature sensor")
+                return None
+        return self._temp.sn()
 
     def imu(self):
         """ Get pose of the FEM in the form of theta and phi
             of spherical coordinate system in degrees
         """
-        theta, phi = imu.pose
+        if not hasattr(self, "_imu"):
+            try:
+                # IMU
+                self._imu = i2c_motion.IMUSimple(self.i2c,self.ADDR_ACCEL,
+                                                orient=self.IMU_ORIENT)
+                self._imu.init()
+            except:
+                self._warning("Failed to initialize I2C IMU")
+                return None, None
+        theta, phi = self._imu.pose
         return theta, phi
 
     def rom(self, string=None):
@@ -1479,6 +1581,13 @@ class Fem(Block):
             rom()               # returns a string ended with a '\0'
             rom('hello')        # write 'hello\0' into ROM
         """
+        if not hasattr(self, "_rom"):
+            try:
+                # ROM
+                self._rom=i2c_eeprom.EEP24XX64(self.i2c,self.ADDR_ROM)
+            except:
+                self._warning("Failed to initialize I2C ROM")
+                return None
         if string == None:
             return self.rom.readString()
         else:
@@ -1493,8 +1602,15 @@ class Fem(Block):
             switch('noise')     # Switch into noise mode
             switch('load')      # Switch into load mode
         """
+        if not hasattr(self, "_sw"):
+            try:
+                # Switch
+                self._sw = i2c_gpio.PCF8574(self.i2c,self.ADDR_GPIO)
+            except:
+                self._warning("Failed to initialize I2C RF switch")
+                return None
         if name == None:
-            val = self.sw.read()
+            val = self._sw.read()
             mode = 'Unknown'
             for key,value in self.SWMODE.iteritems():
                 if val&0b111 == value:
@@ -1503,11 +1619,18 @@ class Fem(Block):
             return mode
         elif name in self.SWMODE:
             val = self.SWMODE[name]
-            self.sw.write(val)
+            self._sw.write(val)
         else:
             raise ValueError('Invalid parameter.')
 
     def temperature(self):
         """ Get temperature in Celcius
         """
-        return self.temp.readTemp()
+        if not hasattr(self, "_temp"):
+            try:
+                # Temperature
+                self._temp = i2c_temp.Si7051(self.i2c, self.ADDR_TEMP)
+            except:
+                self._info("Failed to initialize I2C temperature sensor")
+                return None
+        return self._temp.readTemp()
