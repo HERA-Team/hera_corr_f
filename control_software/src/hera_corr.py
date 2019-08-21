@@ -335,9 +335,9 @@ class HeraCorrelator(object):
         Enable all noise switches.
         """
         self.logger.info('Enabling all noise inputs')
-        for feng in self.fengs:
-           for fem in feng.fems:
-               fem.switch(name='noise')
+        for retry in range(3):
+            for i in range(len(self.fengs[0].fems)):
+                self.do_for_all_f("switch", "fems", block_index=i, args=("noise",), timeout=10)
         self.r.hmset('corr:status_noise_diode', {'state':'on', 'time':time.time()})
 
     def noise_diode_disable(self):
@@ -345,9 +345,9 @@ class HeraCorrelator(object):
         Disable all noise switches.
         """
         self.logger.info('Disabling all noise inputs')
-        for feng in self.fengs:
-           for fem in feng.fems:
-               fem.switch(name='antenna')
+        for retry in range(3):
+            for i in range(len(self.fengs[0].fems)):
+                self.do_for_all_f("switch", "fems", block_index=i, args=("antenna",), timeout=10)
         self.r.hmset('corr:status_noise_diode', {'state':'off', 'time':time.time()})
 
     def get_ant_snap_chan(self, ant, pol):
