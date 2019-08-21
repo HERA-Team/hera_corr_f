@@ -595,7 +595,7 @@ class Pfb(Block):
         self.rst_stats()
 
 class PhaseSwitch(Block):
-    def __init__(self, host, name, nstreams=6, depth=2**12, periodbase=2**13, logger=None):
+    def __init__(self, host, name, nstreams=6, depth=2**12, periodbase=2**18, logger=None):
         super(PhaseSwitch, self).__init__(host, name, logger)
         self.nstreams = nstreams
         self.depth = depth           # number of brams steps in a period
@@ -719,8 +719,8 @@ class PhaseSwitch(Block):
         """
         for stream in range(self.nstreams):
             self.set_walsh(stream, 1, 0, 1)
-        #self.disable_mod()
-        #self.disable_demod()
+        self.disable_mod()
+        self.disable_demod()
         self.set_delay(0)
         
 class Eq(Block):
