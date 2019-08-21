@@ -312,8 +312,9 @@ class HeraCorrelator(object):
         """
         self.logger.info('Disabling all phase switches')
         for feng in self.fengs:
-           for stream in range(feng.phaseswitch.nstreams):
-               feng.phaseswitch.set_walsh(stream, 1, 0, 1) 
+            feng.phaseswitch.set_all_walsh(self.config['walsh_order'], [0]*feng.phaseswitch.nstreams, self.config['log_walsh_step_size'])
+        #self.do_for_all_f("disable_mod", "phaseswitch")
+        #self.do_for_all_f("disable_demod", "phaseswitch")
         self.r.hmset('corr:status_phase_switch', {'state':'off', 'time':time.time()})
 
     def phase_switch_enable(self):
@@ -322,9 +323,10 @@ class HeraCorrelator(object):
         """
         self.logger.info('Enabling all phase switches')
         for feng in self.fengs:
-           for stream in range(feng.phaseswitch.nstreams):
-               #TODO figure out what the patterns should be per antenna
-               feng.phaseswitch.set_walsh(stream, 1, 0, 1) 
+            feng.phaseswitch.set_all_walsh(self.config['walsh_order'], self.config['fengines'][feng.host]['phase_switch_index'], self.config['log_walsh_step_size'])
+        self.do_for_all_f("set_delay", "phaseswitch", args=(self.config["walsh_delay"]))
+        #self.do_for_all_f("enable_mod", "phaseswitch")
+        #self.do_for_all_f("enable_demod", "phaseswitch")
         self.r.hmset('corr:status_phase_switch', {'state':'on', 'time':time.time()})
 
     def noise_diode_enable(self):
@@ -655,6 +657,7 @@ class HeraCorrelator(object):
             manual (Boolean): True if you want to synchronize on a software trigger. False (default) to sync on an external PPS.
         """
         self.logger.info('Sync-ing Fengines')
+        self.do_for_all_f("set_delay", block="sync", args=(0,))
         if not manual:
             self.logger.info('Waiting for PPS at time %.2f' % time.time())
             self.fengs[0].sync.wait_for_sync()
@@ -671,11 +674,48 @@ class HeraCorrelator(object):
             sync_time = int(time.time()) # roughly
         else:
             sync_time = int(before_sync) + 1 + 3 # Takes 3 PPS pulses to arm
-        self.r['corr:feng_sync_time'] = sync_time
+        # Store sync time in ms!!!
+        self.r['corr:feng_sync_time'] = 1000*sync_time
         self.r['corr:feng_sync_time_str'] = time.ctime(sync_time)
         self.logger.info('Syncing took %.2f seconds' % (after_sync - before_sync))
         if after_sync - before_sync > 0.5:
             self.logger.warning("It took longer than expected to arm sync!")
+
+    def sync_with_delay(self, sync_time_s, delay_ms, adc_clk_rate=500e6, adc_demux=2):
+        """
+        Resync all boards at the integer UNIX time `sync_time_s`,
+        delaying the internal trigger until `delay_clocks` fpga
+        clocks after the PPS pulse.
+        """
+        if (delay_ms > 1000):
+            self.logger.error("I refuse to sync with a delay > 1 second")
+            return
+        sync_delay_fpga_clocks = (delay_ms / 1e3) / (adc_clk_rate / adc_demux)
+        target_sync_time_ms = sync_time_s*1000 + (sync_delay_fpga_clocks*(adc_clk_rate / adc_demux)) # sync time in unix ms
+        self.do_for_all_f("set_delay", block="sync", args=(sync_delay_fpga_clocks,))
+        if (time.time()+5) > (target_sync_time_ms/1000.):
+            self.logger.error("I refuse to sync less than 5s in the future")
+            return
+        if (time.time()+120) < (target_sync_time_ms/1000.):
+            self.logger.error("I refuse to sync more than 120s in the future")
+            return
+        # it takes 3 PPS pulses to arm. Arm should occur < 4 seconds and > 3 seconds before sync target
+        now = time.time()
+        time_to_sync = sync_time_s - now - 4
+        time.sleep(time_to_sync + 0.1) # This should be 3.9 seconds before target PPS
+        time_before_arm = time.time()
+        self.logger.info("Arming sync at %.2f" % time_before_arm)
+        self.do_for_all_f("arm_sync", "sync")
+        time_after_arm = time.time()
+        self.logger.info("Finished arming sync at %.2f" % time_after_arm)
+        self.logger.info('Syncing took %.2f seconds' % (time_after_arm - time_before_arm))
+        if time_after_arm - time_before_arm > 0.5:
+            self.logger.warning("It took longer than expected to arm sync!")
+        # Update sync time -- in ms!!!!
+        sync_time_ms = 1000*(int(time_before_arm) + 1 + 3) + delay_ms
+        self.r['corr:feng_sync_time'] = sync_time_ms
+        self.r['corr:feng_sync_time_str'] = time.ctime(sync_time_ms/1000.)
+        return sync_time_ms
 
     def sync_noise(self, manual=False):
         """

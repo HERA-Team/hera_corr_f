@@ -223,6 +223,15 @@ class Sync(Block):
         """
         return self.read_uint('uptime')
 
+    def set_delay(self, delay):
+        """
+        Set the delay, in FPGA clock ticks, between the arrival of an external
+        sync pulse and the issuing of an internal trigger.
+        inputs:
+            delay (integer) : Number of FPGA clocks delay
+        """
+        self.write_int('sync_delay', delay)
+
     def period(self):
         """
         Returns period of sync in pulses, in FPGA clock ticks
@@ -592,7 +601,7 @@ class PhaseSwitch(Block):
         self.depth = depth           # number of brams steps in a period
         self.periodbase = periodbase # number of clock cycles in one bram step
 
-    def set_walsh(self, stream, N, n, stepperiod, demodulate=True):
+    def set_walsh(self, stream, N, n, stepperiod):
         """
         N: order of walsh matrix
         stream: stream to set
@@ -621,17 +630,38 @@ class PhaseSwitch(Block):
         new_bram_vec  = curr_bram_vec & (0xff - (1 << stream)) # zero the stream we are writing
         new_bram_vec  = new_bram_vec + (vec << stream)
         self.write('gpio_switch_states', struct.pack('>%dB' % self.depth, *new_bram_vec))
-        
-        #Modify the appropriate bits of the demodulation bram
-        curr_bram_vec = np.array(struct.unpack('>%dB' % self.depth, self.read('sw_switch_states', self.depth)))
-        new_bram_vec  = curr_bram_vec & (0xff - (1<<((self.nstreams-1)-stream))) # zero the stream we are writing
-        if demodulate:
-            new_bram_vec = new_bram_vec + (vec << ((self.nstreams-1) - stream))
         self.write('sw_switch_states', struct.pack('>%dB' % self.depth, *new_bram_vec))
 
+    def set_all_walsh(self, N, n, stepperiod):
+        """
+        Set multiple walsh patterns simultaneously.
+        N: order of walsh matrix
+        n: list of walsh indices with length self.nstreams, containing walsh indices to give each stream.
+        stepperiod: period (2^?), in multiples of self.periodbase FPGA clocks,
+                of shortest walsh step. I.e., 2**13 * 2**self.baseperiod * N
+                = period of complete cycle in FPGA clocks.
+        """
+        N_round = int(2**(np.ceil(np.log2(N))))
+        walsh_matrix = hadamard(N_round)
+        # reformat so 1 means multiply by -1, and 0 means multiply by 1
+        walsh_matrix[walsh_matrix == 1]  = 0
+        walsh_matrix[walsh_matrix == -1] = 1
+        bram_array = np.zeros(self.depth, dtype=np.int)
+        for stream in range(self.nstreams):
+            walsh_func = walsh_matrix[n[stream]] # a vector of length N_round
+            walsh_func_stretch = walsh_func.repeat(2**stepperiod) # a vector of length N_round * 2*step_period
+
+            # The counter in the FPGA cycles through <depth> ram addresses, so repeat
+            # the sequence. Since N_round and 2**stepperiod are always powers of 2,
+            # this is always an integer number of cycles
+            vec = np.array(walsh_func_stretch.tolist() * (self.depth/ 2**stepperiod / N_round), dtype=np.int)
+            bram_array += (vec << stream)
+        #Modify the appropriate bits of the bram
+        self.write('gpio_switch_states', struct.pack('>%dB' % self.depth, *bram_array))
+        self.write('sw_switch_states', struct.pack('>%dB' % self.depth, *bram_array))
+        
     def set_gpio_high(self, stream):
         #Modify the appropriate bits of the bram
-        # note reverse direction of gpio vs software bit assignments
         curr_bram_vec = np.array(struct.unpack('>%dB' % self.depth, self.read('gpio_switch_states', self.depth)))
         new_bram_vec  = curr_bram_vec & (0xff - (1 << stream)) # zero the stream we are writing
         new_bram_vec += (np.ones(self.depth, dtype=np.int) << stream)
@@ -639,20 +669,17 @@ class PhaseSwitch(Block):
 
     def set_gpio_low(self, stream):
         #Modify the appropriate bits of the bram
-        # note reverse direction of gpio vs software bit assignments
         curr_bram_vec = np.array(struct.unpack('>%dB' % self.depth, self.read('gpio_switch_states', self.depth)))
         new_bram_vec  = curr_bram_vec & (0xff - (1 << stream)) # zero the stream we are writing
         self.write('gpio_switch_states', struct.pack('>%dB' % self.depth, *new_bram_vec))
 
     def get_mod_pattern(self, stream):
-        #Modify the appropriate bits of the bram
         curr_bram_vec = np.array(struct.unpack('>%dB' % self.depth, self.read('gpio_switch_states', self.depth)))
-        return (curr_bram_vec >> ((self.nstreams-1) - stream)) & 0b1
+        return (curr_bram_vec & (1 << stream)) >> stream
 
     def get_demod_pattern(self, stream):
-        #Modify the appropriate bits of the bram
         curr_bram_vec = np.array(struct.unpack('>%dB' % self.depth, self.read('sw_switch_states', self.depth)))
-        return (curr_bram_vec >> ((self.nstreams-1) - stream)) & 0b1
+        return (curr_bram_vec & (1 << stream)) >> stream
 
     def set_delay(self, delay):
         """
@@ -662,12 +689,38 @@ class PhaseSwitch(Block):
         """
         self.write_int('gpio_switch_offset', delay)
 
+    def enable_mod(self):
+        """
+        Turn on the modulation patterns
+        """
+        self.write_int('enable_mod', 1)
+
+    def disable_mod(self):
+        """
+        Turn off the modulation patterns
+        """
+        self.write_int('enable_mod', 0)
+
+    def enable_demod(self):
+        """
+        Turn on the demodulation patterns
+        """
+        self.write_int('enable_demod', 1)
+
+    def disable_demod(self):
+        """
+        Turn off the demodulation patterns
+        """
+        self.write_int('enable_demod', 0)
+
     def initialize(self):
         """
         Initialize, turning off walshing
         """
         for stream in range(self.nstreams):
             self.set_walsh(stream, 1, 0, 1)
+        #self.disable_mod()
+        #self.disable_demod()
         self.set_delay(0)
         
 class Eq(Block):
