@@ -311,8 +311,9 @@ class HeraCorrelator(object):
         Disable all phase switches.
         """
         self.logger.info('Disabling all phase switches')
-        for feng in self.fengs:
-            feng.phaseswitch.set_all_walsh(self.config['walsh_order'], [0]*feng.phaseswitch.nstreams, self.config['log_walsh_step_size'])
+        # Don't bother writing the modulation brams. Just hit the master disable
+        #for feng in self.fengs:
+        #    feng.phaseswitch.set_all_walsh(self.config['walsh_order'], [0]*feng.phaseswitch.nstreams, self.config['log_walsh_step_size'])
         self.do_for_all_f("disable_mod", "phaseswitch")
         self.do_for_all_f("disable_demod", "phaseswitch")
         self.r.hmset('corr:status_phase_switch', {'state':'off', 'time':time.time()})
