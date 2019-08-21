@@ -951,6 +951,87 @@ class Packetizer(Block):
         for cn, chan in enumerate(chans[::8]):
             reorder_block.reindex_channel(chan//8, slot_num*64 + cn)
 
+class Rotator(Block):
+    coeff_bits = 32
+    coeff_bp = 31
+    def __init__(self, host, name, n_chans=2**13, n_streams=2**3, max_spec=2**19, block_size=2**10, logger=None):
+        """
+        Construct a Phase Rotator block.
+        Arguments:
+            host (CasperFpga): FPGA interface
+            name (string): Name of this block in simulink
+            n_chans (int): Number of channels in a spectra
+            max_spectra (int): Number of spectra before cycling coefficients
+            n_stream (int): Number of serial polarizations this block processes
+            block_size (int): Number of spectra sharing a coefficient
+        """
+        super(Packetizer, self).__init__(host, name, logger)
+        self.n_chans = n_chans
+        self.n_streams = n_streams
+        self.max_spec = max_spec
+        self.block_size = block_size
+        self.n_slots = self.max_spec / self.block_size
+
+    def _get_ant_offset_bytes(self, ant):
+        """
+        Get the offset in bytes where coefficients for antenna index `ant` are stored.
+        """
+        return (self.coeff_bits // 8) * self.n_slots * ant
+
+    def set_ant_phases(self, ant, phases):
+        """
+        Set the coefficients for `ant` to `phases`.
+        The latter should be a numpy array of phases. It
+        will be repeated as necessary to fill the bram.
+        """
+        try:
+            phases = np.array(phases)
+        except:
+            self.logger.error("Couldn't convert phase coefficients to numpy array")
+            return
+        n_coeffs = phases.shape[0]
+        if self.n_slots % n_coeffs != 0:
+            self.logger.error("Number of slots is not an integer multiple of number of phase coefficients")
+            return
+        phases = np.tile(phases, self.n_slots // n_coeffs)
+        # sanity check
+        assert phases.shape[0] == self.n_slots
+        # scale for firmware binary point and check for overflow
+        phases_scaled = phases * 2**self.coeff_bp
+        assert np.max(np.abs(phases_scaled)) < (2**self.coeff_bp - 1)
+
+        # write to appropriate memory segment for this antenna
+        assert ant < self.n_streams//2
+
+        phases_str = struct.pack('>%dl' % (phases_scaled.shape[0]), *phases_scaled)
+
+        self.write("phases", phases_scaled, offset=self._get_ant_offset_bytes(ant))
+
+    def get_ant_phases(self, ant):
+        """
+        Get a numpy array of the phases stored for antenna `ant`
+        """
+        phases_str = self.read('phases', self.n_slots * (self.coeff_bits // 4), offset=self._get_ant_offset_bytes(ant))
+        return np.array(struct.unpack('>%dl' % (len(phases_str)//4), phases_str)) / 2**self.coeff_bp
+
+
+    def enable(self):
+        self.write_int('en', 1)
+
+    def disable(self):
+        self.write_int('en', 0)
+
+    def is_enabled(self):
+        return self.read_int('en') == 1
+
+    def initialize(self):
+        self.disable()
+        for ant in range(self.n_streams // 2):
+            self.set_ant_phases(ant, [0])
+
+    def print_status(self):
+        print "Is enabled?", self.is_enabled
+
         
 class Eth(Block):
     def __init__(self, host, name, port=10000, logger=None):
