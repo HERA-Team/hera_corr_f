@@ -26,14 +26,14 @@ class SnapFengine(object):
         self.synth       = Synth(self.fpga, 'lmx_ctrl')
         self.adc         = Adc(self.fpga) # not a subclass of Block
         self.sync        = Sync(self.fpga, 'sync')
-        self.noise       = NoiseGen(self.fpga, 'noise', nstreams=6)
+        self.noise       = NoiseGen(self.fpga, 'noise', nstreams=3)
         self.input       = Input(self.fpga, 'input', nstreams=12)
         self.delay       = Delay(self.fpga, 'delay', nstreams=6)
         self.pfb         = Pfb(self.fpga, 'pfb')
         self.eq          = Eq(self.fpga, 'eq_core', nstreams=6, ncoeffs=2**10)
         self.eq_tvg      = EqTvg(self.fpga, 'eqtvg', nstreams=6, nchans=2**13)
         self.reorder     = ChanReorder(self.fpga, 'chan_reorder', nchans=2**10)
-        self.rotator     = Rotator(self.fpga, 'rotator')
+        self.rotator     = Rotator(self.fpga, 'rotator', n_chans=2**13, n_streams=2**3, max_spec=2**19, block_size=2**10)
         self.packetizer  = Packetizer(self.fpga, 'packetizer', n_time_demux=2) # Round robin time packets to two destinations
         self.eth         = Eth(self.fpga, 'eth')
         self.corr        = Corr(self.fpga,'corr_0')
