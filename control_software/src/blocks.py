@@ -311,6 +311,7 @@ class NoiseGen(Block):
         if seed > 255:
             self._error('Seed value is an 8-bit integer. It cannot be %d' % seed)
             return
+        stream = 2*stream # latest block counts in antennas
         regname = 'seed_%d' % (stream // 4)
         self.change_reg_bits(regname, seed, 8 * (stream % 4), 8)
 
@@ -321,6 +322,7 @@ class NoiseGen(Block):
         if stream > self.nstreams:
             self._error('Tried to get noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
             return
+        stream = 2*stream # latest block counts in antennas
         regname = 'seed_%d' % (stream // 4)
         return (self.read_uint(regname) >> (8 * stream % 4)) & 0xff
 
@@ -549,23 +551,14 @@ class Delay(Block):
         """
         if stream > self.nstreams:
             self._error('Tried to set delay for stream %d > nstreams (%d)' % (stream, self.nstreams))
-        self.write_int(change_reg_bits(self.host.read_uint('delays'), delay, 4*stream, 4))
+        # MSBs of 232-bit register are for stream 0, etc...
+        self.change_reg_bits('delays', delay, 32-4-(4*stream), 4)
 
     def initialize(self):
         """
         Initialize all delays to 0.
         """
         self.write_int('delays', 0)
-
-class Rotator(Block):
-    def __init__(self, host, name, logger=None):
-        super(Rotator, self).__init__(host, name, logger)
-        
-    def disable(self):
-        self.write_int('en',0)
-
-    def initialize(self):
-        self.disable()
 
 class Pfb(Block):
     def __init__(self, host, name, logger=None):
@@ -822,7 +815,8 @@ class EqTvg(Block):
         else:
             for stream in range(self.nstreams):
                 tv[stream*self.nchans:(stream+1)*self.nchans] = stream
-        self.write('tv',tv.tostring())
+        for i in range(self.nstreams // 2):
+            self.write('tv%d' % i,tv.tostring()[i*self.nchans*2:(i+1)*self.nchans*2])
 
     def write_freq_ramp(self,equal_pols=False):
         """ Write a frequency ramp to the test vector 
@@ -839,12 +833,15 @@ class EqTvg(Block):
         else:
             for stream in range(self.nstreams):
                 tv[stream*self.nchans: (stream+1)*self.nchans] = ramp + stream
-        self.write('tv', tv.tostring())
+        for i in range(self.nstreams // 2):
+            self.write('tv%d' % i,tv.tostring()[i*self.nchans*2:(i+1)*self.nchans*2])
 
     def read_tvg(self):
         """ Read the test vector written to the sw bram """
-        tvg = struct.unpack('>%d%s'%(self.nchans*self.nstreams, self.format),
-                            self.read('tv', self.nchans * self.nstreams))
+        s = ""
+        for i in range(self.nstreams // 2):
+            s += self.read('tv%d' % i, self.nchans * 2)
+        tvg = struct.unpack('>%d%s'%(self.nchans*self.nstreams, self.format), s)
         return tvg
 
     def initialize(self):
@@ -965,7 +962,7 @@ class Rotator(Block):
             n_stream (int): Number of serial polarizations this block processes
             block_size (int): Number of spectra sharing a coefficient
         """
-        super(Packetizer, self).__init__(host, name, logger)
+        super(Rotator, self).__init__(host, name, logger)
         self.n_chans = n_chans
         self.n_streams = n_streams
         self.max_spec = max_spec
@@ -1005,14 +1002,14 @@ class Rotator(Block):
 
         phases_str = struct.pack('>%dl' % (phases_scaled.shape[0]), *phases_scaled)
 
-        self.write("phases", phases_scaled, offset=self._get_ant_offset_bytes(ant))
+        self.write("phases", phases_str, offset=self._get_ant_offset_bytes(ant))
 
     def get_ant_phases(self, ant):
         """
         Get a numpy array of the phases stored for antenna `ant`
         """
-        phases_str = self.read('phases', self.n_slots * (self.coeff_bits // 4), offset=self._get_ant_offset_bytes(ant))
-        return np.array(struct.unpack('>%dl' % (len(phases_str)//4), phases_str)) / 2**self.coeff_bp
+        phases_str = self.read('phases', self.n_slots * (self.coeff_bits // 8), offset=self._get_ant_offset_bytes(ant))
+        return np.array(struct.unpack('>%dl' % (len(phases_str)//4), phases_str), dtype=np.float64) / 2**self.coeff_bp
 
 
     def enable(self):
@@ -1214,7 +1211,8 @@ class Corr(Block):
         """
         Get the currently loaded accumulation length. In FPGA clocks
         """
-        self.acc_len = self.read_int('acc_len')
+        #Convert to spectra from clocks. See Firmware for reasoning behind 1024
+        self.acc_len = self.read_int('acc_len') // 1024
         return self.acc_len
 
     def set_acc_len(self,acc_len):
