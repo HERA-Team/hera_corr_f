@@ -202,6 +202,8 @@ if __name__ == "__main__":
                         help ='Seconds between reconnection attempts to dead boards')
     parser.add_argument('-l', dest='loglevel', type=str, default="INFO",
                         help ='Log level. DEBUG / INFO / WARNING / ERROR')
+    parser.add_argument('--noredistapcp', action='store_true',
+                        help='Don\'t use the redis-based SNAP comms protocol')
     args = parser.parse_args()
 
     if args.loglevel not in ["DEBUG", "INFO", "WARNING", "ERROR"]:
@@ -211,7 +213,7 @@ if __name__ == "__main__":
             handler.setLevel(getattr(logging, args.loglevel))
        
 
-    corr = HeraCorrelator(redishost=args.redishost)
+    corr = HeraCorrelator(redishost=args.redishost, use_redis=(not args.noredistapcp))
     upload_time = corr.r.hget('snap_configuration', 'upload_time')
     print_ant_log_messages(corr)
 
@@ -229,7 +231,7 @@ if __name__ == "__main__":
         if corr.r.hget('snap_configuration', 'upload_time') != upload_time:
             upload_time = corr.r.hget('snap_configuration', 'upload_time')
             logger.info('New configuration detected. Reinitializing fengine list')
-            corr = HeraCorrelator(redishost=args.redishost)
+            corr = HeraCorrelator(redishost=args.redishost, use_redis=(not args.noredistapcp))
             print_ant_log_messages(corr)
         
         # Recompute the hookup every time. It's fast
