@@ -72,8 +72,8 @@ def main():
     # Before we start manipulating boards, prevent monitoing scripts from
     # sending TFTP traffic. Expire the key after 5 minutes to lazily account for
     # issues with this script crashing.
-    corr.disable_monitoring(expiry=300)
-    time.sleep(1) # wait for the monitor to pause
+    corr.disable_monitoring(expiry=600)
+    time.sleep(10) # wait for the monitor to pause
     
     if args.program or args.forceprogram:
         corr.program(unprogrammed_only=(not args.forceprogram)) # This should multithread the programming process.
