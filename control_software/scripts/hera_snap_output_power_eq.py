@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import argparse
-from hera_corr_f import HeraCorrelator, helpers, __version__
+from hera_corr_f import HeraCorrelator, SnapFengine, helpers, __version__
 import numpy as np
 import struct
 import collections
@@ -23,24 +23,30 @@ parser.add_argument('--rms', dest='rms', type=float, default=3.,
 args = parser.parse_args()
 
 corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)
+corr.disable_monitoring(expiry=30)
+time.sleep(10) # wait for the monitor to pause
 
-for feng in corr.fengs:
-    for pn, pol in enumerate(feng.ants):
-        if pol is None:
+for ant, snap in corr.ant_to_snap.iteritems():
+    for pol, snap_chan in snap.iteritems():
+        corr.disable_monitoring(expiry=30)
+        feng = snap_chan['host']
+        if not isinstance(feng, SnapFengine):
             continue
-        print "%s: %s:" % (feng.host, pol)
-        spec = feng.corr.get_new_corr(pn, pn).real
-        print spec[700:710]
+        chan = snap_chan['channel']
+        #print "%s: %s:" % (feng.host, pol)
+        spec = feng.corr.get_new_corr(chan, chan).real
+        #print spec[700:710]
         median = np.median(spec)
-        print median
+        #print median
         if median == 0.:
             continue
-        mean = spec[spec < 2*median].mean()
-        print mean
+        mean = spec[np.logical_and(spec < 2*median, spec > 0.5*median)].mean()
+        #print mean
         amp = np.sqrt(mean / 2.)
-        print amp
+        #print amp
         scale = args.rms / amp
-        print scale
-        feng.eq.set_coeffs(pn, scale * feng.eq.get_coeffs(pn))
+        #print scale
+        corr.set_eq(ant, pol, eq=feng.eq.get_coeffs(chan)*scale)
+        #feng.eq.set_coeffs(pn, scale * feng.eq.get_coeffs(pn))
         
-        
+corr.enable_monitoring() 
