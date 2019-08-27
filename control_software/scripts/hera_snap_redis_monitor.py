@@ -242,17 +242,25 @@ if __name__ == "__main__":
 
         # Get antenna stats
         input_stats = corr.do_for_all_f("get_stats", block="input", kwargs={"sum_cores" : True})
+        if corr.r.exists('disable_monitoring'):
+            continue
         histograms = []
         eq_coeffs = []
         autocorrs = []
         for i in range(6):
+            if corr.r.exists('disable_monitoring'):
+                continue
             histograms += [corr.do_for_all_f("get_histogram", block="input", args=(i,), kwargs={"sum_cores" : True})]
             eq_coeffs += [corr.do_for_all_f("get_coeffs", block="eq", args=(i,))]
             autocorrs += [corr.do_for_all_f("get_new_corr", block="corr", args=(i,i))]
 
         # Get FEM/PAM sensor values
         fem_stats = get_all_fem_stats(corr)
+        if corr.r.exists('disable_monitoring'):
+            continue
         pam_stats = get_all_pam_stats(corr)
+        if corr.r.exists('disable_monitoring'):
+            continue
        
         for key, val in input_stats.iteritems():
             antpols = corr.fengs_by_name[key].ants
