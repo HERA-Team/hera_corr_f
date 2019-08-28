@@ -1184,9 +1184,8 @@ class Corr(Block):
         self.set_input(pol,pol)
         self.wait_for_acc()
         spec = self.read_bram()
-   	return spec.imag 
-        
-    
+        return spec.imag 
+
     def plot_corr(self, pol1, pol2, show=False):
         from matplotlib import pyplot as plt
         spec = self.get_new_corr(pol1, pol2)
