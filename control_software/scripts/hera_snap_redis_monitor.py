@@ -219,13 +219,19 @@ if __name__ == "__main__":
 
     retry_tick = time.time()
     script_redis_key = "status:script:%s" % __file__
+    locked_out = False
     while(True):
         tick = time.time()
         corr.r.set(script_redis_key, "alive", ex=max(60, args.delay * 2))
         while corr.r.exists('disable_monitoring'):
-            logger.warning('Monitoring locked out. Waiting 10 seconds and retrying')
+            if not locked_out:
+                logger.warning('Monitoring locked out. Retrying every 10 seconds')
+                locked_out = True
             corr.r.set(script_redis_key, "locked out", ex=20)
             time.sleep(10)
+        if locked_out:
+            logger.warning('Monitoring unlocked')
+            locked_out = False
     
         # Check for a new configuration, and if one exists, update the Fengine list
         if corr.r.hget('snap_configuration', 'upload_time') != upload_time:
