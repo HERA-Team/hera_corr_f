@@ -47,7 +47,7 @@ fft_shift: 0b101010110101011
 
 # Specify a full path to an F-Engine fpg files
 # or redis:<fpg filename> if the fpg file has been uploaded to redis
-fpgfile: 'redis:snap_fengine_2019-08-23_1047.fpg'
+fpgfile: 'redis:snap_fengine_2019-08-28_1535.fpg'
 
 # Destination port for SNAP data
 dest_port: 8511
