@@ -731,7 +731,7 @@ class Eq(Block):
         self.nstreams = nstreams
         self.ncoeffs = ncoeffs
         self.width = 16
-        self.bp = 6
+        self.bp = 5
         self.format = 'H'#'L'
         self.streamsize = struct.calcsize(self.format)*self.ncoeffs
 
