@@ -519,13 +519,21 @@ class HeraCorrelator(object):
                    self.set_eq(str(ant), pol)
                    self.set_pam_attenuation(str(ant), pol)
 
+    def _initialize_fft_shift(self):
+        for feng in self.fengs:
+            try:
+                feng.pfb.set_fft_shift(self.config['fft_shift'])
+            except KeyError:
+                self.logger.error("Couldn't find fft_shift keyword in config file")
+
     def initialize(self, multithread=True, timeout=120):
         """
         Initialize all F-Engines.
 
         1. Initialize F-Eengine blocks.
-        2. Disable noise/phase switches
-        3. Return PAM attenuation and digital EQ to last known state.
+        2. Set FFT shift
+        3. Disable noise/phase switches
+        4. Return PAM attenuation and digital EQ to last known state.
 
         If `multithread` is True, the underlying code will to use
         this class's `do_for_all_f` method to intialize everyone.
@@ -542,6 +550,7 @@ class HeraCorrelator(object):
             self.logger.info('Initializing all hosts using multithreading')
             self.do_for_all_f("initialize", timeout=timeout)
         #TODO multithread these:
+        self._initialize_fft_shift() 
         self.noise_diode_disable()
         self.phase_switch_disable()
         self._initialize_all_eq()
