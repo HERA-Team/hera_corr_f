@@ -203,12 +203,13 @@ class HeraCorrelator(object):
                         new_fengs += [feng]
                         feng.error_count = 0
                         self.dead_fengs.pop(host)
+                        self.logger.info("Tried to reconnect to host %s and succeeded!." % host)
                     else:
-                        self.logger.warning("Tried to reconnect to host %s. It is alive but not programmed." % host)
+                        self.logger.info("Tried to reconnect to host %s. It is alive but not programmed." % host)
                 else:
-                    self.logger.warning("Tried to reconnect to host %s and failed" % host)
+                    self.logger.info("Tried to reconnect to host %s and failed" % host)
             except:
-                self.logger.warning("Tried to reconnect to host %s and failed" % host)
+                self.logger.info("Tried to reconnect to host %s and failed" % host)
 
         for feng in new_fengs:
             feng.ip = socket.gethostbyname(feng.host)
