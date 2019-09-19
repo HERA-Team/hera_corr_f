@@ -281,6 +281,9 @@ if __name__ == "__main__":
                 power = powers[antn]
                 rms   = rmss[antn]
                 redis_vals = {'adc_mean':mean, 'adc_power':power, 'adc_rms':rms}
+                # Give the antenna hash a key indicating the SNAP and input number it is associated with
+                redis_vals['f_host'] = key
+                redis_vals['host_ant_id'] = antn
                 try:
                     hist_bins, hist_vals = histograms[antn][key]
                     redis_vals['histogram'] = json.dumps([hist_bins.tolist(), hist_vals.tolist()])
