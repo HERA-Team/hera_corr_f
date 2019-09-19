@@ -267,6 +267,30 @@ if __name__ == "__main__":
         pam_stats = get_all_pam_stats(corr)
         if corr.r.exists('disable_monitoring'):
             continue
+
+        # Write spectra to snap-indexed keys. This means we'll get spectra even from
+        # unconnected (according to the CM database) antennas
+        for snap in histograms[0].keys():
+           for antn in range(6):
+               status_key = 'status:snaprf:%s:%d' % (snap, antn)
+               snap_rf_stats = {}
+               try:
+                   hist_bins, hist_vals = histograms[antn][snap]
+                   snap_rf_stats['histogram'] = json.dumps([hist_bins.tolist(), hist_vals.tolist()])
+               except:
+                   snap_rf_stats['histogram'] = None
+               try:
+                   snap_rf_stats['autocorrelation'] = json.dumps(autocorrs[antn][snap].real.tolist())
+               except:
+                   snap_rf_stats['autocorrelation'] = None
+               try:
+                   coeffs = eq_coeffs[antn][snap]
+                   snap_rf_stats['eq_coeffs'] = json.dumps(coeffs.tolist())
+               except:
+                   snap_rf_stats['eq_coeffs'] = None
+               snap_rf_stats['timestamp'] = datetime.datetime.now().isoformat()
+               corr.r.hmset(status_key, snap_rf_stats)
+           
        
         for key, val in input_stats.iteritems():
             antpols = corr.fengs_by_name[key].ants
