@@ -1754,7 +1754,7 @@ class Fem(Block):
             
         if name in self.SWMODE:
             self._sw.write((val & 0b11111000) | self.SWMODE[name])
-        elif name != None
+        elif name != None:
             raise ValueError('Invalid parameter.')
 
         if 'east' in kwargs:
