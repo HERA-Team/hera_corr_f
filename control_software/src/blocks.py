@@ -1603,6 +1603,7 @@ class Fem(Block):
 
     IMU_ORIENT = [[0,0,1],[0,1,0],[1,0,0]]
     SWMODE = {'load':0b001,'antenna':0b111,'noise':0b000}
+    SWMODE_REV = {0b001:'load', 0b111:'antenna', 0b000:'noise',}
 
     def __init__(self, host, name, logger=None):
         """ Front End Module (FEM) digital control class
@@ -1724,14 +1725,16 @@ class Fem(Block):
         else:
             self.rom.writeString(string)
 
-    def switch(self,name=None):
+    def switch(self,name=None, **kwargs):
         """ Switch between antenna, noise and load mode
 
             Example:
-            switch()            # Get current mode
-            switch('antenna')   # Switch into antenna mode
-            switch('noise')     # Switch into noise mode
-            switch('load')      # Switch into load mode
+            switch()                # Get mode&status in (mode, east, north)
+            switch(mode='antenna')  # Switch into antenna mode
+            switch(mode='noise')    # Switch into noise mode
+            switch(mode='load')     # Switch into load mode
+            switch(east=True)       # Switch on east pole
+            switch(north=False)     # Switch off north pole
         """
         if not hasattr(self, "_sw"):
             try:
@@ -1740,19 +1743,35 @@ class Fem(Block):
             except:
                 self._warning("Failed to initialize I2C RF switch")
                 return None
-        if name == None:
-            val = self._sw.read()
-            mode = 'Unknown'
-            for key,value in self.SWMODE.iteritems():
-                if val&0b111 == value:
-                    mode = key
-                    break
-            return mode
-        elif name in self.SWMODE:
-            val = self.SWMODE[name]
-            self._sw.write(val)
-        else:
+
+        val = self._sw.read()
+
+        if name == None and 'east' not in kwargs and 'north' not in kwargs:
+            east = val & 0b00010000
+            north = val & 0b00001000
+            mode = self.SWMODE_REV.get(val & 0b00000111, 'Unknown mode')
+            return mode, east, north
+            
+        if name in self.SWMODE:
+            self._sw.write((val & 0b11111000) | self.SWMODE[name])
+        elif name != None
             raise ValueError('Invalid parameter.')
+
+        if 'east' in kwargs:
+            if kwargs['east'] == True:
+                self._sw.write(val | 0b00010000)
+            elif kwargs['east'] == False:
+                self._sw.write(val & 0b11101111)
+            else:
+                raise ValueError('Invalid parameter.')
+
+        if 'north' in kwargs:
+            if kwargs['north'] == True:
+                self._sw.write(val | 0b00001000)
+            elif kwargs['north'] == False:
+                self._sw.write(val & 0b11110111)
+            else:
+                raise ValueError('Invalid parameter.')
 
     def temperature(self):
         """ Get temperature in Celcius
