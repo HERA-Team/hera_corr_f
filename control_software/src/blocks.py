@@ -1773,6 +1773,22 @@ class Fem(Block):
             else:
                 raise ValueError('Invalid parameter.')
 
+    def humidity(self):
+        """ Get relative humidity in percentage
+        """
+        if not hasattr(self, "_rh"):
+            try:
+                # Relative Humidity
+                self._rh = i2c_temp.Si7021(self.i2c, self.ADDR_TEMP)
+            except:
+                self._info("Failed to initialize I2C humidity sensor")
+                return None
+
+        if self._rh.model() != 'Si7021':
+            self._info("There is no humidity sensor in this FEM")
+
+        return self._rh.readTempRH()[1]
+
     def temperature(self):
         """ Get temperature in Celcius
         """
