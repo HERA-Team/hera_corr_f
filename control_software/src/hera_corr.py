@@ -209,7 +209,7 @@ class HeraCorrelator(object):
                 else:
                     self.logger.info("Tried to reconnect to host %s and failed with 'not connected' response" % host)
             except:
-                self.logger.info("Tried to reconnect to host %s and failed with exception" % host)
+                self.logger.exception("Tried to reconnect to host %s and failed with exception" % host)
 
         for feng in new_fengs:
             feng.ip = socket.gethostbyname(feng.host)
