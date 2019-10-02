@@ -184,7 +184,7 @@ def print_ant_log_messages(corr):
                 if isinstance(polval['host'], SnapFengine):
                     host = polval['host'].host # the dictionary contains FEngine instances
                     chan = polval['channel']
-                    logger.info("Expecting data from Ant %s, Pol %s from host %s input %d" % (ant, pol, host, chan))
+                    logger.debug("Expecting data from Ant %s, Pol %s from host %s input %d" % (ant, pol, host, chan))
                 else:
                     logger.warning("Failed to find F-Engine %s associated with ant/pol %s/%s" % (polval['host'], ant, pol))
 
@@ -220,6 +220,7 @@ if __name__ == "__main__":
     retry_tick = time.time()
     script_redis_key = "status:script:%s" % __file__
     locked_out = False
+    logger.info('Starting SNAP redis monitor')
     while(True):
         tick = time.time()
         corr.r.set(script_redis_key, "alive", ex=max(60, args.delay * 2))
@@ -343,7 +344,7 @@ if __name__ == "__main__":
         # If the retry period has been exceeded, try to reconnect to dead boards:
         if time.time() > (retry_tick + args.retrytime):
             if len(corr.dead_fengs) > 0:
-                logger.info('Trying to reconnect to dead boards')
+                logger.debug('Trying to reconnect to dead boards')
                 corr.reestablish_dead_connections(programmed_only=True)
                 retry_tick = time.time()
                 
