@@ -72,6 +72,28 @@ def cmd_handler(corr, r, message, testmode=False):
                 corr.noise_diode_disable()
             send_response(r, command, time)
             return
+    elif command == "snap_eq":
+        if "coeffs" not in args.keys():
+            send_response(r, command, time, err="No `coeffs` argument provided!")
+            return
+        if "ant" not in args.keys():
+            send_response(r, command, time, err="No `ant` argument provided!")
+            return
+        if "pol" not in args.keys():
+            send_response(r, command, time, err="No `pol` argument provided!")
+            return
+        try:
+            coeffs = args['coeffs']#np.array(args["coeffs"], dtype=np.float64)
+        except:
+            corr.logger.exception("Failed to cast coeffs to numpy array")
+            send_response(r, command, time, err="Provided coefficients couldn't be coerced into a numpy array")
+            return
+        try:
+            corr.set_eq(str(args["ant"]), args["pol"], eq=coeffs)
+            send_response(r, command, time)
+        except:
+            corr.logger.exception("snap_eq command failed!")
+            send_response(r, command, time, err="Command failed! Check server logs")
             
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process commands from the corr:message redis channel.',
