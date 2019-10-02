@@ -52,6 +52,9 @@ def cmd_handler(corr, r, message, testmode=False):
                 send_response(r, command, time, err="E/N pols not on matching I2C channel")
                 return
             # If we made it to here, hopefully we're good
+            # initialize the I2C if necessary
+            if not feng.i2c_initialized:
+                feng_e_host._add_i2c()
             # Try the write 5 times
             for i in range(5):
                 feng_e_host.fems[feng_e_chan].switch(name=args["input_sel"])
@@ -83,7 +86,7 @@ def cmd_handler(corr, r, message, testmode=False):
             send_response(r, command, time, err="No `pol` argument provided!")
             return
         try:
-            coeffs = args['coeffs']#np.array(args["coeffs"], dtype=np.float64)
+            coeffs = args['coeffs']
         except:
             corr.logger.exception("Failed to cast coeffs to numpy array")
             send_response(r, command, time, err="Provided coefficients couldn't be coerced into a numpy array")
@@ -94,6 +97,60 @@ def cmd_handler(corr, r, message, testmode=False):
         except:
             corr.logger.exception("snap_eq command failed!")
             send_response(r, command, time, err="Command failed! Check server logs")
+    elif command == "pam_atten":
+        corr.disable_monitoring(30, wait=True)
+        if "rw" not in args.keys():
+            send_response(r, command, time, err="No `rw` argument provided!")
+            return
+        if args["rw"] == "w" and "val" not in args.keys():
+            send_response(r, command, time, err="No `val` argument provided!")
+            return
+        if "ant" not in args.keys():
+            send_response(r, command, time, err="No `ant` argument provided!")
+            return
+        if "pol" not in args.keys():
+            send_response(r, command, time, err="No `pol` argument provided!")
+            return
+        try:
+            feng = corr.ant_to_snap[str(args["ant"])][args["pol"]]
+            feng_host = feng['host']
+            feng_chan = feng['channel']//2
+        except KeyError:
+            send_response(r, command, time, err="Can't find F-engine for selected antenna")
+            return
+        if (isinstance(feng_host, basestring)):
+            send_response(r, command, time, err="Required F-engine is not connected")
+            return
+        # If we made it to here, hopefully we're good
+        # initialize the I2C if necessary
+        if not feng_host.i2c_initialized:
+            feng._add_i2c()
+        if args["rw"] == "w":
+            # Try the write 3 times
+            for i in range(3):
+                if args["pol"] == "e":
+                    feng_host.pams[feng_chan].set_attenuation(args["val"], None)
+                    atten_e_rb, atten_n_rb = feng_host.pams[feng_chan].get_attenuation()
+                    if atten_e_rb == args["val"]:
+                        send_response(r, command, time)
+                        return
+                if args["pol"] == "n":
+                    feng_host.pams[feng_chan].set_attenuation(None, args["val"])
+                    atten_e_rb, atten_n_rb = feng_host.pams[feng_chan].get_attenuation()
+                    if atten_n_rb == args["val"]:
+                        send_response(r, command, time)
+                        return
+            # Retries exceeded
+            send_response(r, command, time, err="Retries exceeded")
+            return
+        if args["rw"] == "r":
+            atten_e_rb, atten_n_rb = feng_host.pams[feng_chan].get_attenuation()
+            if args["pol"] == "e":
+                send_response(r, command, time, val=atten_e_rb)
+                return
+            if args["pol"] == "n":
+                send_response(r, command, time, val=atten_n_rb)
+                return
             
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process commands from the corr:message redis channel.',
@@ -112,7 +169,18 @@ if __name__ == "__main__":
 
     corr = HeraCorrelator()
     
+    retry_tick = 0
+    # Seconds between SNAP reconnection attempts
+    RETRY_TIME = 300
     while(True):
         message = cmd_chan.get_message(timeout=5)
         if message is not None:
             cmd_handler(corr, r, message["data"], testmode=args.testmode)
+        # If the retry period has been exceeded, try to reconnect to dead boards:
+        if time.time() > (retry_tick + RETRY_TIME):
+            if len(corr.dead_fengs) > 0:
+                corr.logger.debug('Trying to reconnect to dead boards')
+                corr.disable_monitoring(60, wait=True)
+                corr.reestablish_dead_connections(programmed_only=True)
+                corr.enable_monitoring()
+                retry_tick = time.time()
