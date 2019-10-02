@@ -257,21 +257,45 @@ class HeraCorrelator(object):
 
         self.dead_fengs[deadfeng.host] = time.time()
 
-    def disable_monitoring(self, expiry=60):
+    def disable_monitoring(self, expiry=60, wait=False):
         """
         Set the "disable_monitoring" key in redis. Hopefully other processes will respect this
         key and stop monitoring. Useful if you are going to hammer the TFTP connection and don't
         want interference from the monitoring loop.
         Inputs:
             expiry (float): Period (in seconds) for which the monitoring loop should be disabled.
+            wait (bool): If True, wait for the monitor script to confirm it is not running before returning
         """
         self.r.set('disable_monitoring', 1, ex=expiry)
-
+        if wait:
+            TIMEOUT = 60
+            start = time.time()
+            while self.is_monitoring():
+                if time.time() > (start + TIMEOUT):
+                    self.logger.warning("Timed out waiting for monitor to stop")
+                    return
+                time.sleep(1)
+            return
+                
+            
+        
     def enable_monitoring(self):
         """
         Delete the "disable_monitoring" key in redis.
         """
         self.r.delete('disable_monitoring')
+
+    def is_monitoring(self):
+        """
+        Return True if the monitoring daemon is polling, False otherwise.
+        Note that a False return could either indicate either that the monitor
+        is suspended or that it is not running at all.
+        """
+        for key in self.r.scan_iter("status:*hera_snap_redis_monitor.py"):
+            state = self.r.get(key)
+            return state == "alive"
+        # If we get here there was no status key and the monitor isn't running
+        return False
 
     def program(self, bitstream=None, unprogrammed_only=True):
         """
