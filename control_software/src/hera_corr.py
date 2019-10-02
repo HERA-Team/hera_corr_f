@@ -27,6 +27,7 @@ class HeraCorrelator(object):
         self.logger = logger
         self.redishost = redishost
         self.r = redis.Redis(redishost)
+        self.use_redis = use_redis
 
         self.get_config(config)
 
@@ -37,7 +38,7 @@ class HeraCorrelator(object):
         self.dead_fengs = {}
         
         if not passive:
-            self.establish_connections(use_redis=use_redis)
+            self.establish_connections()
             # Get antenna<->SNAP maps
             self.compute_hookup()
 
@@ -148,11 +149,9 @@ class HeraCorrelator(object):
             self.config_time_str = time.ctime(self.config_time)
         self.config = yaml.load(self.config_str)
 
-    def establish_connections(self, use_redis=True):
+    def establish_connections(self):
         """
         Connect to SNAP boards listed in the current configuration.
-        inputs:
-            use_redis (Boolean): If True, will use a redis proxy for talking to SNAPs. If False, will attempt a direct TFTP connection.
         """
         # Instantiate CasperFpga connections to all the F-Engine.
         self.fengs = []
@@ -163,7 +162,7 @@ class HeraCorrelator(object):
             ant_index += 3
             self.logger.info("Setting Feng %s antenna indices to %s" % (host, ant_indices))
             try:
-                if use_redis:
+                if self.use_redis:
                     feng = SnapFengine(host, ant_indices=ant_indices, redishost=self.redishost)
                 else:
                     feng = SnapFengine(host, ant_indices=ant_indices, redishost=None)
@@ -198,6 +197,10 @@ class HeraCorrelator(object):
                 continue
             try:
                 feng = SnapFengine(host)
+                if self.use_redis:
+                    feng = SnapFengine(host, redishost=self.redishost)
+                else:
+                    feng = SnapFengine(host, redishost=None)
                 if feng.fpga.is_connected():
                     if (not programmed_only) or (programmed_only and feng.is_programmed()):
                         new_fengs += [feng]
