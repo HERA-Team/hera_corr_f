@@ -196,7 +196,6 @@ class HeraCorrelator(object):
                 self.logger.info("Ignoring host %s, which was only declared dead %d seconds ago" % (time.time() - deadtime))
                 continue
             try:
-                feng = SnapFengine(host)
                 if self.use_redis:
                     feng = SnapFengine(host, redishost=self.redishost)
                 else:
