@@ -63,12 +63,14 @@ class SnapFengine(object):
 
         self.i2c_initialized = False
         # The I2C devices mess with FPGA registers
-        # when instantiated. This fails if the board
-        # isn't programmed yet, so run it in a try block.
-        try:
-            self._add_i2c()
-        except:
-            self.logger.warning("Failed to register I2C")
+        # when instantiated. This will fail if the board
+        # isn't programmed yet, so don't bother trying if this
+        # is not the case.
+        if self.fpga.is_connected() and self.is_programmed():
+            try:
+                self._add_i2c()
+            except:
+                self.logger.warning("Failed to register I2C")
 
     def _add_i2c(self):
         self.pams        = [Pam(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
