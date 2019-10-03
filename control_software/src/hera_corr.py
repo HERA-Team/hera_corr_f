@@ -553,7 +553,7 @@ class HeraCorrelator(object):
             except KeyError:
                 self.logger.error("Couldn't find fft_shift keyword in config file")
 
-    def initialize(self, multithread=True, timeout=120):
+    def initialize(self, multithread=True, timeout=120, uninitialized_only=True):
         """
         Initialize all F-Engines.
 
@@ -570,9 +570,17 @@ class HeraCorrelator(object):
         and longer if individual transactions fail and have to be retried.
         """
         if not multithread:
-            for feng in self.fengs:
+            if uninitialized_only:
+                to_be_initialized = [feng for feng in self.fengs if not feng.is_initialized()]
+                if len(to_be_initialized) == 0:
+                    return
+            else:
+                to_be_initialized = self.fengs
+
+            for feng in to_be_initialized:
                 self.logger.info('Initializing %s'%feng.host)
                 feng.initialize()
+                self.r.hset('status:snap:%s' % f.host, 'last_initialized', time.ctime())
         else:
             self.logger.info('Initializing all hosts using multithreading')
             self.do_for_all_f("initialize", timeout=timeout)

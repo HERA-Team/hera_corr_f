@@ -140,7 +140,7 @@ class Synth(casperfpga.synth.LMX2581):
         pass
 
 class Adc(casperfpga.snapadc.SNAPADC):
-    def __init__(self, host, sample_rate=500, num_chans=2, resolution=8, ref=10, logger=None):
+    def __init__(self, host, sample_rate=500, num_chans=2, resolution=8, ref=10, logger=None, **kwargs):
         """
         Instantiate an ADC block.
         
@@ -160,6 +160,8 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.sample_rate     = sample_rate
         self.resolution      = resolution
         self.host = host # the SNAPADC class doesn't directly expose this
+        self._retry = kwargs.get('retry',3)
+        self._retry_wait = kwargs.get('retry_wait',1)
 
     def set_gain(self, gain):
         """
@@ -193,22 +195,26 @@ class Adc(casperfpga.snapadc.SNAPADC):
         """
         Initialize the configuration of the ADC chip.
         """
-        n_retries = 3
-        for i in range(n_retries):
-            if self.init(self.sample_rate, self.num_chans) == self.SUCCESS:
+        for i in range(self._retry):
+            if self.init(self.sample_rate, self.num_chans):
                 if i == 0:
                     self.logger.info("ADC configured OK")
                 if i > 0:
                     self.logger.warning("ADC took %d attempts to configure" % (i+1))
                 break
-            if i == n_retries - 1:
+            if i == self._retry - 1:
                 self.logger.error("ADC failed to configure after %d attempts" % (i+1))
+
+        if not self.rampTest():
+            self.logger.warning('ADC failed on ramp test')
+
         #self.alignLineClock(mode='dual_pat')
         #self.alignFrameClock()
         ##If aligning complete, alignFrameClock should not output any warning
         self.selectADC()
         self.adc.selectInput([1,1,3,3])
         self.set_gain(4)
+        return True
 
 class Sync(Block):
     def __init__(self, host, name, logger=None):
