@@ -66,13 +66,12 @@ def cmd_handler(corr, r, message, testmode=False):
             send_response(r, command, time, err="Retries exceeded")
             return
         else:
-            if args["input_sel"] not in ["noise", "antenna"]:
-                send_response(r, command, time, err="Only 'noise' or 'antenna' is allowed when switching all antennas")
-                return
             if args["input_sel"] == "noise":
                 corr.noise_diode_enable()
+            elif args["input_sel"] == 'load':
+                corr.load_diode_enable()
             elif args["input_sel"] == "antenna":
-                corr.noise_diode_disable()
+                corr.antenna_enable()
             send_response(r, command, time)
             return
     elif command == "snap_eq":
