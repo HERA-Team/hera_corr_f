@@ -116,9 +116,19 @@ def get_all_fem_stats(corr):
 
             block_index = antn // 2
             try:
-                rv[ant][pol]["fem_switch"] = sensors["fem_switches"][block_index][host]
+                if sensors["fem_switches"][block_index][host] is None:
+                    switch_state = None
+                    e_powered = None
+                    n_powered = None
+                else:
+                    switch_state, e_powered, n_powered = sensors["fem_switches"][block_index][host]
+                rv[ant][pol]["fem_switch"] = switch_state
+                rv[ant][pol]["fem_e_lna_power"]  = e_powered
+                rv[ant][pol]["fem_n_lna_power"]  = n_powered
             except KeyError:
                 rv[ant][pol]["fem_switch"] = None
+                rv[ant][pol]["fem_e_lna_power"]  = None
+                rv[ant][pol]["fem_n_lna_power"]  = None
             try:
                 rv[ant][pol]["fem_temp"] = sensors["fem_temps"][block_index][host]
             except KeyError:

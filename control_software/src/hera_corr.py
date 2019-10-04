@@ -424,6 +424,9 @@ class HeraCorrelator(object):
                self.logger.debug("Trying to set PAM attenuation for Ant %s%s from redis" % (ant, pol))
                redval = self.r.hgetall("atten:ant:%s:%s" % (ant, pol))
                if redval != {}:
+                   if redval['value'] == "None":
+                       self.logger.debug("Attenuation value in redis was None!")
+                       return
                    self.logger.debug("Loading attenuation of %ddB from time %s" % (int(redval['value']),time.ctime(float(redval['time']))))
                    self.set_pam_attenuation(ant, pol, int(redval['value']))
                    return

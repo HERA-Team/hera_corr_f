@@ -16,13 +16,18 @@ from casperfpga import i2c_motion
 from casperfpga import i2c_temp
 from scipy.linalg import hadamard #for walsh (hadamard) matrices
 
+# There are so many I2C warnings that a new level is defined
+# to filter them out
+I2CWARNING = logging.INFO - 5
+logging.addLevelName('I2CWARNING', I2CWARNING)
+
 # Block Classes
 class Block(object):
     def __init__(self, host, name, logger=None):
         self.host = host #casperfpga object
         # One logger per host. Multiple blocks share the same logger.
         # Multiple hosts should *not* share the same logger, since we can multithread over hosts.
-        self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + "%s" % (host.host)))
+        self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + ":%s" % (host.host)))
         self.name = name
         if (name is None) or (name == ''):
             self.prefix = ''
@@ -151,8 +156,8 @@ class Adc(casperfpga.snapadc.SNAPADC):
            resolution (int): Bit resolution of the ADC. Valid values are 8, 12.
            ref (float): Reference frequency (in MHz) from which ADC clock is derived. If None, an external sampling clock must be used.
         """
-        self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + "%s" % (host.host)))
-        casperfpga.snapadc.SNAPADC.__init__(self,host,ref=ref)
+        self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + ":%s" % (host.host)))
+        casperfpga.snapadc.SNAPADC.__init__(self,host,ref=ref,logger=self.logger)
         self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
         self.interleave_mode = 4 >> num_chans
@@ -1421,6 +1426,9 @@ class Pam(Block):
 
         self.i2c = i2c.I2C(host, name, retry=self.I2C_RETRY)
 
+    def _warning(self, msg, *args, **kwargs):
+        self.logger.log(I2CWARNING, self._prefix_log(msg), *args, **kwargs)
+
     def initialize(self):
 
         self.i2c.enable_core()
@@ -1655,8 +1663,10 @@ class Fem(Block):
                 value.
         """
         super(Fem, self).__init__(host, name, logger)
-
         self.i2c = i2c.I2C(host, name, retry=self.I2C_RETRY)
+
+    def _warning(self, msg, *args, **kwargs):
+        self.logger.log(I2CWARNING, self._prefix_log(msg), *args, **kwargs)
 
     def initialize(self):
         self.i2c.enable_core()
@@ -1727,7 +1737,7 @@ class Fem(Block):
                 # Temperature
                 self._temp = i2c_temp.Si7051(self.i2c, self.ADDR_TEMP)
             except:
-                self._info("Failed to initialize I2C temperature sensor")
+                self._warning("Failed to initialize I2C temperature sensor")
                 return None
 
         try:
@@ -1787,6 +1797,8 @@ class Fem(Block):
 
             Example:
             switch()                # Get mode&status in (mode, east, north)
+                                    # eg, ('antenna', True, True)
+                                    # if the switch is set to antenna and both LNAs are on.
             switch(mode='antenna')  # Switch into antenna mode
             switch(mode='noise')    # Switch into noise mode
             switch(mode='load')     # Switch into load mode
@@ -1801,12 +1813,16 @@ class Fem(Block):
                 self._warning("Failed to initialize I2C RF switch")
                 return None
 
-        val = self._sw.read()
+        try:
+            val = self._sw.read()
+        except:
+            self._warning("I2C RF switch read failure")
+            return None
 
         if name == None and 'east' not in kwargs and 'north' not in kwargs:
-            east = val & 0b00010000
-            north = val & 0b00001000
-            mode = self.SWMODE_REV.get(val & 0b00000111, 'Unknown mode')
+            east  = bool(val & 0b00010000)
+            north = bool(val & 0b00001000)
+            mode  = self.SWMODE_REV.get(val & 0b00000111, 'Unknown mode')
             return mode, east, north
             
         if name in self.SWMODE:

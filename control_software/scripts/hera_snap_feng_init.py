@@ -80,7 +80,7 @@ def main():
     
     if args.program or args.forceprogram:
         corr.program(unprogrammed_only=(not args.forceprogram)) # This should multithread the programming process.
-        if args.initialize is None:
+        if args.fast_initialize is None:
             logger.warning('Programming but *NOT* initializing. This is unlikely to be what you want')
     
     if args.fast_initialize is not None:
