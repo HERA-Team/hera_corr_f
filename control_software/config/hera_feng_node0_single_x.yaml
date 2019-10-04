@@ -43,7 +43,7 @@ eth: False
 
 # Specify a full path to an F-Engine fpg files
 # or redis:<fpg filename> if the fpg file has been uploaded to redis
-fpgfile: 'redis:snap_fengine_2018-11-13_1236.fpg'
+fpgfile: 'redis:snap_fengine_2019-08-29_1717.fpg'
 
 # Destination port for SNAP data
 dest_port: 8511
