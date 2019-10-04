@@ -366,15 +366,42 @@ class HeraCorrelator(object):
             for i in range(len(self.fengs[0].fems)):
                 self.do_for_all_f("switch", "fems", block_index=i, args=("noise",), timeout=10)
         self.r.hmset('corr:status_noise_diode', {'state':'on', 'time':time.time()})
+        self.r.hmset('corr:status_load', {'state':'off', 'time':time.time()})
 
     def noise_diode_disable(self):
         """
         Disable all noise switches.
         """
         self.logger.info('Disabling all noise inputs')
+        self.antenna_enable()
+
+    def load_enable(self):
+        """
+        Enable all load switches.
+        """
+        self.logger.info('Enabling all load inputs')
+        for retry in range(3):
+            for i in range(len(self.fengs[0].fems)):
+                self.do_for_all_f("switch", "fems", block_index=i, args=("load",), timeout=10)
+        self.r.hmset('corr:status_load', {'state':'on', 'time':time.time()})
+        self.r.hmset('corr:status_noise_diode', {'state':'off', 'time':time.time()})
+
+    def load_disable(self):
+        """
+        Disable all load switches.
+        """
+        self.logger.info('Disabling all load inputs')
+        self.antenna_enable()
+
+    def antenna_enable(self):
+        """
+        Set all switches to Antenna
+        """
+        self.logger.info('Enable all antenna inputs')
         for retry in range(3):
             for i in range(len(self.fengs[0].fems)):
                 self.do_for_all_f("switch", "fems", block_index=i, args=("antenna",), timeout=10)
+        self.r.hmset('corr:status_load', {'state':'off', 'time':time.time()})
         self.r.hmset('corr:status_noise_diode', {'state':'off', 'time':time.time()})
 
     def get_ant_snap_chan(self, ant, pol):
