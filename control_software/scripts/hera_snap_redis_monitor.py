@@ -95,12 +95,14 @@ def get_all_fem_stats(corr):
     sensors["fem_currents"] = []
     sensors["fem_voltages"] = []
     sensors["fem_ids"]      = []
+    sensors["fem_imu"]      = []
     for i in range(3):
         sensors["fem_switches"] += [corr.do_for_all_f("switch", block="fems", block_index=i)]
         sensors["fem_temps"]    += [corr.do_for_all_f("temperature", block="fems", block_index=i)]
         sensors["fem_currents"] += [corr.do_for_all_f("shunt", block="fems", block_index=i, kwargs={"name":"i"})]
         sensors["fem_voltages"] += [corr.do_for_all_f("shunt", block="fems", block_index=i, kwargs={"name":"u"})]
         sensors["fem_ids"]      += [corr.do_for_all_f("id", block="fems", block_index=i)]
+        sensors["fem_imu"]      += [corr.do_for_all_f("imu", block="fems", block_index=i)]
     
     for feng in corr.fengs:
         for antn, antpol in enumerate(feng.ants):
@@ -145,6 +147,10 @@ def get_all_fem_stats(corr):
                 rv[ant][pol]["fem_id"] = sensors["fem_ids"][block_index][host]
             except KeyError:
                 rv[ant][pol]["fem_id"] = None
+            try:
+                rv[ant][pol]["fem_imu_theta"], rv[ant][pol]["fem_imu_phi"] = sensors["fem_imu"][block_index][host]
+            except KeyError:
+                rv[ant][pol]["fem_imu_theta"], rv[ant][pol]["fem_imu_phi"] = None, None
     return rv
 
 
