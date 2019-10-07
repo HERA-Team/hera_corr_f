@@ -23,12 +23,11 @@ parser.add_argument('--rms', dest='rms', type=float, default=3.,
 args = parser.parse_args()
 
 corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)
-corr.disable_monitoring(expiry=30)
-time.sleep(10) # wait for the monitor to pause
 
 n_loop_max = 4
 
 for ant, snap in corr.ant_to_snap.iteritems():
+    corr.disable_monitoring(expiry=60, wait=True)
     for pol, snap_chan in snap.iteritems():
         print("Equalizing %s:%s" % (ant, pol))
         corr.disable_monitoring(expiry=30)

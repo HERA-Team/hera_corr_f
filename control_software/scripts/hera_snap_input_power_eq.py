@@ -27,6 +27,7 @@ args = parser.parse_args()
 corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)
 
 for feng in corr.fengs:
+    corr.disable_monitoring(60, wait=True)
     for pn, pam in enumerate(feng.pams):
         ants = feng.ants[2*pn : 2*pn + 2]
         # Start by setting attenuation to zero
@@ -60,3 +61,4 @@ for feng in corr.fengs:
             logger.error("Requested E attenuation %d but read back %d" % (req_attn_e, rb_attn_e))
         if rb_attn_n != req_attn_n:
             logger.error("Requested E attenuation %d but read back %d" % (req_attn_n, rb_attn_n))
+    corr.enable_monitoring()

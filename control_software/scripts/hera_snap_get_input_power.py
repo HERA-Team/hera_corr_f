@@ -23,6 +23,7 @@ args = parser.parse_args()
 corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)
 
 for feng in corr.fengs:
+    corr.disable_monitoring(30, wait=True)
     for pn, pam in enumerate(feng.pams):
         ants = feng.ants[2*pn : 2*pn + 2]
         try:
@@ -33,3 +34,5 @@ for feng in corr.fengs:
             continue
         att_e, att_n = pam.attenuation()
         print "Antenna %s power: N: %.2f (attenuation %d dB) E: %.2f (attenuation %d dB)" % (ants, pow_n, att_n, pow_e, att_e)
+
+corr.enable_monitoring(30, wait=True)
