@@ -6,10 +6,13 @@ import datetime
 import argparse
 import logging
 import json
+import socket
 from hera_corr_f import HeraCorrelator, SnapFengine, __version__, __package__, helpers
 
 logger = helpers.add_default_log_handlers(logging.getLogger(__file__))
 FAIL_COUNT_LIMIT = 5
+
+hostname = socket.gethostname()
 
 
 def get_all_pam_stats(corr):
@@ -234,7 +237,7 @@ if __name__ == "__main__":
     print_ant_log_messages(corr)
 
     retry_tick = time.time()
-    script_redis_key = "status:script:%s" % __file__
+    script_redis_key = "status:script:%s:%s" % (hostname, __file__)
     locked_out = False
     logger.info('Starting SNAP redis monitor')
     while(True):
