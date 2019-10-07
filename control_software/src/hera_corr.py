@@ -7,11 +7,23 @@ import yaml
 import json
 import helpers
 import hashlib
+from Queue import Queue
+from threading import Thread
 from hera_corr_f import SnapFengine
 import numpy as np
 from casperfpga import utils
 
 LOGGER = helpers.add_default_log_handlers(logging.getLogger(__name__))
+
+def _queue_instance_method(q, num, inst, method, args, kwargs):
+    '''
+    Add an [num, inst.method(*args, **kwargs)] call to queue, q.
+    Use q.get() to get the return data from this call.
+    
+    This function is used for parallelizing calls to multiple
+    roaches/engines.
+    '''
+    q.put([num, getattr(inst, method)(*args, **kwargs)])
 
 class HeraCorrelator(object):
     def __init__(self, redishost='redishost', config=None, logger=LOGGER, passive=False, use_redis=True):
@@ -38,7 +50,8 @@ class HeraCorrelator(object):
         self.dead_fengs = {}
         
         if not passive:
-            self.establish_connections()
+            self.disable_monitoring(60, wait=True)
+            self.establish_connections_multithread()
             # Get antenna<->SNAP maps
             self.compute_hookup()
 
@@ -175,6 +188,56 @@ class HeraCorrelator(object):
             except:
                 self.logger.exception("Exception whilst connecting to board %s" % host)
                 self.dead_fengs[host] = time.time()
+        self.fengs_by_name = {}
+        self.fengs_by_ip = {}
+        for feng in self.fengs:
+            feng.ip = socket.gethostbyname(feng.host)
+            self.fengs_by_name[feng.host] = feng
+            self.fengs_by_ip[feng.ip] = feng
+        self.logger.info('SNAPs are: %s' % ', '.join([feng.host for feng in self.fengs]))
+
+    def _try_to_connect(self, q, host, ant_indices, redishost):
+        """
+        Try to connect to  a single SNAP. Used in a multithreaded manner
+        by `establish_connections`
+        """
+        q.put([host, SnapFengine(host, ant_indices=ant_indices, redishost=redishost)])
+            
+
+    def establish_connections_multithread(self):
+        """
+        Connect to SNAP boards listed in the current configuration.
+        """
+        # Instantiate CasperFpga connections to all the F-Engine.
+        self.fengs = []
+        self.dead_fengs = {}
+        ant_index = 0
+        # Build a queue to multithread over
+        q = Queue()
+        hosts =  self.config['fengines'].keys()
+        for host_n, host in enumerate(hosts):
+            ant_indices = self.config['fengines'][host].get('ants', range(ant_index, ant_index + 3))
+            ant_index += 3
+            self.logger.info("Setting Feng %s antenna indices to %s" % (host, ant_indices))
+            if self.use_redis:
+                t = Thread(target=self._try_to_connect, args=(q, host, ant_indices, self.redishost))
+            else:
+                t = Thread(target=self._try_to_connect, args=(q, host, ant_indices, None))
+            t.daemon = True
+            t.start()
+        for host in hosts:
+            host, feng = q.get()
+            q.task_done()
+            self.fengs += [feng]
+        q.join()
+        is_connected = self.do_for_all_f('is_connected', block = 'fpga')
+        for feng in self.fengs:
+            if not is_connected.get(feng.host, False):
+                self.dead_fengs[feng.host] = time.time()
+                self.fengs.remove(feng)
+                self.logger.warning("Board %s is not connected" % feng.host)
+            else:
+                feng.error_count = 0
         self.fengs_by_name = {}
         self.fengs_by_ip = {}
         for feng in self.fengs:
