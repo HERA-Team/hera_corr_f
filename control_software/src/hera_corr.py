@@ -680,7 +680,7 @@ class HeraCorrelator(object):
             self.logger.info('Initializing all hosts using multithreading')
             init_time = time.ctime()
             self.do_for_all_f("initialize", timeout=timeout)
-            for feng in self.fengs
+            for feng in self.fengs:
                 self.r.hset('status:snap:%s' % feng.host, 'last_initialized', init_time)
         #TODO multithread these:
         self._initialize_fft_shift() 
