@@ -61,6 +61,7 @@ class SnapFengine(object):
             self.phaseswitch,
         ]
 
+        self.initialized = False
         self.i2c_initialized = False
         # The I2C devices mess with FPGA registers
         # when instantiated. This will fail if the board
@@ -99,9 +100,10 @@ class SnapFengine(object):
         for block in self.blocks:
             self.logger.info("Initializing block: %s" % block.name)
             block.initialize()
+        self.initialized = True
 
     def is_initialized(self):
-        return self.i2c_initialized
+        return self.initialized
 
     def get_fpga_stats(self):
         """

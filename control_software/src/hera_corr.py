@@ -659,6 +659,8 @@ class HeraCorrelator(object):
         this class's `do_for_all_f` method to intialize everyone.
         In this case, the `timeout` parameter specifies (in seconds)
         how long the threads should wait before timing out.
+        If `multithread` is False, `unitialized_only` will only attempt
+        to intiialize boards which weren't initialized already.
         NB: initialization takes about 30 seconds if things are going well,
         and longer if individual transactions fail and have to be retried.
         """
@@ -673,10 +675,13 @@ class HeraCorrelator(object):
             for feng in to_be_initialized:
                 self.logger.info('Initializing %s'%feng.host)
                 feng.initialize()
-                self.r.hset('status:snap:%s' % f.host, 'last_initialized', time.ctime())
+                self.r.hset('status:snap:%s' % feng.host, 'last_initialized', time.ctime())
         else:
             self.logger.info('Initializing all hosts using multithreading')
+            init_time = time.ctime()
             self.do_for_all_f("initialize", timeout=timeout)
+            for feng in self.fengs
+                self.r.hset('status:snap:%s' % feng.host, 'last_initialized', init_time)
         #TODO multithread these:
         self._initialize_fft_shift() 
         self.noise_diode_disable()
