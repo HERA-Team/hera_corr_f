@@ -51,7 +51,7 @@ class HeraCorrelator(object):
         
         if not passive:
             self.disable_monitoring(60, wait=True)
-            self.establish_connections_multithread()
+            self.establish_connections()
             # Get antenna<->SNAP maps
             self.compute_hookup()
 
