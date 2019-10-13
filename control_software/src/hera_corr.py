@@ -393,6 +393,7 @@ class HeraCorrelator(object):
             to_be_programmed = self.fengs
         self.logger.info("Actually programming %s" % ([f.host for f in self.fengs]))
         utils.program_fpgas([f.fpga for f in to_be_programmed], progfile, timeout=300.0)
+        time.sleep(20)
         for f in to_be_programmed:
             self.r.hset('status:snap:%s' % f.host, 'last_programmed', time.ctime())
         
