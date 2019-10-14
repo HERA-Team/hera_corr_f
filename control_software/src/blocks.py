@@ -196,7 +196,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.adc.write((gain_map[gain]<<4) + gain_map[gain], 0x2b)
         
 
-    def initialize(self):
+    def initialize(self, trial=0):
         """
         Initialize the configuration of the ADC chip.
         """
@@ -211,7 +211,11 @@ class Adc(casperfpga.snapadc.SNAPADC):
                 self.logger.error("ADC failed to configure after %d attempts" % (i+1))
 
         if not self.rampTest():
-            self.logger.warning('ADC failed on ramp test')
+            if trial < 3:
+                self.logger.warning('ADC failed on ramp test, retrying')
+                self.initialize(trial+1)
+            else:
+                self.logger.error('ADC failed on ramp test, giving up')
 
         #self.alignLineClock(mode='dual_pat')
         #self.alignFrameClock()
