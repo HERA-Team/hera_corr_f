@@ -320,7 +320,7 @@ class HeraCorrelator(object):
 
         self.dead_fengs[deadfeng.host] = time.time()
 
-    def disable_monitoring(self, expiry=60, wait=False):
+    def disable_monitoring(self, expiry=60, wait=True):
         """
         Set the "disable_monitoring" key in redis. Hopefully other processes will respect this
         key and stop monitoring. Useful if you are going to hammer the TFTP connection and don't
