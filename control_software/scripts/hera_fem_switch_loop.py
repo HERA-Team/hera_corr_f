@@ -35,7 +35,7 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
         if not isinstance(hostname, (list, tuple)):
             hostname = [hostname]
 
-        hostname = sorted(hostname)
+    hostname = sorted(hostname)
 
     if not hostname and not antenna_input:
         logger.info("Using all SNAPs from redis configuration")
