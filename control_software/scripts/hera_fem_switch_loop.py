@@ -24,7 +24,7 @@ logger = helpers.add_default_log_handlers(logging.getLogger(__name__),
 
 
 def main(redishost='redishost', hostname=None, antenna_input=None,
-         integration_time=None):
+         integration_time=None, do_not_initialize=False):
 
     # not actually using the connection
     # but will bw used tempo manipulate the monitoring state
@@ -53,7 +53,14 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
         # Disable the monitoring process for 5 minutes,
         # to stop it interfering with this script
         c.disable_monitoring(300, wait=True)
+
         snap = SnapFengine(SNAP_HOST, redishost=redishost)
+
+        if not snap.is_programmed():
+            snap.fpga.transport.prog_user_image()
+        # maybe add an option to turn of this call?
+        if not do_not_initialize:
+            snap.initialize()
 
         if integration_time is not None:
             acc_len = int(integration_time * 250e6
@@ -182,6 +189,10 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--filename', dest='filename',
                         default='fem_status_plot.html',
                         help='Filename to save the plot.')
+    parser.add_argument('--do_not_initialize', action='store_true',
+                        help="Do not initialize the SNAP(s). "
+                        "This is uncommon and should only be done "
+                        "if observation is currently underway.")
     parser.add_argument('--show', dest='show', action='store_true',
                         help='Show plot.')
 
