@@ -198,7 +198,7 @@ if __name__ == "__main__":
     if args.filename is not None:
         filename = os.path.join(args.output, args.filename)
         pio.write_html(fig, auto_open=False,
-                       file='fem_switch_plot.html',
+                       file=filename,
                        )
     if args.show:
         pio.show(fig)
