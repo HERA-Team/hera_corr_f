@@ -62,9 +62,9 @@ walsh_order: 32
 walsh_delay: 600
 
 fengines:
-    heraNode0Snap0:
-        phase_switch_index: [1,2,3,4,5,6]
-        ants: [0, 1, 2]
+    #heraNode0Snap0:
+    #    phase_switch_index: [1,2,3,4,5,6]
+    #    ants: [0, 1, 2]
     heraNode0Snap1:
         phase_switch_index: [7,8,9,10,11,12]
         ants: [3, 4, 5]
