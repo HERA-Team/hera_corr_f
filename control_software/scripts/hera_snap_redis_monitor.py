@@ -232,7 +232,7 @@ if __name__ == "__main__":
             handler.setLevel(getattr(logging, args.loglevel))
        
 
-    corr = HeraCorrelator(redishost=args.redishost, use_redis=(not args.noredistapcp))
+    corr = HeraCorrelator(redishost=args.redishost, use_redis=(not args.noredistapcp), block_monitoring=False)
     upload_time = corr.r.hget('snap_configuration', 'upload_time')
     print_ant_log_messages(corr)
 

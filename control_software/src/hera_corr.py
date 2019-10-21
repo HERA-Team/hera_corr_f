@@ -26,7 +26,7 @@ def _queue_instance_method(q, num, inst, method, args, kwargs):
     q.put([num, getattr(inst, method)(*args, **kwargs)])
 
 class HeraCorrelator(object):
-    def __init__(self, redishost='redishost', config=None, logger=LOGGER, passive=False, use_redis=True):
+    def __init__(self, redishost='redishost', config=None, logger=LOGGER, passive=False, use_redis=True, block_monitoring=True):
         """
         Instantiate a HeraCorrelator instance.
         optional inputs:
@@ -35,6 +35,7 @@ class HeraCorrelator(object):
             logger (logging.Logger): Logging object this class will use.
             passive (Boolean): If True, won't connect to SNAPs. If False, will establish SNAP connections and check the connected boards are alive.
             use_redis (Boolean): If True, will use a redis proxy (at `redishost`) for talking to SNAP boards, rather than direct TFTP.
+            block_monitoring (Boolean): If True, will disable monitoring before connecting to boards
         """
         self.logger = logger
         self.redishost = redishost
@@ -50,7 +51,8 @@ class HeraCorrelator(object):
         self.dead_fengs = {}
         
         if not passive:
-            self.disable_monitoring(60, wait=True)
+            if block_monitoring:
+                self.disable_monitoring(60, wait=True)
             self.establish_connections()
             # Get antenna<->SNAP maps
             self.compute_hookup()
