@@ -145,6 +145,7 @@ def make_plot(correlations=None):
                                       name=name,
                                       marker={"color": colors[state],
                                               },
+                                      hovertemplate="%{x:.1f}\tMHz<br>%{y:.3f}\t[dB]",
                                       visible=visible,
                                       showlegend=showlegend
                                       )
