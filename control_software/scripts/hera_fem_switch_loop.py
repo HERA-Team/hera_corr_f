@@ -121,11 +121,9 @@ def make_plot(correlations=None):
                 _scatter = go.Scatter(x=freqs,
                                       y=autocorr,
                                       name=name,
-                                      row=row,
-                                      col=col,
                                       visible=visible)
                 scatters.append(_scatter)
-                fig.add_trace(_scatter)
+                fig.add_trace(_scatter, row=row, col=col)
 
     # make a mask for each host
     host_mask = []
@@ -136,6 +134,7 @@ def make_plot(correlations=None):
                           for ant in correlations[h2]
                           for state in correlations[h2][ant]
                           ])
+        host_mask.append(_mask)
 
     buttons = []
     for host_cnt, host in enumerate(hostnames):
