@@ -58,7 +58,6 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
 
         if not snap.is_programmed():
             snap.fpga.transport.prog_user_image()
-        # maybe add an option to turn of this call?
         if not do_not_initialize:
             snap.initialize()
 
