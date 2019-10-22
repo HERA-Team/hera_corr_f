@@ -103,7 +103,7 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
 
 def make_plot(correlations=None):
     n_plots = len(list(correlations.values())[0].keys())
-    colors = {"anteanna": "blue",
+    colors = {"antenna": "blue",
               "load": "orange",
               "noise": "red"
               }
@@ -115,6 +115,10 @@ def make_plot(correlations=None):
     fig = subplots.make_subplots(rows=rows, cols=cols,
                                  subplot_titles=subplot_titles
                                  )
+    for row in range(rows):
+        for col in range(cols):
+            fig.update_xaxes(title="Frequency [MHz]", row=row, col=col)
+            fig.update_yaxes(title="Power [dB]", row=row, col=col)
 
     # lost of nasty plotly code to make stuff
     freqs = np.linspace(0, 250e6, 1024)
@@ -138,7 +142,8 @@ def make_plot(correlations=None):
                 _scatter = go.Scatter(x=freqs,
                                       y=autocorr,
                                       name=name,
-                                      color=colors[state],
+                                      marker={"color": colors[state],
+                                              },
                                       visible=visible,
                                       showlegend=showlegend
                                       )
