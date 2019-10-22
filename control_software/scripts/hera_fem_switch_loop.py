@@ -115,8 +115,8 @@ def make_plot(correlations=None):
     fig = subplots.make_subplots(rows=rows, cols=cols,
                                  subplot_titles=subplot_titles
                                  )
-    for row in range(rows):
-        for col in range(cols):
+    for row in range(rows + 1):
+        for col in range(cols + 1):
             fig.update_xaxes(title="Frequency [MHz]", row=row, col=col)
             fig.update_yaxes(title="Power [dB]", row=row, col=col)
 
