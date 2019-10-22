@@ -110,7 +110,7 @@ def make_plot(correlations=None):
     cols = np.int(np.ceil(np.sqrt(n_plots)))
     rows = np.int(np.ceil(n_plots / np.float(cols)))
     subplot_titles = ["ADC PORT {}".format(n)
-                      for n in sorted(correlations.values())[0].keys()
+                      for n in sorted(correlations.values()[0].keys())
                       ]
     fig = subplots.make_subplots(rows=rows, cols=cols,
                                  subplot_titles=subplot_titles
@@ -143,6 +143,7 @@ def make_plot(correlations=None):
                 _scatter = go.Scatter(x=freqs,
                                       y=autocorr,
                                       name=name,
+                                      host=host,
                                       marker={"color": colors[state],
                                               },
                                       visible=visible,
@@ -151,26 +152,19 @@ def make_plot(correlations=None):
                 scatters.append(_scatter)
                 fig.add_trace(_scatter, row=row, col=col)
 
-    # make a mask for each host
-    host_mask = []
-    for h1 in hostnames:
-        _mask = []
-        for h2 in hostnames:
-            _mask.append([True if h1 == h2 else False
-                          for ant in correlations[h2]
-                          for state in correlations[h2][ant]
-                          ])
-        host_mask.append(_mask)
-
     buttons = []
     for host_cnt, host in enumerate(hostnames):
-        _button = {"args": [{"visible": host_mask[host_cnt]},
+        visibility = [h2 == host for h2 in sorted(correlations.keys())
+                      for ant in correlations[h2]
+                      for stat in correlations[h2][ant]
+                      ]
+        _button = {"args": [{"visible": visibility},
                             {  # "title": '',
                             "annotations": {}
                              }
                             ],
                    "label": host,
-                   "method": "restyle"
+                   "method": "update"
                    }
         buttons.append(_button)
 
