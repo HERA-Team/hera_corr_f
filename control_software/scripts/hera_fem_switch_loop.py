@@ -143,7 +143,6 @@ def make_plot(correlations=None):
                 _scatter = go.Scatter(x=freqs,
                                       y=autocorr,
                                       name=name,
-                                      host=host,
                                       marker={"color": colors[state],
                                               },
                                       visible=visible,
@@ -159,8 +158,7 @@ def make_plot(correlations=None):
                       for stat in correlations[h2][ant]
                       ]
         _button = {"args": [{"visible": visibility},
-                            {  # "title": '',
-                            "annotations": {}
+                            {"annotations": {}
                              }
                             ],
                    "label": host,
