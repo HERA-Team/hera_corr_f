@@ -25,7 +25,9 @@ logger = helpers.add_default_log_handlers(logging.getLogger(__name__),
 
 def main(redishost='redishost', hostname=None, antenna_input=None,
          integration_time=None, do_not_initialize=False):
-
+    if hostname is None:
+        raise ValueError("Must specify a hostname or list of hostames. "
+                         "To run on all Snaps set hostame='all'")
     # not actually using the connection
     # but will bw used tempo manipulate the monitoring state
     # and find all hosts if needed.
@@ -37,11 +39,11 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
 
     hostname = sorted(hostname)
 
-    if not hostname and not antenna_input:
+    if hostname == ['all'] and not antenna_input:
         logger.info("Using all SNAPs from redis configuration")
         SNAP_HOST = sorted(list(c.config['fengines'].keys()))
         ANTENNA_INPUT = np.arange(0, 6)
-    elif hostname and not antenna_input:
+    elif hostname != ['all'] and not antenna_input:
         SNAP_HOST = hostname
         ANTENNA_INPUT = np.arange(0, 6)
     else:
@@ -188,14 +190,16 @@ if __name__ == "__main__":
             'Record a auto-correlation spectra from the SNAP for each state. '
             'Can run on a single antenna when both "hostname" and "antenna_input" '
             'are set. If "hostname" is set with no "ANTENNA_INPUT" will run on all '
-            'antennas in that SNAP. If both inputs "hostname" '
-            'and "antenna_input" are not provides, will loop through all SNAPS '
-            'and all antennas.')
+            'antennas in that SNAP. To run on all Snaps and antennas set '
+            '"hostname" to all.')
     parser = argparse.ArgumentParser(description=desc,
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument(dest='hostname', type=str, nargs='*',
-                        help='Host board to collect data from.')
+    parser.add_argument(dest='hostname', type=str, nargs='+',
+                        help=('Host board to collect data from. '
+                              'Formatted as heraNode?Snap? or '
+                              '"all" for all Snaps.')
+                        )
     parser.add_argument('-r', dest='redishost', type=str, default='redishost',
                         help='Host servicing redis requests')
     parser.add_argument('-a', '--antenna_input', dest='antenna_input',
