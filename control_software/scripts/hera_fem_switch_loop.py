@@ -54,7 +54,7 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
         # to stop it interfering with this script
         c.disable_monitoring(300, wait=True)
 
-        snap = SnapFengine(SNAP_HOST, redishost=redishost)
+        snap = SnapFengine(host, redishost=redishost)
 
         if not snap.is_programmed():
             snap.fpga.transport.prog_user_image()
