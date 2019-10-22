@@ -71,6 +71,11 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
         host_group = correlations.setdefault(host, {})
 
         for antenna_ind in ANTENNA_INPUT:
+            logger.info("Running FEM switch loop "
+                        "for {host} antenna {ant}".format(host=host,
+                                                          ant=antenna_ind)
+                        )
+
             c.disable_monitoring(60, wait=True)
             fem_ind = antenna_ind / 2
             fem_pol = antenna_ind % 2
@@ -98,9 +103,18 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
 
 def make_plot(correlations=None):
     n_plots = len(list(correlations.values())[0].keys())
+    colors = {"anteanna": "blue",
+              "load": "orange",
+              "noise": "red"
+              }
     cols = np.int(np.ceil(np.sqrt(n_plots)))
     rows = np.int(np.ceil(n_plots / np.float(cols)))
-    fig = subplots.make_subplots(rows=rows, cols=cols)
+    subplot_titles = ["ADC PORT {}".format(n)
+                      for n in sorted(correlations.values())[0].keys()
+                      ]
+    fig = subplots.make_subplots(rows=rows, cols=cols,
+                                 subplot_titles=subplot_titles
+                                 )
 
     # lost of nasty plotly code to make stuff
     freqs = np.linspace(0, 250e6, 1024)
@@ -109,18 +123,25 @@ def make_plot(correlations=None):
     hostnames = sorted(list(correlations.keys()))
     for host in hostnames:
         visible = True if host == hostnames[0] else False
-        for ant in correlations[host]:
+        for ant in sorted(correlations[host].keys()):
+            if ant == 0:
+                showlegend = True
+            else:
+                showlegend = False
             row = ant // cols + 1
             col = ant % cols + 1
             for state in correlations[host][ant]:
-                name = "{ant}:{state}".format(ant=ant, state=state)
+                name = "{state}".format(state=state)
                 autocorr = correlations[host][ant][state]
                 autocorr = 10 * np.log10(np.ma.masked_invalid(autocorr)
                                          ).filled(-50)
                 _scatter = go.Scatter(x=freqs,
                                       y=autocorr,
                                       name=name,
-                                      visible=visible)
+                                      color=colors[state],
+                                      visible=visible,
+                                      showlegend=showlegend
+                                      )
                 scatters.append(_scatter)
                 fig.add_trace(_scatter, row=row, col=col)
 
@@ -138,8 +159,8 @@ def make_plot(correlations=None):
     buttons = []
     for host_cnt, host in enumerate(hostnames):
         _button = {"args": [{"visible": host_mask[host_cnt]},
-                            {"title": '',
-                             "annotations": {}
+                            {  # "title": '',
+                            "annotations": {}
                              }
                             ],
                    "label": host,
@@ -200,7 +221,8 @@ if __name__ == "__main__":
     correlations = main(
         redishost=args.redishost, hostname=args.hostname,
         antenna_input=args.antenna_input,
-        integration_time=args.integration_time
+        integration_time=args.integration_time,
+        do_not_initialize=args.do_not_initialize
     )
 
     fig = make_plot(correlations=correlations)
