@@ -138,7 +138,8 @@ def make_plot(correlations=None):
                 name = "{state}".format(state=state)
                 autocorr = correlations[host][ant][state]
                 autocorr = 10 * np.log10(np.ma.masked_invalid(autocorr)
-                                         ).filled(-50)
+                                         )
+                autocorr = autocorr.filled(-50)
                 _scatter = go.Scatter(x=freqs,
                                       y=autocorr,
                                       name=name,
