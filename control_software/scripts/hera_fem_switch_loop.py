@@ -73,15 +73,16 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
 
         for antenna_ind in ANTENNA_INPUT:
             c.disable_monitoring(60, wait=True)
-
-            fem = snap.fems[antenna_ind]
+            fem_ind = antenna_ind / 2
+            fem_pol = antenna_ind % 2
+            fem = snap.fems[fem_ind]
             current_state = fem.switch()
 
             ant_group = host_group.setdefault(antenna_ind, {})
 
             for state in ['noise', 'load', 'antenna']:
-                fem.switch(state)
-                autocorr = snap.corr.get_new_corr(antenna_ind, antenna_ind)
+                fem.switch(name=state)
+                autocorr = snap.corr.get_new_corr(antenna_ind, antenna_ind).real
 
                 eq_coeff = snap.eq.get_coeffs(antenna_ind)
                 ant_group[state] = autocorr / eq_coeff**2
