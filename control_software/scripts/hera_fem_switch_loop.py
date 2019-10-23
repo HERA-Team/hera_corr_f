@@ -8,6 +8,9 @@
 import os
 import sys
 import numpy as np
+import json
+import redis
+import copy
 import argparse
 import logging
 from hera_corr_f import HeraCorrelator, SnapFengine, helpers
@@ -107,10 +110,17 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
 
     # Re-enable monitoring.
     c.enable_monitoring()
-    return correlations
+
+    redis_connection = redis.ConnectionPool(host=redishost)
+    with redis.Redis(connection_pool=redis_connection) as r:
+        snap_to_ant = r.hget('corr:map', 'snap_to_ant')
+        if snap_to_ant is not None:
+            snap_to_ant = json.loads(snap_to_ant)
+
+    return correlations, snap_to_ant
 
 
-def make_plot(correlations=None):
+def make_plot(correlations=None, snap_to_ant=None):
     n_plots = len(list(correlations.values())[0].keys())
     colors = {"antenna": "blue",
               "load": "orange",
@@ -167,8 +177,18 @@ def make_plot(correlations=None):
                       for ant in correlations[h2]
                       for stat in correlations[h2][ant]
                       ]
+        annos = [an for an in copy.deepcopy(fig.layout.annotations)]
+
+        for port, _an in zip(sorted(correlations[host].keys()), annos):
+            if snap_to_ant is not None:
+                antpol = snap_to_ant[host][int(port)]
+                _an.text = 'ADC PORT {port} {antpol}'.format(port=port,
+                                                             antpol=antpol)
+            else:
+                _an.text = 'ADC PORT {port}'.format(port=port)
+
         _button = {"args": [{"visible": visibility},
-                            {"annotations": {}
+                            {"annotations": annos
                              }
                             ],
                    "label": host,
@@ -232,7 +252,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    correlations = main(
+    correlations, snap_to_ant = main(
         redishost=args.redishost, hostname=args.hostname,
         antenna_input=args.antenna_input,
         integration_time=args.integration_time,
@@ -240,7 +260,7 @@ if __name__ == "__main__":
         no_equalization=args.no_equalization
     )
 
-    fig = make_plot(correlations=correlations)
+    fig = make_plot(correlations=correlations, snap_to_ant=snap_to_ant)
 
     if args.filename is not None:
         filename = os.path.join(args.output, args.filename)
