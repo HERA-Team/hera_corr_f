@@ -236,6 +236,8 @@ def make_plot(correlations=None, snap_to_ant=None):
         for port, _an in zip(sorted(correlations[host].keys()), annos):
             if snap_to_ant is not None:
                 antpol = snap_to_ant[host][int(port)]
+                if antpol is None:
+                    antpol = 'N/C'
                 _an.text = 'ADC PORT {port} {antpol}'.format(port=port,
                                                              antpol=antpol)
             else:
