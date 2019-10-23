@@ -168,6 +168,8 @@ def make_plot(correlations=None, snap_to_ant=None):
 
 
     """
+    hostnames = sorted(list(correlations.keys()))
+
     n_plots = len(list(correlations.values())[0].keys())
     colors = {"antenna": "blue",
               "load": "orange",
@@ -175,9 +177,19 @@ def make_plot(correlations=None, snap_to_ant=None):
               }
     cols = np.int(np.ceil(np.sqrt(n_plots)))
     rows = np.int(np.ceil(n_plots / np.float(cols)))
-    subplot_titles = ["ADC PORT {}".format(n)
-                      for n in sorted(correlations.values()[0].keys())
-                      ]
+
+    subplot_titles = []
+    for n in sorted(correlations.values()[0].keys()):
+        if snap_to_ant is not None:
+            antpol = snap_to_ant[hostnames[0]][int(n)]
+            if antpol is None:
+                antpol = 'N/C'
+            subplot_titles.append('ADC PORT {port} {antpol}'
+                                  .format(port=n, antpol=antpol)
+                                  )
+        else:
+            subplot_titles.append('ADC PORT {port}'.format(port=n))
+
     fig = subplots.make_subplots(rows=rows, cols=cols,
                                  subplot_titles=subplot_titles
                                  )
@@ -197,7 +209,6 @@ def make_plot(correlations=None, snap_to_ant=None):
     freqs = np.linspace(0, 250e6, 1024)
     freqs /= 1e6
     scatters = []
-    hostnames = sorted(list(correlations.keys()))
     for host in hostnames:
         visible = True if host == hostnames[0] else False
         for ant in sorted(correlations[host].keys()):
