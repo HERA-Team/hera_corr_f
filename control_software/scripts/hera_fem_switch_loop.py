@@ -28,6 +28,36 @@ logger = helpers.add_default_log_handlers(logging.getLogger(__name__),
 
 def main(redishost='redishost', hostname=None, antenna_input=None,
          integration_time=None, do_not_initialize=False, no_equalization=False):
+    """Loop through input hostnames and collect spectra for all FEM switch states.
+
+    Parameters
+    ----------
+    redishost : str
+        The name of the redis host to connect to.
+    hostname : str or list of str
+        hostnames to collect spectra from of the form heraNode?Snap?
+        if input is 'all' all snaps in the config file will be used
+    antenna_input : int, list of int, or None
+        Antenna number (ADC Port #) on the snap to collect spectra from.
+        Can accept a single antenna, list, or None.
+        If None all antennas on a snap will be returned with spectra.
+    integration_time : float
+        The desired integration time in s for a spectra.
+    do_not_initialize : bool
+        Flag used to not initialize Snap boards if they are not programmed.
+        This is not a common option and should only be set if observing is underway.
+    no_equalization : bool
+        Do not divide the spectra by the the equalization coefficients
+
+    Returns
+    -------
+    correlations : dict of dict of dict
+        Nested dicts of correlations indexed by keys in the order
+        hostname, antenna index, and load_type
+    snap_to_ant : dict
+        dict defining the snap to antenna mapping for HERA.
+
+    """
     if hostname is None:
         raise ValueError("Must specify a hostname or list of hostames. "
                          "To run on all Snaps set hostame='all'")
@@ -121,6 +151,23 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
 
 
 def make_plot(correlations=None, snap_to_ant=None):
+    """Make a plotly plot from input correlation dict and snap_to_ant dict.
+
+    Parameters
+    ----------
+    correlations : dict of dict of dict
+        Nested dicts of correlations indexed by keys in the order
+        hostname, antenna index, and load_type
+    snap_to_ant : dict (optional)
+        dict defining the snap to antenna mapping for HERA.
+        If no mapping dictionary is provided, plot names will only use ADC Port numbers
+
+    Returns
+    -------
+    plotly figure
+
+
+    """
     n_plots = len(list(correlations.values())[0].keys())
     colors = {"antenna": "blue",
               "load": "orange",
