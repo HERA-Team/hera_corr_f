@@ -60,8 +60,14 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
 
         if not snap.is_programmed():
             snap.fpga.transport.prog_user_image()
-        if not do_not_initialize:
             snap.initialize()
+
+        elif not do_not_initialize:
+            # programmed Snap may sill need to be initialized
+            snap.initialize()
+        else:
+            # Snap is programmed and user does not want to initialize
+            pass
 
         if integration_time is not None:
             acc_len = int(integration_time * 250e6
