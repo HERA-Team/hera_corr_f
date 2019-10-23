@@ -184,7 +184,7 @@ def make_plot(correlations=None, snap_to_ant=None):
             antpol = snap_to_ant[hostnames[0]][int(n)]
             if antpol is None:
                 antpol = 'N/C'
-            subplot_titles.append('ADC PORT {port} {antpol}'
+            subplot_titles.append('ADC PORT {port}<br>{antpol}'
                                   .format(port=n, antpol=antpol)
                                   )
         else:
@@ -249,8 +249,8 @@ def make_plot(correlations=None, snap_to_ant=None):
                 antpol = snap_to_ant[host][int(port)]
                 if antpol is None:
                     antpol = 'N/C'
-                _an.text = 'ADC PORT {port} {antpol}'.format(port=port,
-                                                             antpol=antpol)
+                _an.text = 'ADC PORT {port}<br>{antpol}'.format(port=port,
+                                                                antpol=antpol)
             else:
                 _an.text = 'ADC PORT {port}'.format(port=port)
 
