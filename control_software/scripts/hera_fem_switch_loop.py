@@ -181,10 +181,17 @@ def make_plot(correlations=None, snap_to_ant=None):
     fig = subplots.make_subplots(rows=rows, cols=cols,
                                  subplot_titles=subplot_titles
                                  )
+    gridcolor = 'rgba(0,0,0,.125)'
     for row in range(rows + 1):
         for col in range(cols + 1):
-            fig.update_xaxes(title="Frequency [MHz]", row=row, col=col)
-            fig.update_yaxes(title="Power [dB]", row=row, col=col)
+            fig.update_xaxes(title="Frequency [MHz]", row=row, col=col,
+                             gridcolor=gridcolor,
+                             zerolinecolor=gridcolor
+                             )
+            fig.update_yaxes(title="Power [dB]", row=row, col=col,
+                             gridcolor=gridcolor,
+                             zerolinecolor=gridcolor
+                             )
 
     # lost of nasty plotly code to make stuff
     freqs = np.linspace(0, 250e6, 1024)
@@ -252,7 +259,9 @@ def make_plot(correlations=None, snap_to_ant=None):
     # Finish plot
     layout = go.Layout(showlegend=True,
                        title='Antenna Fem switch states',
-                       updatemenus=[updatemenu]
+                       updatemenus=[updatemenu],
+                       paper_bgcolor='rgba(0,0,0,0)',
+                       plot_bgcolor='rgba(0,0,0,0)',
                        )
     fig.update_layout(layout)
 
