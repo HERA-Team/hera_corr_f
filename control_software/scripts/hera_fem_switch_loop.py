@@ -24,7 +24,7 @@ logger = helpers.add_default_log_handlers(logging.getLogger(__name__),
 
 
 def main(redishost='redishost', hostname=None, antenna_input=None,
-         integration_time=None, do_not_initialize=False):
+         integration_time=None, do_not_initialize=False, no_equalization=False):
     if hostname is None:
         raise ValueError("Must specify a hostname or list of hostames. "
                          "To run on all Snaps set hostame='all'")
@@ -90,8 +90,9 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
                 fem.switch(name=state)
                 autocorr = snap.corr.get_new_corr(antenna_ind, antenna_ind).real
 
-                eq_coeff = snap.eq.get_coeffs(antenna_ind)
-                ant_group[state] = autocorr / eq_coeff**2
+                if not no_equalization:
+                    eq_coeff = snap.eq.get_coeffs(antenna_ind)
+                    ant_group[state] = autocorr / eq_coeff**2
 
             # restore this antenna to the state it started in
             fem.switch(name=current_state[0],
@@ -216,6 +217,10 @@ if __name__ == "__main__":
                         help="Do not initialize the SNAP(s). "
                         "This is uncommon and should only be done "
                         "if observation is currently underway.")
+    parser.add_argument('--no_equalization', action='store_true',
+                        help=("Do not divide out the equalization "
+                              "coefficients when taking spectra.")
+                        )
     parser.add_argument('--show', dest='show', action='store_true',
                         help='Show plot.')
 
@@ -225,7 +230,8 @@ if __name__ == "__main__":
         redishost=args.redishost, hostname=args.hostname,
         antenna_input=args.antenna_input,
         integration_time=args.integration_time,
-        do_not_initialize=args.do_not_initialize
+        do_not_initialize=args.do_not_initialize,
+        no_equalization=args.no_equalization
     )
 
     fig = make_plot(correlations=correlations)
