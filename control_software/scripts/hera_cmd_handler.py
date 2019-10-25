@@ -21,6 +21,7 @@ def cmd_handler(corr, r, message, testmode=False):
         print "       args:", args
         return
     if command == "phase_switch":
+        corr.reestablish_dead_connections(programmed_only=True)
         if args["activate"]:
             corr.phase_switch_enable()
         else:
@@ -66,6 +67,7 @@ def cmd_handler(corr, r, message, testmode=False):
             send_response(r, command, time, err="Retries exceeded")
             return
         else:
+            corr.reestablish_dead_connections(programmed_only=True)
             if args["input_sel"] == "noise":
                 corr.noise_diode_enable()
             elif args["input_sel"] == 'load':
@@ -175,11 +177,11 @@ if __name__ == "__main__":
         message = cmd_chan.get_message(timeout=5)
         if message is not None:
             cmd_handler(corr, r, message["data"], testmode=args.testmode)
-        # If the retry period has been exceeded, try to reconnect to dead boards:
-        if time.time() > (retry_tick + RETRY_TIME):
-            if len(corr.dead_fengs) > 0:
-                corr.logger.debug('Trying to reconnect to dead boards')
-                corr.disable_monitoring(60, wait=True)
-                corr.reestablish_dead_connections(programmed_only=True)
-                corr.enable_monitoring()
-                retry_tick = time.time()
+        ## If the retry period has been exceeded, try to reconnect to dead boards:
+        #if time.time() > (retry_tick + RETRY_TIME):
+        #    if len(corr.dead_fengs) > 0:
+        #        corr.logger.debug('Trying to reconnect to dead boards')
+        #        corr.disable_monitoring(60, wait=True)
+        #        corr.reestablish_dead_connections(programmed_only=True)
+        #        corr.enable_monitoring()
+        #        retry_tick = time.time()
