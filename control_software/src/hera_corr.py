@@ -520,7 +520,7 @@ class HeraCorrelator(object):
                    if redtime is None:
                        redtime_str = "UNKNOWN"
                    else:
-                       redtime_str = time.ctime(redtime)
+                       redtime_str = time.ctime(float(redtime))
                    self.logger.debug("Loading attenuation of %ddB from time %s" % (int(redval), redtime_str))
                    self.set_pam_attenuation(ant, pol, int(redval))
                    return
