@@ -257,7 +257,7 @@ if __name__ == "__main__":
         if corr.r.hget('snap_configuration', 'upload_time') != upload_time:
             upload_time = corr.r.hget('snap_configuration', 'upload_time')
             logger.info('New configuration detected. Reinitializing fengine list')
-            corr = HeraCorrelator(redishost=args.redishost, use_redis=(not args.noredistapcp))
+            corr = HeraCorrelator(redishost=args.redishost, use_redis=(not args.noredistapcp), block_monitoring=False)
             print_ant_log_messages(corr)
         
         # Recompute the hookup every time. It's fast
