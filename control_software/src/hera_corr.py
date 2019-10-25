@@ -515,33 +515,37 @@ class HeraCorrelator(object):
             if val is None:
                # Try to reload coefficients from redis
                self.logger.debug("Trying to set PAM attenuation for Ant %s%s from redis" % (ant, pol))
-               redval = self.r.hgetall("atten:ant:%s:%s" % (ant, pol))
-               if redval != {}:
-                   if redval['value'] == "None":
-                       self.logger.debug("Attenuation value in redis was None!")
-                       return
-                   self.logger.debug("Loading attenuation of %ddB from time %s" % (int(redval['value']),time.ctime(float(redval['time']))))
-                   self.set_pam_attenuation(ant, pol, int(redval['value']))
+               redval, redtime = self.r.hmget("atten:ant:%s:%s" % (ant, pol), "commanded", "command_time")
+               if redval is not None:
+                   if redtime is None:
+                       redtime_str = "UNKNOWN"
+                   else:
+                       redtime_str = time.ctime(redtime)
+                   self.logger.debug("Loading attenuation of %ddB from time %s" % (int(redval), redtime_str))
+                   self.set_pam_attenuation(ant, pol, int(redval))
                    return
                # If there are no coeffs in redis. Look at whatever is actually loaded and update redis
                else:
                    self.logger.debug("Failed to find attenuation value in redis!")
-                   val = self.get_pam_attenuation(ant, pol, update_redis=True)
+                   # update redis with the current values, but do not update the commanded value
+                   val = self.get_pam_attenuation(ant, pol)
                    return
+            # Else if we have a value provided, update redis and try to load it
+            self.logger.info("Setting ant %s pol %s PAM attenuation to %d" % (ant, pol, val))
+            self.r.hmset('atten:ant:%s:%s' % (ant, pol), {'commanded': str(val), 'command_time':time.time()})
             if pol == 'e':
                 snap.pams[chan//2].set_attenuation(east=val)
             else:
                 snap.pams[chan//2].set_attenuation(north=val)
-            self.get_pam_attenuation(ant, pol, update_redis=True)
+            self.get_pam_attenuation(ant, pol)
 
-    def get_pam_attenuation(self, ant, pol, update_redis=False):
+    def get_pam_attenuation(self, ant, pol):
         """
         Get the PAM attenuation values of Antenna `ant`, polarization `pol`.
         Optionally update the coefficients stored in redis
         Inputs:
            ant: Antenna string. Eg. '0', for HH0
            pol: String polarization -- 'e' or 'n'
-           update_redis: Boolean. If True, update this antennas redis PAM attenkey
         Returns:
            Current attenuation value (int)
         """
@@ -558,9 +562,43 @@ class HeraCorrelator(object):
                 val = val_e
             else:
                 val = val_n
-        if update_redis:
-            self.r.hmset('atten:ant:%s:%s' % (ant, pol), {'value': str(val), 'time':time.time()})
+        self.r.hmset('atten:ant:%s:%s' % (ant, pol), {'value': str(val), 'time':time.time()})
+        time.sleep(0.01)
+        commanded, actual = self.r.hmget('atten:ant:%s:%s' % (ant, pol), 'commanded', 'value')
+        if (commanded is not None) and (actual is not None) and (commanded != actual):
+            self.logger.warning("%s%s: Commanded attenuation (%s) doesn't match read attenuation (%s)" % (ant, pol, commanded, actual))
         return val
+
+    def tune_pam_attenuation(self, ant, pol, target_pow=None, target_rms=None):
+        """
+        Set the PAM attenuation values of Antenna `ant`, polarization `pol`
+        so as to target either a PAM power level `target_pow` dBm, or an
+        ADC RMS of `target_rms` units.
+        Inputs:
+           ant: Antenna string. Eg. '0', for HH0
+           pol: String polarization -- 'e' or 'n'
+           target_pow (float): dBm target
+           target_rms (float): ADC RMS target
+        Returns:
+           True if tuning succeeded, else False
+        """
+        assert (target_pow is None) or (target_rms is None), "You may only target _either_ an ADC RMS _or_ a PAM power"
+        assert (target_pow is not None) or (target_rms is not None), "You must target _either_ an ADC RMS _or_ a PAM power"
+        assert pol in ['e', 'n']
+        
+        snap, chan = self.get_ant_snap_chan(ant, pol)
+        if snap is None:
+            self.logger.warning("Tried to tune EQ for an antenna we don't recognize!")
+            return False
+        elif not isinstance(snap, SnapFengine):
+            self.logger.warning("Tried to tune EQ for an antenna whose SNAP can't be reached!")
+            return False
+        req_atten = snap.get_pam_atten_by_target(chan, target_pow=target_pow, target_rms=target_rms)
+        if req_atten is not False:
+            self.set_pam_attenuation(ant, pol, req_atten)
+        else:
+            self.logger.warning("Failed to get attenuation target")
+            return False
 
 
     def set_eq(self, ant, pol, eq=None):
