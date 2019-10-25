@@ -35,6 +35,8 @@ corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)
 for feng in corr.fengs:
     corr.disable_monitoring(60, wait=True)
     for input_n, antenna in enumerate(feng.ants):
+        if antenna is None:
+            continue
         ant = antenna[:-1].lstrip('HH')
         pol = antenna[-1].lower()
         corr.logger.info("Balancing %s (SNAP %s, input %d)" % (antenna, feng.host, input_n))
