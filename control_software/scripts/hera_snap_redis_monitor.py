@@ -279,6 +279,10 @@ if __name__ == "__main__":
             histograms += [corr.do_for_all_f("get_histogram", block="input", args=(i,), kwargs={"sum_cores" : True})]
             eq_coeffs += [corr.do_for_all_f("get_coeffs", block="eq", args=(i,))]
             autocorrs += [corr.do_for_all_f("get_new_corr", block="corr", args=(i,i))]
+        # We only detect overflow once per FPGA (not per antenna).
+        # Get the overflow flag and reset it
+        fft_of = corr.do_for_all_f("is_overflowing", block="pfb")
+        corr.do_for_all_f("rst_stats", block="pfb")
 
         # Get FEM/PAM sensor values
         fem_stats = get_all_fem_stats(corr)
@@ -350,6 +354,10 @@ if __name__ == "__main__":
                     pass
                 try:
                     redis_vals.update(fem_stats[ant][pol])
+                except KeyError:
+                    pass
+                try:
+                    redis_vals["fft_of"] = fft_of[key]
                 except KeyError:
                     pass
                 redis_vals['timestamp'] = datetime.datetime.now().isoformat()
