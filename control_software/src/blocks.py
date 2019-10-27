@@ -579,10 +579,10 @@ class Pfb(Block):
     def __init__(self, host, name, logger=None):
         super(Pfb, self).__init__(host, name, logger)
         self.SHIFT_OFFSET = 0
-        self.SHIFT_WIDTH  = 12
-        self.PRESHIFT_OFFSET = 12
+        self.SHIFT_WIDTH  = 16
+        self.PRESHIFT_OFFSET = 16
         self.PRESHIFT_WIDTH  = 2
-        self.STAT_RST_BIT = 14
+        self.STAT_RST_BIT = 18
 
     def set_fft_shift(self, shift):
         self.change_reg_bits('ctrl', shift, self.SHIFT_OFFSET, self.SHIFT_WIDTH)
