@@ -25,12 +25,16 @@ args = parser.parse_args()
 corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)
 
 n_loop_max = 4
+eq_start_val = 1000
 
 for ant, snap in corr.ant_to_snap.iteritems():
     corr.disable_monitoring(expiry=60, wait=True)
     for pol, snap_chan in snap.iteritems():
         print("Equalizing %s:%s" % (ant, pol))
         corr.disable_monitoring(expiry=30)
+        # Start with coefficients at some nominal value.
+        # Otherwise we'll never recover from (eg) coefficients of 0
+        corr.set_eq(ant, pol, eq=eq_start_val)
         feng = snap_chan['host']
         # feng can just be a string hostname if the SNAP board isn't connected
         if not isinstance(feng, SnapFengine):
@@ -46,10 +50,6 @@ for ant, snap in corr.ant_to_snap.iteritems():
             # Do some trivial rfi excision my masking around the median
             median = np.median(spec)
             print "median:", median
-            # If the median is zero then the input is all zeros.
-            # Give up and move on to the next input.
-            if median == 0.:
-                continue
             spec_sliced = spec[np.logical_and(spec < 2*median, spec > 0.5*median)]
             if spec_sliced.shape[0] == 0:
                 continue
