@@ -6,10 +6,13 @@ import datetime
 import argparse
 import logging
 import json
+import socket
 from hera_corr_f import HeraCorrelator, SnapFengine, __version__, __package__, helpers
 
 logger = helpers.add_default_log_handlers(logging.getLogger(__file__))
 FAIL_COUNT_LIMIT = 5
+
+hostname = socket.gethostname()
 
 
 def get_all_pam_stats(corr):
@@ -95,12 +98,14 @@ def get_all_fem_stats(corr):
     sensors["fem_currents"] = []
     sensors["fem_voltages"] = []
     sensors["fem_ids"]      = []
+    sensors["fem_imu"]      = []
     for i in range(3):
         sensors["fem_switches"] += [corr.do_for_all_f("switch", block="fems", block_index=i)]
         sensors["fem_temps"]    += [corr.do_for_all_f("temperature", block="fems", block_index=i)]
         sensors["fem_currents"] += [corr.do_for_all_f("shunt", block="fems", block_index=i, kwargs={"name":"i"})]
         sensors["fem_voltages"] += [corr.do_for_all_f("shunt", block="fems", block_index=i, kwargs={"name":"u"})]
         sensors["fem_ids"]      += [corr.do_for_all_f("id", block="fems", block_index=i)]
+        sensors["fem_imu"]      += [corr.do_for_all_f("imu", block="fems", block_index=i)]
     
     for feng in corr.fengs:
         for antn, antpol in enumerate(feng.ants):
@@ -116,9 +121,19 @@ def get_all_fem_stats(corr):
 
             block_index = antn // 2
             try:
-                rv[ant][pol]["fem_switch"] = sensors["fem_switches"][block_index][host]
+                if sensors["fem_switches"][block_index][host] is None:
+                    switch_state = None
+                    e_powered = None
+                    n_powered = None
+                else:
+                    switch_state, e_powered, n_powered = sensors["fem_switches"][block_index][host]
+                rv[ant][pol]["fem_switch"] = switch_state
+                rv[ant][pol]["fem_e_lna_power"]  = e_powered
+                rv[ant][pol]["fem_n_lna_power"]  = n_powered
             except KeyError:
                 rv[ant][pol]["fem_switch"] = None
+                rv[ant][pol]["fem_e_lna_power"]  = None
+                rv[ant][pol]["fem_n_lna_power"]  = None
             try:
                 rv[ant][pol]["fem_temp"] = sensors["fem_temps"][block_index][host]
             except KeyError:
@@ -135,6 +150,10 @@ def get_all_fem_stats(corr):
                 rv[ant][pol]["fem_id"] = sensors["fem_ids"][block_index][host]
             except KeyError:
                 rv[ant][pol]["fem_id"] = None
+            try:
+                rv[ant][pol]["fem_imu_theta"], rv[ant][pol]["fem_imu_phi"] = sensors["fem_imu"][block_index][host]
+            except KeyError:
+                rv[ant][pol]["fem_imu_theta"], rv[ant][pol]["fem_imu_phi"] = None, None
     return rv
 
 
@@ -184,7 +203,7 @@ def print_ant_log_messages(corr):
                 if isinstance(polval['host'], SnapFengine):
                     host = polval['host'].host # the dictionary contains FEngine instances
                     chan = polval['channel']
-                    logger.info("Expecting data from Ant %s, Pol %s from host %s input %d" % (ant, pol, host, chan))
+                    logger.debug("Expecting data from Ant %s, Pol %s from host %s input %d" % (ant, pol, host, chan))
                 else:
                     logger.warning("Failed to find F-Engine %s associated with ant/pol %s/%s" % (polval['host'], ant, pol))
 
@@ -213,13 +232,14 @@ if __name__ == "__main__":
             handler.setLevel(getattr(logging, args.loglevel))
        
 
-    corr = HeraCorrelator(redishost=args.redishost, use_redis=(not args.noredistapcp))
+    corr = HeraCorrelator(redishost=args.redishost, use_redis=(not args.noredistapcp), block_monitoring=False)
     upload_time = corr.r.hget('snap_configuration', 'upload_time')
     print_ant_log_messages(corr)
 
     retry_tick = time.time()
-    script_redis_key = "status:script:%s" % __file__
+    script_redis_key = "status:script:%s:%s" % (hostname, __file__)
     locked_out = False
+    logger.info('Starting SNAP redis monitor')
     while(True):
         tick = time.time()
         corr.r.set(script_redis_key, "alive", ex=max(60, args.delay * 2))
@@ -237,7 +257,7 @@ if __name__ == "__main__":
         if corr.r.hget('snap_configuration', 'upload_time') != upload_time:
             upload_time = corr.r.hget('snap_configuration', 'upload_time')
             logger.info('New configuration detected. Reinitializing fengine list')
-            corr = HeraCorrelator(redishost=args.redishost, use_redis=(not args.noredistapcp))
+            corr = HeraCorrelator(redishost=args.redishost, use_redis=(not args.noredistapcp), block_monitoring=False)
             print_ant_log_messages(corr)
         
         # Recompute the hookup every time. It's fast
@@ -259,6 +279,10 @@ if __name__ == "__main__":
             histograms += [corr.do_for_all_f("get_histogram", block="input", args=(i,), kwargs={"sum_cores" : True})]
             eq_coeffs += [corr.do_for_all_f("get_coeffs", block="eq", args=(i,))]
             autocorrs += [corr.do_for_all_f("get_new_corr", block="corr", args=(i,i))]
+        # We only detect overflow once per FPGA (not per antenna).
+        # Get the overflow flag and reset it
+        fft_of = corr.do_for_all_f("is_overflowing", block="pfb")
+        corr.do_for_all_f("rst_stats", block="pfb")
 
         # Get FEM/PAM sensor values
         fem_stats = get_all_fem_stats(corr)
@@ -267,6 +291,30 @@ if __name__ == "__main__":
         pam_stats = get_all_pam_stats(corr)
         if corr.r.exists('disable_monitoring'):
             continue
+
+        # Write spectra to snap-indexed keys. This means we'll get spectra even from
+        # unconnected (according to the CM database) antennas
+        for snap in histograms[0].keys():
+           for antn in range(6):
+               status_key = 'status:snaprf:%s:%d' % (snap, antn)
+               snap_rf_stats = {}
+               try:
+                   hist_bins, hist_vals = histograms[antn][snap]
+                   snap_rf_stats['histogram'] = json.dumps([hist_bins.tolist(), hist_vals.tolist()])
+               except:
+                   snap_rf_stats['histogram'] = None
+               try:
+                   snap_rf_stats['autocorrelation'] = json.dumps(autocorrs[antn][snap].real.tolist())
+               except:
+                   snap_rf_stats['autocorrelation'] = None
+               try:
+                   coeffs = eq_coeffs[antn][snap]
+                   snap_rf_stats['eq_coeffs'] = json.dumps(coeffs.tolist())
+               except:
+                   snap_rf_stats['eq_coeffs'] = None
+               snap_rf_stats['timestamp'] = datetime.datetime.now().isoformat()
+               corr.r.hmset(status_key, snap_rf_stats)
+           
        
         for key, val in input_stats.iteritems():
             antpols = corr.fengs_by_name[key].ants
@@ -281,6 +329,9 @@ if __name__ == "__main__":
                 power = powers[antn]
                 rms   = rmss[antn]
                 redis_vals = {'adc_mean':mean, 'adc_power':power, 'adc_rms':rms}
+                # Give the antenna hash a key indicating the SNAP and input number it is associated with
+                redis_vals['f_host'] = key
+                redis_vals['host_ant_id'] = antn
                 try:
                     hist_bins, hist_vals = histograms[antn][key]
                     redis_vals['histogram'] = json.dumps([hist_bins.tolist(), hist_vals.tolist()])
@@ -305,6 +356,10 @@ if __name__ == "__main__":
                     redis_vals.update(fem_stats[ant][pol])
                 except KeyError:
                     pass
+                try:
+                    redis_vals["fft_of"] = fft_of[key]
+                except KeyError:
+                    pass
                 redis_vals['timestamp'] = datetime.datetime.now().isoformat()
                 corr.r.hmset(status_key, redis_vals)
             
@@ -316,7 +371,7 @@ if __name__ == "__main__":
         # If the retry period has been exceeded, try to reconnect to dead boards:
         if time.time() > (retry_tick + args.retrytime):
             if len(corr.dead_fengs) > 0:
-                logger.info('Trying to reconnect to dead boards')
+                logger.debug('Trying to reconnect to dead boards')
                 corr.reestablish_dead_connections(programmed_only=True)
                 retry_tick = time.time()
                 

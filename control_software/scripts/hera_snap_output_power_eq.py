@@ -23,30 +23,49 @@ parser.add_argument('--rms', dest='rms', type=float, default=3.,
 args = parser.parse_args()
 
 corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)
-corr.disable_monitoring(expiry=30)
-time.sleep(10) # wait for the monitor to pause
+
+n_loop_max = 4
 
 for ant, snap in corr.ant_to_snap.iteritems():
+    corr.disable_monitoring(expiry=60, wait=True)
     for pol, snap_chan in snap.iteritems():
+        print("Equalizing %s:%s" % (ant, pol))
         corr.disable_monitoring(expiry=30)
         feng = snap_chan['host']
+        # feng can just be a string hostname if the SNAP board isn't connected
         if not isinstance(feng, SnapFengine):
+            continue
+        if not feng.is_programmed():
             continue
         chan = snap_chan['channel']
         #print "%s: %s:" % (feng.host, pol)
-        spec = feng.corr.get_new_corr(chan, chan).real
-        #print spec[700:710]
-        median = np.median(spec)
-        #print median
-        if median == 0.:
-            continue
-        mean = spec[np.logical_and(spec < 2*median, spec > 0.5*median)].mean()
-        #print mean
-        amp = np.sqrt(mean / 2.)
-        #print amp
-        scale = args.rms / amp
-        #print scale
-        corr.set_eq(ant, pol, eq=feng.eq.get_coeffs(chan)*scale)
-        #feng.eq.set_coeffs(pn, scale * feng.eq.get_coeffs(pn))
+        # Get an autocorrelation (pure real)
+        for i in range(n_loop_max):
+            spec = feng.corr.get_new_corr(chan, chan).real
+            #print spec[700:710]
+            # Do some trivial rfi excision my masking around the median
+            median = np.median(spec)
+            print "median:", median
+            # If the median is zero then the input is all zeros.
+            # Give up and move on to the next input.
+            if median == 0.:
+                continue
+            spec_sliced = spec[np.logical_and(spec < 2*median, spec > 0.5*median)]
+            if spec_sliced.shape[0] == 0:
+                continue
+            mean = spec_sliced.mean()
+            print "mean:", mean
+            # Assuming gaussian noise, compute std dev of real/imag parts
+            rms = np.sqrt(mean / 2.)
+            print "rms:", rms
+            scale = args.rms / rms
+            print "scale:", scale
+            if scale == np.nan:
+                continue
+            if (scale < 1.05) and (scale > 0.95):
+                print 'Breaking without updating coefficients'
+                break
+            corr.set_eq(ant, pol, eq=feng.eq.get_coeffs(chan)*scale)
+            #feng.eq.set_coeffs(pn, scale * feng.eq.get_coeffs(pn))
         
 corr.enable_monitoring() 

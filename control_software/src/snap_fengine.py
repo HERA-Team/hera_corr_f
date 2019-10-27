@@ -61,14 +61,17 @@ class SnapFengine(object):
             self.phaseswitch,
         ]
 
+        self.initialized = False
         self.i2c_initialized = False
         # The I2C devices mess with FPGA registers
-        # when instantiated. This fails if the board
-        # isn't programmed yet, so run it in a try block.
-        try:
-            self._add_i2c()
-        except:
-            self.logger.warning("Failed to register I2C")
+        # when instantiated. This will fail if the board
+        # isn't programmed yet, so don't bother trying if this
+        # is not the case.
+        if self.fpga.is_connected() and self.is_programmed():
+            try:
+                self._add_i2c()
+            except:
+                self.logger.warning("Failed to register I2C")
 
     def _add_i2c(self):
         self.pams        = [Pam(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
@@ -97,6 +100,10 @@ class SnapFengine(object):
         for block in self.blocks:
             self.logger.info("Initializing block: %s" % block.name)
             block.initialize()
+        self.initialized = True
+
+    def is_initialized(self):
+        return self.initialized
 
     def get_fpga_stats(self):
         """
@@ -150,4 +157,48 @@ class SnapFengine(object):
         # of 512 (first 192 clks of 256clks for 2 pols)
         for cn, chan in enumerate(chans[::8]):
             self.reorder.reindex_channel(chan//8, slot_num*64 + cn)
+
+    def get_pam_atten_by_target(self, chan, target_pow=None, target_rms=None):
+        """
+        Set the PAM attenuation values of Antenna `ant`, polarization `pol`
+        so as to target either a PAM power level `target_pow` dBm, or an
+        ADC RMS of `target_rms` units.
+        Inputs:
+           chan (int): Which ADC channel 0-5
+           target_pow (float): dBm target
+           target_rms (float): ADC RMS target
+        Returns:
+           The required PAM attenuation to reach the target. Or False if failure
+        """
+        assert (target_pow is None) or (target_rms is None), "You may only target _either_ an ADC RMS _or_ a PAM power"
+        assert (target_pow is not None) or (target_rms is not None), "You must target _either_ an ADC RMS _or_ a PAM power"
+        pam = self.pams[chan//2]
+        current_pam_atten_e, current_pam_atten_n = pam.get_attenuation()
+        if chan % 2:
+            current_pam_atten = current_pam_atten_n
+            pam_pol = "east"
+        else:
+            current_pam_atten = current_pam_atten_e
+            pam_pol = "north"
+
+        if current_pam_atten is None:
+            self.logger.error("Failed to read current PAM attenuator settings")
+            return False
+        if target_pow is not None:
+            current_pow = pam.power(pam_pol)
+            if current_pow is None:
+                self.logger.error("Failed to read power")
+                return False
+            req_atten = current_pam_atten + int(current_pow - target_pow)
+        elif target_rms is not None:
+            _, _, current_rms = self.input.get_stats(sum_cores=True)
+            current_rms = current_rms[chan]
+            req_atten = current_pam_atten + int(20*np.log10(current_rms/target_rms))
+
+        # saturate to allowed PAM attenuation levels
+        if req_atten > 15:
+            req_atten = 15
+        if req_atten < 0:
+            req_atten = 0
+        return req_atten
 

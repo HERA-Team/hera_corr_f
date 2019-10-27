@@ -115,7 +115,8 @@ def snap_part_to_host_input(part):
     adc_num = int(adc[1:]) // 2 # divide by 2 because ADC is in demux 2
     # convert the name into something which should be a hostname.
     # name has the form SNPA0000123. Hostnames have the form herasnapA123
-    hostname = "herasnap%s" % (name[3] + name[4:].lstrip('0'))
+    # Edit 16 Sep 2019 -- This isn't true anymore. CM names and hostnames are now the same
+    hostname = name#"herasnap%s" % (name[3] + name[4:].lstrip('0'))
     try:
         true_name, aliases, addresses = socket.gethostbyaddr(hostname)
     except:
