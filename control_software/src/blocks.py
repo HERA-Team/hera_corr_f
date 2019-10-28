@@ -363,10 +363,45 @@ class Input(Block):
         """
         super(Input, self).__init__(host, name, logger)
         self.nstreams = nstreams
+        self.ninput_mux_streams = nstreams // 2
         self.USE_NOISE = 0
         self.USE_ADC   = 1
         self.USE_ZERO  = 2
         self.INT_TIME  = 2**20 / 250.0e6
+        self._SNAPSHOT_SAMPLES_PER_POL = 2048
+    
+    def get_adc_snapshot(self, antenna):
+        """
+        Get a block of samples from both pols of `antenna`
+        returns samples_x, samples_y
+        """
+        self.write_int('snap_sel', antenna)
+        self.write_int('snapshot_ctrl', 0)
+        self.write_int('snapshot_ctrl', 1)
+        self.write_int('snapshot_ctrl', 3)
+        d = struct.unpack('>%db' % (2*self._SNAPSHOT_SAMPLES_PER_POL), self.read('snapshot_bram', 2*self._SNAPSHOT_SAMPLES_PER_POL))
+        x = []
+        y = []
+        for i in range(self._SNAPSHOT_SAMPLES_PER_POL // 2):
+            x += [d[4*i]]
+            x += [d[4*i + 1]]
+            y += [d[4*i + 2]]
+            y += [d[4*i + 3]]
+        return np.array(x), np.array(y)
+
+    def get_power_spectra(self, antenna, acc_len=1):
+        """
+        Perform a software FFT of samples from `antenna`.
+        Accumulate power from `acc_len` snapshots.
+        returns power_spectra_X, power_spectra_Y
+        """
+        X = np.zeros(self._SNAPSHOT_SAMPLES_PER_POL // 2 + 1)
+        Y = np.zeros(self._SNAPSHOT_SAMPLES_PER_POL // 2 + 1)
+        for i in range(acc_len):
+            x, y = self.get_adc_snapshot(antenna)
+            X += np.abs(np.fft.rfft(x))**2
+            Y += np.abs(np.fft.rfft(y))**2
+        return X, Y
 
     def use_noise(self, stream=None):
         """
@@ -376,11 +411,11 @@ class Input(Block):
         """
         if stream is None:
             v = 0
-            for stream in range(self.nstreams):
+            for stream in range(self.ninput_mux_streams):
                 v += self.USE_NOISE << (2 * stream)
             self.write_int('source_sel', v)
         else:
-            self.change_reg_bits('source_sel', self.USE_NOISE, 2*(self.nstreams-1-stream), 2)
+            self.change_reg_bits('source_sel', self.USE_NOISE, 2*(self.ninput_mux_streams-1-stream), 2)
 
     def use_adc(self, stream=None):
         """
@@ -390,11 +425,11 @@ class Input(Block):
         """
         if stream is None:
             v = 0
-            for stream in range(self.nstreams):
+            for stream in range(self.ninput_mux_streams):
                 v += self.USE_ADC << (2 * stream)
             self.write_int('source_sel', v)
         else:
-            self.change_reg_bits('source_sel', self.USE_ADC, 2*(self.nstreams-1-stream), 2)
+            self.change_reg_bits('source_sel', self.USE_ADC, 2*(self.ninput_mux_streams-1-stream), 2)
 
     def use_zero(self, stream=None):
         """
@@ -404,11 +439,11 @@ class Input(Block):
         """
         if stream is None:
             v = 0
-            for stream in range(self.nstreams):
+            for stream in range(self.ninput_mux_streams):
                 v += self.USE_ZERO << (2 * stream)
             self.write_int('source_sel', v)
         else:
-            self.change_reg_bits('source_sel', self.USE_ZERO, 2*(self.nstreams-1-stream), 2)
+            self.change_reg_bits('source_sel', self.USE_ZERO, 2*(self.ninput_mux_streams-1-stream), 2)
 
     def get_stats(self, sum_cores=False):
         """
