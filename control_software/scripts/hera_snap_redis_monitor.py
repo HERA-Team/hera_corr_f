@@ -276,7 +276,7 @@ if __name__ == "__main__":
         for i in range(6):
             if corr.r.exists('disable_monitoring'):
                 continue
-            histograms += [corr.do_for_all_f("get_histogram", block="input", args=(i,), kwargs={"sum_cores" : True})]
+            histograms += [corr.do_for_all_f("get_input_histogram", block="input", args=(i,), kwargs={"sum_cores" : True})]
             eq_coeffs += [corr.do_for_all_f("get_coeffs", block="eq", args=(i,))]
             autocorrs += [corr.do_for_all_f("get_new_corr", block="corr", args=(i,i))]
         # We only detect overflow once per FPGA (not per antenna).
