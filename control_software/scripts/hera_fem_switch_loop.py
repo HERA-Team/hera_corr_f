@@ -27,7 +27,7 @@ logger = helpers.add_default_log_handlers(logging.getLogger(__name__),
 
 
 def main(redishost='redishost', hostname=None, antenna_input=None,
-         integration_time=None, do_not_initialize=False, no_equalization=False):
+         integration_time=None, initilize=True, no_equalization=False):
     """Loop through input hostnames and collect spectra for all FEM switch states.
 
     Parameters
@@ -43,9 +43,11 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
         If None all antennas on a snap will be returned with spectra.
     integration_time : float
         The desired integration time in s for a spectra.
-    do_not_initialize : bool
-        Flag used to not initialize Snap boards if they are not programmed.
-        This is not a common option and should only be set if observing is underway.
+    initilize : bool
+        Flag used to initialize Snap boards even if they are already programmed.
+        Defualts to True.
+        Set to False to not initialize Snap boards on call; however this
+        is not a common option and should only be done if observing is underway.
     no_equalization : bool
         Do not divide the spectra by the the equalization coefficients
 
@@ -95,7 +97,7 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
             snap.fpga.transport.prog_user_image()
             snap.initialize()
 
-        elif not do_not_initialize:
+        elif initilize:
             # programmed Snap may sill need to be initialized
             snap.initialize()
         else:
@@ -308,7 +310,8 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--filename', dest='filename',
                         default='fem_status_plot.html',
                         help='Filename to save the plot.')
-    parser.add_argument('--do_not_initialize', action='store_true',
+    parser.add_argument('--do_not_initialize', action='store_false',
+                        dest='initilize',
                         help="Do not initialize the SNAP(s). "
                         "This is uncommon and should only be done "
                         "if observation is currently underway.")
@@ -325,7 +328,7 @@ if __name__ == "__main__":
         redishost=args.redishost, hostname=args.hostname,
         antenna_input=args.antenna_input,
         integration_time=args.integration_time,
-        do_not_initialize=args.do_not_initialize,
+        initilize=args.initilize,
         no_equalization=args.no_equalization
     )
 
