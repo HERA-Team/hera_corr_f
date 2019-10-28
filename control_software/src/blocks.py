@@ -380,7 +380,7 @@ class Input(Block):
                 v += self.USE_NOISE << (2 * stream)
             self.write_int('source_sel', v)
         else:
-            raise NotImplementedError('Different input selects not supported yet!')
+            self.change_reg_bits('source_sel', self.USE_NOISE, 2*(self.nstreams-1-stream), 2)
 
     def use_adc(self, stream=None):
         """
@@ -394,7 +394,7 @@ class Input(Block):
                 v += self.USE_ADC << (2 * stream)
             self.write_int('source_sel', v)
         else:
-            raise NotImplementedError('Different input selects not supported yet!')
+            self.change_reg_bits('source_sel', self.USE_ADC, 2*(self.nstreams-1-stream), 2)
 
     def use_zero(self, stream=None):
         """
@@ -408,7 +408,7 @@ class Input(Block):
                 v += self.USE_ZERO << (2 * stream)
             self.write_int('source_sel', v)
         else:
-            raise NotImplementedError('Different input selects not supported yet!')
+            self.change_reg_bits('source_sel', self.USE_ZERO, 2*(self.nstreams-1-stream), 2)
 
     def get_stats(self, sum_cores=False):
         """
