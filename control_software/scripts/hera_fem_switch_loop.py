@@ -133,12 +133,15 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
 
                 if not no_equalization:
                     eq_coeff = snap.eq.get_coeffs(antenna_ind)
-                    ant_group[state] = autocorr / eq_coeff**2
+                    autocorr = autocorr / eq_coeff**2
 
-            # restore this antenna to the state it started in
-            fem.switch(name=current_state[0],
-                       east=current_state[1],
-                       north=current_state[2])
+                ant_group[state] = autocorr
+
+            if current_state is not None:
+                # restore this antenna to the state it started in
+                fem.switch(name=current_state[0],
+                           east=current_state[1],
+                           north=current_state[2])
 
     # Re-enable monitoring.
     c.enable_monitoring()
