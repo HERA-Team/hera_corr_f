@@ -314,7 +314,9 @@ if __name__ == "__main__":
                         dest='initialize',
                         help="Do not initialize the SNAP(s). "
                         "This is uncommon and should only be done "
-                        "if observation is currently underway.")
+                        "if observation is currently underway. "
+                        "Default listed for this entry is for 'initialize' "
+                        "keyword (True means it will initialize).")
     parser.add_argument('--no_equalization', action='store_true',
                         help=("Do not divide out the equalization "
                               "coefficients when taking spectra.")
