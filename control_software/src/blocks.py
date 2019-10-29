@@ -369,8 +369,18 @@ class Input(Block):
         self.USE_ZERO  = 2
         self.INT_TIME  = 2**20 / 250.0e6
         self._SNAPSHOT_SAMPLES_PER_POL = 2048
-    
+
     def get_adc_snapshot(self, antenna):
+        """
+        Get a block of samples from both pols of `antenna`
+        returns samples_x, samples_y
+        """
+        if "snap_sel" in self.listdev():
+            return self._get_adc_snapshot_single_ant(antenna)
+        else:
+            return self._get_adc_snapshot_all_ants(antenna)
+
+    def _get_adc_snapshot_single_ant(self, antenna):
         """
         Get a block of samples from both pols of `antenna`
         returns samples_x, samples_y
@@ -387,6 +397,25 @@ class Input(Block):
             x += [d[4*i + 1]]
             y += [d[4*i + 2]]
             y += [d[4*i + 3]]
+        return np.array(x), np.array(y)
+
+    def _get_adc_snapshot_all_ants(self, antenna):
+        """
+        Get a block of samples from both pols of `antenna`
+        returns samples_x, samples_y
+        """
+        self.write_int('snapshot_ctrl', 0)
+        self.write_int('snapshot_ctrl', 1)
+        self.write_int('snapshot_ctrl', 3)
+        d = struct.unpack('>%db' % (16 * self._SNAPSHOT_SAMPLES_PER_POL // 2), self.read('snapshot_bram', 16 * self._SNAPSHOT_SAMPLES_PER_POL // 2))
+        x = []
+        y = []
+        for i in range(self._SNAPSHOT_SAMPLES_PER_POL // 2):
+            # Add 1 to antenna since there is a dummy ant 0 which is all zeros
+            x += [d[16*i + 4*(antenna+1)]]
+            x += [d[16*i + 4*(antenna+1) + 1]]
+            y += [d[16*i + 4*(antenna+1) + 2]]
+            y += [d[16*i + 4*(antenna+1) + 3]]
         return np.array(x), np.array(y)
 
     def get_power_spectra(self, antenna, acc_len=1):
