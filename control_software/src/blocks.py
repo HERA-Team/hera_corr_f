@@ -157,7 +157,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
            ref (float): Reference frequency (in MHz) from which ADC clock is derived. If None, an external sampling clock must be used.
         """
         self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + ":%s" % (host.host)))
-        casperfpga.snapadc.SNAPADC.__init__(self,host,ref=ref,logger=self.logger)
+        casperfpga.snapadc.SNAPADC.__init__(self, host, ref=ref)
         self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
         self.interleave_mode = 4 >> num_chans
@@ -165,7 +165,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.sample_rate     = sample_rate
         self.resolution      = resolution
         self.host = host # the SNAPADC class doesn't directly expose this
-        self._retry = kwargs.get('retry',3)
+        self._retry = kwargs.get('retry',5)
         self._retry_wait = kwargs.get('retry_wait',1)
 
     def set_gain(self, gain):
@@ -196,34 +196,27 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.adc.write((gain_map[gain]<<4) + gain_map[gain], 0x2b)
         
 
-    def initialize(self, trial=0):
+    def initialize(self):
         """
         Initialize the configuration of the ADC chip.
+        Returns True if initialization was successful. False otherwise.
         """
+        status = True
         for i in range(self._retry):
             if self.init(self.sample_rate, self.num_chans):
                 if i == 0:
                     self.logger.info("ADC configured OK")
                 if i > 0:
-                    self.logger.warning("ADC took %d attempts to configure" % (i+1))
+                    self.logger.info("ADC took %d attempts to configure" % (i+1))
                 break
             if i == self._retry - 1:
                 self.logger.error("ADC failed to configure after %d attempts" % (i+1))
+                status = False
 
-        if not self.rampTest():
-            if trial < 3:
-                self.logger.warning('ADC failed on ramp test, retrying')
-                self.initialize(trial+1)
-            else:
-                self.logger.error('ADC failed on ramp test, giving up')
-
-        #self.alignLineClock(mode='dual_pat')
-        #self.alignFrameClock()
-        ##If aligning complete, alignFrameClock should not output any warning
         self.selectADC()
         self.adc.selectInput([1,1,3,3])
         self.set_gain(4)
-        return True
+        return status
 
 class Sync(Block):
     def __init__(self, host, name, logger=None):
