@@ -157,7 +157,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
            ref (float): Reference frequency (in MHz) from which ADC clock is derived. If None, an external sampling clock must be used.
         """
         self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + ":%s" % (host.host)))
-        casperfpga.snapadc.SNAPADC.__init__(self, host, ref=ref)
+        casperfpga.snapadc.SNAPADC.__init__(self, host, ref=ref, logger=self.logger)
         self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
         self.interleave_mode = 4 >> num_chans
