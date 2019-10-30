@@ -207,7 +207,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
                 if i == 0:
                     self.logger.info("ADC configured OK")
                 if i > 0:
-                    self.logger.info("ADC took %d attempts to configure" % (i+1))
+                    self.logger.warning("ADC took %d attempts to configure" % (i+1))
                 break
             if i == self._retry - 1:
                 self.logger.error("ADC failed to configure after %d attempts" % (i+1))
