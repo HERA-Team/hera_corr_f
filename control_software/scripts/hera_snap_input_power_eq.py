@@ -23,11 +23,15 @@ group.add_argument('--epower', type=float, default=None,
                     help ='Target ADC power for E-pol in dBm')
 group.add_argument('--erms', type=float, default=None,
                     help ='Target ADC RMS for E-pol in ADC units')
+group.add_argument('--edb', type=int, default=None,
+                    help ='set all E-pol attenuators to `ndb` dBs')
 group = parser.add_mutually_exclusive_group()
 group.add_argument('--npower', type=float, default=None,
                     help ='Target ADC power for N-pol in dBm')
 group.add_argument('--nrms', type=float, default=None,
                     help ='Target ADC RMS for N-pol in ADC units')
+group.add_argument('--ndb', type=int, default=None,
+                    help ='set all N-pol attenuators to `ndb` dBs')
 args = parser.parse_args()
 
 corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)
@@ -39,8 +43,17 @@ for feng in corr.fengs:
             continue
         ant = antenna[:-1].lstrip('HH')
         pol = antenna[-1].lower()
-        corr.logger.info("Balancing %s (SNAP %s, input %d)" % (antenna, feng.host, input_n))
         if pol == 'e':
-            corr.tune_pam_attenuation(ant, pol, target_pow=args.epower, target_rms=args.erms)
-        else:
-            corr.tune_pam_attenuation(ant, pol, target_pow=args.npower, target_rms=args.nrms)
+            if args.edb is not None:
+                corr.logger.info("Setting %s E-pol (SNAP %s, input %d) attenuation to %d" % (antenna, feng.host, input_n, args.edb))
+                corr.set_pam_attenuation(ant, pol, val=args.edb)
+            else:
+                corr.logger.info("Balancing %s E-pol (SNAP %s, input %d)" % (antenna, feng.host, input_n))
+                corr.tune_pam_attenuation(ant, pol, target_pow=args.epower, target_rms=args.erms)
+        elif pol == 'n':
+            if args.ndb is not None:
+                corr.logger.info("Setting %s N-pol (SNAP %s, input %d) attenuation to %d" % (antenna, feng.host, input_n, args.edb))
+                corr.set_pam_attenuation(ant, pol, val=args.ndb)
+            else:
+                corr.logger.info("Balancing %s N-pol (SNAP %s, input %d)" % (antenna, feng.host, input_n))
+                corr.tune_pam_attenuation(ant, pol, target_pow=args.npower, target_rms=args.nrms)

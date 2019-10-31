@@ -18,8 +18,11 @@ parser.add_argument('--config_file', type=str, default=None,
                     help = 'YAML configuration file with hosts and channels list')
 parser.add_argument('-r', dest='redishost', type=str, default='redishost',
                     help ='Host servicing redis requests')
-parser.add_argument('--rms', dest='rms', type=float, default=3.,
+group = parser.add_mutually_exclusive_group()
+group.add_argument('--rms', dest='rms', type=float, default=3.,
                     help ='Target RMS after quantization')
+group.add_argument('--scale', dest='scale', type=float, default=None,
+                    help ='Fixed scale factor to apply to all antennas')
 args = parser.parse_args()
 
 corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)
@@ -30,7 +33,6 @@ eq_start_val = 1000
 for ant, snap in corr.ant_to_snap.iteritems():
     corr.disable_monitoring(expiry=60, wait=True)
     for pol, snap_chan in snap.iteritems():
-        print("Equalizing %s:%s" % (ant, pol))
         corr.disable_monitoring(expiry=30)
         # Start with coefficients at some nominal value.
         # Otherwise we'll never recover from (eg) coefficients of 0
@@ -42,6 +44,12 @@ for ant, snap in corr.ant_to_snap.iteritems():
         if not feng.is_programmed():
             continue
         chan = snap_chan['channel']
+        # If a user-selected scale is set, apply this and move on
+        if args.scale is not None:
+            logger.info("Setting %s:%s (Snap:%s, chan %d) EQ to %f" % (ant, pol, feng.host, chan, args.scale))
+            corr.set_eq(ant, pol, eq=args.scale)
+            continue
+        logger.info("Equalizing %s:%s (Snap:%s, chan %d)" % (ant, pol, feng.host, chan))
         #print "%s: %s:" % (feng.host, pol)
         # Get an autocorrelation (pure real)
         for i in range(n_loop_max):
