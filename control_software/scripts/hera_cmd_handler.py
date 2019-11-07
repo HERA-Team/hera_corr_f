@@ -71,7 +71,7 @@ def cmd_handler(corr, r, message, testmode=False):
             if args["input_sel"] == "noise":
                 corr.noise_diode_enable()
             elif args["input_sel"] == 'load':
-                corr.load_diode_enable()
+                corr.load_enable()
             elif args["input_sel"] == "antenna":
                 corr.antenna_enable()
             send_response(r, command, time)
