@@ -3,8 +3,11 @@ import redis
 import time
 import json
 import argparse
+import os
+import datetime
+import socket
 from subprocess import Popen, PIPE
-from hera_corr_f import HeraCorrelator
+from hera_corr_f import HeraCorrelator, __version__, __package__
 
 def send_response(r, command, time, **kwargs):
     message_dict = {"command":command, "time":time, "args":kwargs}
@@ -169,6 +172,13 @@ if __name__ == "__main__":
     cmd_chan.get_message(timeout=0.1)
 
     corr = HeraCorrelator()
+
+    # load this module's version into redis
+    corr.r.hmset('version:%s:%s' % (__package__, os.path.basename(__file__)), {'version':__version__, 'timestamp':datetime.datetime.now().isoformat()})
+    # Create key for this module's status
+    hostname = socket.gethostname()
+    script_redis_key = "status:script:%s:%s" % (hostname, __file__)
+
     
     retry_tick = 0
     # Seconds between SNAP reconnection attempts
@@ -177,11 +187,4 @@ if __name__ == "__main__":
         message = cmd_chan.get_message(timeout=5)
         if message is not None:
             cmd_handler(corr, r, message["data"], testmode=args.testmode)
-        ## If the retry period has been exceeded, try to reconnect to dead boards:
-        #if time.time() > (retry_tick + RETRY_TIME):
-        #    if len(corr.dead_fengs) > 0:
-        #        corr.logger.debug('Trying to reconnect to dead boards')
-        #        corr.disable_monitoring(60, wait=True)
-        #        corr.reestablish_dead_connections(programmed_only=True)
-        #        corr.enable_monitoring()
-        #        retry_tick = time.time()
+        corr.r.set(script_redis_key, "alive", ex=120)
