@@ -27,7 +27,7 @@ logger = helpers.add_default_log_handlers(logging.getLogger(__name__),
 
 
 def main(redishost='redishost', hostname=None, antenna_input=None,
-         integration_time=None, initilize=True, no_equalization=False):
+         integration_time=None, initialize=True, no_equalization=False):
     """Loop through input hostnames and collect spectra for all FEM switch states.
 
     Parameters
@@ -43,7 +43,7 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
         If None all antennas on a snap will be returned with spectra.
     integration_time : float
         The desired integration time in s for a spectra.
-    initilize : bool
+    initialize : bool
         Flag used to initialize Snap boards even if they are already programmed.
         Defualts to True.
         Set to False to not initialize Snap boards on call; however this
@@ -97,7 +97,7 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
             snap.fpga.transport.prog_user_image()
             snap.initialize()
 
-        elif initilize:
+        elif initialize:
             # programmed Snap may sill need to be initialized
             snap.initialize()
         else:
@@ -133,12 +133,15 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
 
                 if not no_equalization:
                     eq_coeff = snap.eq.get_coeffs(antenna_ind)
-                    ant_group[state] = autocorr / eq_coeff**2
+                    autocorr = autocorr / eq_coeff**2
 
-            # restore this antenna to the state it started in
-            fem.switch(name=current_state[0],
-                       east=current_state[1],
-                       north=current_state[2])
+                ant_group[state] = autocorr
+
+            if current_state is not None:
+                # restore this antenna to the state it started in
+                fem.switch(name=current_state[0],
+                           east=current_state[1],
+                           north=current_state[2])
 
     # Re-enable monitoring.
     c.enable_monitoring()
@@ -311,10 +314,12 @@ if __name__ == "__main__":
                         default='fem_status_plot.html',
                         help='Filename to save the plot.')
     parser.add_argument('--do_not_initialize', action='store_false',
-                        dest='initilize',
+                        dest='initialize',
                         help="Do not initialize the SNAP(s). "
                         "This is uncommon and should only be done "
-                        "if observation is currently underway.")
+                        "if observation is currently underway. "
+                        "Default listed for this entry is for 'initialize' "
+                        "keyword (True means it will initialize).")
     parser.add_argument('--no_equalization', action='store_true',
                         help=("Do not divide out the equalization "
                               "coefficients when taking spectra.")
@@ -328,7 +333,7 @@ if __name__ == "__main__":
         redishost=args.redishost, hostname=args.hostname,
         antenna_input=args.antenna_input,
         integration_time=args.integration_time,
-        initilize=args.initilize,
+        initialize=args.initialize,
         no_equalization=args.no_equalization
     )
 
