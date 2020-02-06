@@ -2,16 +2,13 @@ import numpy as np
 import argparse
 from pyuvdata import UVData
 from pyuvdata.utils import polstr2num
-import pyuvdata.utils as utils
 from astropy.time import Time
-from astropy.coordinates import SkyCoord, EarthLocation
+from astropy.coordinates import SkyCoord
 import astropy.units as u
 from hera_corr_f import SnapFengine
 from hera_corr_f import HeraCorrelator
 from hera_corr_f import helpers
 import logging
-import redis
-import json
 import time
 from collections import OrderedDict
 
@@ -68,29 +65,7 @@ first_run = 1
 
 fqs = np.linspace(0, 250, num=1024)*1e6
 
-redishost = redis.Redis('redishost')
-cofa_info = json.loads(redishost.hget('corr:map', 'cofa'))
-lla = (np.radians(cofa_info['lat']), np.radians(cofa_info['lon']), cofa_info['alt'])
-COFA_telescope_location = utils.XYZ_from_LatLonAlt(lla[0], lla[1], lla[2])
-observatory = EarthLocation(lat=cofa_info['lat']*u.degree,
-                            lon=cofa_info['lon']*u.degree,
-                            height=cofa_info['alt']*u.m)
-antenna_numbers = json.loads(redishost.hget('corr:map', 'antenna_numbers'))
-antenna_numbers = np.array(antenna_numbers).astype(int)
-antenna_names = json.loads(redishost.hget('corr:map', 'antenna_names'))
-antenna_names = np.asarray([str(a) for a in antenna_names])
-antenna_positions = json.loads(redishost.hget('corr:map', 'antenna_positions'))
-antenna_utm_eastings = json.loads(redishost.hget('corr:map', 'antenna_utm_eastings'))
-antenna_utm_northings = json.loads(redishost.hget('corr:map', 'antenna_utm_northings'))
-number_of_antennas = len(antenna_numbers)
-# Compute uvw for baselines
-all_antennas_enu = {}
-
-for i, antnum in enumerate(antenna_numbers):
-    ant_enu = (antenna_utm_eastings[i],
-               antenna_utm_northings[i],
-               cofa_info['alt'])
-    all_antennas_enu[antnum] = np.array(ant_enu)
+loc = helpers.read_locations_from_redis(redishost=args.redishost)
 
 # Write different files for different polarizations
 while(True):
@@ -162,11 +137,11 @@ while(True):
             data.ant_2_array = np.asarray([str(a)[2:-1] for a in data.ant_2_array]).astype(int)
 
             # set telescope data
-            data.telescope_location = COFA_telescope_location
-            data.antenna_positions = antenna_positions
-            data.antenna_numbers = antenna_numbers
-            data.antenna_names = antenna_names
-            data.Nants_telescope = number_of_antennas
+            data.telescope_location = loc.COFA_telescope_location
+            data.antenna_positions = loc.antenna_positions
+            data.antenna_numbers = loc.antenna_numbers
+            data.antenna_names = loc.antenna_names
+            data.Nants_telescope = loc.number_of_antennas
             data.Nants_data = 3
 
             # Write times
@@ -180,7 +155,7 @@ while(True):
 
             for tnum, t in enumerate(data.time_array):
                 observation_time = Time(t, format='jd')
-                zenith_altaz = SkyCoord(location=observatory, obstime=observation_time,
+                zenith_altaz = SkyCoord(location=loc.observatory, obstime=observation_time,
                                         alt=90.*u.degree, az=0.*u.degree, frame='altaz').icrs
                 data.zenith_ra[tnum] = zenith_altaz.ra.degree
                 data.zenith_dec[tnum] = zenith_altaz.dec.degree
@@ -198,7 +173,7 @@ while(True):
 
             data.uvw_array = np.zeros((data.Nblts, 3))
             for ai, ant1, ant2 in zip(range(data.Nblts), data.ant_1_array, data.ant_2_array):
-                data.uvw_array[ai] = all_antennas_enu[ant2] - all_antennas_enu[ant1]
+                data.uvw_array[ai] = loc.all_antennas_enu[ant2] - loc.all_antennas_enu[ant1]
 
             data.baseline_array = (2048*(data.ant_1_array+1) +
                                    (data.ant_2_array+1)+2**16).astype(np.int64)

@@ -5,6 +5,11 @@ import time
 import redis
 import json
 import socket
+import numpy as np
+from astropy.coordinates import EarthLocation
+import astropy.units as u
+import pyuvdata.utils as utils
+from argparse import Namespace
 
 '''
 A Redis-based log handler from:
@@ -145,3 +150,30 @@ def read_maps_from_redis(redishost='redishost'):
     x['ant_to_snap'] = json.loads(x['ant_to_snap'])
     x['snap_to_ant'] = json.loads(x['snap_to_ant'])
     return x
+
+
+def read_locations_from_redis(redishost='redishost'):
+    loc = Namespace()
+    redishost = redis.Redis('redishost')
+    cofa_info = json.loads(redishost.hget('corr:map', 'cofa'))
+    lla = (np.radians(cofa_info['lat']), np.radians(cofa_info['lon']), cofa_info['alt'])
+    loc.COFA_telescope_location = utils.XYZ_from_LatLonAlt(lla[0], lla[1], lla[2])
+    loc.observatory = EarthLocation(lat=cofa_info['lat']*u.degree,
+                                    lon=cofa_info['lon']*u.degree,
+                                    height=cofa_info['alt']*u.m)
+    loc.antenna_numbers = json.loads(redishost.hget('corr:map', 'antenna_numbers'))
+    loc.antenna_numbers = np.array(loc.antenna_numbers).astype(int)
+    loc.antenna_names = json.loads(redishost.hget('corr:map', 'antenna_names'))
+    loc.antenna_names = np.asarray([str(a) for a in loc.antenna_names])
+    loc.antenna_positions = json.loads(redishost.hget('corr:map', 'antenna_positions'))
+    antenna_utm_eastings = json.loads(redishost.hget('corr:map', 'antenna_utm_eastings'))
+    antenna_utm_northings = json.loads(redishost.hget('corr:map', 'antenna_utm_northings'))
+    loc.number_of_antennas = len(loc.antenna_numbers)
+    # Compute uvw for baselines
+    loc.all_antennas_enu = {}
+    for i, antnum in enumerate(loc.antenna_numbers):
+        ant_enu = (antenna_utm_eastings[i],
+                   antenna_utm_northings[i],
+                   cofa_info['alt'])
+        loc.all_antennas_enu[antnum] = np.array(ant_enu)
+    return loc
