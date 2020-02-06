@@ -114,7 +114,7 @@ def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.
     return logger
 
 
-def write_snaphosts_to_redis(redishost='redishost'):
+def write_maps_to_redis(redishost='redishost'):
     if isinstance(redishost, str):
         redishost = redis.Redis(redishost)
     snap_host = {}
