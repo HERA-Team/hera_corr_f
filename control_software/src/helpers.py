@@ -96,7 +96,7 @@ def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.
             mc_handler.setLevel(mc_level)
             mc_handler.setFormatter(formatter)
             logger.addHandler(mc_handler)
-        except:
+        except:  # noqa
             logger.warn("Failed to add HERA MC log handler")
             logger.exception(sys.exc_info()[0])
 
@@ -114,7 +114,7 @@ def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.
     return logger
 
 
-def write_maps_to_redis(redishost='redishost'):
+def write_snap_hostnames_to_redis(redishost='redishost'):
     if isinstance(redishost, str):
         redishost = redis.Redis(redishost)
     snap_host = {}
@@ -122,7 +122,7 @@ def write_maps_to_redis(redishost='redishost'):
     for snap in snap_list:
         try:
             true_name, aliases, addresses = socket.gethostbyaddr(snap)
-        except:
+        except:  # noqa
             logger.error('Failed to gethostbyname for host %s' % snap)
             continue
         snap_host[snap] = aliases[-1]

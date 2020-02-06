@@ -195,7 +195,7 @@ while(True):
         logger.info('Last file written: %s' % outfilename)
         break
 
-    except:
+    except:  # noqa
         logger.info('Will try again in two minutes')
         time.sleep(120)
         cnt = 0
@@ -204,7 +204,7 @@ while(True):
                 feng = SnapFengine(args.host)
                 if feng.fpga.is_connected():
                     break
-            except:
+            except:  # noqa
                 logger.info('Still cannot connect. Wait two more minutes')
                 time.sleep(60)
                 cnt += 1
