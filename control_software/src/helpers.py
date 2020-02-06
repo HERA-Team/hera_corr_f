@@ -5,7 +5,6 @@ import time
 import redis
 import json
 import socket
-import struct
 
 '''
 A Redis-based log handler from:
@@ -17,6 +16,7 @@ NOTIFY = logging.INFO + 1
 logging.addLevelName(NOTIFY, "NOTIFY")
 
 IS_INITIALIZED_ATTR = "_hera_has_default_handlers"
+
 
 class RedisHandler(logging.Handler):
     def __init__(self, channel, conn, *args, **kwargs):
@@ -39,6 +39,7 @@ class RedisHandler(logging.Handler):
         except redis.RedisError:
             pass
 
+
 class HeraMCHandler(logging.Handler):
     def __init__(self, subsystem, *args, **kwargs):
         from hera_mc import mc
@@ -50,18 +51,21 @@ class HeraMCHandler(logging.Handler):
         self.session = db.sessionmaker()
 
     def emit(self, record):
-        # Re-code level because HeraMC logs 1 as most severe, and python logging calls critical:50, debug:10
+        # Re-code level because HeraMC logs 1 as most severe, and python logging
+        # calls critical:50, debug:10
         severity = max(1, 100 / record.levelno)
         message = self.format(record)
         logtime = self.Time(time.time(), format="unix")
         self.session.add_subsystem_error(logtime, self.subsystem, severity, message)
-            
+
+
 def log_notify(log, message=None):
     msg = message or "%s starting on %s" % (log.name, socket.gethostname())
     log.log(NOTIFY, msg)
-            
-    
-def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.INFO, bglevel=NOTIFY, include_mc=False, mc_level=logging.WARNING):
+
+
+def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.INFO,
+                             bglevel=NOTIFY, include_mc=False, mc_level=logging.WARNING):
     if getattr(logger, IS_INITIALIZED_ATTR, False):
         return logger
     setattr(logger, IS_INITIALIZED_ATTR, True)
@@ -95,7 +99,7 @@ def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.
     try:
         redis_host.ping()
     except redis.ConnectionError:
-        logger.warn("Couldn't connect to redis server at %s"%redishostname)
+        logger.warn("Couldn't connect to redis server at %s" % redishostname)
         return logger
 
     redis_handler = RedisHandler('log-channel', redis_host)
@@ -104,59 +108,25 @@ def add_default_log_handlers(logger, redishostname='redishost', fglevel=logging.
     logger.addHandler(redis_handler)
     return logger
 
-def snap_part_to_host_input(part):
-    """
-    Given a part string, eg. 'e2>SNP008', return the hostname of the snap board
-    and the antenna number 0-2.
-    eg, returns "heraNode1Snap2", 0
-    """
-    adc, name = part.split('>')
-    # convert the string adc (eg "e2") into a channel number 0-2
-    adc_num = int(adc[1:]) // 2 # divide by 2 because ADC is in demux 2
-    # convert the name into something which should be a hostname.
-    # name has the form SNPA0000123. Hostnames have the form herasnapA123
-    # Edit 16 Sep 2019 -- This isn't true anymore. CM names and hostnames are now the same
-    hostname = name#"herasnap%s" % (name[3] + name[4:].lstrip('0'))
-    try:
-        true_name, aliases, addresses = socket.gethostbyaddr(hostname)
-    except:
-        logger.error('Failed to gethostbyname for host %s' % hostname)
-    # assume that the one we want is the last thing in the hosts file line
-    return aliases[-1], adc_num
-    
 
-def cminfo_compute():
-    """
-    Use hera_mc's get_cminfo_correlator method to build a dictionary
-    of pam/fem/ant/snap mappings.
-    Requires hera_mc.
-    """
-    from hera_mc import cm_sysutils 
-    h = cm_sysutils.Handling()
-    cminfo = h.get_cminfo_correlator()
-    snap_to_ant = {}
-    ant_to_snap = {}
-    for antn, ant in enumerate(cminfo['antenna_numbers']):
-        name = cminfo['antenna_names'][antn]
-        for pol in cminfo['correlator_inputs'][antn]:
-            if pol.startswith('e'):
-                e_pol = pol
-            if pol.startswith('n'):
-                n_pol = pol
-        ant_to_snap[ant] = {}
-        if e_pol != 'None':
-            snapi_e, channel_e = snap_part_to_host_input(cminfo['correlator_inputs'][antn][0])
-            ant_to_snap[ant]['e'] = {'host': snapi_e, 'channel': channel_e}
-            if snapi_e not in snap_to_ant.keys():
-                snap_to_ant[snapi_e] = [None] * 6
-            snap_to_ant[snapi_e][channel_e] = name + 'E'
-        if n_pol != 'None':
-            snapi_n, channel_n = snap_part_to_host_input(cminfo['correlator_inputs'][antn][1])
-            ant_to_snap[ant]['n'] = {'host': snapi_n, 'channel': channel_n}
-            if snapi_n not in snap_to_ant.keys():
-                snap_to_ant[snapi_n] = [None] * 6
-            snap_to_ant[snapi_n][channel_n] = name + 'N'
-    return snap_to_ant, ant_to_snap
+def write_snaphosts_to_redis(redishost='redishost'):
+    if isinstance(redishost, str):
+        redishost = redis.Redis(redishost)
+    snap_host = {}
+    snap_list = list(json.loads(redishost.hget('corr:map', 'snap_to_ant')).keys())
+    for snap in snap_list:
+        try:
+            true_name, aliases, addresses = socket.gethostbyaddr(snap)
+        except:
+            logger.error('Failed to gethostbyname for host %s' % snap)
+            continue
+        snap_host[snap] = aliases[-1]
+    redhash = {}
+    redhash['snap_host'] = json.dumps(snap_host)
+    redhash['snap_host_update_time'] = time.time()
+    redhash['snap_host_update_time_str'] = time.ctime(redhash['snap_host_update_time'])
+    redishost.hmset('corr:map', redhash)
+
 
 def hera_antpol_to_ant_pol(antpol):
     antpol = antpol.lower().lstrip('h')
@@ -164,14 +134,6 @@ def hera_antpol_to_ant_pol(antpol):
     ant = int(antpol[:-1])
     return ant, pol
 
-def write_maps_to_redis(redishost='redishost'):
-    if isinstance(redishost, str):
-        redishost = redis.Redis(redishost)
-    snap_to_ant, ant_to_snap = cminfo_compute()
-    redhash = {'snap_to_ant':json.dumps(snap_to_ant), 'ant_to_snap':json.dumps(ant_to_snap)}
-    redhash['update_time'] = time.time()
-    redhash['update_time_str'] = time.ctime(redhash['update_time'])
-    redishost.hmset('corr:map', redhash)
 
 def read_maps_from_redis(redishost='redishost'):
     if isinstance(redishost, str):
