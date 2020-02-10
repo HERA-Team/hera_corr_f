@@ -257,7 +257,7 @@ if __name__ == "__main__":
         if corr.r.hget('snap_configuration', 'upload_time') != upload_time:
             upload_time = corr.r.hget('snap_configuration', 'upload_time')
             logger.info('New configuration detected. Reinitializing fengine list')
-            corr = HeraCorrelator(redishost=args.redishost, use_redis=(not args.noredistapcp))
+            corr = HeraCorrelator(redishost=args.redishost, use_redis=(not args.noredistapcp), block_monitoring=False)
             print_ant_log_messages(corr)
         
         # Recompute the hookup every time. It's fast
@@ -276,9 +276,13 @@ if __name__ == "__main__":
         for i in range(6):
             if corr.r.exists('disable_monitoring'):
                 continue
-            histograms += [corr.do_for_all_f("get_histogram", block="input", args=(i,), kwargs={"sum_cores" : True})]
+            histograms += [corr.do_for_all_f("get_input_histogram", block="input", args=(i,))]
             eq_coeffs += [corr.do_for_all_f("get_coeffs", block="eq", args=(i,))]
             autocorrs += [corr.do_for_all_f("get_new_corr", block="corr", args=(i,i))]
+        # We only detect overflow once per FPGA (not per antenna).
+        # Get the overflow flag and reset it
+        fft_of = corr.do_for_all_f("is_overflowing", block="pfb")
+        corr.do_for_all_f("rst_stats", block="pfb")
 
         # Get FEM/PAM sensor values
         fem_stats = get_all_fem_stats(corr)
@@ -350,6 +354,10 @@ if __name__ == "__main__":
                     pass
                 try:
                     redis_vals.update(fem_stats[ant][pol])
+                except KeyError:
+                    pass
+                try:
+                    redis_vals["fft_of"] = fft_of[key]
                 except KeyError:
                     pass
                 redis_vals['timestamp'] = datetime.datetime.now().isoformat()

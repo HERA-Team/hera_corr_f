@@ -157,7 +157,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
            ref (float): Reference frequency (in MHz) from which ADC clock is derived. If None, an external sampling clock must be used.
         """
         self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + ":%s" % (host.host)))
-        casperfpga.snapadc.SNAPADC.__init__(self,host,ref=ref,logger=self.logger)
+        casperfpga.snapadc.SNAPADC.__init__(self, host, ref=ref, logger=self.logger)
         self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
         self.interleave_mode = 4 >> num_chans
@@ -165,7 +165,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.sample_rate     = sample_rate
         self.resolution      = resolution
         self.host = host # the SNAPADC class doesn't directly expose this
-        self._retry = kwargs.get('retry',3)
+        self._retry = kwargs.get('retry',5)
         self._retry_wait = kwargs.get('retry_wait',1)
 
     def set_gain(self, gain):
@@ -196,10 +196,12 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.adc.write((gain_map[gain]<<4) + gain_map[gain], 0x2b)
         
 
-    def initialize(self, trial=0):
+    def initialize(self):
         """
         Initialize the configuration of the ADC chip.
+        Returns True if initialization was successful. False otherwise.
         """
+        status = True
         for i in range(self._retry):
             if self.init(self.sample_rate, self.num_chans):
                 if i == 0:
@@ -209,21 +211,12 @@ class Adc(casperfpga.snapadc.SNAPADC):
                 break
             if i == self._retry - 1:
                 self.logger.error("ADC failed to configure after %d attempts" % (i+1))
+                status = False
 
-        if not self.rampTest():
-            if trial < 3:
-                self.logger.warning('ADC failed on ramp test, retrying')
-                self.initialize(trial+1)
-            else:
-                self.logger.error('ADC failed on ramp test, giving up')
-
-        #self.alignLineClock(mode='dual_pat')
-        #self.alignFrameClock()
-        ##If aligning complete, alignFrameClock should not output any warning
         self.selectADC()
         self.adc.selectInput([1,1,3,3])
         self.set_gain(4)
-        return True
+        return status
 
 class Sync(Block):
     def __init__(self, host, name, logger=None):
@@ -363,10 +356,74 @@ class Input(Block):
         """
         super(Input, self).__init__(host, name, logger)
         self.nstreams = nstreams
+        self.ninput_mux_streams = nstreams // 2
         self.USE_NOISE = 0
         self.USE_ADC   = 1
         self.USE_ZERO  = 2
         self.INT_TIME  = 2**20 / 250.0e6
+        self._SNAPSHOT_SAMPLES_PER_POL = 2048
+
+    def get_adc_snapshot(self, antenna):
+        """
+        Get a block of samples from both pols of `antenna`
+        returns samples_x, samples_y
+        """
+        if "snap_sel" in self.listdev():
+            return self._get_adc_snapshot_single_ant(antenna)
+        else:
+            return self._get_adc_snapshot_all_ants(antenna)
+
+    def _get_adc_snapshot_single_ant(self, antenna):
+        """
+        Get a block of samples from both pols of `antenna`
+        returns samples_x, samples_y
+        """
+        self.write_int('snap_sel', antenna)
+        self.write_int('snapshot_ctrl', 0)
+        self.write_int('snapshot_ctrl', 1)
+        self.write_int('snapshot_ctrl', 3)
+        d = struct.unpack('>%db' % (2*self._SNAPSHOT_SAMPLES_PER_POL), self.read('snapshot_bram', 2*self._SNAPSHOT_SAMPLES_PER_POL))
+        x = []
+        y = []
+        for i in range(self._SNAPSHOT_SAMPLES_PER_POL // 2):
+            x += [d[4*i]]
+            x += [d[4*i + 1]]
+            y += [d[4*i + 2]]
+            y += [d[4*i + 3]]
+        return np.array(x), np.array(y)
+
+    def _get_adc_snapshot_all_ants(self, antenna):
+        """
+        Get a block of samples from both pols of `antenna`
+        returns samples_x, samples_y
+        """
+        self.write_int('snapshot_ctrl', 0)
+        self.write_int('snapshot_ctrl', 1)
+        self.write_int('snapshot_ctrl', 3)
+        d = struct.unpack('>%db' % (16 * self._SNAPSHOT_SAMPLES_PER_POL // 2), self.read('snapshot_bram', 16 * self._SNAPSHOT_SAMPLES_PER_POL // 2))
+        x = []
+        y = []
+        for i in range(self._SNAPSHOT_SAMPLES_PER_POL // 2):
+            # Add 1 to antenna since there is a dummy ant 0 which is all zeros
+            x += [d[16*i + 4*(antenna+1)]]
+            x += [d[16*i + 4*(antenna+1) + 1]]
+            y += [d[16*i + 4*(antenna+1) + 2]]
+            y += [d[16*i + 4*(antenna+1) + 3]]
+        return np.array(x), np.array(y)
+
+    def get_power_spectra(self, antenna, acc_len=1):
+        """
+        Perform a software FFT of samples from `antenna`.
+        Accumulate power from `acc_len` snapshots.
+        returns power_spectra_X, power_spectra_Y
+        """
+        X = np.zeros(self._SNAPSHOT_SAMPLES_PER_POL // 2 + 1)
+        Y = np.zeros(self._SNAPSHOT_SAMPLES_PER_POL // 2 + 1)
+        for i in range(acc_len):
+            x, y = self.get_adc_snapshot(antenna)
+            X += np.abs(np.fft.rfft(x))**2
+            Y += np.abs(np.fft.rfft(y))**2
+        return X, Y
 
     def use_noise(self, stream=None):
         """
@@ -376,11 +433,11 @@ class Input(Block):
         """
         if stream is None:
             v = 0
-            for stream in range(self.nstreams):
+            for stream in range(self.ninput_mux_streams):
                 v += self.USE_NOISE << (2 * stream)
             self.write_int('source_sel', v)
         else:
-            raise NotImplementedError('Different input selects not supported yet!')
+            self.change_reg_bits('source_sel', self.USE_NOISE, 2*(self.ninput_mux_streams-1-stream), 2)
 
     def use_adc(self, stream=None):
         """
@@ -390,11 +447,11 @@ class Input(Block):
         """
         if stream is None:
             v = 0
-            for stream in range(self.nstreams):
+            for stream in range(self.ninput_mux_streams):
                 v += self.USE_ADC << (2 * stream)
             self.write_int('source_sel', v)
         else:
-            raise NotImplementedError('Different input selects not supported yet!')
+            self.change_reg_bits('source_sel', self.USE_ADC, 2*(self.ninput_mux_streams-1-stream), 2)
 
     def use_zero(self, stream=None):
         """
@@ -404,11 +461,11 @@ class Input(Block):
         """
         if stream is None:
             v = 0
-            for stream in range(self.nstreams):
+            for stream in range(self.ninput_mux_streams):
                 v += self.USE_ZERO << (2 * stream)
             self.write_int('source_sel', v)
         else:
-            raise NotImplementedError('Different input selects not supported yet!')
+            self.change_reg_bits('source_sel', self.USE_ZERO, 2*(self.ninput_mux_streams-1-stream), 2)
 
     def get_stats(self, sum_cores=False):
         """
@@ -579,10 +636,10 @@ class Pfb(Block):
     def __init__(self, host, name, logger=None):
         super(Pfb, self).__init__(host, name, logger)
         self.SHIFT_OFFSET = 0
-        self.SHIFT_WIDTH  = 12
-        self.PRESHIFT_OFFSET = 12
+        self.SHIFT_WIDTH  = 16
+        self.PRESHIFT_OFFSET = 16
         self.PRESHIFT_WIDTH  = 2
-        self.STAT_RST_BIT = 14
+        self.STAT_RST_BIT = 18
 
     def set_fft_shift(self, shift):
         self.change_reg_bits('ctrl', shift, self.SHIFT_OFFSET, self.SHIFT_WIDTH)
