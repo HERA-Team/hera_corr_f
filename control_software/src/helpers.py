@@ -8,7 +8,6 @@ import socket
 import numpy as np
 from astropy.coordinates import EarthLocation
 import astropy.units as u
-import pyuvdata.utils as utils
 from argparse import Namespace
 
 '''
