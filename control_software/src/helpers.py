@@ -155,9 +155,9 @@ def read_maps_from_redis(redishost='redishost'):
 def read_locations_from_redis(redishost='redishost'):
     loc = Namespace()
     redishost = redis.Redis('redishost')
+    cofa_xyz = json.loads(redishost.hget('corr:map', 'cofa_xyz'))
+    loc.COFA_telescope_location = [cofa_xyz['X'], cofa_xyz['Y'], cofa_xyz['Z']]
     cofa_info = json.loads(redishost.hget('corr:map', 'cofa'))
-    lla = (np.radians(cofa_info['lat']), np.radians(cofa_info['lon']), cofa_info['alt'])
-    loc.COFA_telescope_location = utils.XYZ_from_LatLonAlt(lla[0], lla[1], lla[2])
     loc.observatory = EarthLocation(lat=cofa_info['lat']*u.degree,
                                     lon=cofa_info['lon']*u.degree,
                                     height=cofa_info['alt']*u.m)
