@@ -10,3 +10,6 @@ https://github.com/HERA-Team/hera_corr_f/blob/master/control_software/scripts/he
 (or I think there hera a hera_corr_cm method to do the same thing)
 
 At the point you've loaded the config to redis, it will be active when you run hera_snap_feng_init.py or other F-engine scripts. Things like the SNAP monitor should pick up the new config automatically.
+
+Note that the RFI testing write-up has some helpful stuff (since SNAPs get added there):
+https://docs.google.com/document/d/1kMEwdN1F9zylfThGX56OnC0vd-AzWmBqsY3oLVmqKFU/edit?us
