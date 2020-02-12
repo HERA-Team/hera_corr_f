@@ -1,5 +1,6 @@
 *.autosave
 *.log
+dump.rdb
 snap_fengine/
 !snap_fengine/outputs/
 snap_fengine_test/
