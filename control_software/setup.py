@@ -18,11 +18,11 @@ setup(name='hera_corr_f',
       version='%s' % ver,
       description='Python libraries and scripts to control the HERA correlator F-Engines',
       author='Jack Hickish',
-      author_email='jackh@berkeley.edu',
+      author_email='jackhickish@gmail.com',
       url='https://github.com/hera-team/hera_corr_f',
       provides=['hera_corr_f'],
       packages=['hera_corr_f'],
-      package_dir={'hera_corr_f' : 'src'},
+      package_dir={'hera_corr_f': 'src'},
       scripts=glob.glob('scripts/*.py'),
       )
 
