@@ -1,36 +1,36 @@
 #
 # For each fengine, specify the host ip address (host_ip), destination port (dest_port),
-# the antenna numbers it is processing (ants). 
+# the antenna numbers it is processing (ants).
 #
-# The following booleans can also be set- 
-# if it needs to be initialized (init), 
-# if you want to set noise (noise), 
-# or test vector (tvg) input and if you want it to 
+# The following booleans can also be set-
+# if it needs to be initialized (init),
+# if you want to set noise (noise),
+# or test vector (tvg) input and if you want it to
 # send data over ethernet (eth).
 #
-# If a specific boolean task needs to be implemented on all fengines, you can 
+# If a specific boolean task needs to be implemented on all fengines, you can
 # set it as a global parameter.
 #
-# NB: If fengine antennas are not specified, they will be alloted according the order in 
+# NB: If fengine antennas are not specified, they will be alloted according the order in
 # which they are presented here.
 
-# You can set the following global parameters for all fengines 
-# or enable them for only some fengines. The global parameters 
+# You can set the following global parameters for all fengines
+# or enable them for only some fengines. The global parameters
 # overrride the individual fengine settings.
 
 # You can sync the fengines using an external PPS signal
-# or manually using a software register. 
+# or manually using a software register.
 # Choices: 'pps', 'manual', False (default: 'pps')
 sync: 'pps'
 
 # The test vector generator can operate in multiple modes:
-# 'const_ants' : Writes a different constant value 
+# 'const_ants' : Writes a different constant value
 #                to all channels of an antenna (both pols).
-# 'const_pols' : Write a different constant value  
+# 'const_pols' : Write a different constant value
 #                to both pols of an antenna.
 # 'ramp'       : Write the same ramp to all pols.
 # 'ramp_pols'  : Write a different ramp to each pol.
-# False        : Do not set the test vector (default) 
+# False        : Do not set the test vector (default)
 tvg: False
 
 # Turn on the noise generator for testing
@@ -86,7 +86,7 @@ fengines:
         ants: [18, 19, 20]
     heraNode8Snap3:
         phase_switch_index: [19,20,21,22,23,24]
-        ants: [21, 22, 23] 
+        ants: [21, 22, 23]
     heraNode9Snap0:
         phase_switch_index: [1,2,3,4,5,6]
         ants: [24, 25, 26]
@@ -111,8 +111,44 @@ fengines:
     heraNode7Snap3:
         phase_switch_index: [19,20,21,22,23,24]
         ants: [45, 46, 47]
-# Data is sent assuming a total of 32 Xengines and 
-# a maximum of 48 channels per Xengine. If all the 
+    heraNode4Snap0:
+        phase_switch_index: [1,2,3,4,5,6]
+        ants: [48, 49, 50]
+    heraNode4Snap1:
+        phase_switch_index: [7,8,9,10,11,12]
+        ants: [51, 52, 53]
+    heraNode4Snap2:
+        phase_switch_index: [13,14,15,16,17,18]
+        ants: [54, 55, 56]
+    heraNode4Snap3:
+        phase_switch_index: [19,20,21,22,23,24]
+        ants: [57, 58, 59]
+    heraNode5Snap0:
+        phase_switch_index: [1,2,3,4,5,6]
+        ants: [60, 61, 62]
+    heraNode5Snap1:
+        phase_switch_index: [7,8,9,10,11,12]
+        ants: [63, 64, 65]
+    heraNode5Snap2:
+        phase_switch_index: [13,14,15,16,17,18]
+        ants: [66, 67, 68]
+    heraNode5Snap3:
+        phase_switch_index: [19,20,21,22,23,24]
+        ants: [69, 70, 71]
+    heraNode13Snap0:
+        phase_switch_index: [1,2,3,4,5,6]
+        ants: [72, 73, 74]
+    heraNode13Snap1:
+        phase_switch_index: [7,8,9,10,11,12]
+        ants: [75, 76, 77]
+    heraNode13Snap2:
+        phase_switch_index: [13,14,15,16,17,18]
+        ants: [78, 79, 80]
+    heraNode13Snap3:
+        phase_switch_index: [19,20,21,22,23,24]
+        ants: [81, 82, 83]
+# Data is sent assuming a total of 32 Xengines and
+# a maximum of 48 channels per Xengine. If all the
 # 32 Xengines are not defined, the corresponding channels
 # are not sent anywhere.
 xengines:
