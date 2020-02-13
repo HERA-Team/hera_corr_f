@@ -1,4 +1,4 @@
-# To add SNAPs to work in the correlator.
+# Add SNAPs to the correlator.
 David DeBoer - February 12, 2020
 
 The steps below relate to hera-snap-head.  You will need to sudo to make changes.
@@ -11,7 +11,9 @@ The steps below relate to hera-snap-head.  You will need to sudo to make changes
    (or I think there hera a hera_corr_cm method to do the same thing)
 5. Reset dnsmasq via the script reset_dnsmasq.sh
 
-At the point you've loaded the config to redis, it will be active when you run hera_snap_feng_init.py or other F-engine scripts. Things like the SNAP monitor should pick up the new config automatically.
+At the point you've loaded the config to redis and it should be active when you run e.g.
+hera_snap_feng_init.py or other F-engine scripts. Things like the SNAP monitor should pick up
+the new config automatically.
 
 Note that the RFI testing write-up has some helpful stuff (since SNAPs get added there):
 https://docs.google.com/document/d/1kMEwdN1F9zylfThGX56OnC0vd-AzWmBqsY3oLVmqKFU/edit?us

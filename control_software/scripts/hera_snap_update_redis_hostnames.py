@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 
+"""Add snap hostnames to redis."""
+
 import argparse
 import logging
 from hera_corr_f import helpers
