@@ -117,7 +117,7 @@ def write_snap_hostnames_to_redis(redishost='redishost'):
     if isinstance(redishost, str):
         redishost = redis.Redis(redishost)
     snap_host = {}
-    snap_list = list(json.loads(redishost.hget('corr:map', 'snap_to_ant')).keys())
+    snap_list = list(json.loads(redishost.hget('corr:map', 'all_snap_inputs')).keys())
     for snap in snap_list:
         try:
             true_name, aliases, addresses = socket.gethostbyaddr(snap)
