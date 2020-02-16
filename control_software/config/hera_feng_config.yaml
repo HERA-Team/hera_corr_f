@@ -63,6 +63,18 @@ walsh_order: 32
 walsh_delay: 600
 
 fengines:
+    heraNode12Snap0:
+        phase_switch_index: [1,2,3,4,5,6]
+        ants: [84, 85, 86]
+    heraNode12Snap1:
+        phase_switch_index: [7,8,9,10,11,12]
+        ants: [87, 88, 89]
+    heraNode12Snap2:
+        phase_switch_index: [13,14,15,16,17,18]
+        ants: [90, 91, 92]
+    heraNode12Snap3:
+        phase_switch_index: [19,20,21,22,23,24]
+        ants: [93, 94, 95]
     #heraNode0Snap0:
   #    phase_switch_index: [1,2,3,4,5,6]
   #      ants: [0, 1, 2]
@@ -147,18 +159,6 @@ fengines:
     heraNode13Snap3:
         phase_switch_index: [19,20,21,22,23,24]
         ants: [81, 82, 83]
-    heraNode12Snap0:
-        phase_switch_index: [1,2,3,4,5,6]
-        ants: [84, 85, 86]
-    heraNode12Snap1:
-        phase_switch_index: [7,8,9,10,11,12]
-        ants: [87, 88, 89]
-    heraNode12Snap2:
-        phase_switch_index: [13,14,15,16,17,18]
-        ants: [90, 91, 92]
-    heraNode12Snap3:
-        phase_switch_index: [19,20,21,22,23,24]
-        ants: [93, 94, 95]
 # Data is sent assuming a total of 32 Xengines and
 # a maximum of 48 channels per Xengine. If all the
 # 32 Xengines are not defined, the corresponding channels
