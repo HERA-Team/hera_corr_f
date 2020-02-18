@@ -265,11 +265,12 @@ class HeraCorrelator(object):
 
     def reestablish_dead_connections(self, age=0.0, programmed_only=False):
         """
-        Try to reconnect to all boards in `self.dead_fengs`,
-        if the board was declared dead more than `age` seconds ago.
+        Reconnect to all boards in `self.dead_fengs`.
+
+        If the board was declared dead more than `age` seconds ago.
         Is non-disruptive to connected boards.
         """
-        t_thresh = time.time() - age  # Try to connect to boards which were declared dead before this time
+        t_thresh = time.time() - age  # Try to connect to boards which were declared dead before this time  # noqa
         new_fengs = []
         for host, deadtime in self.dead_fengs.items():
             if deadtime > t_thresh:
