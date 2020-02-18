@@ -1,3 +1,5 @@
+"""HeraCorrelator."""
+
 import logging
 import os
 import time
@@ -15,26 +17,34 @@ from casperfpga import utils
 
 LOGGER = helpers.add_default_log_handlers(logging.getLogger(__name__))
 
+
 def _queue_instance_method(q, num, inst, method, args, kwargs):
-    '''
+    """
     Add an [num, inst.method(*args, **kwargs)] call to queue, q.
+
     Use q.get() to get the return data from this call.
-    
     This function is used for parallelizing calls to multiple
     roaches/engines.
-    '''
+    """
     q.put([num, getattr(inst, method)(*args, **kwargs)])
 
+
 class HeraCorrelator(object):
-    def __init__(self, redishost='redishost', config=None, logger=LOGGER, passive=False, use_redis=True, block_monitoring=True):
+    """HERA Correlator control class."""
+
+    def __init__(self, redishost='redishost', config=None, logger=LOGGER, passive=False,
+                 use_redis=True, block_monitoring=True):
         """
         Instantiate a HeraCorrelator instance.
+
         optional inputs:
             redishost (str): Hostname (or IP address) or redis database.
             config (str): Path to configuration file. If None, config will be grabbed from redis.
             logger (logging.Logger): Logging object this class will use.
-            passive (Boolean): If True, won't connect to SNAPs. If False, will establish SNAP connections and check the connected boards are alive.
-            use_redis (Boolean): If True, will use a redis proxy (at `redishost`) for talking to SNAP boards, rather than direct TFTP.
+            passive (Boolean): If True, won't connect to SNAPs. If False, will establish
+            SNAP connections and check the connected boards are alive.
+            use_redis (Boolean): If True, will use a redis proxy (at `redishost`) for talking to
+            SNAP boards, rather than direct TFTP.
             block_monitoring (Boolean): If True, will disable monitoring before connecting to boards
         """
         self.logger = logger
@@ -49,7 +59,7 @@ class HeraCorrelator(object):
         # Dictionary of {hostname: time (float)} where keys are hostnames
         # of dead boards and time entries are unix times when the host was declared dead
         self.dead_fengs = {}
-        
+
         if not passive:
             if block_monitoring:
                 self.disable_monitoring(60, wait=True)
@@ -57,20 +67,26 @@ class HeraCorrelator(object):
             # Get antenna<->SNAP maps
             self.compute_hookup()
 
-        self.config_is_valid= self._verify_config()
+        self.config_is_valid = self._verify_config()
 
-    def do_for_all_f(self, method, block=None, block_index=None, args=(), kwargs={}, timeout=3, dead_count_threshold=3, check_programmed=False):
+    def do_for_all_f(self, method, block=None, block_index=None, args=(), kwargs={}, timeout=3,
+                     dead_count_threshold=3, check_programmed=False):
         """
         Call `method` against all F-Engine instances.
+
         inputs:
             method (str): Method to call
-            block (str or None): What block should the method call -- eg SnapFengine.`block`.`method`(...).
-                         Use None to indicate that the call is against the SnapFengine instance directly
-            block_index (int): Use to specify an index if the SnapFengine.`block` attribute is a list
+            block (str or None): What block should the method call
+                               -- eg SnapFengine.`block`.`method`(...).
+                         Use None to indicate that the call is against the SnapFengine
+                         instance directly
+            block_index (int): Use to specify an index if the SnapFengine.`block`
+                         attribute is a list
             args (tuple): positional arguments to pass to the underlying method
             kwargs (dict): keyword arguments to pass to the underlying method
             timeout (float): Timeout in seconds
-            dead_count_threshold (int): Number of failed connection attempts allowed before declaring an F-Engine dead. Set to None to skip error tracking
+            dead_count_threshold (int): Number of failed connection attempts allowed before
+                          declaring an F-Engine dead. Set to None to skip error tracking
             check_programmed (bool): Set to True to call against only programmed F-Engines
         returns:
             dictionary of return values from the underlying method. Keys are f-engine hostnames.
@@ -96,20 +112,21 @@ class HeraCorrelator(object):
             else:
                 instances = [getattr(f, block) for f in self.fengs if f.is_programmed()]
         # If the instances are themselves lists, demand the user specify a block index
-        #TODO just checking the first entry
+        # TODO just checking the first entry
         if isinstance(instances[0], list):
             if block_index is None:
-                self.logger.error("Instances of block %s are lists, but no block_index was specified!" % block)
+                self.logger.error("Instances of block %s are lists, "
+                                  "but no block_index was specified!" % block)
                 return None
             else:
                 temp = [instance[block_index] for instance in instances]
                 instances = temp
-        
+
         # Check that the method is an attribute (may or may not be callable)
         if not hasattr(instances[0], method):
             return None
 
-        rv = {} # return value dictionary
+        rv = {}  # return value dictionary
         # Check if the method is callable. If so, call
         # if not, just get the attribute for all FEngines in a single-threaded manner
         if not callable(getattr(instances[0], method)):
@@ -138,23 +155,25 @@ class HeraCorrelator(object):
                 else:
                     feng.error_count = 0
                 if feng.error_count > dead_count_threshold:
-                    self.logger.warning("Declaring %s dead after %d errors" % (feng.host, feng.error_count))
-                    self.declare_feng_dead(feng) 
+                    self.logger.warning("Declaring %s dead after %d errors" % (feng.host, feng.error_count))  # noqa
+                    self.declare_feng_dead(feng)
         return rv
 
     def get_config(self, config=None):
         """
         Parse a configuration file.
+
         inputs:
-            config (str): Path to configuration file. If None, a configuration will be pulled from redis.
+            config (str): Path to configuration file. If None, a configuration will
+            be pulled from redis.
         """
         if config is None:
-            self.config_str  = self.r.hget('snap_configuration', 'config')
+            self.config_str = self.r.hget('snap_configuration', 'config')
             self.config_name = self.r.hget('snap_configuration', 'name')
             self.config_hash = self.r.hget('snap_configuration', 'md5')
-            self.config_time  = float(self.r.hget('snap_configuration', 'upload_time'))
-            self.config_time_str  = self.r.hget('snap_configuration', 'upload_time_str')
-            self.logger.info('Using configuration from redis, uploaded at %s' % self.config_time_str)
+            self.config_time = float(self.r.hget('snap_configuration', 'upload_time'))
+            self.config_time_str = self.r.hget('snap_configuration', 'upload_time_str')
+            self.logger.info('Using configuration from redis, uploaded at %s' % self.config_time_str)  # noqa
         else:
             with open(config, 'r') as fp:
                 self.config_str = fp.read()
@@ -165,9 +184,7 @@ class HeraCorrelator(object):
         self.config = yaml.load(self.config_str)
 
     def establish_connections(self):
-        """
-        Connect to SNAP boards listed in the current configuration.
-        """
+        """Connect to SNAP boards listed in the current configuration."""
         # Instantiate CasperFpga connections to all the F-Engine.
         self.fengs = []
         self.dead_fengs = {}
@@ -200,23 +217,21 @@ class HeraCorrelator(object):
 
     def _try_to_connect(self, q, host, ant_indices, redishost):
         """
-        Try to connect to  a single SNAP. Used in a multithreaded manner
-        by `establish_connections`
+        Try to connect to  a single SNAP.
+
+        Used in a multithreaded manner by `establish_connections`
         """
         q.put([host, SnapFengine(host, ant_indices=ant_indices, redishost=redishost)])
-            
 
     def establish_connections_multithread(self):
-        """
-        Connect to SNAP boards listed in the current configuration.
-        """
+        """Connect to SNAP boards listed in the current configuration."""
         # Instantiate CasperFpga connections to all the F-Engine.
         self.fengs = []
         self.dead_fengs = {}
         ant_index = 0
         # Build a queue to multithread over
         q = Queue()
-        hosts =  self.config['fengines'].keys()
+        hosts = self.config['fengines'].keys()
         for host_n, host in enumerate(hosts):
             ant_indices = self.config['fengines'][host].get('ants', range(ant_index, ant_index + 3))
             ant_index += 3
@@ -232,7 +247,7 @@ class HeraCorrelator(object):
             q.task_done()
             self.fengs += [feng]
         q.join()
-        is_connected = self.do_for_all_f('is_connected', block = 'fpga')
+        is_connected = self.do_for_all_f('is_connected', block='fpga')
         for feng in self.fengs:
             if not is_connected.get(feng.host, False):
                 self.dead_fengs[feng.host] = time.time()
@@ -254,7 +269,7 @@ class HeraCorrelator(object):
         if the board was declared dead more than `age` seconds ago.
         Is non-disruptive to connected boards.
         """
-        t_thresh = time.time() - age # Try to connect to boards which were declared dead before this time
+        t_thresh = time.time() - age  # Try to connect to boards which were declared dead before this time
         new_fengs = []
         for host, deadtime in self.dead_fengs.items():
             if deadtime > t_thresh:
@@ -282,7 +297,7 @@ class HeraCorrelator(object):
             feng.ip = socket.gethostbyname(feng.host)
             self.fengs_by_name[feng.host] = feng
             self.fengs_by_ip[feng.ip] = feng
-        
+
         if len(new_fengs) > 0:
             self.logger.info('Re-established connections to SNAPs : %s' % ', '.join([feng.host for feng in new_fengs]))
 
@@ -291,10 +306,11 @@ class HeraCorrelator(object):
 
     def declare_feng_dead(self, feng):
         """
-        Delare the Fengine `feng` dead. Remove it from the active list
-        of connected boards. Add it to the list of dead boards if it's not there
-        already. `feng` can either be a SnapFengine object (i.e., an entry from self.fengs)
-        or a hostname.
+        Declare the Fengine `feng` dead.
+
+        Remove it from the active list of connected boards. Add it to the list of dead boards
+        if it's not there already. `feng` can either be a SnapFengine object (i.e., an entry
+        from self.fengs) or a hostname.
         """
         deadfeng = None
         # if `feng` is a string, find the object corresponding to the SNAP with that hostname
@@ -324,9 +340,10 @@ class HeraCorrelator(object):
 
     def disable_monitoring(self, expiry=60, wait=True):
         """
-        Set the "disable_monitoring" key in redis. Hopefully other processes will respect this
-        key and stop monitoring. Useful if you are going to hammer the TFTP connection and don't
-        want interference from the monitoring loop.
+        Set the "disable_monitoring" key in redis.
+
+        Hopefully other processes will respect this key and stop monitoring. Useful if you
+        are going to hammer the TFTP connection and don't want interference from the monitoring loop.
         Inputs:
             expiry (float): Period (in seconds) for which the monitoring loop should be disabled.
             wait (bool): If True, wait for the monitor script to confirm it is not running before returning
@@ -341,17 +358,15 @@ class HeraCorrelator(object):
                     return
                 time.sleep(1)
             return
-                
-            
-        
+
     def enable_monitoring(self):
-        """
-        Delete the "disable_monitoring" key in redis.
-        """
+        """Delete the "disable_monitoring" key in redis."""
         self.r.delete('disable_monitoring')
 
     def is_monitoring(self):
         """
+        Check if monitoring.
+
         Return True if the monitoring daemon is polling, False otherwise.
         Note that a False return could either indicate either that the monitor
         is suspended or that it is not running at all.
@@ -365,8 +380,10 @@ class HeraCorrelator(object):
     def program(self, bitstream=None, unprogrammed_only=True):
         """
         Program SNAPs.
+
         Inputs:
-            bitstream (str): Path to fpgfile to program. If None, the bitstream described in the current configuration will be used.
+            bitstream (str): Path to fpgfile to program. If None, the bitstream described in the
+                             current configuration will be used.
             unprogrammed_only (Boolean): If True, only program boards which aren't yet programmed.
         """
         TEMP_BITSTREAM_STORE = "/tmp/"
@@ -382,7 +399,7 @@ class HeraCorrelator(object):
             progfile = os.path.join(TEMP_BITSTREAM_STORE, progfile)
             with open(progfile, "wb") as fh:
                 fh.write(bitstream)
-            
+
         if unprogrammed_only:
             to_be_programmed = []
             for feng in self.fengs:
@@ -398,82 +415,70 @@ class HeraCorrelator(object):
         time.sleep(20)
         for f in to_be_programmed:
             self.r.hset('status:snap:%s' % f.host, 'last_programmed', time.ctime())
-        
+
     def phase_switch_disable(self):
-        """
-        Disable all phase switches.
-        """
+        """Disable all phase switches."""
         self.logger.info('Disabling all phase switches')
         # Don't bother writing the modulation brams. Just hit the master disable
-        #for feng in self.fengs:
+        # for feng in self.fengs:
         #    feng.phaseswitch.set_all_walsh(self.config['walsh_order'], [0]*feng.phaseswitch.nstreams, self.config['log_walsh_step_size'])
         self.do_for_all_f("disable_mod", "phaseswitch")
         self.do_for_all_f("disable_demod", "phaseswitch")
         self.r.hmset('corr:status_phase_switch', {'state':'off', 'time':time.time()})
 
     def phase_switch_enable(self):
-        """
-        Enable all phase switches.
-        """
+        """Enable all phase switches."""
         self.logger.info('Enabling all phase switches')
         for feng in self.fengs:
-            feng.phaseswitch.set_all_walsh(self.config['walsh_order'], self.config['fengines'][feng.host]['phase_switch_index'], self.config['log_walsh_step_size'])
+            feng.phaseswitch.set_all_walsh(self.config['walsh_order'],
+                                           self.config['fengines'][feng.host]['phase_switch_index'],
+                                           self.config['log_walsh_step_size'])
         self.do_for_all_f("set_delay", "phaseswitch", args=(self.config["walsh_delay"],))
         self.do_for_all_f("enable_mod", "phaseswitch")
         self.do_for_all_f("enable_demod", "phaseswitch")
-        self.r.hmset('corr:status_phase_switch', {'state':'on', 'time':time.time()})
+        self.r.hmset('corr:status_phase_switch', {'state': 'on', 'time': time.time()})
 
     def noise_diode_enable(self):
-        """
-        Enable all noise switches.
-        """
+        """Enable all noise switches."""
         self.logger.info('Enabling all noise inputs')
         for retry in range(3):
             for i in range(len(self.fengs[0].fems)):
                 self.do_for_all_f("switch", "fems", block_index=i, args=("noise",), timeout=10)
-        self.r.hmset('corr:status_noise_diode', {'state':'on', 'time':time.time()})
-        self.r.hmset('corr:status_load', {'state':'off', 'time':time.time()})
+        self.r.hmset('corr:status_noise_diode', {'state': 'on', 'time': time.time()})
+        self.r.hmset('corr:status_load', {'state': 'off', 'time': time.time()})
 
     def noise_diode_disable(self):
-        """
-        Disable all noise switches.
-        """
+        """Disable all noise switches."""
         self.logger.info('Disabling all noise inputs')
         self.antenna_enable()
 
     def load_enable(self):
-        """
-        Enable all load switches.
-        """
+        """Enable all load switches."""
         self.logger.info('Enabling all load inputs')
         for retry in range(3):
             for i in range(len(self.fengs[0].fems)):
                 self.do_for_all_f("switch", "fems", block_index=i, args=("load",), timeout=10)
-        self.r.hmset('corr:status_load', {'state':'on', 'time':time.time()})
-        self.r.hmset('corr:status_noise_diode', {'state':'off', 'time':time.time()})
+        self.r.hmset('corr:status_load', {'state': 'on', 'time': time.time()})
+        self.r.hmset('corr:status_noise_diode', {'state': 'off', 'time': time.time()})
 
     def load_disable(self):
-        """
-        Disable all load switches.
-        """
+        """Disable all load switches."""
         self.logger.info('Disabling all load inputs')
         self.antenna_enable()
 
     def antenna_enable(self):
-        """
-        Set all switches to Antenna
-        """
+        """Set all switches to Antenna."""
         self.logger.info('Enable all antenna inputs')
         for retry in range(3):
             for i in range(len(self.fengs[0].fems)):
                 self.do_for_all_f("switch", "fems", block_index=i, args=("antenna",), timeout=10)
-        self.r.hmset('corr:status_load', {'state':'off', 'time':time.time()})
-        self.r.hmset('corr:status_noise_diode', {'state':'off', 'time':time.time()})
+        self.r.hmset('corr:status_load', {'state': 'off', 'time': time.time()})
+        self.r.hmset('corr:status_noise_diode', {'state': 'off', 'time': time.time()})
 
     def get_ant_snap_chan(self, ant, pol):
         """
         Get the input number and SnapFengine object for a given ant, pol.
- 
+
         Inputs:
            ant: Antenna string. Eg. '0', for HH0
            pol: String polarization -- 'e' or 'n'
@@ -495,8 +500,8 @@ class HeraCorrelator(object):
 
     def set_pam_attenuation(self, ant, pol, val=None):
         """
-        Set the PAM attenuation of Antenna `ant`, polarization `pol` to
-        `val` dB.
+        Set the PAM attenuation of Antenna `ant`, polarization `pol` to `val` dB.
+
         Inputs:
            ant: Antenna string. Eg. '0', for HH0
            pol: String polarization -- 'e' or 'n'
@@ -513,26 +518,26 @@ class HeraCorrelator(object):
             return
         else:
             if val is None:
-               # Try to reload coefficients from redis
-               self.logger.debug("Trying to set PAM attenuation for Ant %s%s from redis" % (ant, pol))
-               redval, redtime = self.r.hmget("atten:ant:%s:%s" % (ant, pol), "commanded", "command_time")
-               if redval is not None:
-                   if redtime is None:
-                       redtime_str = "UNKNOWN"
-                   else:
-                       redtime_str = time.ctime(float(redtime))
-                   self.logger.debug("Loading attenuation of %ddB from time %s" % (int(redval), redtime_str))
-                   self.set_pam_attenuation(ant, pol, int(redval))
-                   return
-               # If there are no coeffs in redis. Look at whatever is actually loaded and update redis
-               else:
-                   self.logger.debug("Failed to find attenuation value in redis!")
-                   # update redis with the current values, but do not update the commanded value
-                   val = self.get_pam_attenuation(ant, pol)
-                   return
+                # Try to reload coefficients from redis
+                self.logger.debug("Trying to set PAM attenuation for Ant %s%s from redis" % (ant, pol))
+                redval, redtime = self.r.hmget("atten:ant:%s:%s" % (ant, pol), "commanded", "command_time")
+                if redval is not None:
+                    if redtime is None:
+                        redtime_str = "UNKNOWN"
+                    else:
+                        redtime_str = time.ctime(float(redtime))
+                    self.logger.debug("Loading attenuation of %ddB from time %s" % (int(redval), redtime_str))
+                    self.set_pam_attenuation(ant, pol, int(redval))
+                    return
+                # If there are no coeffs in redis. Look at whatever is actually loaded and update redis
+                else:
+                    self.logger.debug("Failed to find attenuation value in redis!")
+                    # update redis with the current values, but do not update the commanded value
+                    val = self.get_pam_attenuation(ant, pol)
+                    return
             # Else if we have a value provided, update redis and try to load it
             self.logger.info("Setting ant %s pol %s PAM attenuation to %d" % (ant, pol, val))
-            self.r.hmset('atten:ant:%s:%s' % (ant, pol), {'commanded': str(val), 'command_time':time.time()})
+            self.r.hmset('atten:ant:%s:%s' % (ant, pol), {'commanded': str(val), 'command_time': time.time()})
             if pol == 'e':
                 snap.pams[chan//2].set_attenuation(east=val)
             else:
@@ -542,6 +547,7 @@ class HeraCorrelator(object):
     def get_pam_attenuation(self, ant, pol):
         """
         Get the PAM attenuation values of Antenna `ant`, polarization `pol`.
+
         Optionally update the coefficients stored in redis
         Inputs:
            ant: Antenna string. Eg. '0', for HH0
@@ -562,7 +568,7 @@ class HeraCorrelator(object):
                 val = val_e
             else:
                 val = val_n
-        self.r.hmset('atten:ant:%s:%s' % (ant, pol), {'value': str(val), 'time':time.time()})
+        self.r.hmset('atten:ant:%s:%s' % (ant, pol), {'value': str(val), 'time': time.time()})
         time.sleep(0.01)
         commanded, actual = self.r.hmget('atten:ant:%s:%s' % (ant, pol), 'commanded', 'value')
         if (commanded is not None) and (actual is not None) and (commanded != actual):
@@ -571,9 +577,10 @@ class HeraCorrelator(object):
 
     def tune_pam_attenuation(self, ant, pol, target_pow=None, target_rms=None):
         """
-        Set the PAM attenuation values of Antenna `ant`, polarization `pol`
-        so as to target either a PAM power level `target_pow` dBm, or an
-        ADC RMS of `target_rms` units.
+        Set the PAM attenuation values of Antenna.
+
+        Set values for `ant`, polarization `pol` so as to target either a PAM power
+        level `target_pow` dBm, or an ADC RMS of `target_rms` units.
         Inputs:
            ant: Antenna string. Eg. '0', for HH0
            pol: String polarization -- 'e' or 'n'
@@ -585,7 +592,7 @@ class HeraCorrelator(object):
         assert (target_pow is None) or (target_rms is None), "You may only target _either_ an ADC RMS _or_ a PAM power"
         assert (target_pow is not None) or (target_rms is not None), "You must target _either_ an ADC RMS _or_ a PAM power"
         assert pol in ['e', 'n']
-        
+
         snap, chan = self.get_ant_snap_chan(ant, pol)
         if snap is None:
             self.logger.warning("Tried to tune EQ for an antenna we don't recognize!")
@@ -600,11 +607,10 @@ class HeraCorrelator(object):
             self.logger.warning("Failed to get attenuation target")
             return False
 
-
     def set_eq(self, ant, pol, eq=None):
         """
-        Set the EQ coefficients of Antenna `ant`, polarization `pol` to
-        a constant or vector `eq`.
+        Set the EQ coefficients of Antenna `ant`, polarization `pol` to a constant or vector `eq`.
+
         Inputs:
            ant: Antenna string. Eg. '0', for HH0
            pol: String polarization -- 'e' or 'n'
@@ -621,19 +627,19 @@ class HeraCorrelator(object):
             return
         else:
             if eq is None:
-               # Try to reload coefficients from redis
-               self.logger.debug("Trying to set coeffs for Ant %s%s from redis" % (ant, pol))
-               redval = self.r.hgetall("eq:ant:%s:%s" % (ant, pol))
-               if redval != {}:
-                   self.logger.debug("Loading coeffs from time %s" % (time.ctime(float(redval['time']))))
-                   coeffs = np.array(json.loads(redval['values']))
-                   self.set_eq(ant, pol, coeffs)
-                   return
-               # If there are no coeffs in redis. Look at whatever is actually loaded and update redis
-               else:
-                   self.logger.debug("Failed to find coefficients in redis!")
-                   coeffs = self.get_eq(ant, pol, update_redis=True)
-                   return
+                # Try to reload coefficients from redis
+                self.logger.debug("Trying to set coeffs for Ant %s%s from redis" % (ant, pol))
+                redval = self.r.hgetall("eq:ant:%s:%s" % (ant, pol))
+                if redval != {}:
+                    self.logger.debug("Loading coeffs from time %s" % (time.ctime(float(redval['time']))))
+                    coeffs = np.array(json.loads(redval['values']))
+                    self.set_eq(ant, pol, coeffs)
+                    return
+                # If there are no coeffs in redis look at whatever is actually loaded and update redis
+                else:
+                    self.logger.debug("Failed to find coefficients in redis!")
+                    coeffs = self.get_eq(ant, pol, update_redis=True)
+                    return
             elif not isinstance(eq, np.ndarray):
                 try:
                     eq = np.ones(snap.eq.ncoeffs) * eq
@@ -642,11 +648,11 @@ class HeraCorrelator(object):
                     return
             snap.eq.set_coeffs(chan, eq)
             self.get_eq(ant, pol, update_redis=True)
-            
 
     def get_eq(self, ant, pol, update_redis=False):
         """
         Get the EQ coefficients of Antenna `ant`, polarization `pol`.
+
         Optionally update the coefficients stored in redis
         Inputs:
            ant: Antenna string. Eg. '0', for HH0
@@ -669,16 +675,14 @@ class HeraCorrelator(object):
         return coeffs
 
     def _initialize_all_eq(self):
-        """
-        Initialize PAM attenuation and SNAP EQ settings to the values currently held in redis.
-        """
+        """Initialize PAM attenuation and SNAP EQ settings to the values currently held in redis."""
         for feng in self.fengs:
             for antpol in feng.ants:
                 if antpol is not None:
-                   self.logger.info("Initializing EQ for %s" % antpol)
-                   ant, pol = helpers.hera_antpol_to_ant_pol(antpol)
-                   self.set_eq(str(ant), pol)
-                   self.set_pam_attenuation(str(ant), pol)
+                    self.logger.info("Initializing EQ for %s" % antpol)
+                    ant, pol = helpers.hera_antpol_to_ant_pol(antpol)
+                    self.set_eq(str(ant), pol)
+                    self.set_pam_attenuation(str(ant), pol)
 
     def _initialize_fft_shift(self):
         for feng in self.fengs:
@@ -714,7 +718,7 @@ class HeraCorrelator(object):
                 to_be_initialized = self.fengs
 
             for feng in to_be_initialized:
-                self.logger.info('Initializing %s'%feng.host)
+                self.logger.info('Initializing %s' % feng.host)
                 feng.initialize()
                 self.r.hset('status:snap:%s' % feng.host, 'last_initialized', time.ctime())
         else:
@@ -723,17 +727,14 @@ class HeraCorrelator(object):
             self.do_for_all_f("initialize", timeout=timeout)
             for feng in self.fengs:
                 self.r.hset('status:snap:%s' % feng.host, 'last_initialized', init_time)
-        #TODO multithread these:
-        self._initialize_fft_shift() 
+        # TODO multithread these:
+        self._initialize_fft_shift()
         self.noise_diode_disable()
         self.phase_switch_disable()
         self._initialize_all_eq()
 
     def compute_hookup(self):
-        """
-        Generate an antenna-map from antenna names to
-        Fengine instances.
-        """
+        """Generate an antenna-map from antenna names to Fengine instances."""
         hookup = helpers.read_maps_from_redis(self.r)
         if hookup is None:
             self.logger.error('Failed to compute antenna hookup from redis maps')
@@ -767,20 +768,21 @@ class HeraCorrelator(object):
     def _verify_config(self):
         """
         Do some basic sanity checking on the currently loaded config.
+
         Returns:
             Bool : True if tests pass, False otherwise.
         """
         test_passed = True
         # Check that there are only three antennas per board
-        for fn,(host,params) in enumerate(self.config['fengines'].items()):
+        for fn, (host, params) in enumerate(self.config['fengines'].items()):
             if 'ants' in params.keys():
-                if len(params['ants']) != 3: 
+                if len(params['ants']) != 3:
                     self.logger.warning("%s: Number of antennas is not 3!" % host)
                     test_passed = False
         # Check that there are only 48 channels per x-engine.
-        for host,params in self.config['xengines'].items():
+        for host, params in self.config['xengines'].items():
             if 'chan_range' in params.keys():
-                chan_range= params['chan_range']
+                chan_range = params['chan_range']
                 chans = np.arange(chan_range[0], chan_range[1])
                 if len(chans) > 384:
                     self.logger.warning("%s: Cannot process >384 channels." % host)
@@ -788,40 +790,38 @@ class HeraCorrelator(object):
         return test_passed
 
     def configure_freq_slots(self, multithread=True):
-        """
-        Configure F-Engine destination packet slots.
-        """
+        """Configure F-Engine destination packet slots."""
         n_xengs = self.config.get('n_xengs', 16)
-        chans_per_packet = self.config.get('chans_per_packet', 384) # Hardcoded in firmware
+        chans_per_packet = self.config.get('chans_per_packet', 384)  # Hardcoded in firmware
         self.logger.info('Configuring frequency slots for %d X-engines, %d channels per packet' % (n_xengs, chans_per_packet))
-        dest_port = self.config['dest_port'] 
+        dest_port = self.config['dest_port']
         self.r.delete("corr:snap_ants")
         self.r.delete("corr:xeng_chans")
         for xn, xparams in self.config['xengines'].items():
             chan_range = xparams.get('chan_range', [xn*384, (xn+1)*384])
             chans = range(chan_range[0], chan_range[1])
             self.r.hset("corr:xeng_chans", xn, json.dumps(chans))
-            if (xn > n_xengs): 
-               self.logger.error("Cannot have more than %d X-engs!!" % n_xengs)
-               return False
+            if (xn > n_xengs):
+                self.logger.error("Cannot have more than %d X-engs!!" % n_xengs)
+                return False
             ip = [int(i) for i in xparams['even']['ip'].split('.')]
-            ip_even = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
+            ip_even = (ip[0] << 24) + (ip[1] << 16) + (ip[2] << 8) + ip[3]
             ip = [int(i) for i in xparams['odd']['ip'].split('.')]
-            ip_odd = (ip[0]<<24) + (ip[1]<<16) + (ip[2]<<8) + ip[3]
+            ip_odd = (ip[0] << 24) + (ip[1] << 16) + (ip[2] << 8) + ip[3]
 
             for fn, feng in enumerate(self.fengs):
                 self.logger.info('%s: Setting Xengine %d: chans %d-%d: %s (even) / %s (odd)' % (feng.fpga.host, xn, chans[0], chans[-1], xparams['even']['ip'], xparams['odd']['ip']))
                 # Update redis to reflect current assignments
                 self.r.hset("corr:snap_ants", feng.host, json.dumps(feng.ant_indices))
                 # if the user hasn't specified a source port, auto increment mod 4
-                source_port = self.config['fengines'][feng.host].get('source_port', dest_port + (fn%4))
+                source_port = self.config['fengines'][feng.host].get('source_port', dest_port + (fn % 4))
                 if not multithread:
                     # if not multithreading use the original packetizer method, which is known good.
                     feng.packetizer.assign_slot(xn, chans, [ip_even,ip_odd], feng.reorder, feng.ant_indices[0])
-                    feng.eth.add_arp_entry(ip_even,xparams['even']['mac'])
-                    feng.eth.add_arp_entry(ip_odd,xparams['odd']['mac'])
+                    feng.eth.add_arp_entry(ip_even, xparams['even']['mac'])
+                    feng.eth.add_arp_entry(ip_odd, xparams['odd']['mac'])
             else:
-                self.do_for_all_f("assign_slot", args=[xn, chans, [ip_even,ip_odd]])
+                self.do_for_all_f("assign_slot", args=[xn, chans, [ip_even, ip_odd]])
                 self.do_for_all_f("add_arp_entry", block="eth", args=[ip_even, xparams['even']['mac']])
                 self.do_for_all_f("add_arp_entry", block="eth", args=[ip_odd, xparams['odd']['mac']])
         if not multithread:
@@ -836,9 +836,10 @@ class HeraCorrelator(object):
     def resync(self, manual=False):
         """
         Resynchronize boards to PPS.
-        
+
         Inputs:
-            manual (Boolean): True if you want to synchronize on a software trigger. False (default) to sync on an external PPS.
+            manual (Boolean): True if you want to synchronize on a software trigger.
+            False (default) to sync on an external PPS.
         """
         self.logger.info('Sync-ing Fengines')
         self.do_for_all_f("set_delay", block="sync", args=(0,))
@@ -852,12 +853,12 @@ class HeraCorrelator(object):
         after_sync = time.time()
         if manual:
             self.logger.warning('Using manual sync trigger')
-            for i in range(3): # takes 3 syncs to trigger
+            for i in range(3):  # takes 3 syncs to trigger
                 for feng in self.fengs:
                     feng.sync.sw_sync()
-            sync_time = int(time.time()) # roughly
+            sync_time = int(time.time())  # roughly
         else:
-            sync_time = int(before_sync) + 1 + 3 # Takes 3 PPS pulses to arm
+            sync_time = int(before_sync) + 1 + 3  # Takes 3 PPS pulses to arm
         # Store sync time in ms!!!
         self.r['corr:feng_sync_time'] = 1000*sync_time
         self.r['corr:feng_sync_time_str'] = time.ctime(sync_time)
@@ -867,15 +868,16 @@ class HeraCorrelator(object):
 
     def sync_with_delay(self, sync_time_s, delay_ms, adc_clk_rate=500e6, adc_demux=2):
         """
-        Resync all boards at the integer UNIX time `sync_time_s`,
-        delaying the internal trigger until `delay_clocks` fpga
+        Resync all boards at the integer UNIX time `sync_time_s`.
+
+        Delays the internal trigger until `delay_clocks` fpga
         clocks after the PPS pulse.
         """
         if (delay_ms > 1000):
             self.logger.error("I refuse to sync with a delay > 1 second")
             return
         sync_delay_fpga_clocks = (delay_ms / 1e3) / (adc_clk_rate / adc_demux)
-        target_sync_time_ms = sync_time_s*1000 + (sync_delay_fpga_clocks*(adc_clk_rate / adc_demux)) # sync time in unix ms
+        target_sync_time_ms = sync_time_s*1000 + (sync_delay_fpga_clocks*(adc_clk_rate / adc_demux))  # sync time in unix ms
         self.do_for_all_f("set_delay", block="sync", args=(sync_delay_fpga_clocks,))
         if (time.time()+5) > (target_sync_time_ms/1000.):
             self.logger.error("I refuse to sync less than 5s in the future")
@@ -886,7 +888,7 @@ class HeraCorrelator(object):
         # it takes 3 PPS pulses to arm. Arm should occur < 4 seconds and > 3 seconds before sync target
         now = time.time()
         time_to_sync = sync_time_s - now - 4
-        time.sleep(time_to_sync + 0.1) # This should be 3.9 seconds before target PPS
+        time.sleep(time_to_sync + 0.1)  # This should be 3.9 seconds before target PPS
         time_before_arm = time.time()
         self.logger.info("Arming sync at %.2f" % time_before_arm)
         self.do_for_all_f("arm_sync", "sync")
@@ -904,9 +906,10 @@ class HeraCorrelator(object):
     def sync_noise(self, manual=False):
         """
         Resynchronize internal noise generators to PPS.
-        
+
         Inputs:
-            manual (Boolean): True if you want to synchronize on a software trigger. False (default) to sync on an external PPS.
+            manual (Boolean): True if you want to synchronize on a software trigger.
+            False (default) to sync on an external PPS.
         """
         self.logger.info('Sync-ing noise generators')
         if not manual:
@@ -919,26 +922,22 @@ class HeraCorrelator(object):
         after_sync = time.time()
         if manual:
             self.logger.warning('Using manual sync trigger')
-            for i in range(3): # takes 3 syncs to trigger
+            for i in range(3):  # takes 3 syncs to trigger
                 for feng in self.fengs:
                     feng.sync.sw_sync()
-            sync_time = int(time.time()) # roughly
+            sync_time = int(time.time())  # roughly  # noqa
         self.logger.info('Syncing took %.2f seconds' % (after_sync - before_sync))
         if after_sync - before_sync > 0.5:
             self.logger.warning("It took longer than expected to arm sync!")
 
     def enable_output(self):
-        """
-        Enable all ethernet outputs.
-        """
+        """Enable all ethernet outputs."""
         self.logger.info('Enabling ethernet output')
         for feng in self.fengs:
             feng.eth.enable_tx()
 
     def disable_output(self):
-        """
-        Disable all ethernet outputs.
-        """
+        """Disable all ethernet outputs."""
         self.logger.info('Disabling ethernet output')
         for feng in self.fengs:
             feng.eth.disable_tx()
