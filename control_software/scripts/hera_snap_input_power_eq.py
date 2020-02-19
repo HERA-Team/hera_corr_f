@@ -1,37 +1,34 @@
 #! /usr/bin/env python
 
 import argparse
-from hera_corr_f import HeraCorrelator, helpers, __version__
-import numpy as np
-import struct
-import collections
-import time
-import yaml
+from hera_corr_f import HeraCorrelator
+from hera_corr_cm.handlers import add_default_log_handlers
 import logging
 
-logger = helpers.add_default_log_handlers(logging.getLogger(__file__))
+logger = add_default_log_handlers(logging.getLogger(__file__))
 
-parser = argparse.ArgumentParser(description='Interact with a programmed SNAP board for testing and '\
-                                 'networking. FLAGS OVERRIDE CONFIG FILE!',
+parser = argparse.ArgumentParser(description='Interact with a programmed SNAP '
+                                             'board for testing and networking. '
+                                             'FLAGS OVERRIDE CONFIG FILE!',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--config_file', type=str, default=None,
-                    help = 'YAML configuration file with hosts and channels list')
+                    help='YAML configuration file with hosts and channels list')
 parser.add_argument('-r', dest='redishost', type=str, default='redishost',
-                    help ='Host servicing redis requests')
+                    help='Host servicing redis requests')
 group = parser.add_mutually_exclusive_group()
 group.add_argument('--epower', type=float, default=None,
-                    help ='Target ADC power for E-pol in dBm')
+                   help='Target ADC power for E-pol in dBm')
 group.add_argument('--erms', type=float, default=None,
-                    help ='Target ADC RMS for E-pol in ADC units')
+                   help='Target ADC RMS for E-pol in ADC units')
 group.add_argument('--edb', type=int, default=None,
-                    help ='set all E-pol attenuators to `ndb` dBs')
+                   help='set all E-pol attenuators to `ndb` dBs')
 group = parser.add_mutually_exclusive_group()
 group.add_argument('--npower', type=float, default=None,
-                    help ='Target ADC power for N-pol in dBm')
+                   help='Target ADC power for N-pol in dBm')
 group.add_argument('--nrms', type=float, default=None,
-                    help ='Target ADC RMS for N-pol in ADC units')
+                   help='Target ADC RMS for N-pol in ADC units')
 group.add_argument('--ndb', type=int, default=None,
-                    help ='set all N-pol attenuators to `ndb` dBs')
+                   help='set all N-pol attenuators to `ndb` dBs')
 args = parser.parse_args()
 
 corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)

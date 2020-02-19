@@ -1,34 +1,31 @@
 #!/usr/bin/env python
 import numpy as np
-from hera_corr_f import SnapFengine
-from hera_corr_f import helpers
 from hera_corr_f import HeraCorrelator
+from hera_corr_cm.handlers import add_default_log_handlers
 from astropy.time import Time
 import time
-import redis
 import logging
 import argparse
 import os
 import json
-import yaml
 
-logger = helpers.add_default_log_handlers(logging.getLogger(__name__), fglevel=logging.NOTSET)
+logger = add_default_log_handlers(logging.getLogger(__name__), fglevel=logging.NOTSET)
 
 parser = argparse.ArgumentParser(description='Obtain cross-correlation spectra from a SNAP Board',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('host',type=str,
+parser.add_argument('host', type=str,
                     help='Host board to program')
-#parser.add_argument('config_file', type=str, 
+#parser.add_argument('config_file', type=str,
 #                    help='Configuration yaml file with hostboards and pols')
 parser.add_argument('-r', dest='redishost', type=str, default='redishost',
-                    help ='Host servicing redis requests')
-parser.add_argument('-n','--num_spectra',type=int,default=10,
+                    help='Host servicing redis requests')
+parser.add_argument('-n', '--num_spectra', type=int, default=10,
                     help='Number of spectra per file')
 parser.add_argument('-t', '--integration_time', type=int, default=1,
                     help='Integration time in seconds for each spectra')
-parser.add_argument('-o','--output',type=str, default='.',
+parser.add_argument('-o', '--output', type=str, default='.',
                     help='Path to destination folder')
-parser.add_argument('-f','--files', type=int, default=0,
+parser.add_argument('-f', '--files', type=int, default=0,
                     help='Total number of files to write.')
 args = parser.parse_args()
 
@@ -79,7 +76,7 @@ while(Nfiles < args.files):
                 next_a1, next_a2 = cycle_pols[(idx+1)%len(cycle_pols)]
                 feng.corr.set_input(next_a1, next_a2)
                 bram = feng.corr.read_bram()
-                #logger.info('Getting baseline pair: (%d, %d)..'%(a1,a2)) 
+                #logger.info('Getting baseline pair: (%d, %d)..'%(a1,a2))
                 t = time.time()
                 times.append(t)
                 corr.r.hset('poco','timestamp',t)
@@ -89,7 +86,7 @@ while(Nfiles < args.files):
                 corr.r.hset('poco','max_hold_%d'%a1,json.dumps(bram.imag.tolist()))
             avg.append(np.transpose(cavg))
             max_hold.append(np.transpose(cmxhld))
-        
+
         ant1_array = [a[0] for a in recorded_pols]
         ant2_array = [a[1] for a in recorded_pols]
         jd = Time(times[0],format='unix')
@@ -101,7 +98,7 @@ while(Nfiles < args.files):
                  times=times, ant1_array=ant1_array, ant2_array=ant2_array)
         Nfiles += 1
         #time.sleep(900)
- 
+
     except KeyboardInterrupt:
         logger.info('Manually interrupted')
         logger.info('Last file written: %s'%outfilename)
@@ -120,10 +117,10 @@ while(Nfiles < args.files):
 #            try:
 #                print cnt
 #                feng = SnapFengine(args.host)
-#                if feng.fpga.is_connected(): 
+#                if feng.fpga.is_connected():
 #                    print 'Got connection!'
 #                    break
-#            except: 
+#            except:
 #                logger.info('Still cannot connect. Wait one more minute')
 #                time.sleep(60)
 #                cnt += 1

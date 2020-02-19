@@ -1,5 +1,5 @@
 import logging
-import helpers
+from hera_corr_cm.handlers import add_default_log_handlers
 import numpy as np
 import datetime
 import casperfpga
@@ -9,7 +9,7 @@ from blocks import *
 class SnapFengine(object):
     def __init__(self, host, ant_indices=None, logger=None, redishost='redishost'):
         self.host = host
-        self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + "(%s)" % host))
+        self.logger = logger or add_default_log_handlers(logging.getLogger(__name__ + "(%s)" % host))
         if redishost is None:
             self.fpga = casperfpga.CasperFpga(host=host, transport=casperfpga.TapcpTransport)
         else:

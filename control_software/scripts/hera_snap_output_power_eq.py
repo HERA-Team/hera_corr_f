@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 
 import argparse
-from hera_corr_f import HeraCorrelator, SnapFengine, helpers, __version__
+from hera_corr_f import HeraCorrelator, SnapFengine, __version__
+from hera_corr_cm.handlers import add_default_log_handlers
 import numpy as np
 import struct
 import collections
@@ -9,20 +10,21 @@ import time
 import yaml
 import logging
 
-logger = helpers.add_default_log_handlers(logging.getLogger(__file__))
+logger = add_default_log_handlers(logging.getLogger(__file__))
 
-parser = argparse.ArgumentParser(description='Interact with a programmed SNAP board for testing and '\
-                                 'networking. FLAGS OVERRIDE CONFIG FILE!',
+parser = argparse.ArgumentParser(description='Interact with a programmed SNAP board '
+                                             'for testing and networking. '
+                                             'FLAGS OVERRIDE CONFIG FILE!',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--config_file', type=str, default=None,
-                    help = 'YAML configuration file with hosts and channels list')
+                    help='YAML configuration file with hosts and channels list')
 parser.add_argument('-r', dest='redishost', type=str, default='redishost',
-                    help ='Host servicing redis requests')
+                    help='Host servicing redis requests')
 group = parser.add_mutually_exclusive_group()
 group.add_argument('--rms', dest='rms', type=float, default=3.,
-                    help ='Target RMS after quantization')
+                   help='Target RMS after quantization')
 group.add_argument('--scale', dest='scale', type=float, default=None,
-                    help ='Fixed scale factor to apply to all antennas')
+                   help='Fixed scale factor to apply to all antennas')
 args = parser.parse_args()
 
 corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)
@@ -50,11 +52,9 @@ for ant, snap in corr.ant_to_snap.iteritems():
             corr.set_eq(ant, pol, eq=args.scale)
             continue
         logger.info("Equalizing %s:%s (Snap:%s, chan %d)" % (ant, pol, feng.host, chan))
-        #print "%s: %s:" % (feng.host, pol)
         # Get an autocorrelation (pure real)
         for i in range(n_loop_max):
             spec = feng.corr.get_new_corr(chan, chan).real
-            #print spec[700:710]
             # Do some trivial rfi excision my masking around the median
             median = np.median(spec)
             print "median:", median
@@ -74,6 +74,6 @@ for ant, snap in corr.ant_to_snap.iteritems():
                 print 'Breaking without updating coefficients'
                 break
             corr.set_eq(ant, pol, eq=feng.eq.get_coeffs(chan)*scale)
-            #feng.eq.set_coeffs(pn, scale * feng.eq.get_coeffs(pn))
-        
-corr.enable_monitoring() 
+            # feng.eq.set_coeffs(pn, scale * feng.eq.get_coeffs(pn))
+
+corr.enable_monitoring()

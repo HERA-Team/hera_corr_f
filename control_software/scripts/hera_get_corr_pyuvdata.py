@@ -7,13 +7,14 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 from hera_corr_f import SnapFengine
 from hera_corr_f import HeraCorrelator
-from hera_corr_f import helpers
+from hera_corr_f import redis_cm
+from hera_corr_cm.handlers import add_default_log_handlers
 import logging
 import time
 from collections import OrderedDict
 
 
-logger = helpers.add_default_log_handlers(logging.getLogger(__name__))
+logger = add_default_log_handlers(logging.getLogger(__name__))
 
 parser = argparse.ArgumentParser(description='Obtain cross-correlation spectra from a SNAP Board',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -65,7 +66,7 @@ first_run = 1
 
 fqs = np.linspace(0, 250, num=1024)*1e6
 
-loc = helpers.read_locations_from_redis(redishost=args.redishost)
+loc = redis_cm.read_locations_from_redis(redishost=args.redishost)
 
 # Write different files for different polarizations
 while(True):

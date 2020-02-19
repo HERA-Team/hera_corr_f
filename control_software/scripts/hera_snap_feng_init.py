@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 
 import argparse
-from hera_corr_f import HeraCorrelator, helpers, __version__
+from hera_corr_f import HeraCorrelator, __version__
+from hera_corr_cm import handlers
 import numpy as np
 import struct
 import collections
@@ -47,8 +48,8 @@ def main():
                         help='Don\'t multithread initialization')
     args = parser.parse_args()
 
-    logger = helpers.add_default_log_handlers(logging.getLogger(__file__))
-    helpers.log_notify(logger)  # send a NOTIFY level message that this script has started
+    logger = handlers.add_default_log_handlers(logging.getLogger(__file__))
+    handlers.log_notify(logger)  # send a NOTIFY level message that this script has started
 
     corr = HeraCorrelator(redishost=args.redishost, config=args.config_file, use_redis=args.noredistapcp)  # noqa
 
@@ -81,13 +82,15 @@ def main():
     corr.disable_monitoring(expiry=600, wait=True)
 
     if args.program or args.forceprogram:
-        corr.program(unprogrammed_only=(not args.forceprogram))  # This should multithread the programming process.
+        corr.program(unprogrammed_only=(not args.forceprogram))  # This should multithread the programming process.  # noqa
         if args.fast_initialize is None:
-            logger.warning('Programming but *NOT* initializing. This is unlikely to be what you want')
+            logger.warning('Programming but *NOT* initializing. '
+                           'This is unlikely to be what you want')
 
     if args.fast_initialize is not None:
         corr.disable_output()
-        corr.initialize(multithread=(not args.nomultithread), uninitialized_only=args.fast_initialize)
+        corr.initialize(multithread=(not args.nomultithread),
+                        uninitialized_only=args.fast_initialize)
 
     if args.tvg:
         logger.info('Enabling EQ TVGs...')

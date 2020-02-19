@@ -7,7 +7,8 @@ import socket
 import redis
 import yaml
 import json
-import helpers
+from hera_corr_cm.handlers import add_default_log_handlers
+from . import redis_cm
 import hashlib
 from Queue import Queue
 from threading import Thread
@@ -15,7 +16,7 @@ from hera_corr_f import SnapFengine
 import numpy as np
 from casperfpga import utils
 
-LOGGER = helpers.add_default_log_handlers(logging.getLogger(__name__))
+LOGGER = add_default_log_handlers(logging.getLogger(__name__))
 
 
 def _queue_instance_method(q, num, inst, method, args, kwargs):
@@ -672,7 +673,8 @@ class HeraCorrelator(object):
         else:
             coeffs = snap.eq.get_coeffs(chan)
         if update_redis:
-            self.r.hmset('eq:ant:%s:%s' % (ant, pol), {'values':json.dumps(coeffs.tolist()), 'time':time.time()})
+            self.r.hmset('eq:ant:%s:%s' % (ant, pol), {'values': json.dumps(coeffs.tolist()),
+                                                       'time': time.time()})
         return coeffs
 
     def _initialize_all_eq(self):
@@ -681,7 +683,7 @@ class HeraCorrelator(object):
             for antpol in feng.ants:
                 if antpol is not None:
                     self.logger.info("Initializing EQ for %s" % antpol)
-                    ant, pol = helpers.hera_antpol_to_ant_pol(antpol)
+                    ant, pol = redis_cm.hera_antpol_to_ant_pol(antpol)
                     self.set_eq(str(ant), pol)
                     self.set_pam_attenuation(str(ant), pol)
 
@@ -736,7 +738,7 @@ class HeraCorrelator(object):
 
     def compute_hookup(self):
         """Generate an antenna-map from antenna names to Fengine instances."""
-        hookup = helpers.read_maps_from_redis(self.r)
+        hookup = redis_cm.read_maps_from_redis(self.r)
         if hookup is None:
             self.logger.error('Failed to compute antenna hookup from redis maps')
             return

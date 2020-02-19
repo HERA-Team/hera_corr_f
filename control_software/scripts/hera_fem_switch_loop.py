@@ -13,7 +13,8 @@ import redis
 import copy
 import argparse
 import logging
-from hera_corr_f import HeraCorrelator, SnapFengine, helpers
+from hera_corr_f import HeraCorrelator, SnapFengine
+from hera_corr_cm.handlers import add_default_log_handlers
 
 if sys.version_info[0] < 3:
     # py2
@@ -22,8 +23,8 @@ else:
     # py3
     from plotly import graph_objects as go, subplots, io as pio
 
-logger = helpers.add_default_log_handlers(logging.getLogger(__name__),
-                                          fglevel=logging.NOTSET)
+logger = add_default_log_handlers(logging.getLogger(__name__),
+                                  fglevel=logging.NOTSET)
 
 
 def main(redishost='redishost', hostname=None, antenna_input=None,

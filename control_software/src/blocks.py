@@ -5,7 +5,7 @@ import socket
 import time
 import casperfpga
 import casperfpga.snapadc
-from hera_corr_mc.handlers import add_default_log_handlers
+from hera_corr_cm.handlers import add_default_log_handlers
 from casperfpga import i2c
 from casperfpga import i2c_gpio
 from casperfpga import i2c_volt

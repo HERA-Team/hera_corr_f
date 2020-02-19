@@ -6,9 +6,11 @@ import argparse
 import logging
 import json
 import socket
-from hera_corr_f import HeraCorrelator, SnapFengine, __version__, __package__, helpers
+from hera_corr_f import HeraCorrelator, SnapFengine, __version__, redis_cm, __package__
+from hera_corr_cm.handlers import add_default_log_handlers
+import numpy as np
 
-logger = helpers.add_default_log_handlers(logging.getLogger(__file__))
+logger = add_default_log_handlers(logging.getLogger(__file__))
 FAIL_COUNT_LIMIT = 5
 
 hostname = socket.gethostname()
@@ -17,6 +19,7 @@ hostname = socket.gethostname()
 def get_all_pam_stats(corr):
     """
     Get PAM stats.
+
     returns: Dictionary of dictionaries
     dict[key1][key2][key3] = value
     where key1 is an antenna name, key2 is a polarization, key3 is a stat type (eg. "pam_power")
@@ -45,7 +48,7 @@ def get_all_pam_stats(corr):
                 host = feng.host
             except:  # noqa
                 continue
-            ant, pol = helpers.hera_antpol_to_ant_pol(antpol)
+            ant, pol = redis_cm.hera_antpol_to_ant_pol(antpol)
             if ant not in rv.keys():
                 rv[ant] = {"e": {}, "n": {}}
 
@@ -87,6 +90,7 @@ def get_all_pam_stats(corr):
 def get_all_fem_stats(corr):
     """
     Get FEM stats.
+
     returns: Dictionary of dictionaries
     dict[key1][key2][key3] = value
     where key1 is an antenna name, key2 is a polarization, key3 is a stat type (eg. "fem_power")
@@ -115,7 +119,7 @@ def get_all_fem_stats(corr):
                 host = feng.host
             except:  # noqa
                 continue
-            ant, pol = helpers.hera_antpol_to_ant_pol(antpol)
+            ant, pol = redis_cm.hera_antpol_to_ant_pol(antpol)
             if ant not in rv.keys():
                 rv[ant] = {"e": {}, "n": {}}
 
@@ -159,8 +163,9 @@ def get_all_fem_stats(corr):
 
 def get_poco_output(feng, redishost):
     """
-    Get pocket correlator output. Antennas and integration time
-    polled from redis database.
+    Get pocket correlator output.
+
+    Antennas and integration time polled from redis database.
     Params:  feng: SnapFengine object that maps to a SNAP board
              redishost: Redis database to upload the data to.
     Returns: Dict: {'data':shape(fqs, pols),
@@ -324,7 +329,7 @@ if __name__ == "__main__":
                 # Don't report inputs which aren't connected
                 if antpol is None:
                     continue
-                ant, pol = helpers.hera_antpol_to_ant_pol(antpol)
+                ant, pol = redis_cm.hera_antpol_to_ant_pol(antpol)
                 status_key = 'status:ant:%s:%s' % (ant, pol)
                 mean  = means[antn]
                 power = powers[antn]
