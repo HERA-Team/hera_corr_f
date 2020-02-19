@@ -5,7 +5,7 @@ import socket
 import time
 import casperfpga
 import casperfpga.snapadc
-import helpers
+from hera_corr_mc.handlers import add_default_log_handlers
 from casperfpga import i2c
 from casperfpga import i2c_gpio
 from casperfpga import i2c_volt
@@ -14,20 +14,21 @@ from casperfpga import i2c_sn
 from casperfpga import i2c_bar
 from casperfpga import i2c_motion
 from casperfpga import i2c_temp
-from scipy.linalg import hadamard #for walsh (hadamard) matrices
+from scipy.linalg import hadamard  # for walsh (hadamard) matrices
 
 # There are so many I2C warnings that a new level is defined
 # to filter them out
 I2CWARNING = logging.INFO - 5
 logging.addLevelName('I2CWARNING', I2CWARNING)
 
+
 # Block Classes
 class Block(object):
     def __init__(self, host, name, logger=None):
-        self.host = host #casperfpga object
+        self.host = host  # casperfpga object
         # One logger per host. Multiple blocks share the same logger.
         # Multiple hosts should *not* share the same logger, since we can multithread over hosts.
-        self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + ":%s" % (host.host)))
+        self.logger = logger or add_default_log_handlers(logging.getLogger(__name__ + ":%s" % (host.host)))
         self.name = name
         if (name is None) or (name == ''):
             self.prefix = ''
@@ -79,7 +80,7 @@ class Block(object):
         return a list of all register names within
         the block.
         """
-    
+
     def print_status(self):
         """
         Individual blocks should override this
@@ -124,15 +125,16 @@ class Block(object):
 
     def change_reg_bits(self, reg, val, start, width=1):
         orig_val = self.read_uint(reg)
-        masked   = orig_val & (0xffffffff - ((2**width - 1) << start))
-        new_val  = masked + (val << start)
+        masked = orig_val & (0xffffffff - ((2**width - 1) << start))
+        new_val = masked + (val << start)
         self.write_int(reg, new_val)
+
 
 class Synth(casperfpga.synth.LMX2581):
     def __init__(self, host, name, logger=None):
-        self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + "%s" % (host.host)))
+        self.logger = logger or add_default_log_handlers(logging.getLogger(__name__ + "%s" % (host.host)))
         super(Synth, self).__init__(host, name)
-        self.host = host 
+        self.host = host
 
     def initialize(self):
         """
@@ -148,7 +150,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
     def __init__(self, host, sample_rate=500, num_chans=2, resolution=8, ref=10, logger=None, **kwargs):
         """
         Instantiate an ADC block.
-        
+
         Inputs:
            host (casperfpga.Casperfpga): Host FPGA
            sample_rate (float): Sample rate in MS/s
@@ -156,7 +158,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
            resolution (int): Bit resolution of the ADC. Valid values are 8, 12.
            ref (float): Reference frequency (in MHz) from which ADC clock is derived. If None, an external sampling clock must be used.
         """
-        self.logger = logger or helpers.add_default_log_handlers(logging.getLogger(__name__ + ":%s" % (host.host)))
+        self.logger = logger or add_default_log_handlers(logging.getLogger(__name__ + ":%s" % (host.host)))
         casperfpga.snapadc.SNAPADC.__init__(self, host, ref=ref, logger=self.logger)
         self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
@@ -192,9 +194,9 @@ class Adc(casperfpga.snapadc.SNAPADC):
 
         if gain not in gain_map.keys():
             raise ValueError("Gain %f is not allowed! Only gains %s are allowed" % (gain, gain_map.keys()))
-        
+
         self.adc.write((gain_map[gain]<<4) + gain_map[gain], 0x2b)
-        
+
 
     def initialize(self):
         """
@@ -224,7 +226,7 @@ class Sync(Block):
         self.OFFSET_ARM_SYNC  = 0
         self.OFFSET_ARM_NOISE = 1
         self.OFFSET_SW_SYNC   = 4
-    
+
     def uptime(self):
         """
         Returns uptime in seconds, assumes 250 MHz FPGA clock
@@ -258,7 +260,7 @@ class Sync(Block):
         Returns Number of external sync pulses received.
         """
         return self.read_uint('count')
-    
+
     def wait_for_sync(self):
         """
         Block until a sync has been received.
@@ -342,13 +344,13 @@ class NoiseGen(Block):
     def print_status(self):
         for stream in range(self.nstreams):
             print 'NoiseGen block: %s: stream %d seed: %d' % (self.name, stream, self.get_seed(stream))
-       
+
 
 class Input(Block):
     def __init__(self, host, name, nstreams=6, logger=None):
         """
         Instantiate an input contol block.
-        
+
         Inputs:
             host (casperfpga.CasperFpga): Host FPGA object
             name (string): Name (in simulink) of this block
@@ -558,7 +560,7 @@ class Input(Block):
                 vals (numpy array): histogram bin centers
                 hist (numpy array): histogram data
         """
-        
+
         vals, a = self.get_histogram(antpol*2, sum_cores=True)
         vals, b = self.get_histogram(antpol*2 + 1, sum_cores=True)
         return vals, a+b
@@ -598,13 +600,13 @@ class Input(Block):
     def show_histogram_plot(self):
         from matplotlib import pyplot as plt
         plt.show()
-        
+
 
 class Delay(Block):
     def __init__(self, host, name, nstreams=6, logger=None):
         """
         Instantiate a delay contol block.
-        
+
         Inputs:
             host (casperfpga.CasperFpga): Host FPGA object
             name (string): Name (in simulink) of this block
@@ -653,7 +655,7 @@ class Pfb(Block):
 
     def is_overflowing(self):
         return self.read_uint('status') != 0
-        
+
     def initialize(self):
         self.write_int('ctrl', 0)
         self.set_fft_shift(0b110101010101)
@@ -681,14 +683,14 @@ class PhaseSwitch(Block):
         walsh_matrix[walsh_matrix == 1]  = 0
         walsh_matrix[walsh_matrix == -1] = 1
         walsh_func = walsh_matrix[n] # a vector of length N_round
-        
+
         walsh_func_stretch = walsh_func.repeat(2**stepperiod) # a vector of length N_round * 2*step_period
 
         # The counter in the FPGA cycles through <depth> ram addresses, so repeat
         # the sequence. Since N_round and 2**stepperiod are always powers of 2,
         # this is always an integer number of cycles
         vec = np.array(walsh_func_stretch.tolist() * (self.depth/ 2**stepperiod / N_round), dtype=np.int)
-        
+
         #Modify the appropriate bits of the bram
         # note reverse direction of gpio vs software bit assignments
         curr_bram_vec = np.array(struct.unpack('>%dB' % self.depth, self.read('gpio_switch_states', self.depth)))
@@ -724,7 +726,7 @@ class PhaseSwitch(Block):
         #Modify the appropriate bits of the bram
         self.write('gpio_switch_states', struct.pack('>%dB' % self.depth, *bram_array))
         self.write('sw_switch_states', struct.pack('>%dB' % self.depth, *bram_array))
-        
+
     def set_gpio_high(self, stream):
         #Modify the appropriate bits of the bram
         curr_bram_vec = np.array(struct.unpack('>%dB' % self.depth, self.read('gpio_switch_states', self.depth)))
@@ -787,12 +789,12 @@ class PhaseSwitch(Block):
         self.disable_mod()
         self.disable_demod()
         self.set_delay(0)
-        
+
 class Eq(Block):
     def __init__(self, host, name, nstreams=8, ncoeffs=2**10, logger=None):
         """
         Instantiate an EQ block
-        
+
         Inputs:
             host (casperfpga.CasperFpga): Host FPGA object
             name (string): Name (in simulink) of this block
@@ -811,7 +813,7 @@ class Eq(Block):
         """
         Set the coefficients for a data stream. Clipping and saturation will be applied before
         loading.
-        
+
         Inputs
            stream (int): Which stream to manipulate
            coeffs (list or numpy array): Coefficients to load.
@@ -872,8 +874,8 @@ class EqTvg(Block):
 
     def write_const_ants(self,equal_pols=False):
         """
-            Write a constant to all the channels of a polarization unless 
-            equal_pols is set, then a constant is written to all pols of 
+            Write a constant to all the channels of a polarization unless
+            equal_pols is set, then a constant is written to all pols of
             an antenna.
             if `equal_pols`:
                tv[ant][pol] = ant
@@ -891,9 +893,9 @@ class EqTvg(Block):
             self.write('tv%d' % i,tv.tostring()[i*self.nchans*2:(i+1)*self.nchans*2])
 
     def write_freq_ramp(self,equal_pols=False):
-        """ Write a frequency ramp to the test vector 
-            that is repeated for all antennas. 
-            equal_pols: Write the same ramp to both pols 
+        """ Write a frequency ramp to the test vector
+            that is repeated for all antennas.
+            equal_pols: Write the same ramp to both pols
             of an antenna.
         """
         ramp = np.arange(self.nchans)
@@ -941,17 +943,17 @@ class ChanReorder(Block):
     def read_reorder(self, slot_num=None):
         reorder = self.read('reorder3_map1',1024*4)
         reorder = struct.unpack('>%d%s'%(self.nchans,self.format),reorder)
-        if slot_num: 
+        if slot_num:
             return reorder[slot_num*64:(slot_num*64)+(384//8)]
         else:
-            return reorder 
+            return reorder
 
     def reindex_channel(self, actual_index, output_index):
         self.write_int('reorder3_map1', actual_index, word_offset=output_index)
 
     def initialize(self):
         self.set_channel_order(np.arange(self.nchans))
-        
+
 
 class Packetizer(Block):
     def __init__(self, host, name, n_time_demux=2, logger=None):
@@ -963,10 +965,10 @@ class Packetizer(Block):
         for time_slot in range(self.n_time_demux):
             self.write_int('ips',ip[time_slot], word_offset=(time_slot * self.n_slots + slot_offset))
 
-    def set_ant_header(self, ant, slot_offset=0): 
+    def set_ant_header(self, ant, slot_offset=0):
         for time_slot in range(self.n_time_demux):
             self.write_int('ants', ant, word_offset=(time_slot * self.n_slots + slot_offset))
-        
+
     def set_chan_header(self, chan, slot_offset=0):
         for time_slot in range(self.n_time_demux):
             self.write_int('chans', chan, word_offset=(time_slot*self.n_slots + slot_offset))
@@ -1101,7 +1103,7 @@ class Rotator(Block):
     def print_status(self):
         print "Is enabled?", self.is_enabled
 
-        
+
 class Eth(Block):
     def __init__(self, host, name, port=10000, logger=None):
         super(Eth, self).__init__(host, name, logger)
@@ -1130,7 +1132,7 @@ class Eth(Block):
     def get_status(self):
         stat = self.read_uint('sw_txs_ss_status')
         rv = {}
-        #rv['rx_overrun'  ] =  (stat >> 0) & 1   
+        #rv['rx_overrun'  ] =  (stat >> 0) & 1
         #rv['rx_bad_frame'] =  (stat >> 1) & 1
         #rv['tx_of'       ] =  (stat >> 2) & 1   # Transmission FIFO overflow
         #rv['tx_afull'    ] =  (stat >> 3) & 1   # Transmission FIFO almost full
@@ -1144,7 +1146,7 @@ class Eth(Block):
         rv['tx_vld'       ] =  self.read_uint('sw_txvldctr')
         rv['tx_ctr'       ] =  self.read_uint('sw_txctr')
         return rv
-        
+
     def status_reset(self):
         self.change_reg_bits('ctrl', 0, 18)
         self.change_reg_bits('ctrl', 1, 18)
@@ -1177,7 +1179,7 @@ class Eth(Block):
     def set_source_port(self, port):
         # see config_10gbe_core in katcp_wrapper
         self.blindwrite('sw', struct.pack('>BBH', 0, 1, port), offset=0x20)
-                        
+
     def print_status(self):
         rv = self.get_status()
         for key in rv.keys():
@@ -1189,7 +1191,7 @@ class Corr(Block):
         """
         Instantiate an correlation block, which allows correlation
         of pairs of inputs to be computed.
-        
+
         Inputs:
             host (casperfpga.CasperFpga): Host FPGA object
             name (string): Name (in simulink) of this block
@@ -1200,13 +1202,13 @@ class Corr(Block):
         self.acc_len = acc_len
         self.spec_per_acc = 8
         self.format='l'
-   
+
     def set_input(self, pol1, pol2):
         """
         Set correlation inputs to `pol1`, `pol2`
         """
         self.write_int('input_sel',(pol1 + (pol2<<8)))
- 
+
     def wait_for_acc(self):
         """
         Wait for a new accumulation to complete.
@@ -1217,9 +1219,9 @@ class Corr(Block):
         return 1
 
     def read_bram(self, flush_vacc=True):
-        """ 
+        """
         Waits for the next accumulation to complete and then
-        outputs the contents of the results BRAM. If you want a 
+        outputs the contents of the results BRAM. If you want a
         fresh accumulation use get_new_corr(pol1, pol2) instead.
         Returns:
             complex numpy array containing cross-correlation spectra
@@ -1229,7 +1231,7 @@ class Corr(Block):
         spec = np.array(struct.unpack('>2048l',self.read('dout',8*1024)))
         spec = (spec[0::2]+1j*spec[1::2])
         return spec
-    
+
     def get_new_corr(self, pol1, pol2, flush_vacc=True):
         """
         Get a new correlation with the given inputs.
@@ -1256,7 +1258,7 @@ class Corr(Block):
         self.set_input(pol,pol)
         self.wait_for_acc()
         spec = self.read_bram()
-        return spec.imag 
+        return spec.imag
 
     def plot_corr(self, pol1, pol2, show=False):
         from matplotlib import pyplot as plt
@@ -1269,7 +1271,7 @@ class Corr(Block):
         ax[1][0].plot(np.angle(spec))
         ax[1][0].set_title('Phase')
         ax[1][1].plot(10*np.log10(np.abs(spec)))
-        ax[1][1].set_title('Power [dB]')            
+        ax[1][1].set_title('Power [dB]')
 
         if show:
             plt.show()
@@ -1298,7 +1300,7 @@ class Corr(Block):
     def initialize(self):
         self.set_acc_len(self.acc_len)
 
-            
+
 class RoachInput(Block):
     def __init__(self, host, name, nstreams=32, logger=None):
         super(RoachInput, self).__init__(host, name, logger)
@@ -1524,7 +1526,7 @@ class Pam(Block):
             Example:
             attenuation(east=0,north=15)
             attenuation(east=12)
-            
+
             If only one pol is specified, a read is issued to
             figure out what the other value should be.
         """
@@ -1885,7 +1887,7 @@ class Fem(Block):
             north = bool(val & 0b00001000)
             mode  = self.SWMODE_REV.get(val & 0b00000111, 'Unknown mode')
             return mode, east, north
-            
+
         if name in self.SWMODE:
             self._sw.write((val & 0b11111000) | self.SWMODE[name])
         elif name != None:
