@@ -8,7 +8,7 @@ import redis
 import yaml
 import json
 from hera_corr_cm.handlers import add_default_log_handlers
-from . import redis_cm
+from hera_corr_cm import redis_cm
 import hashlib
 from Queue import Queue
 from threading import Thread

@@ -5,7 +5,7 @@
 import argparse
 import logging
 from hera_corr_cm.handlers import add_default_log_handlers
-from hera_corr_f import redis_cm
+from hera_corr_cm import redis_cm
 
 logger = add_default_log_handlers(logging.getLogger(__file__))
 
