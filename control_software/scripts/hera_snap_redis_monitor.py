@@ -6,7 +6,8 @@ import argparse
 import logging
 import json
 import socket
-from hera_corr_f import HeraCorrelator, SnapFengine, __version__, redis_cm, __package__
+from hera_corr_f import HeraCorrelator, SnapFengine, __version__, __package__
+from hera_corr_cm import redis_cm
 from hera_corr_cm.handlers import add_default_log_handlers
 import numpy as np
 

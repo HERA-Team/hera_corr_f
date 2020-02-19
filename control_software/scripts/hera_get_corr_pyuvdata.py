@@ -7,7 +7,7 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 from hera_corr_f import SnapFengine
 from hera_corr_f import HeraCorrelator
-from hera_corr_f import redis_cm
+from hera_corr_cm import redis_cm
 from hera_corr_cm.handlers import add_default_log_handlers
 import logging
 import time
