@@ -1,11 +1,10 @@
 import logging
 import helpers
 import numpy as np
-import struct
-import time
 import datetime
 import casperfpga
 from blocks import *
+
 
 class SnapFengine(object):
     def __init__(self, host, ant_indices=None, logger=None, redishost='redishost'):
@@ -41,7 +40,7 @@ class SnapFengine(object):
 
         self.ants = [None] * 6 # An attribute to store the antenna names of this board's inputs
         self.ant_indices = ant_indices or range(3) # An attribute to store the antenna numbers used in packet headers
-        
+
         # The order here can be important, blocks are initialized in the
         # order they appear here
         self.blocks = [
@@ -201,4 +200,3 @@ class SnapFengine(object):
         if req_atten < 0:
             req_atten = 0
         return req_atten
-
