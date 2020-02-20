@@ -1,3 +1,4 @@
+"""Get corr into pyuvdata."""
 import numpy as np
 import argparse
 from pyuvdata import UVData
@@ -66,7 +67,7 @@ first_run = 1
 
 fqs = np.linspace(0, 250, num=1024)*1e6
 
-loc = redis_cm.read_locations_from_redis(redishost=args.redishost)
+loc = redis_cm.read_cminfo_from_redis(redishost=args.redishost, return_namespace=True)
 
 # Write different files for different polarizations
 while(True):
