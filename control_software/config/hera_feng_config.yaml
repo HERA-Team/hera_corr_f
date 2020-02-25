@@ -125,9 +125,10 @@ fengines:
     heraNode7Snap2:
         phase_switch_index: [13,14,15,16,17,18]
         ants: [42, 43, 44]
-    heraNode7Snap3:
-        phase_switch_index: [19,20,21,22,23,24]
-        ants: [45, 46, 47]
+# ARP 2/25/20 MMCM not locked error on Snap3
+#    heraNode7Snap3:
+#        phase_switch_index: [19,20,21,22,23,24]
+#        ants: [45, 46, 47]
 #    heraNode4Snap0:
 #        phase_switch_index: [1,2,3,4,5,6]
 #        ants: [48, 49, 50]
