@@ -79,15 +79,16 @@ fengines:
 #    #heraNode0Snap0:
 #  #    phase_switch_index: [1,2,3,4,5,6]
 #  #      ants: [0, 1, 2]
-    heraNode0Snap1:
-        phase_switch_index: [7,8,9,10,11,12]
-        ants: [3, 4, 5]
-    heraNode0Snap2:
-        phase_switch_index: [13,14,15,16,17,18]
-        ants: [6, 7, 8]
-    heraNode0Snap3:
-        phase_switch_index: [19,20,21,22,23,24]
-        ants: [9, 10, 11]
+# ARP 2/25/20 Node0 unpingable snaps, commenting out
+#    heraNode0Snap1:
+#        phase_switch_index: [7,8,9,10,11,12]
+#        ants: [3, 4, 5]
+#    heraNode0Snap2:
+#        phase_switch_index: [13,14,15,16,17,18]
+#        ants: [6, 7, 8]
+#    heraNode0Snap3:
+#        phase_switch_index: [19,20,21,22,23,24]
+#        ants: [9, 10, 11]
     heraNode8Snap0:
         phase_switch_index: [1,2,3,4,5,6]
         ants: [12, 13, 14]
