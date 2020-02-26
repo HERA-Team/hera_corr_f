@@ -75,20 +75,20 @@ fengines:
     heraNode12Snap3:
         phase_switch_index: [19,20,21,22,23,24]
         ants: [93, 94, 95]
-# JH commented this out (when?, why?)
-#    #heraNode0Snap0:
-#  #    phase_switch_index: [1,2,3,4,5,6]
-#  #      ants: [0, 1, 2]
-# ARP 2/25/20 Node0 unpingable snaps, commenting out
-#    heraNode0Snap1:
-#        phase_switch_index: [7,8,9,10,11,12]
-#        ants: [3, 4, 5]
-#    heraNode0Snap2:
-#        phase_switch_index: [13,14,15,16,17,18]
-#        ants: [6, 7, 8]
-#    heraNode0Snap3:
-#        phase_switch_index: [19,20,21,22,23,24]
-#        ants: [9, 10, 11]
+## JH commented this out (when?, why?)
+##    #heraNode0Snap0:
+##  #    phase_switch_index: [1,2,3,4,5,6]
+##  #      ants: [0, 1, 2]
+## ARP 2/25/20 Node0 unpingable snaps, commenting out
+##    heraNode0Snap1:
+##        phase_switch_index: [7,8,9,10,11,12]
+##        ants: [3, 4, 5]
+##    heraNode0Snap2:
+##        phase_switch_index: [13,14,15,16,17,18]
+##        ants: [6, 7, 8]
+##    heraNode0Snap3:
+##        phase_switch_index: [19,20,21,22,23,24]
+##        ants: [9, 10, 11]
     heraNode8Snap0:
         phase_switch_index: [1,2,3,4,5,6]
         ants: [12, 13, 14]
@@ -98,24 +98,24 @@ fengines:
     heraNode8Snap2:
         phase_switch_index: [13,14,15,16,17,18]
         ants: [18, 19, 20]
-# ARP: Node8Snap3 currently unpingable 2/21/20
-#    #heraNode8Snap3:
-#    #    phase_switch_index: [19,20,21,22,23,24]
-#    #    ants: [21, 22, 23]
-# ARP: commenting out Node9Snap0 2/17/20 b/c clock failing to lock
-#    heraNode9Snap0:
-#        phase_switch_index: [1,2,3,4,5,6]
-#        ants: [24, 25, 26]
-#    #heraNode9Snap1:
-#    #    phase_switch_index: [7,8,9,10,11,12]
-#    #    ants: [27, 28, 29]
-#    #heraNode9Snap2:
-#    #    phase_switch_index: [13,14,15,16,17,18]
-#    #    ants: [30, 31, 32]
-#    # ARP: commenting out Node9Snap3 2/17/20 b/c clock failing to lock
-#    #heraNode9Snap3:
-#    #    phase_switch_index: [19,20,21,22,23,24]
-#    #    ants: [33, 34, 35]
+    # ARP: Node8Snap3 unpingable 2/21/20, restored 2/26/20
+    heraNode8Snap3:
+        phase_switch_index: [19,20,21,22,23,24]
+        ants: [21, 22, 23]
+## ARP: commenting out Node9Snap0 2/17/20 b/c clock failing to lock
+##    heraNode9Snap0:
+##        phase_switch_index: [1,2,3,4,5,6]
+##        ants: [24, 25, 26]
+##    #heraNode9Snap1:
+##    #    phase_switch_index: [7,8,9,10,11,12]
+##    #    ants: [27, 28, 29]
+##    #heraNode9Snap2:
+##    #    phase_switch_index: [13,14,15,16,17,18]
+##    #    ants: [30, 31, 32]
+##    # ARP: commenting out Node9Snap3 2/17/20 b/c clock failing to lock
+##    #heraNode9Snap3:
+##    #    phase_switch_index: [19,20,21,22,23,24]
+##    #    ants: [33, 34, 35]
     heraNode7Snap0:
         phase_switch_index: [1,2,3,4,5,6]
         ants: [36, 37, 38]
@@ -129,34 +129,32 @@ fengines:
 #    heraNode7Snap3:
 #        phase_switch_index: [19,20,21,22,23,24]
 #        ants: [45, 46, 47]
-#    heraNode4Snap0:
-#        phase_switch_index: [1,2,3,4,5,6]
-#        ants: [48, 49, 50]
-#    # ARP
-#    #heraNode4Snap1:
-#    #    phase_switch_index: [7,8,9,10,11,12]
-#    #    ants: [51, 52, 53]
-#    heraNode4Snap2:
-#        phase_switch_index: [13,14,15,16,17,18]
-#        ants: [54, 55, 56]
-#    # ARP
-#    #heraNode4Snap3:
-#    #    phase_switch_index: [19,20,21,22,23,24]
-#    #    ants: [57, 58, 59]
-#    heraNode5Snap0: # this or 1 isn't syncing
-#        phase_switch_index: [1,2,3,4,5,6]
-#        ants: [60, 61, 62]
-#    heraNode5Snap1: # this or 0 isn't syncing
-#        phase_switch_index: [7,8,9,10,11,12]
-#        ants: [63, 64, 65]
-#    # ARP commented this out 2/18/20 b/c ADC failed to configure 5 times
-#    #heraNode5Snap2:
-#    #    phase_switch_index: [13,14,15,16,17,18]
-#    #    ants: [66, 67, 68]
-#    # ARP: commented this out 2/17/20 b/c of I2C cable issue w/ pams
-#    #heraNode5Snap3:
-#    #    phase_switch_index: [19,20,21,22,23,24]
-#    #    ants: [69, 70, 71]
+    heraNode4Snap0:
+        phase_switch_index: [1,2,3,4,5,6]
+        ants: [48, 49, 50]
+    heraNode4Snap1:
+        phase_switch_index: [7,8,9,10,11,12]
+        ants: [51, 52, 53]
+    heraNode4Snap2:
+        phase_switch_index: [13,14,15,16,17,18]
+        ants: [54, 55, 56]
+    heraNode4Snap3:
+        phase_switch_index: [19,20,21,22,23,24]
+        ants: [57, 58, 59]
+    heraNode5Snap0: # this or 1 isn't syncing
+        phase_switch_index: [1,2,3,4,5,6]
+        ants: [60, 61, 62]
+    heraNode5Snap1: # this or 0 isn't syncing
+        phase_switch_index: [7,8,9,10,11,12]
+        ants: [63, 64, 65]
+    # ARP commented this out 2/18/20 b/c ADC failed to configure 5 times
+    #heraNode5Snap2:
+    #    phase_switch_index: [13,14,15,16,17,18]
+    #    ants: [66, 67, 68]
+    # ARP: commented this out 2/17/20 b/c of I2C cable issue w/ pams
+    #heraNode5Snap3:
+    #    phase_switch_index: [19,20,21,22,23,24]
+    #    ants: [69, 70, 71]
     heraNode13Snap0:
         phase_switch_index: [1,2,3,4,5,6]
         ants: [72, 73, 74]
@@ -166,9 +164,10 @@ fengines:
     heraNode13Snap2:
         phase_switch_index: [13,14,15,16,17,18]
         ants: [78, 79, 80]
-    heraNode13Snap3:
-        phase_switch_index: [19,20,21,22,23,24]
-        ants: [81, 82, 83]
+    ## ARP 2/26/20 went AWOL in middle of debug
+    #heraNode13Snap3:
+    #    phase_switch_index: [19,20,21,22,23,24]
+    #    ants: [81, 82, 83]
 # Data is sent assuming a total of 32 Xengines and
 # a maximum of 48 channels per Xengine. If all the
 # 32 Xengines are not defined, the corresponding channels
