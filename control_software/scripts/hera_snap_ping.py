@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """SNAP ping monitor."""
 import subprocess
 import redis
@@ -26,4 +27,4 @@ for snap in snaps_cm:
     packets = 1.0 - float(stats[4].split(',')[2].strip().split()[0].strip('%')) / 100.0
     fn = path.join(path_to_use, '{}.txt'.format(snap_to_host[snap]))
     with open(fn, 'a') as fp:
-        print('{}\t{}\t{:.2f}'.format(now, snap, packets), file=fp)
+        fp.write('{}\t{}\t{:.2f}'.format(now, snap, packets))
