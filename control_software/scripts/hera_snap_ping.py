@@ -4,6 +4,7 @@ import subprocess
 import redis
 import json
 from datetime import datetime
+import time
 from os import path
 
 
@@ -15,6 +16,7 @@ now = datetime.strftime(datetime.now(), '%Y/%m/%d %H:%M')
 path_to_use = '/home/hera/logs'
 
 for snap in snaps_cm:
+    time.sleep(1)
     try:
         snap_ping = 'ping -c 1 {}'.format(snap_to_host[snap])
     except KeyError:
