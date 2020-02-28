@@ -50,6 +50,24 @@ def hera_antpol_to_ant_pol(antpol):
     return ant, pol
 
 
+def get_snaps_from_redis():
+    """Read SNAPs from redis - from CM, config and correlator viewpoints."""
+    import yaml
+
+    r = redis.Redis('redishost')
+    snaps_cm_list = list(json.loads(r.hget('corr:map', 'all_snap_inputs')).keys())
+    snap_to_host = json.loads(r.hget('corr:map', 'snap_host'))
+    snaps = {'cm': [], 'cfg': [], 'corr': []}
+    for snap in snaps_cm_list:
+        try:
+            snaps['cm'].append(snap_to_host[snap])
+        except KeyError:
+            continue
+    snaps['cfg'] = list(yaml.safe_load(r.hget('init_configuration', 'config'))['fengines'].keys())
+    snaps['corr'] = list(r.hgetall('corr:snap_ants').keys())
+    return snaps
+
+
 def read_maps_from_redis(redishost='redishost'):
     """Read subset of corr:map."""
     if isinstance(redishost, str):
