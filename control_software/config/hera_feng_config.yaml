@@ -79,22 +79,22 @@ fengines:
 ###    #heraNode0Snap0:
 ###  #    phase_switch_index: [1,2,3,4,5,6]
 ###  #      ants: [0, 1, 2]
-### ARP 2/25/20 Node0 unpingable snaps, commenting out
-###    heraNode0Snap1:
-###        phase_switch_index: [7,8,9,10,11,12]
-###        ants: [3, 4, 5]
-###    heraNode0Snap2:
-###        phase_switch_index: [13,14,15,16,17,18]
-###        ants: [6, 7, 8]
-###    heraNode0Snap3:
-###        phase_switch_index: [19,20,21,22,23,24]
-###        ants: [9, 10, 11]
+    # ARP 2/25/20 Node0 unpingable snaps, back 2/28/20
+    heraNode0Snap1:
+        phase_switch_index: [7,8,9,10,11,12]
+        ants: [3, 4, 5]
+    heraNode0Snap2:
+        phase_switch_index: [13,14,15,16,17,18]
+        ants: [6, 7, 8]
+    heraNode0Snap3:
+        phase_switch_index: [19,20,21,22,23,24]
+        ants: [9, 10, 11]
 #    heraNode8Snap0:
 #        phase_switch_index: [1,2,3,4,5,6]
 #        ants: [12, 13, 14]
-#    heraNode8Snap1:
-#        phase_switch_index: [7,8,9,10,11,12]
-#        ants: [15, 16, 17]
+##    heraNode8Snap1: # ARP 2/28/20 Failed to sync
+##        phase_switch_index: [7,8,9,10,11,12]
+##        ants: [15, 16, 17]
 #    heraNode8Snap2:
 #        phase_switch_index: [13,14,15,16,17,18]
 #        ants: [18, 19, 20]
@@ -102,21 +102,21 @@ fengines:
 #    heraNode8Snap3:
 #        phase_switch_index: [19,20,21,22,23,24]
 #        ants: [21, 22, 23]
-### ARP: commenting out Node9Snap0 2/17/20 b/c clock failing to lock
-###    heraNode9Snap0:
-###        phase_switch_index: [1,2,3,4,5,6]
-###        ants: [24, 25, 26]
-###    #heraNode9Snap1:
-###    #    phase_switch_index: [7,8,9,10,11,12]
-###    #    ants: [27, 28, 29]
-###    #heraNode9Snap2:
-###    #    phase_switch_index: [13,14,15,16,17,18]
-###    #    ants: [30, 31, 32]
-###    # ARP: commenting out Node9Snap3 2/17/20 b/c clock failing to lock
-###    #heraNode9Snap3:
-###    #    phase_switch_index: [19,20,21,22,23,24]
-###    #    ants: [33, 34, 35]
-#    heraNode7Snap0:
+#### ARP: commenting out Node9Snap0 2/17/20 b/c clock failing to lock
+#    heraNode9Snap0:
+#        phase_switch_index: [1,2,3,4,5,6]
+#        ants: [24, 25, 26]
+#    heraNode9Snap1:
+#        phase_switch_index: [7,8,9,10,11,12]
+#        ants: [27, 28, 29]
+#    #heraNode9Snap2: # ARP 2/28/20 unpingable
+#    #    phase_switch_index: [13,14,15,16,17,18]
+#    #    ants: [30, 31, 32]
+#    # ARP: commenting out Node9Snap3 2/17/20 b/c clock failing to lock
+#    heraNode9Snap3: # ARP 2/28/20 failed to sync
+#        phase_switch_index: [19,20,21,22,23,24]
+#        ants: [33, 34, 35]
+#    heraNode7Snap0: # ARP 2/28/20 Not syncing
 #        phase_switch_index: [1,2,3,4,5,6]
 #        ants: [36, 37, 38]
 #    heraNode7Snap1:
@@ -129,19 +129,19 @@ fengines:
 ##    heraNode7Snap3:
 ##        phase_switch_index: [19,20,21,22,23,24]
 ##        ants: [45, 46, 47]
-    heraNode4Snap0:
-        phase_switch_index: [1,2,3,4,5,6]
-        ants: [48, 49, 50]
-    heraNode4Snap1:
-        phase_switch_index: [7,8,9,10,11,12]
-        ants: [51, 52, 53]
-    heraNode4Snap2:
-        phase_switch_index: [13,14,15,16,17,18]
-        ants: [54, 55, 56]
-    heraNode4Snap3:
-        phase_switch_index: [19,20,21,22,23,24]
-        ants: [57, 58, 59]
-#    heraNode5Snap0:
+#    heraNode4Snap0: # ARP: not syncing 2/28/20
+#        phase_switch_index: [1,2,3,4,5,6]
+#        ants: [48, 49, 50]
+#    heraNode4Snap1:
+#        phase_switch_index: [7,8,9,10,11,12]
+#        ants: [51, 52, 53]
+#    heraNode4Snap2:
+#        phase_switch_index: [13,14,15,16,17,18]
+#        ants: [54, 55, 56]
+#    heraNode4Snap3:
+#        phase_switch_index: [19,20,21,22,23,24]
+#        ants: [57, 58, 59]
+#    heraNode5Snap0: # ARP 2/28/20 not syncing
 #        phase_switch_index: [1,2,3,4,5,6]
 #        ants: [60, 61, 62]
 #    heraNode5Snap1:
@@ -164,7 +164,6 @@ fengines:
     heraNode13Snap2:
         phase_switch_index: [13,14,15,16,17,18]
         ants: [78, 79, 80]
-    # ARP 2/26/20 went AWOL in middle of debug, back 2/28/20
     heraNode13Snap3:
         phase_switch_index: [19,20,21,22,23,24]
         ants: [81, 82, 83]
