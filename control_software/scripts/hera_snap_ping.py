@@ -5,7 +5,7 @@ import subprocess
 from datetime import datetime
 import time
 from os import path
-from hera_corr_f import redis_cm
+from hera_corr_cm import redis_cm
 
 ap = argparse.ArgumentParser()
 ap.add_argument('-s', '--snaps', help="Use snaps from redis for one of cm/cfg/corr.", default='cfg')

@@ -67,7 +67,7 @@ first_run = 1
 
 fqs = np.linspace(0, 250, num=1024)*1e6
 
-loc = redis_cm.read_cminfo_from_redis(redishost=args.redishost, return_namespace=True)
+loc = redis_cm.read_cminfo_from_redis(return_as='namespace', redishost=args.redishost)
 
 # Write different files for different polarizations
 while(True):

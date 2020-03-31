@@ -344,11 +344,14 @@ class HeraCorrelator(object):
         """
         Set the "disable_monitoring" key in redis.
 
-        Hopefully other processes will respect this key and stop monitoring. Useful if you
-        are going to hammer the TFTP connection and don't want interference from the monitoring loop.
+        Hopefully other processes will respect this key and stop monitoring.
+        Useful if you are going to hammer the TFTP connection and don't want interference
+        from the monitoring loop.
         Inputs:
-            expiry (float): Period (in seconds) for which the monitoring loop should be disabled.
-            wait (bool): If True, wait for the monitor script to confirm it is not running before returning
+            expiry (float): Period (in seconds) for which the monitoring loop
+                            should be disabled.
+            wait (bool): If True, wait for the monitor script to confirm it is
+                         not running before returning
         """
         self.r.set('disable_monitoring', 1, ex=expiry)
         if wait:
@@ -753,7 +756,8 @@ class HeraCorrelator(object):
                     except socket.gaierror:
                         self.logger.debug("Failed to get hostname for SNAP %s. Using this name" % host)
                         self.ant_to_snap[ant][pol]['host'] = host
-        # Make the snap->ant dict, but make sure the hostnames match what is expected by this class's Fengines
+        # Make the snap->ant dict, but make sure the hostnames match what
+        # is expected by this class's Fengines
         for hooked_up_snap in hookup['snap_to_ant'].keys():
             try:
                 ip = socket.gethostbyname(hooked_up_snap)
