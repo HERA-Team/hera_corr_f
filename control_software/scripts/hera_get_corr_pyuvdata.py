@@ -1,3 +1,4 @@
+"""Get corr into pyuvdata."""
 import numpy as np
 import argparse
 from pyuvdata import UVData
@@ -7,7 +8,7 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 from hera_corr_f import SnapFengine
 from hera_corr_f import HeraCorrelator
-from hera_corr_f import redis_cm
+from hera_corr_cm import redis_cm
 from hera_corr_cm.handlers import add_default_log_handlers
 import logging
 import time
@@ -66,7 +67,7 @@ first_run = 1
 
 fqs = np.linspace(0, 250, num=1024)*1e6
 
-loc = redis_cm.read_locations_from_redis(redishost=args.redishost)
+loc = redis_cm.read_cminfo_from_redis(return_as='namespace', redishost=args.redishost)
 
 # Write different files for different polarizations
 while(True):
