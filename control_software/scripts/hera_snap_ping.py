@@ -11,11 +11,17 @@ ap = argparse.ArgumentParser()
 ap.add_argument('-s', '--snaps', help="Use snaps from redis for one of cm/cfg/corr.", default='cfg')
 ap.add_argument('-n', '--nap', help="Nap time in seconds between snap pings.", default=1.0)
 ap.add_argument('-c', '--count', help="Number of pings to send.", default=1)
+ap.add_argument('--print_stuff_out', help="Print stuff out.", action='store_true')
 args = ap.parse_args()
 
 snaps = redis_cm.get_snaps_from_redis()
-print("Using snaps from redis for {}".format(args.snaps))
-print(snaps[args.snaps])
+if args.print_stuff_out:
+    print("Using snaps from redis for {}".format(args.snaps))
+    print(snaps[args.snaps])
+    print("\nNumber used:")
+    print("\tcm:  {}".format(len(snaps['cm'])))
+    print("\tcfg:  {}".format(len(snaps['cfg'])))
+    print("\tcorr:  {}".format(len(snaps['corr'])))
 
 now = datetime.strftime(datetime.now(), '%Y/%m/%d %H:%M')
 path_to_use = '/home/hera/logs'
