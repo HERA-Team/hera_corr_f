@@ -179,13 +179,19 @@ if __name__ == "__main__":
     retry_tick = 0
     # Seconds between SNAP reconnection attempts
     RETRY_TIME = 300
-    # setting the time to 0 will make sure any commands issued after 1 Jan 1970 are valid
-    last_command_time = 0
+
+    last_command_time = None
     while(True):
         message = r.get("corr:command")
         if message is not None:
             command_time = float(json.loads(message)["time"])
-            if command_time > last_command_time:
-                last_command_time = command_time
-                cmd_handler(corr, r, message["data"], testmode=args.testmode)
+            if last_command_time is not None:
+                if command_time > last_command_time:
+                    last_command_time = command_time
+                    cmd_handler(corr, r, message["data"], testmode=args.testmode)
+                else:
+                    # daemon was probably restarted.
+                    # log the execution time but take no action
+                    last_command_time = command_time
+
         corr.r.set(script_redis_key, "alive", ex=120)
