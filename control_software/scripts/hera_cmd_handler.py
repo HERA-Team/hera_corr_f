@@ -189,9 +189,9 @@ if __name__ == "__main__":
                 if command_time > last_command_time:
                     last_command_time = command_time
                     cmd_handler(corr, r, message["data"], testmode=args.testmode)
-                else:
-                    # daemon was probably restarted.
-                    # log the execution time but take no action
-                    last_command_time = command_time
+            else:
+                # daemon was probably restarted.
+                # log the execution time but take no action
+                last_command_time = command_time
 
         corr.r.set(script_redis_key, "alive", ex=120)
