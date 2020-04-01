@@ -28,7 +28,8 @@ if not os.path.exists(args.fpg):
     print "FPG file %s not found!" % args.fpg
     exit()
 
-r = redis.Redis(args.redishost)
+connection_pool = redis.ConnectionPool(host=args.redishost)
+r = redis.Redis(connection_pool=connection_pool, max_connections=100)
 
 with open(args.fpg, 'r') as fh:
     d = {}
