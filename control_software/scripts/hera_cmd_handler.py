@@ -164,8 +164,8 @@ if __name__ == "__main__":
     parser.add_argument('-t', dest='testmode', action='store_true', default=False,
                         help ='Use this flag to run in test mode, where no commands are executed')
     args = parser.parse_args()
-
-    r = redis.Redis(args.redishost)
+    connection_pool = redis.ConnectionPool(host=args.redishost)
+    r = redis.Redis(connection_pool=connection_pool, max_connections=100)
 
     corr = HeraCorrelator()
 
