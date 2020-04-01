@@ -19,7 +19,8 @@ parser.add_argument('-r', dest='redishost', type=str, default='redishost',
 
 args = parser.parse_args()
 
-r = redis.Redis(args.redishost)
+connection_pool = redis.ConnectionPool(host=args.redishost)
+r = redis.Redis(connection_pool=connection_pool, max_connections=100)
 
 with open(args.config_file, 'r') as fh:
     upload_time = time.time()
