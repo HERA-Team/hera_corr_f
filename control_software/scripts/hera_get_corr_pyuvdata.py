@@ -35,6 +35,16 @@ parser.add_argument('-w', '--wait_time', type=int, default=0,
                     help='Wait time between files (duty cycle basically)')
 args = parser.parse_args()
 
+
+raise NotImplementedError(
+    "The form of the cminfo used by this script has changed. "
+    "As a result, this script is no longer executable as written."
+    "\nAdditional knowledge is needed to propagate the new cminfo into this script."
+    "\nPlease contact developers and make a new issue outlining the desired "
+    "use of this script."
+    "\nhttps://github.com/HERA-Team/hera_corr_f/issues"
+)
+
 corr = HeraCorrelator(redishost=args.redishost)
 corr.r.set('disable_monitoring', 1, ex=60)
 logger.warning('Disabling the monitoring.')
