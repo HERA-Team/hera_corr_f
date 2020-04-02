@@ -155,21 +155,17 @@ def cmd_handler(corr, r, message, testmode=False):
             if args["pol"] == "n":
                 send_response(r, command, time, val=atten_n_rb)
                 return
-            
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Process commands from the corr:message redis channel.',
+    parser = argparse.ArgumentParser(description='Process commands from the corr:command key channel.',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-r', dest='redishost', type=str, default='redishost',
                         help ='Hostname of redis server')
     parser.add_argument('-t', dest='testmode', action='store_true', default=False,
                         help ='Use this flag to run in test mode, where no commands are executed')
     args = parser.parse_args()
-    
+
     r = redis.Redis(args.redishost)
-    
-    cmd_chan = r.pubsub()
-    cmd_chan.subscribe("corr:message")
-    cmd_chan.get_message(timeout=0.1)
 
     corr = HeraCorrelator()
 
@@ -179,12 +175,23 @@ if __name__ == "__main__":
     hostname = socket.gethostname()
     script_redis_key = "status:script:%s:%s" % (hostname, __file__)
 
-    
+
     retry_tick = 0
     # Seconds between SNAP reconnection attempts
     RETRY_TIME = 300
+
+    last_command_time = None
     while(True):
-        message = cmd_chan.get_message(timeout=5)
+        message = r.get("corr:command")
         if message is not None:
-            cmd_handler(corr, r, message["data"], testmode=args.testmode)
+            command_time = float(json.loads(message)["time"])
+            if last_command_time is not None:
+                if command_time > last_command_time:
+                    last_command_time = command_time
+                    cmd_handler(corr, r, message, testmode=args.testmode)
+            else:
+                # daemon was probably restarted.
+                # log the execution time but take no action
+                last_command_time = command_time
+
         corr.r.set(script_redis_key, "alive", ex=120)
