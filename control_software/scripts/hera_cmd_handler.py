@@ -188,7 +188,7 @@ if __name__ == "__main__":
             if last_command_time is not None:
                 if command_time > last_command_time:
                     last_command_time = command_time
-                    cmd_handler(corr, r, message["data"], testmode=args.testmode)
+                    cmd_handler(corr, r, message, testmode=args.testmode)
             else:
                 # daemon was probably restarted.
                 # log the execution time but take no action
