@@ -9,9 +9,41 @@ import socket
 from subprocess import Popen, PIPE
 from hera_corr_f import HeraCorrelator, __version__, __package__
 
-def send_response(r, command, time, **kwargs):
-    message_dict = {"command":command, "time":time, "args":kwargs}
-    n = r.publish("corr:response", json.dumps(message_dict))
+
+def create_status(r, command, time, status, **kwargs):
+    command_status = {
+        "command": command,
+        "time": time,
+        "args": json.dumps(kwargs),
+        "status": status,
+        "update_time": time.time(),
+    }
+    # clear out the status dict from last command
+    r.hdel("corr:cmd_status", *self.r.hkeys("corr:cmd_status"))
+
+    r.hmset("corr:cmd_status", command_status)
+
+
+def update_status(r, status, **kwargs):
+    command_status = {
+        "status": status,
+        "update_time": time.time(),
+    }
+
+    # some corr_f commands return "err"
+    # want to be able to update the args dict
+    args = self.r.hget("corr:cmd_status", "args")
+    args = json.loads(args)
+    args.update(kwargs)
+
+    args = json.dumps(args)
+    command_status["args"] = args
+
+    if status == "complete":
+        command_status["completion_time"] = time.time()
+
+    r.hmset("corr:cmd_status", command_status)
+
 
 def cmd_handler(corr, r, message, testmode=False):
     d = json.loads(message)
@@ -23,17 +55,19 @@ def cmd_handler(corr, r, message, testmode=False):
         print "Got command:", command
         print "       args:", args
         return
+
+    create_status(command, time, status="running")
     if command == "phase_switch":
         corr.reestablish_dead_connections(programmed_only=True)
         if args["activate"]:
             corr.phase_switch_enable()
         else:
             corr.phase_switch_disable()
-        send_response(r, command, time)
+        update_status(r, status="complete")
         return
     elif command == "rf_switch":
         if args["input_sel"] not in ["antenna", "noise", "load"]:
-            send_response(r, command, time, err="Unrecognized switch input")
+            update_status(r, status="errored", err="Unrecognized switch input")
             return
         if args["ant"] is not None:
             try:
@@ -44,16 +78,16 @@ def cmd_handler(corr, r, message, testmode=False):
                 feng_e_chan = feng_e['channel']//2
                 feng_n_chan = feng_n['channel']//2
             except KeyError:
-                send_response(r, command, time, err="Can't find F-engine for selected antenna")
+                update_status(r, status="errored", err="Can't find F-engine for selected antenna")
                 return
             if (feng_e_host != feng_n_host):
-                send_response(r, command, time, err="E/N pols not on matching SNAP")
+                update_status(r, status="errored", err="E/N pols not on matching SNAP")
                 return
             if (isinstance(feng_e_host, basestring)):
-                send_response(r, command, time, err="Required F-engine is not connected")
+                update_status(r, status="errored", err="Required F-engine is not connected")
                 return
             if (feng_e_chan != feng_n_chan):
-                send_response(r, command, time, err="E/N pols not on matching I2C channel")
+                update_status(r, status="errored", err="E/N pols not on matching I2C channel")
                 return
             # If we made it to here, hopefully we're good
             # initialize the I2C if necessary
@@ -64,10 +98,10 @@ def cmd_handler(corr, r, message, testmode=False):
                 feng_e_host.fems[feng_e_chan].switch(name=args["input_sel"])
                 switch_pos = feng_e_host.fems[feng_e_chan].switch()
                 if switch_pos == args["input_sel"]:
-                    send_response(r, command, time)
+                    update_status(r, status="complete")
                     return
             # Retries exceeded
-            send_response(r, command, time, err="Retries exceeded")
+            update_status(r, status="errored", err="Retries exceeded")
             return
         else:
             corr.reestablish_dead_connections(programmed_only=True)
@@ -77,53 +111,53 @@ def cmd_handler(corr, r, message, testmode=False):
                 corr.load_enable()
             elif args["input_sel"] == "antenna":
                 corr.antenna_enable()
-            send_response(r, command, time)
+            update_status(r, status="complete")
             return
     elif command == "snap_eq":
         if "coeffs" not in args.keys():
-            send_response(r, command, time, err="No `coeffs` argument provided!")
+            update_status(r, status="errored", err="No `coeffs` argument provided!")
             return
         if "ant" not in args.keys():
-            send_response(r, command, time, err="No `ant` argument provided!")
+            update_status(r, status="errored", err="No `ant` argument provided!")
             return
         if "pol" not in args.keys():
-            send_response(r, command, time, err="No `pol` argument provided!")
+            update_status(r, status="errored", err="No `pol` argument provided!")
             return
         try:
             coeffs = args['coeffs']
         except:
             corr.logger.exception("Failed to cast coeffs to numpy array")
-            send_response(r, command, time, err="Provided coefficients couldn't be coerced into a numpy array")
+            update_status(r, status="errored", err="Provided coefficients couldn't be coerced into a numpy array")
             return
         try:
             corr.set_eq(str(args["ant"]), args["pol"], eq=coeffs)
-            send_response(r, command, time)
+            update_status(r, status="complete")
         except:
             corr.logger.exception("snap_eq command failed!")
-            send_response(r, command, time, err="Command failed! Check server logs")
+            update_status(r, status="errored", err="Command failed! Check server logs")
     elif command == "pam_atten":
         corr.disable_monitoring(30, wait=True)
         if "rw" not in args.keys():
-            send_response(r, command, time, err="No `rw` argument provided!")
+            update_status(r, status="errored", err="No `rw` argument provided!")
             return
         if args["rw"] == "w" and "val" not in args.keys():
-            send_response(r, command, time, err="No `val` argument provided!")
+            update_status(r, status="errored", err="No `val` argument provided!")
             return
         if "ant" not in args.keys():
-            send_response(r, command, time, err="No `ant` argument provided!")
+            update_status(r, status="errored", err="No `ant` argument provided!")
             return
         if "pol" not in args.keys():
-            send_response(r, command, time, err="No `pol` argument provided!")
+            update_status(r, status="errored", err="No `pol` argument provided!")
             return
         try:
             feng = corr.ant_to_snap[str(args["ant"])][args["pol"]]
             feng_host = feng['host']
             feng_chan = feng['channel']//2
         except KeyError:
-            send_response(r, command, time, err="Can't find F-engine for selected antenna")
+            update_status(r, status="errored", err="Can't find F-engine for selected antenna")
             return
         if (isinstance(feng_host, basestring)):
-            send_response(r, command, time, err="Required F-engine is not connected")
+            update_status(r, status="errored", err="Required F-engine is not connected")
             return
         # If we made it to here, hopefully we're good
         # initialize the I2C if necessary
@@ -136,24 +170,24 @@ def cmd_handler(corr, r, message, testmode=False):
                     feng_host.pams[feng_chan].set_attenuation(args["val"], None)
                     atten_e_rb, atten_n_rb = feng_host.pams[feng_chan].get_attenuation()
                     if atten_e_rb == args["val"]:
-                        send_response(r, command, time)
+                        update_status(r, status="complete")
                         return
                 if args["pol"] == "n":
                     feng_host.pams[feng_chan].set_attenuation(None, args["val"])
                     atten_e_rb, atten_n_rb = feng_host.pams[feng_chan].get_attenuation()
                     if atten_n_rb == args["val"]:
-                        send_response(r, command, time)
+                        update_status(r, status="complete")
                         return
             # Retries exceeded
-            send_response(r, command, time, err="Retries exceeded")
+            update_status(r, status="errored", err="Retries exceeded")
             return
         if args["rw"] == "r":
             atten_e_rb, atten_n_rb = feng_host.pams[feng_chan].get_attenuation()
             if args["pol"] == "e":
-                send_response(r, command, time, val=atten_e_rb)
+                update_status(r, status="complete", val=atten_e_rb)
                 return
             if args["pol"] == "n":
-                send_response(r, command, time, val=atten_n_rb)
+                update_status(r, status="complete", val=atten_n_rb)
                 return
 
 if __name__ == "__main__":
