@@ -57,9 +57,8 @@ def cmd_handler(corr, r, message, testmode=False):
         print "Got command:", command
         print "       args:", args
         return
-
-    create_status(command, command_time, status="running")
     if command == "phase_switch":
+        create_status(r, command, command_time, status="running")
         corr.reestablish_dead_connections(programmed_only=True)
         if args["activate"]:
             corr.phase_switch_enable()
@@ -68,6 +67,7 @@ def cmd_handler(corr, r, message, testmode=False):
         update_status(r, status="complete")
         return
     elif command == "rf_switch":
+        create_status(r, command, command_time, status="running")
         if args["input_sel"] not in ["antenna", "noise", "load"]:
             update_status(r, status="errored", err="Unrecognized switch input")
             return
@@ -116,6 +116,7 @@ def cmd_handler(corr, r, message, testmode=False):
             update_status(r, status="complete")
             return
     elif command == "snap_eq":
+        create_status(r, command, command_time, status="running")
         if "coeffs" not in args.keys():
             update_status(r, status="errored", err="No `coeffs` argument provided!")
             return
@@ -138,6 +139,7 @@ def cmd_handler(corr, r, message, testmode=False):
             corr.logger.exception("snap_eq command failed!")
             update_status(r, status="errored", err="Command failed! Check server logs")
     elif command == "pam_atten":
+        create_status(r, command, command_time, status="running")
         corr.disable_monitoring(30, wait=True)
         if "rw" not in args.keys():
             update_status(r, status="errored", err="No `rw` argument provided!")
