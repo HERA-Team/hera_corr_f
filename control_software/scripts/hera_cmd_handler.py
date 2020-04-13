@@ -20,7 +20,7 @@ def create_status(r, command, command_time, status, **kwargs):
     }
     # bool(empty dict) is false.
     # If it is not empy, clear out the status dict from last command
-    if not bool(r.hgetall("corr:cmd_status")):
+    if bool(r.hgetall("corr:cmd_status")):
         r.hdel("corr:cmd_status", *self.r.hkeys("corr:cmd_status"))
 
     r.hmset("corr:cmd_status", command_status)
