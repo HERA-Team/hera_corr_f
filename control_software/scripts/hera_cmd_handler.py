@@ -21,7 +21,7 @@ def create_status(r, command, command_time, status, **kwargs):
     # bool(empty dict) is false.
     # If it is not empy, clear out the status dict from last command
     if bool(r.hgetall("corr:cmd_status")):
-        r.hdel("corr:cmd_status", *self.r.hkeys("corr:cmd_status"))
+        r.hdel("corr:cmd_status", *r.hkeys("corr:cmd_status"))
 
     r.hmset("corr:cmd_status", command_status)
 
@@ -34,7 +34,7 @@ def update_status(r, status, **kwargs):
 
     # some corr_f commands return "err"
     # want to be able to update the args dict
-    args = self.r.hget("corr:cmd_status", "args")
+    args = r.hget("corr:cmd_status", "args")
     args = json.loads(args)
     args.update(kwargs)
 
