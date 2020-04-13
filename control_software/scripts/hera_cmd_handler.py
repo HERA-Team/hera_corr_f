@@ -10,10 +10,10 @@ from subprocess import Popen, PIPE
 from hera_corr_f import HeraCorrelator, __version__, __package__
 
 
-def create_status(r, command, time, status, **kwargs):
+def create_status(r, command, command_time, status, **kwargs):
     command_status = {
         "command": command,
-        "time": time,
+        "time": command_time,
         "args": json.dumps(kwargs),
         "status": status,
         "update_time": time.time(),
@@ -49,14 +49,14 @@ def cmd_handler(corr, r, message, testmode=False):
     d = json.loads(message)
     corr.logger.info("Got command: %s" % d)
     command = d["command"]
-    time = d["time"]
+    command_time = d["time"]
     args = d["args"]
     if testmode:
         print "Got command:", command
         print "       args:", args
         return
 
-    create_status(command, time, status="running")
+    create_status(command, command_time, status="running")
     if command == "phase_switch":
         corr.reestablish_dead_connections(programmed_only=True)
         if args["activate"]:
