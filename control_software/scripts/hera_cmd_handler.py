@@ -220,6 +220,8 @@ if __name__ == "__main__":
 
     last_command_time = None
     while(True):
+        # sleep 1s between each attempt
+        time.sleep(1)
         message = r.get("corr:command")
         if message is not None:
             command_time = float(json.loads(message)["time"])
