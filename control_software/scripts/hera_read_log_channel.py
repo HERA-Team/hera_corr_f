@@ -14,7 +14,7 @@ parser.add_argument('-r', dest='redishost', type=str, default='redishost',
 args = parser.parse_args()
 
 print('Connecting to redis server %s' % args.redishost)
-r = redis.Redis(args.redishost)
+r = redis.Redis(args.redishost, decode_responses=True)
 
 ps = r.pubsub()
 

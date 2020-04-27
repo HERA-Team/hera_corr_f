@@ -19,7 +19,7 @@ parser.add_argument('-r', dest='redishost', type=str, default='redishost',
 
 args = parser.parse_args()
 
-r = redis.Redis(args.redishost)
+r = redis.Redis(args.redishost, decode_responses=True)
 
 with open(args.config_file, 'r') as fh:
     upload_time = time.time()

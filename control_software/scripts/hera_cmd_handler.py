@@ -203,7 +203,7 @@ if __name__ == "__main__":
                         help ='Use this flag to run in test mode, where no commands are executed')
     args = parser.parse_args()
 
-    r = redis.Redis(args.redishost)
+    r = redis.Redis(args.redishost, decode_responses=True)
 
     corr = HeraCorrelator()
 

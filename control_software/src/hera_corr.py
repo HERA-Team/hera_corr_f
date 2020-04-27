@@ -50,7 +50,7 @@ class HeraCorrelator(object):
         """
         self.logger = logger
         self.redishost = redishost
-        self.r = redis.Redis(redishost)
+        self.r = redis.Redis(redishost, decode_responses=True)
         self.use_redis = use_redis
 
         self.get_config(config)

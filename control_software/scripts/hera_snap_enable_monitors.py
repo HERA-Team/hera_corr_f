@@ -15,7 +15,7 @@ parser.add_argument('-r', dest='redishost', type=str, default='redishost',
 args = parser.parse_args()
 
 logger.info('Connecting to redis server %s' % args.redishost)
-r = redis.Redis(args.redishost)
+r = redis.Redis(args.redishost, decode_responses=True)
 
 logger.info('Enabling snap monitoring')
 r.delete('disable_monitoring')
