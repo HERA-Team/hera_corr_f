@@ -51,6 +51,9 @@ class HeraCorrelator(object):
         self.logger = logger
         self.redishost = redishost
         self.r = redis.Redis(redishost, decode_responses=True)
+        # also keep a non-decoded redis connection for reading
+        # values with byte-strings like the .fpg files
+        self.r_bytes = redis.Redis(redishost, decode_responses=False)
         self.use_redis = use_redis
 
         self.get_config(config)
@@ -397,7 +400,7 @@ class HeraCorrelator(object):
         if progfile.startswith("redis:"):
             progfile = progfile.split(":")[-1]
             try:
-                bitstream = self.r.hget("fpg:%s" % progfile, "fpg")
+                bitstream = self.r_bytes.hget("fpg:%s" % progfile, "fpg")
             except KeyError:
                 self.logger.error("FPG file %s not available in redis. Cannot program" % progfile)
                 return
