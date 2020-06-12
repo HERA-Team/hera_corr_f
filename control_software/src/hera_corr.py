@@ -810,7 +810,7 @@ class HeraCorrelator(object):
         for xn, xparams in self.config['xengines'].items():
             chan_range = xparams.get('chan_range', [xn*384, (xn+1)*384])
             chans = range(chan_range[0], chan_range[1])
-            self.r.hset("corr:xeng_chans", xn, json.dumps(chans))
+            self.r.hset("corr:xeng_chans", str(xn), json.dumps(chans))
             if (xn > n_xengs):
                 self.logger.error("Cannot have more than %d X-engs!!" % n_xengs)
                 return False
