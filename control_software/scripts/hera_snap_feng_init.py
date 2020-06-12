@@ -11,6 +11,7 @@ import redis
 import time
 import yaml
 import logging
+import json
 
 
 def main():
@@ -65,7 +66,7 @@ def main():
     init_time = time.time()
     corr.r.hmset('init_configuration', {
         'hera_corr_f_version': __version__,
-        'init_args': args,
+        'init_args': json.dumps(vars(args)),
         'init_time': init_time,
         'init_time_str': time.ctime(init_time),
         'config': corr.config_str,

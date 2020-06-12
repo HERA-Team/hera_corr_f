@@ -17,7 +17,7 @@ parser.add_argument('-t', dest='suspend_mins', type=float, default=5.0,
 args = parser.parse_args()
 
 logger.info('Connecting to redis server %s' % args.redishost)
-r = redis.Redis(args.redishost)
+r = redis.Redis(args.redishost, decode_responses=True)
 
 suspend_secs = int(60*args.suspend_mins)
 logger.info('Disabling snap monitoring for %.1f minutes (%d seconds)' % (args.suspend_mins, suspend_secs))

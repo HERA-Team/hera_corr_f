@@ -21,7 +21,7 @@ parser.add_argument('-m', dest='mansync', action='store_true', default=False,
                     help ='Use this flag to manually sync the F-engines with an asynchronous software trigger')
 args = parser.parse_args()
 
-r = redis.Redis(args.redishost)
+r = redis.Redis(args.redishost, decode_responses=True)
 if args.config_file is None:
     config_str  = r.hget('snap_configuration', 'config')
     config_time = r.hget('snap_configuration', 'upload_time_str')

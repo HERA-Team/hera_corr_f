@@ -147,7 +147,7 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
     # Re-enable monitoring.
     c.enable_monitoring()
 
-    redis_connection = redis.ConnectionPool(host=redishost)
+    redis_connection = redis.ConnectionPool(host=redishost, decode_responses=True)
     with redis.Redis(connection_pool=redis_connection) as r:
         snap_to_ant = r.hget('corr:map', 'snap_to_ant')
         if snap_to_ant is not None:
