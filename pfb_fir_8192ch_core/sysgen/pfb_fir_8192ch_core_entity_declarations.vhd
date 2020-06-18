@@ -1,7 +1,7 @@
 -------------------------------------------------------------------
--- System Generator version 2016.4 VHDL source file.
+-- System Generator version 2019.1 VHDL source file.
 --
--- Copyright(C) 2013 by Xilinx, Inc.  All rights reserved.  This
+-- Copyright(C) 2019 by Xilinx, Inc.  All rights reserved.  This
 -- text/file contains proprietary, confidential information of Xilinx,
 -- Inc., is distributed under license from Xilinx, Inc., and may be used,
 -- copied and/or disclosed only pursuant to the terms of a valid license
@@ -30,7 +30,7 @@
 -- sole risk and will be unsupported.
 --
 -- This copyright and support notice must be retained as part of this
--- text at all times.  (c) Copyright 1995-2013 Xilinx, Inc.  All rights
+-- text at all times.  (c) Copyright 1995-2019 Xilinx, Inc.  All rights
 -- reserved.
 -------------------------------------------------------------------
 
@@ -614,6 +614,75 @@ end behavior;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
 
+library xpm;
+use xpm.vcomponents.all;
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+entity pfb_fir_8192ch_core_xlsprom is
+   generic(c_address_width   : integer := -1;
+           c_width             : integer := -1;
+           mem_size          : integer := 0;
+           mem_init_file     : string  := "none";
+           read_reset_val    : string  := "0";
+           mem_type          : string  := "auto";
+           latency           : integer := 0);
+   port(addr: in std_logic_vector(c_address_width-1 downto 0);
+        en: in std_logic_vector(0 downto 0);
+        rst: in std_logic_vector(0 downto 0);
+        ce: in std_logic;
+        clk: in std_logic;
+        data: out std_logic_vector(c_width-1 downto 0)
+);
+
+end pfb_fir_8192ch_core_xlsprom;
+
+architecture behavior of pfb_fir_8192ch_core_xlsprom is
+signal a_en: std_logic_vector(0 downto 0);
+signal a_rst: std_logic_vector(0 downto 0);
+signal core_data_out, dly_data_out: std_logic_vector(c_width-1 downto 0);
+begin
+a_en(0) <= en(0) and ce;
+a_rst(0) <= rst(0) and ce;
+ data <= dly_data_out;
+xpm_memory_sprom_inst : xpm_memory_sprom
+
+generic map (
+   -- Common module generics
+     MEMORY_SIZE        => mem_size,        --positive integer
+     MEMORY_PRIMITIVE   => mem_type,
+     MEMORY_INIT_FILE   => mem_init_file,
+     MEMORY_INIT_PARAM  => "",
+     USE_MEM_INIT       => 1,
+     WAKEUP_TIME        => "disable_sleep",
+     MESSAGE_CONTROL    => 0,
+
+     -- Port A module generics
+     READ_DATA_WIDTH_A  => c_width,
+     ADDR_WIDTH_A       => c_address_width,
+     READ_RESET_VALUE_A => read_reset_val,
+     READ_LATENCY_A     => latency
+ )
+ port map (
+     -- Common module ports
+     sleep          =>  '0',
+     -- Port A module ports
+     clka           =>  clk,
+     rsta           =>  a_rst(0),
+     ena            =>  a_en(0),
+     regcea         =>  '1',
+	  addra          =>  addr,
+	  injectsbiterra =>  '0',  --do not change
+	  injectdbiterra =>  '0',  --do not change
+	  douta          =>  core_data_out,
+	  sbiterra       =>  open, --do not change
+	  dbiterra       =>  open  --do not change
+);
+ dly_data_out <= core_data_out;
+end behavior;
+library xil_defaultlib;
+use xil_defaultlib.conv_pkg.all;
+
 ---------------------------------------------------------------------
 --
 --  Filename      : xlregister.vhd
@@ -834,22 +903,22 @@ use xil_defaultlib.conv_pkg.all;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-entity sysgen_counter_1f89c3d2fa is
+entity sysgen_counter_c03116c7b4 is
   port (
-    op : out std_logic_vector((13 - 1) downto 0);
+    op : out std_logic_vector((10 - 1) downto 0);
     clk : in std_logic;
     ce : in std_logic;
     clr : in std_logic);
-end sysgen_counter_1f89c3d2fa;
-architecture behavior of sysgen_counter_1f89c3d2fa
+end sysgen_counter_c03116c7b4;
+architecture behavior of sysgen_counter_c03116c7b4
 is
-  signal count_reg_20_23: unsigned((13 - 1) downto 0) := "0000000000000";
+  signal count_reg_20_23: unsigned((10 - 1) downto 0) := "0000000000";
   signal count_reg_20_23_rst: std_logic;
   signal rel_34_8: boolean;
   signal rst_limit_join_34_5: boolean;
   signal bool_44_4: boolean;
   signal rst_limit_join_44_1: boolean;
-  signal count_reg_join_44_1: unsigned((14 - 1) downto 0);
+  signal count_reg_join_44_1: unsigned((11 - 1) downto 0);
   signal count_reg_join_44_1_rst: std_logic;
 begin
   proc_count_reg_20_23: process (clk)
@@ -857,13 +926,13 @@ begin
   begin
     if (clk'event and (clk = '1')) then
       if ((ce = '1') and (count_reg_20_23_rst = '1')) then
-        count_reg_20_23 <= "0000000000000";
+        count_reg_20_23 <= "0000000000";
       elsif (ce = '1') then 
-        count_reg_20_23 <= count_reg_20_23 + std_logic_vector_to_unsigned("0000000000001");
+        count_reg_20_23 <= count_reg_20_23 + std_logic_vector_to_unsigned("0000000001");
       end if;
     end if;
   end process proc_count_reg_20_23;
-  rel_34_8 <= count_reg_20_23 = std_logic_vector_to_unsigned("1111111111101");
+  rel_34_8 <= count_reg_20_23 = std_logic_vector_to_unsigned("1111111101");
   proc_if_34_5: process (rel_34_8)
   is
   begin
@@ -895,20 +964,135 @@ end behavior;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
 
+library xpm;
+use xpm.vcomponents.all;
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+entity pfb_fir_8192ch_core_xlspram is
+   generic(width_addr        : integer := -1;
+           width             : integer := -1;
+           mem_size          : integer := 0;
+           write_mode_a      : string  := "no_change";
+           mem_init_file     : string  := "none";
+           read_reset_val    : string  := "0";
+           mem_type          : string  := "auto";
+           init_value        : bit_vector := b"00";
+           xpm_lat            : integer := 1;
+           latency           : integer := 0);
+   port(data_in: in std_logic_vector(width-1 downto 0);
+        addr: in std_logic_vector(width_addr-1 downto 0);
+        we: in std_logic_vector(0 downto 0);
+        en: in std_logic_vector(0 downto 0);
+        rst: in std_logic_vector(0 downto 0);
+        ce: in std_logic;
+        clk: in std_logic;
+        data_out: out std_logic_vector(width-1 downto 0)
+);
+
+end pfb_fir_8192ch_core_xlspram;
+
+architecture behavior of pfb_fir_8192ch_core_xlspram is
+signal a_en: std_logic_vector(0 downto 0);
+signal a_we: std_logic_vector(0 downto 0);
+signal a_rst: std_logic_vector(0 downto 0);
+signal xpm_rst: std_logic_vector(0 downto 0);
+signal core_data_out, lat_data_out, dly_data_out: std_logic_vector(width-1 downto 0);
+
+begin
+a_en(0) <= en(0) and ce;
+a_we(0) <= we(0) and ce;
+a_rst(0) <= rst(0) and ce;
+data_out <= dly_data_out;
+
+  rst_test: if (latency > 1) generate
+     xpm_rst(0) <= '0';
+  end generate;
+  rst_test_2:if (latency <= 1) generate
+     xpm_rst(0) <= rst(0) and ce;
+  end generate; 
+
+
+xpm_memory_spram_inst : xpm_memory_spram
+
+generic map (
+   -- Common module generics
+     MEMORY_SIZE        => mem_size,        --positive integer
+     MEMORY_PRIMITIVE   => mem_type,
+     MEMORY_INIT_FILE   => mem_init_file,
+     MEMORY_INIT_PARAM  => "",
+     USE_MEM_INIT       => 1,
+     WAKEUP_TIME        => "disable_sleep",
+     MESSAGE_CONTROL    => 0,
+
+     -- Port A module generics
+     WRITE_DATA_WIDTH_A => width,
+     READ_DATA_WIDTH_A  => width,
+     BYTE_WRITE_WIDTH_A => width,
+     ADDR_WIDTH_A       => width_addr,
+     READ_RESET_VALUE_A => read_reset_val,
+     READ_LATENCY_A     => xpm_lat,
+     WRITE_MODE_A       => write_mode_a
+ )
+ port map (
+     -- Common module ports
+     sleep          =>  '0',
+     -- Port A module ports
+     clka           =>  clk,
+     rsta           =>  a_rst(0),
+     ena            =>  a_en(0),
+     regcea         =>  ce,
+	  wea            =>  a_we,
+	  addra          =>  addr,
+	  dina           =>  data_in,
+	  injectsbiterra =>  '0',  --do not change
+	  injectdbiterra =>  '0',  --do not change
+	  douta          =>  core_data_out,
+	  sbiterra       =>  open, --do not change
+	  dbiterra       =>  open  --do not change
+);
+
+  dly_data_out <= core_data_out;
+end behavior;
+library xil_defaultlib;
+use xil_defaultlib.conv_pkg.all;
+
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-entity sysgen_constant_bad8a75cb5 is
+entity sysgen_delay_e1d10b13c0 is
   port (
-    op : out std_logic_vector((14 - 1) downto 0);
+    d : in std_logic_vector((8 - 1) downto 0);
+    q : out std_logic_vector((8 - 1) downto 0);
     clk : in std_logic;
     ce : in std_logic;
     clr : in std_logic);
-end sysgen_constant_bad8a75cb5;
-architecture behavior of sysgen_constant_bad8a75cb5
+end sysgen_delay_e1d10b13c0;
+architecture behavior of sysgen_delay_e1d10b13c0
 is
+  signal d_1_22: std_logic_vector((8 - 1) downto 0);
+  type array_type_op_mem_20_24 is array (0 to (1 - 1)) of std_logic_vector((8 - 1) downto 0);
+  signal op_mem_20_24: array_type_op_mem_20_24 := (
+    0 => "00000000");
+  signal op_mem_20_24_front_din: std_logic_vector((8 - 1) downto 0);
+  signal op_mem_20_24_back: std_logic_vector((8 - 1) downto 0);
+  signal op_mem_20_24_push_front_pop_back_en: std_logic;
 begin
-  op <= "00000000000001";
+  d_1_22 <= d;
+  op_mem_20_24_back <= op_mem_20_24(0);
+  proc_op_mem_20_24: process (clk)
+  is
+    variable i: integer;
+  begin
+    if (clk'event and (clk = '1')) then
+      if ((ce = '1') and (op_mem_20_24_push_front_pop_back_en = '1')) then
+        op_mem_20_24(0) <= op_mem_20_24_front_din;
+      end if;
+    end if;
+  end process proc_op_mem_20_24;
+  op_mem_20_24_front_din <= d_1_22;
+  op_mem_20_24_push_front_pop_back_en <= '1';
+  q <= op_mem_20_24_back;
 end behavior;
 
 library xil_defaultlib;
@@ -917,17 +1101,17 @@ use xil_defaultlib.conv_pkg.all;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-entity sysgen_constant_6c7e003559 is
+entity sysgen_constant_a08d884c70 is
   port (
-    op : out std_logic_vector((14 - 1) downto 0);
+    op : out std_logic_vector((11 - 1) downto 0);
     clk : in std_logic;
     ce : in std_logic;
     clr : in std_logic);
-end sysgen_constant_6c7e003559;
-architecture behavior of sysgen_constant_6c7e003559
+end sysgen_constant_a08d884c70;
+architecture behavior of sysgen_constant_a08d884c70
 is
 begin
-  op <= "00000000000000";
+  op <= "00000000001";
 end behavior;
 
 library xil_defaultlib;
@@ -936,17 +1120,36 @@ use xil_defaultlib.conv_pkg.all;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-entity sysgen_constant_da390adeb9 is
+entity sysgen_constant_945dec4b17 is
   port (
-    op : out std_logic_vector((14 - 1) downto 0);
+    op : out std_logic_vector((11 - 1) downto 0);
     clk : in std_logic;
     ce : in std_logic;
     clr : in std_logic);
-end sysgen_constant_da390adeb9;
-architecture behavior of sysgen_constant_da390adeb9
+end sysgen_constant_945dec4b17;
+architecture behavior of sysgen_constant_945dec4b17
 is
 begin
-  op <= "10000000000000";
+  op <= "00000000000";
+end behavior;
+
+library xil_defaultlib;
+use xil_defaultlib.conv_pkg.all;
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+entity sysgen_constant_5b7917c701 is
+  port (
+    op : out std_logic_vector((11 - 1) downto 0);
+    clk : in std_logic;
+    ce : in std_logic;
+    clr : in std_logic);
+end sysgen_constant_5b7917c701;
+architecture behavior of sysgen_constant_5b7917c701
+is
+begin
+  op <= "10000000000";
 end behavior;
 
 library xil_defaultlib;
@@ -1021,19 +1224,19 @@ use xil_defaultlib.conv_pkg.all;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-entity sysgen_relational_34fa202604 is
+entity sysgen_relational_2b543d8433 is
   port (
-    a : in std_logic_vector((14 - 1) downto 0);
-    b : in std_logic_vector((14 - 1) downto 0);
+    a : in std_logic_vector((11 - 1) downto 0);
+    b : in std_logic_vector((11 - 1) downto 0);
     op : out std_logic_vector((1 - 1) downto 0);
     clk : in std_logic;
     ce : in std_logic;
     clr : in std_logic);
-end sysgen_relational_34fa202604;
-architecture behavior of sysgen_relational_34fa202604
+end sysgen_relational_2b543d8433;
+architecture behavior of sysgen_relational_2b543d8433
 is
-  signal a_1_31: unsigned((14 - 1) downto 0);
-  signal b_1_34: unsigned((14 - 1) downto 0);
+  signal a_1_31: unsigned((11 - 1) downto 0);
+  signal b_1_34: unsigned((11 - 1) downto 0);
   signal result_12_3_rel: boolean;
 begin
   a_1_31 <= std_logic_vector_to_unsigned(a);
@@ -1048,19 +1251,19 @@ use xil_defaultlib.conv_pkg.all;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-entity sysgen_relational_b390b4fdeb is
+entity sysgen_relational_6edf461f73 is
   port (
-    a : in std_logic_vector((14 - 1) downto 0);
-    b : in std_logic_vector((14 - 1) downto 0);
+    a : in std_logic_vector((11 - 1) downto 0);
+    b : in std_logic_vector((11 - 1) downto 0);
     op : out std_logic_vector((1 - 1) downto 0);
     clk : in std_logic;
     ce : in std_logic;
     clr : in std_logic);
-end sysgen_relational_b390b4fdeb;
-architecture behavior of sysgen_relational_b390b4fdeb
+end sysgen_relational_6edf461f73;
+architecture behavior of sysgen_relational_6edf461f73
 is
-  signal a_1_31: unsigned((14 - 1) downto 0);
-  signal b_1_34: unsigned((14 - 1) downto 0);
+  signal a_1_31: unsigned((11 - 1) downto 0);
+  signal b_1_34: unsigned((11 - 1) downto 0);
   signal result_14_3_rel: boolean;
 begin
   a_1_31 <= std_logic_vector_to_unsigned(a);
@@ -1073,9 +1276,9 @@ library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
 
 -------------------------------------------------------------------
- -- System Generator version 11.1 VHDL source file.
+ -- System Generator VHDL source file.
  --
- -- Copyright(C) 2009 by Xilinx, Inc.  All rights reserved.  This
+ -- Copyright(C) 2018 by Xilinx, Inc.  All rights reserved.  This
  -- text/file contains proprietary, confidential information of Xilinx,
  -- Inc., is distributed under license from Xilinx, Inc., and may be used,
  -- copied and/or disclosed only pursuant to the terms of a valid license
@@ -1104,7 +1307,7 @@ use xil_defaultlib.conv_pkg.all;
  -- sole risk and will be unsupported.
  --
  -- This copyright and support notice must be retained as part of this
- -- text at all times.  (c) Copyright 1995-2009 Xilinx, Inc.  All rights
+ -- text at all times.  (c) Copyright 1995-2018 Xilinx, Inc.  All rights
  -- reserved.
  -------------------------------------------------------------------
  library IEEE;
@@ -1416,1384 +1619,4 @@ entity pfb_fir_8192ch_core_xlcounter_free is
    end generate;
 
 end behavior;
-
-library xil_defaultlib;
-use xil_defaultlib.conv_pkg.all;
-
-library IEEE;
- use IEEE.std_logic_1164.all;
-
-entity pfb_fir_8192ch_core_xlspram is 
-   generic (
-     core_name0: string := "";
-     c_width: integer := 12;
-     c_address_width: integer := 4;
-     latency: integer := 1
-     );
-   port (
-     data_in: in std_logic_vector(c_width - 1 downto 0);
-     addr: in std_logic_vector(c_address_width - 1 downto 0);
-     we: in std_logic_vector(0 downto 0);
-     en: in std_logic_vector(0 downto 0);
-     rst: in std_logic_vector(0 downto 0);
-     ce: in std_logic;
-     clk: in std_logic;
-     data_out: out std_logic_vector(c_width - 1 downto 0)
-   );
- end pfb_fir_8192ch_core_xlspram;
- 
- architecture behavior of pfb_fir_8192ch_core_xlspram is
- component synth_reg
- generic (
- width: integer;
- latency: integer
- );
- port (
- i: in std_logic_vector(width - 1 downto 0);
- ce: in std_logic;
- clr: in std_logic;
- clk: in std_logic;
- o: out std_logic_vector(width - 1 downto 0)
- );
- end component;
- signal core_data_out, dly_data_out: std_logic_vector(c_width - 1 downto 0);
- signal core_we, core_ce, sinit: std_logic;
-
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i4
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      dina: in std_logic_vector(c_width - 1 downto 0);
-      wea: in std_logic_vector(0 downto 0);
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
-begin
- data_out <= dly_data_out;
- core_we <= we(0);
- core_ce <= ce and en(0);
- sinit <= rst(0) and ce;
-
-
- comp0: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i4")) generate 
-  core_instance0:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i4
-   port map ( 
-        addra => addr,
-        clka => clk,
-        dina => data_in,
-        wea(0) => core_we,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
-latency_test: if (latency > 1) generate
- reg: synth_reg
- generic map (
- width => c_width,
- latency => latency - 1
- )
- port map (
- i => core_data_out,
- ce => core_ce,
- clr => '0',
- clk => clk,
- o => dly_data_out
- );
- end generate;
- latency_1: if (latency <= 1) generate
- dly_data_out <= core_data_out;
- end generate;
- end behavior;
-
-library xil_defaultlib;
-use xil_defaultlib.conv_pkg.all;
-
-library IEEE;
- use IEEE.std_logic_1164.all;
- use IEEE.std_logic_arith.all;
-
-entity pfb_fir_8192ch_core_xlsprom is 
-   generic (
-     core_name0: string := "";
-     c_width: integer := 12;             -- equal to data_width
-     c_address_width: integer := 4;      -- Block RAM address width (might not
-                                         -- be equal to addr_width, but
-                                         -- addr_width <= c_address_width)
-     latency: integer := 1
-   );
-   port (
-     addr: in std_logic_vector(c_address_width - 1 downto 0);
-     en: in std_logic_vector(0 downto 0);
-     rst: in std_logic_vector(0 downto 0);
-     ce: in std_logic;
-     clk: in std_logic;
-     data: out std_logic_vector(c_width - 1 downto 0)
-   );
- end pfb_fir_8192ch_core_xlsprom;
- 
- architecture behavior of pfb_fir_8192ch_core_xlsprom is
- component synth_reg
- generic (
- width: integer;
- latency: integer
- );
- port (
- i: in std_logic_vector(width - 1 downto 0);
- ce: in std_logic;
- clr: in std_logic;
- clk: in std_logic;
- o: out std_logic_vector(width - 1 downto 0)
- );
- end component;
- 
- signal core_addr: std_logic_vector(c_address_width - 1 downto 0);
- signal core_data_out: std_logic_vector(c_width - 1 downto 0);
- signal core_ce, sinit: std_logic;
-
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i0
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i1
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i2
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i3
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i5
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i6
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i7
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i8
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i9
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i10
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i11
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i12
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i13
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i14
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i15
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i16
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i17
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i18
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i19
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i20
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i21
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i22
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i23
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i24
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i25
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i26
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i27
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i28
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i29
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i30
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i31
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i32
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i33
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i34
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i35
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i36
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i37
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i38
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i39
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i40
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i41
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i42
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i43
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i44
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i45
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i46
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i47
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i48
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i49
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i50
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i51
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i52
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i53
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i54
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i55
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i56
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i57
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i58
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i59
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i60
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i61
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i62
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i63
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
- component pfb_fir_8192ch_core_blk_mem_gen_v8_3_i64
-    port ( 
-      addra: in std_logic_vector(c_address_width - 1 downto 0);
-      clka: in std_logic;
-      ena: in std_logic;
-      douta: out std_logic_vector(c_width - 1 downto 0) 
- 		  ); 
- end component;
-
-begin
- core_addr <= addr;
- core_ce <= ce and en(0);
- sinit <= rst(0) and ce;
-
-
- comp0: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i0")) generate 
-  core_instance0:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i0
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp1: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i1")) generate 
-  core_instance1:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i1
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp2: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i2")) generate 
-  core_instance2:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i2
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp3: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i3")) generate 
-  core_instance3:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i3
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp4: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i5")) generate 
-  core_instance4:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i5
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp5: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i6")) generate 
-  core_instance5:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i6
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp6: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i7")) generate 
-  core_instance6:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i7
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp7: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i8")) generate 
-  core_instance7:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i8
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp8: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i9")) generate 
-  core_instance8:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i9
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp9: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i10")) generate 
-  core_instance9:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i10
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp10: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i11")) generate 
-  core_instance10:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i11
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp11: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i12")) generate 
-  core_instance11:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i12
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp12: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i13")) generate 
-  core_instance12:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i13
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp13: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i14")) generate 
-  core_instance13:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i14
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp14: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i15")) generate 
-  core_instance14:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i15
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp15: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i16")) generate 
-  core_instance15:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i16
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp16: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i17")) generate 
-  core_instance16:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i17
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp17: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i18")) generate 
-  core_instance17:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i18
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp18: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i19")) generate 
-  core_instance18:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i19
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp19: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i20")) generate 
-  core_instance19:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i20
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp20: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i21")) generate 
-  core_instance20:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i21
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp21: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i22")) generate 
-  core_instance21:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i22
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp22: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i23")) generate 
-  core_instance22:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i23
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp23: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i24")) generate 
-  core_instance23:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i24
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp24: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i25")) generate 
-  core_instance24:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i25
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp25: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i26")) generate 
-  core_instance25:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i26
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp26: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i27")) generate 
-  core_instance26:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i27
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp27: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i28")) generate 
-  core_instance27:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i28
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp28: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i29")) generate 
-  core_instance28:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i29
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp29: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i30")) generate 
-  core_instance29:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i30
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp30: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i31")) generate 
-  core_instance30:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i31
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp31: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i32")) generate 
-  core_instance31:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i32
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp32: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i33")) generate 
-  core_instance32:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i33
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp33: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i34")) generate 
-  core_instance33:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i34
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp34: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i35")) generate 
-  core_instance34:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i35
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp35: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i36")) generate 
-  core_instance35:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i36
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp36: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i37")) generate 
-  core_instance36:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i37
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp37: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i38")) generate 
-  core_instance37:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i38
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp38: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i39")) generate 
-  core_instance38:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i39
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp39: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i40")) generate 
-  core_instance39:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i40
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp40: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i41")) generate 
-  core_instance40:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i41
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp41: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i42")) generate 
-  core_instance41:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i42
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp42: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i43")) generate 
-  core_instance42:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i43
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp43: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i44")) generate 
-  core_instance43:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i44
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp44: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i45")) generate 
-  core_instance44:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i45
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp45: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i46")) generate 
-  core_instance45:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i46
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp46: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i47")) generate 
-  core_instance46:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i47
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp47: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i48")) generate 
-  core_instance47:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i48
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp48: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i49")) generate 
-  core_instance48:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i49
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp49: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i50")) generate 
-  core_instance49:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i50
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp50: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i51")) generate 
-  core_instance50:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i51
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp51: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i52")) generate 
-  core_instance51:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i52
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp52: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i53")) generate 
-  core_instance52:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i53
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp53: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i54")) generate 
-  core_instance53:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i54
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp54: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i55")) generate 
-  core_instance54:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i55
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp55: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i56")) generate 
-  core_instance55:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i56
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp56: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i57")) generate 
-  core_instance56:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i57
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp57: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i58")) generate 
-  core_instance57:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i58
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp58: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i59")) generate 
-  core_instance58:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i59
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp59: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i60")) generate 
-  core_instance59:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i60
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp60: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i61")) generate 
-  core_instance60:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i61
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp61: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i62")) generate 
-  core_instance61:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i62
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp62: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i63")) generate 
-  core_instance62:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i63
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
- comp63: if ((core_name0 = "pfb_fir_8192ch_core_blk_mem_gen_v8_3_i64")) generate 
-  core_instance63:pfb_fir_8192ch_core_blk_mem_gen_v8_3_i64
-   port map ( 
-        addra => core_addr,
-        clka => clk,
-        ena => core_ce,
-        douta => core_data_out
-  ); 
-   end generate;
-
-latency_test: if (latency > 1) generate
- reg: synth_reg
- generic map (
- width => c_width,
- latency => latency - 1
- )
- port map (
- i => core_data_out,
- ce => core_ce,
- clr => '0',
- clk => clk,
- o => data
- );
- end generate;
- 
- latency_1: if (latency <= 1) generate
- data <= core_data_out;
- end generate;
- end behavior;
 

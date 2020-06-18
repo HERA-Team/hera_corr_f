@@ -14,7 +14,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set FPGAClockPeriod 100
 	set GenerateTestBench 0
 	set HDLLanguage {vhdl}
-	set IPOOCCacheRootPath {/home/jackh/.Xilinx/Sysgen/SysgenVivado/lnx64.o/ip}
+	set IPOOCCacheRootPath {/home/kocz/.Xilinx/Sysgen/SysgenVivado/lnx64.o/ip}
 	set IP_Auto_Infer {1}
 	set IP_Categories_Text {System_Generator_for_DSP}
 	set IP_Common_Repos {0}
@@ -24,7 +24,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set IP_LifeCycle_Menu {2}
 	set IP_Logo {sysgen_icon_100.png}
 	set IP_Name {}
-	set IP_Revision {150469605}
+	set IP_Revision {223232072}
 	set IP_Socket_IP {0}
 	set IP_Socket_IP_Proj_Path {}
 	set IP_Vendor_Text {User_Company}
@@ -41,36 +41,38 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 		{{synth_reg_reg.vhd} -lib {xil_defaultlib}}
 		{{single_reg_w_init.vhd} -lib {xil_defaultlib}}
 		{{xlclockdriver_rd.vhd} -lib {xil_defaultlib}}
+		{{xpm_f6cc85_vivado.mem}}
 		{{vivado_ip.tcl}}
-		{{fft_8192_1a_core_blk_mem_gen_v8_3_i0_vivado.coe}}
-		{{fft_8192_1a_core_blk_mem_gen_v8_3_i1_vivado.coe}}
-		{{fft_8192_1a_core_blk_mem_gen_v8_3_i2_vivado.coe}}
-		{{fft_8192_1a_core_blk_mem_gen_v8_3_i3_vivado.coe}}
-		{{fft_8192_1a_core_blk_mem_gen_v8_3_i4_vivado.coe}}
-		{{fft_8192_1a_core_blk_mem_gen_v8_3_i5_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i0_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i1_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i2_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i3_vivado.coe}}
-		{{fft_8192_1a_core_blk_mem_gen_v8_3_i6_vivado.coe}}
-		{{fft_8192_1a_core_blk_mem_gen_v8_3_i7_vivado.coe}}
-		{{fft_8192_1a_core_blk_mem_gen_v8_3_i8_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i4_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i5_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i6_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i7_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i8_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i9_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i10_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i11_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i12_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i13_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i14_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i15_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i16_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i17_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i18_vivado.coe}}
-		{{fft_8192_1a_core_dist_mem_gen_v8_0_i19_vivado.coe}}
+		{{xpm_862abf_vivado.mem}}
+		{{xpm_aac239_vivado.mem}}
+		{{xpm_fa7f51_vivado.mem}}
+		{{xpm_31439a_vivado.mem}}
+		{{fft_8192_1a_core_dist_mem_gen_i0_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i1_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i2_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i3_vivado.coe}}
+		{{xpm_98f453_vivado.mem}}
+		{{xpm_cb2434_vivado.mem}}
+		{{xpm_45185a_vivado.mem}}
+		{{fft_8192_1a_core_dist_mem_gen_i4_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i5_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i6_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i7_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i8_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i9_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i10_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i11_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i12_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i13_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i14_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i15_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i16_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i17_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i18_vivado.coe}}
+		{{fft_8192_1a_core_dist_mem_gen_i19_vivado.coe}}
+		{{xpm_258bd0_vivado.mem}}
+		{{xpm_f5fed5_vivado.mem}}
+		{{xpm_ecb464_dpram.mem}}
 		{{fft_8192_1a_core_entity_declarations.vhd} -lib {xil_defaultlib}}
 		{{fft_8192_1a_core.vhd} -lib {xil_defaultlib}}
 		{{fft_8192_1a_core_clock.xdc}}
@@ -81,9 +83,9 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set SimulationTime {614700.00000000 ns}
 	set SynthStrategyName {Vivado Synthesis Defaults}
 	set SynthesisTool {Vivado}
-	set TargetDir {/home/jackh/herafengine/fft_8192_1a_core}
+	set TargetDir {/data/home/kocz/casper/models/hera_corr_f/fft_8192_1a_core}
 	set TopLevelModule {fft_8192_1a_core}
-	set TopLevelSimulinkHandle 75505
+	set TopLevelSimulinkHandle 76286
 	set VHDLLib {xil_defaultlib}
 	set TopLevelPortInterface {}
 	dict set TopLevelPortInterface sync Name {sync}
