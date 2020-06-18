@@ -54,8 +54,8 @@ def cmd_handler(corr, r, message, testmode=False):
     command_time = d["time"]
     args = d["args"]
     if testmode:
-        print "Got command:", command
-        print "       args:", args
+        print ("Got command:", command)
+        print ("       args:", args)
         return
     if command == "phase_switch":
         create_status(r, command, command_time, status="running", **args)

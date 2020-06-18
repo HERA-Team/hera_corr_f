@@ -34,6 +34,6 @@ for feng in corr.fengs:
             logger.error("Failed to read power from antenna %s. Skipping EQ" % ants)
             continue
         att_e, att_n = pam.attenuation()
-        print "Antenna %s power: N: %.2f (attenuation %d dB) E: %.2f (attenuation %d dB)" % (ants, pow_n, att_n, pow_e, att_e)
+        print ("Antenna %s power: N: %.2f (attenuation %d dB) E: %.2f (attenuation %d dB)" % (ants, pow_n, att_n, pow_e, att_e))
 
 corr.enable_monitoring(30, wait=True)

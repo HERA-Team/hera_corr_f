@@ -71,31 +71,31 @@ if args.timeorder:
             time, chan, ant  = decode_header(payload)
             if (ant == anti) and (chan == chani):
                 if (time-ti != 2*nsamp_per_pkt): #2x for even odd split
-                    print "ERROR: TIME not incrementing by %d" %(2*nsamp_per_pkt)
-                    print "ANT: %d CHAN: %d TIME: %d"%(ant,chan,time)
+                    print ("ERROR: TIME not incrementing by %d" %(2*nsamp_per_pkt))
+                    print ("ANT: %d CHAN: %d TIME: %d"%(ant,chan,time))
                     errorctr += 1
                 ti = time;
                 n += 1
         except KeyboardInterrupt:
-            print '#######################'
-            print 'Grabbed %d packets' % n
-            print 'Errors: %d' % errorctr
-            print '#######################'
+            print ('#######################')
+            print ('Grabbed %d packets' % n)
+            print ('Errors: %d' % errorctr)
+            print ('#######################')
             break
     exit()          
 
 if args.single_packet:
     payload, addr = sock.recvfrom(BUFSIZE)
     time, chan, ant, data = decode_packet(payload)
-    print 'TIME: %d (TIME%%4: %d), CHAN: %d , ANT: %d' % (time, time%4, chan, ant)
+    print ('TIME: %d (TIME%%4: %d), CHAN: %d , ANT: %d' % (time, time%4, chan, ant))
     for ant in range(3):
-        print '\nAnt: %d'%ant
+        print ('\nAnt: %d'%ant)
         offset = ant*chans_per_pkt*nsamp_per_pkt*pol
         for i in range(96):
-            print '%3d:%3d: ' %(i*4, (i+1)*4),
+            print ('%3d:%3d: ' %(i*4, (i+1)*4)),
             for d in data[(offset+i*4*2*2):(offset+4*2*2*(i+1)):1]:
-                print '%4d'%d,
-            print ''
+                print ('%4d'%d),
+            print ('')
     exit()
     
 
@@ -136,15 +136,15 @@ while(True):
         time, chan, ant, data = decode_packet(payload)
 
         if args.verbose:
-            print '%d: TIME: %d (TIME%%4: %d), CHAN: %4d, ANT: %3d, DATA0: %d'\
-                   % (n, time, time%4, chan, ant, data[0])
+            print ('%d: TIME: %d (TIME%%4: %d), CHAN: %4d, ANT: %3d, DATA0: %d'\
+                   % (n, time, time%4, chan, ant, data[0]))
         ant_counter[ant//3] += 1
         chan_counter[chan] += 1
 
         if args.errors or args.timeerrors:
             # Check you are getting only one (odd/even) bank
             if (time % 4!=bank):
-                print 'ERROR: Receiving both odd and even banks!'
+                print ('ERROR: Receiving both odd and even banks!')
                 err_count += 1
 
         if args.errors or args.ordererrors:
@@ -156,9 +156,9 @@ while(True):
                     for t in range(nsamp_per_pkt):
                         offset = a * pol * chans_per_pkt * nsamp_per_pkt + t*pol + p
                         if not np.all(data[offset:offset+(pol*nsamp_per_pkt*nbytes):pol*nsamp_per_pkt] == tvg[tvg_offset:tvg_offset+nbytes]):
-                            print 'ERROR: Header and packet contents do not match! (Ant %d (pkt ant %d), Pol: %d, Sample %d, Chan %d)' % (ant, a, p, t, chan)
-                            print 'Expected:', tvg[tvg_offset:tvg_offset+nbytes]
-                            print 'Received:', data[offset:offset+(pol*nsamp_per_pkt*nbytes):pol*nsamp_per_pkt]
+                            print ('ERROR: Header and packet contents do not match! (Ant %d (pkt ant %d), Pol: %d, Sample %d, Chan %d)' % (ant, a, p, t, chan))
+                            print ('Expected:', tvg[tvg_offset:tvg_offset+nbytes])
+                            print ('Received:', data[offset:offset+(pol*nsamp_per_pkt*nbytes):pol*nsamp_per_pkt])
                             err_count += 1
 
         if args.errors or args.chanerrors:
@@ -174,21 +174,21 @@ while(True):
         break
 
 if args.stats:
-    print 'Packet count by antenna:'
+    print ('Packet count by antenna:')
     for xn, x in enumerate(ant_counter):
-        print 'ANT %3d: %d' % (3*xn, x)
-    print 'Packet count by channel: from headers (from data)'
+        print ('ANT %3d: %d' % (3*xn, x))
+    print ('Packet count by channel: from headers (from data)')
     for xn, x in enumerate(chan_counter[0::chans_per_pkt]):
         #a0 = data_chan_counter[xn]
         #a1 = data_chan_counter[xn+2048]
         #a2 = data_chan_counter[xn+4096]
         #tot = a0+a1+a2
-        print 'CHAN %4d-%4d: %d '%(xn*chans_per_pkt, (xn+1)*chans_per_pkt-1, x)
+        print ('CHAN %4d-%4d: %d '%(xn*chans_per_pkt, (xn+1)*chans_per_pkt-1, x))
         #(ANT0:%d, ANT1:%d, ANT2:%d TOTAL:%d)' % (xn, x, a0, a1, a2, tot)
 
-print '#######################'
-print 'Grabbed %d packets' % n
-print 'Errors: %d' % err_count
-print '#######################'
+print ('#######################')
+print ('Grabbed %d packets' % n)
+print ('Errors: %d' % err_count)
+print ('#######################')
 
     

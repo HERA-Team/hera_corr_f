@@ -24,7 +24,7 @@ while(True):
     try:
         mess = ps.get_message(ignore_subscribe_messages=True)
         if mess is not None:
-            print json.loads(mess['data'])['formatted']
+            print (json.loads(mess['data'])['formatted'])
         else:
             time.sleep(0.01)
     except KeyboardInterrupt:

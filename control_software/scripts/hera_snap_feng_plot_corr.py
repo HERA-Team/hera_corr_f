@@ -13,7 +13,7 @@ for i in range(6):
         antj = i // 2
         poli = i % 2
         polj = j % 2
-        print "Plotting baseline (%d,%d) (Ant %d Pol %d, Ant %d Pol %d)" % (i, j, anti, poli, antj, polj)
+        print ("Plotting baseline (%d,%d) (Ant %d Pol %d, Ant %d Pol %d)" % (i, j, anti, poli, antj, polj))
         c = f.corr.get_new_corr(i,j)
         plt.subplot(6,6,6*i+j)
         plt.semilogy(np.abs(c))

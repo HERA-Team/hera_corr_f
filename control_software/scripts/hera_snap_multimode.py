@@ -125,7 +125,7 @@ if args.noise:
 
 fengines_list = []
 for fengine, fparams in zip(corr.fengs, fengs.values()):
-    print 'Setting Antenna indices for fengine: %s .... ' % fengine.host
+    print ('Setting Antenna indices for fengine: %s .... ' % fengine.host)
     fengine.packetizer.initialize()
     fengine.reorder.initialize()
 
@@ -138,10 +138,10 @@ for fengine, fparams in zip(corr.fengs, fengs.values()):
         ip_odd = (ip[0] << 24) + (ip[1] << 16) + (ip[2] << 8) + ip[3]
         for a in range(ant_list.shape[0]):
             slot_num = xhost*ant_list.shape[0] + a
-            print 'Slot_num: %d\t' % slot_num,
-            print 'Ants: ', ant_list[a],
-            print '\tChans: ', xparams['chans'][0:4],
-            print '\t...', xparams['chans'][-5:]
+            print ('Slot_num: %d\t' % slot_num),
+            print ('Ants: ', ant_list[a]),
+            print ('\tChans: ', xparams['chans'][0:4]),
+            print ('\t...', xparams['chans'][-5:])
             fengine.packetizer.assign_slot(slot_num, xparams['chans'],
                                            [ip_even, ip_odd], fengine.reorder
                                            ant_list[a][0])
@@ -166,4 +166,4 @@ else:
 # Re-enable the monitoring process
 corr.enable_monitoring()
 
-print 'Initialization complete'
+print ('Initialization complete')
