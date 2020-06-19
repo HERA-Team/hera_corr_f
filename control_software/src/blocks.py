@@ -294,9 +294,9 @@ class Sync(Block):
         self.change_reg_bits('arm', 0, self.OFFSET_SW_SYNC)
 
     def print_status(self):
-        print 'Sync block: %s: Uptime: %d seconds' % (self.name, self.uptime())
-        print 'Sync block: %s: Period: %d FPGA clocks' % (self.name, self.period())
-        print 'Sync block: %s: Count : %d' % (self.name, self.count())
+        print ('Sync block: %s: Uptime: %d seconds' % (self.name, self.uptime()))
+        print ('Sync block: %s: Period: %d FPGA clocks' % (self.name, self.period()))
+        print ('Sync block: %s: Count : %d' % (self.name, self.count()))
 
     def initialize(self):
         """
@@ -343,7 +343,7 @@ class NoiseGen(Block):
 
     def print_status(self):
         for stream in range(self.nstreams):
-            print 'NoiseGen block: %s: stream %d seed: %d' % (self.name, stream, self.get_seed(stream))
+            print ('NoiseGen block: %s: stream %d seed: %d' % (self.name, stream, self.get_seed(stream)))
 
 
 class Input(Block):
@@ -501,15 +501,15 @@ class Input(Block):
 
     def print_status(self):
         mean, power, rms = self.get_stats()
-        print 'mean:',
-        for i in mean: print '%3f'%i,
-        print ''
-        print 'power:',
-        for i in power: print '%3f'%i,
-        print ''
-        print 'rms:',
-        for i in rms: print '%3f'%i,
-        print ''
+        print ('mean:'),
+        for i in mean: print ('%3f'%i),
+        print ('')
+        print ('power:'),
+        for i in power: print ('%3f'%i),
+        print ('')
+        print ('rms:'),
+        for i in rms: print ('%3f'%i),
+        print ('')
 
     def set_input(self, i):
         """
@@ -584,10 +584,10 @@ class Input(Block):
         x, hist = self.get_all_histograms()
         hist /= 1024.*1024
         for vn, v in enumerate(x):
-            print '%5d:'%v,
+            print ('%5d:'%v),
             for an, ant in enumerate(hist):
-                print '%.3f'%ant[vn],
-            print ''
+                print ('%.3f'%ant[vn]),
+            print ('')
 
     def plot_histogram(self, input, show=False):
         from matplotlib import pyplot as plt
@@ -849,7 +849,7 @@ class Eq(Block):
         return self.read_uint('clip_cnt')
 
     def print_status(self):
-        print 'Number of times input got clipped: %d'%self.clip_count()
+        print ('Number of times input got clipped: %d'%self.clip_count())
 
     def initialize(self):
         """
@@ -1101,7 +1101,7 @@ class Rotator(Block):
             self.set_ant_phases(ant, [0])
 
     def print_status(self):
-        print "Is enabled?", self.is_enabled
+        print ("Is enabled?", self.is_enabled)
 
 
 class Eth(Block):
@@ -1183,7 +1183,7 @@ class Eth(Block):
     def print_status(self):
         rv = self.get_status()
         for key in rv.keys():
-            print '%12s : %d'%(key,rv[key])
+            print ('%12s : %d'%(key,rv[key]))
 
 
 class Corr(Block):
@@ -1357,7 +1357,7 @@ class RoachInput(Block):
         self.write_int('rms_enable', 1)
 
     def print_status(self):
-        print self.get_stats()
+        print (self.get_stats())
 
 class RoachDelay(Block):
     def __init__(self, host, name, nstreams=6, logger=None):

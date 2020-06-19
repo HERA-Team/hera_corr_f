@@ -25,7 +25,7 @@ r = redis.Redis(args.redishost, decode_responses=True)
 if args.config_file is None:
     config_str  = r.hget('snap_configuration', 'config')
     config_time = r.hget('snap_configuration', 'upload_time_str')
-    print 'Using configuration from redis, uploaded at %s' % config_time
+    print ('Using configuration from redis, uploaded at %s' % config_time)
     config = yaml.load(config_str)
 else:
     with open(args.config_file,'r') as fp:
@@ -44,10 +44,10 @@ fengines_list = []
 for host,params in fengs.items():
     fengines_list += [SnapFengine(host)]
 
-print 'Sync-ing Fengines'
-print 'Waiting for PPS at time %.2f' % time.time()
+print ('Sync-ing Fengines')
+print ('Waiting for PPS at time %.2f' % time.time())
 fengines_list[0].sync.wait_for_sync()
-print 'Sync passed at time %.2f' % time.time()
+print ('Sync passed at time %.2f' % time.time())
 before_sync = time.time()
 for fengine in fengines_list:
     fengine.sync.arm_sync()
@@ -55,24 +55,24 @@ after_sync = time.time()
 sync_time = int(before_sync) + 3 # Takes 3 clcok cycles to arm
 r['corr:feng_sync_time'] = sync_time
 r['corr:feng_sync_time_str'] = time.ctime(sync_time)
-print 'Syncing took %.2f seconds' % (after_sync - before_sync)
+print ('Syncing took %.2f seconds' % (after_sync - before_sync))
 if after_sync - before_sync > 0.5:
-    print "WARNING!!!"
+    print ("WARNING!!!")
 
-print 'Sync-ing Noise generators'
-print 'Waiting for PPS at time %.2f' % time.time()
+print ('Sync-ing Noise generators')
+print ('Waiting for PPS at time %.2f' % time.time())
 fengines_list[0].sync.wait_for_sync()
-print 'Sync passed at time %.2f' % time.time()
+print ('Sync passed at time %.2f' % time.time())
 before_sync = time.time()
 for fengine in fengines_list:
     fengine.sync.arm_noise()
 after_sync = time.time()
-print 'Syncing took %.2f seconds' % (after_sync - before_sync)
+print ('Syncing took %.2f seconds' % (after_sync - before_sync))
 if after_sync - before_sync > 0.5:
-    print "WARNING!!!"
+    print ("WARNING!!!")
 
 if args.mansync:
-    print 'Generating a software sync trigger'
+    print ('Generating a software sync trigger')
     for fengine in fengines_list:
         fengine.sync.arm_sync()
         fengine.sync.arm_noise()
@@ -86,4 +86,4 @@ if args.mansync:
 # Re-enable the monitoring process
 r.delete('disable_monitoring')
 
-print 'Syncing complete'
+print ('Syncing complete')

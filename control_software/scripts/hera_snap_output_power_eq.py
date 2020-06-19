@@ -57,21 +57,21 @@ for ant, snap in corr.ant_to_snap.iteritems():
             spec = feng.corr.get_new_corr(chan, chan).real
             # Do some trivial rfi excision my masking around the median
             median = np.median(spec)
-            print "median:", median
+            print ("median:", median)
             spec_sliced = spec[np.logical_and(spec < 2*median, spec > 0.5*median)]
             if spec_sliced.shape[0] == 0:
                 continue
             mean = spec_sliced.mean()
-            print "mean:", mean
+            print ("mean:", mean)
             # Assuming gaussian noise, compute std dev of real/imag parts
             rms = np.sqrt(mean / 2.)
-            print "rms:", rms
+            print ("rms:", rms)
             scale = args.rms / rms
-            print "scale:", scale
+            print ("scale:", scale)
             if scale == np.nan:
                 continue
             if (scale < 1.05) and (scale > 0.95):
-                print 'Breaking without updating coefficients'
+                print ('Breaking without updating coefficients')
                 break
             corr.set_eq(ant, pol, eq=feng.eq.get_coeffs(chan)*scale)
             # feng.eq.set_coeffs(pn, scale * feng.eq.get_coeffs(pn))

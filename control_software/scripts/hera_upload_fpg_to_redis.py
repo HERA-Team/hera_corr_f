@@ -21,11 +21,11 @@ parser.add_argument('-r', dest='redishost', type=str, default='redishost',
 args = parser.parse_args()
 
 if not args.fpg.endswith('.fpg'):
-    print "You may only upload FPG files with a '.fpg' extension"
+    print ("You may only upload FPG files with a '.fpg' extension")
     exit()
 
 if not os.path.exists(args.fpg):
-    print "FPG file %s not found!" % args.fpg
+    print ("FPG file %s not found!" % args.fpg)
     exit()
 
 r = redis.Redis(args.redishost, decode_responses=True)

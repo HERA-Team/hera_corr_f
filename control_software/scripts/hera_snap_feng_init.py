@@ -130,7 +130,7 @@ def main():
     # Re-enable the monitoring process
     corr.enable_monitoring()
 
-    print 'Initialization complete'
+    print ('Initialization complete')
 
 
 if __name__ == "__main__":
