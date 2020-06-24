@@ -15,8 +15,7 @@ Restart=always
 RestartSec=60
 User=hera
 Group=hera
-ExecStart=/home/hera/.venv/bin/hera_snap_redis_monitor.py --noredistapcp
+ExecStart=/home/hera/anaconda2/envs/venv/bin/hera_snap_redis_monitor.py --noredistapcp
 
 [Install]
 WantedBy=multi-user.target
-
