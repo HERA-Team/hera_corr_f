@@ -15,8 +15,7 @@ Restart=always
 RestartSec=60
 User=hera
 Group=hera
-ExecStart=/home/hera/.venv/bin/casperfpga_redis_tapcp_daemon.py
+ExecStart=/home/hera/anaconda2/envs/venv/bin/casperfpga_redis_tapcp_daemon.py
 
 [Install]
 WantedBy=multi-user.target
-
