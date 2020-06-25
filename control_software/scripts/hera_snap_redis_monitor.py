@@ -368,11 +368,17 @@ if __name__ == "__main__":
                 except KeyError:
                     pass
 
+                redis_vals['timestamp'] = datetime.datetime.now().isoformat()
+
                 for key in redis_vals:
                     if isinstance(redis_vals[key], bool):
+                        # bools are compared using lambda x: x == "True" later
                         redis_vals[key] = str(redis_vals[key])
+                    elif isinstance(redis_vals[key], list):
+                        # values that are appearing as lists as loaded
+                        # with json.loads in corr_cm
+                        redis_vals[key] = json.dumps(redis_vals[key])
 
-                redis_vals['timestamp'] = datetime.datetime.now().isoformat()
                 corr.r.hmset(status_key, redis_vals)
 
         # Get FPGA stats
