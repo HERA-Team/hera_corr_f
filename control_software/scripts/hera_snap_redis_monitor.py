@@ -378,6 +378,9 @@ if __name__ == "__main__":
                         # values that are appearing as lists as loaded
                         # with json.loads in corr_cm
                         redis_vals[key] = json.dumps(redis_vals[key])
+                    elif redis_vals[key] is None:
+                        # newer redis-py does not accept Nonetype, wrap in json.dumps
+                        redis_vals[key] = json.dumps(redis_vals[key])
 
                 corr.r.hmset(status_key, redis_vals)
 
