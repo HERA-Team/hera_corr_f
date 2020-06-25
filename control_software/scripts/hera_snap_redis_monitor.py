@@ -367,6 +367,11 @@ if __name__ == "__main__":
                     redis_vals["fft_of"] = fft_of[key]
                 except KeyError:
                     pass
+
+                for key in redis_vals:
+                    if isinstance(redis_vals[key], bool):
+                        redis_vals[key] = str(redis_vals[key])
+
                 redis_vals['timestamp'] = datetime.datetime.now().isoformat()
                 corr.r.hmset(status_key, redis_vals)
 
