@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/home/hera/anaconda2/envs/venv/bin/python
 
 import argparse
 from hera_corr_f import HeraCorrelator, __version__
@@ -40,12 +40,12 @@ def main():
     parser.add_argument('-p', '--program', action='store_true', default=False,
                         help='Program FPGAs with the fpgfile specified in the config file'
                              'if not programmed already')
-    parser.add_argument('--noredistapcp', action='store_false',
+    parser.add_argument('--noredistapcp', action='store_false', default=True,
                         help='Don\'t use the redis-based SNAP comms protocol')
     parser.add_argument('-P', '--forceprogram', action='store_true', default=False,
                         help='Program FPGAs with the fpgfile specified in the config file'
                              'irrespective of whether they are programmed already')
-    parser.add_argument('--nomultithread', action='store_true', default=False,
+    parser.add_argument('--nomultithread', action='store_true', default=True,
                         help='Don\'t multithread initialization')
     args = parser.parse_args()
 
@@ -92,6 +92,14 @@ def main():
         corr.disable_output()
         corr.initialize(multithread=(not args.nomultithread),
                         uninitialized_only=args.fast_initialize)
+        # Now assign frequency slots to different X-engines as
+        # per the config file. A total of 32 Xengs are assumed for
+        # assigning slots- 16 for the even bank, 16 for the odd.
+        # Channels not assigned to Xengs in the config file are
+        # ignored. Following are the assumed globals:
+        if not corr.configure_freq_slots():
+            logger.error('Configuring frequency slots failed!')
+            #exit()
 
     if args.tvg:
         logger.info('Enabling EQ TVGs...')
@@ -104,15 +112,6 @@ def main():
         for stream in range(fengine.noise.nstreams):
             corr.do_for_all_f("set_seed", block="noise", args=[stream, seed])
         corr.do_for_all_f("use_noise", block="input")
-
-    # Now assign frequency slots to different X-engines as
-    # per the config file. A total of 32 Xengs are assumed for
-    # assigning slots- 16 for the even bank, 16 for the odd.
-    # Channels not assigned to Xengs in the config file are
-    # ignored. Following are the assumed globals:
-    if not corr.configure_freq_slots():
-        logger.error('Configuring frequency slots failed!')
-        exit()
 
     # Sync logic. Do global sync first, and then noise generators
     # wait for a PPS to pass then arm all the boards
