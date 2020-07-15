@@ -321,6 +321,11 @@ if __name__ == "__main__":
                 except:  # noqa
                     snap_rf_stats['eq_coeffs'] = None
                 snap_rf_stats['timestamp'] = datetime.datetime.now().isoformat()
+
+                for key in snap_rf_stats:
+                    if snap_rf_stats[key] is None:
+                        snap_rf_stats[key] = json.dumps(snap_rf_stats[key])
+
                 corr.r.hmset(status_key, snap_rf_stats)
 
         for key, val in input_stats.iteritems():
@@ -332,9 +337,9 @@ if __name__ == "__main__":
                     continue
                 ant, pol = redis_cm.hera_antpol_to_ant_pol(antpol)
                 status_key = 'status:ant:%s:%s' % (ant, pol)
-                mean  = means[antn]
+                mean = means[antn]
                 power = powers[antn]
-                rms   = rmss[antn]
+                rms = rmss[antn]
                 redis_vals = {'adc_mean': mean, 'adc_power': power, 'adc_rms': rms}
                 # Give the antenna hash a key indicating the SNAP and input number it is associated with
                 redis_vals['f_host'] = key
@@ -367,7 +372,23 @@ if __name__ == "__main__":
                     redis_vals["fft_of"] = fft_of[key]
                 except KeyError:
                     pass
+
                 redis_vals['timestamp'] = datetime.datetime.now().isoformat()
+
+                for key in redis_vals:
+                    # make a few explicit type conversions to coerce non-redis
+                    # compatible variables into redis.
+                    if isinstance(redis_vals[key], bool):
+                        # bools are compared using lambda x: x == "True" later
+                        redis_vals[key] = str(redis_vals[key])
+                    elif isinstance(redis_vals[key], list):
+                        # values that are appearing as lists as loaded
+                        # with json.loads in corr_cm
+                        redis_vals[key] = json.dumps(redis_vals[key])
+                    elif redis_vals[key] is None:
+                        # newer redis-py does not accept Nonetype, wrap in json.dumps
+                        redis_vals[key] = json.dumps(redis_vals[key])
+
                 corr.r.hmset(status_key, redis_vals)
 
         # Get FPGA stats
