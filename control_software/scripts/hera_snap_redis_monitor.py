@@ -376,6 +376,8 @@ if __name__ == "__main__":
                 redis_vals['timestamp'] = datetime.datetime.now().isoformat()
 
                 for key in redis_vals:
+                    # make a few explicit type conversions to coerce non-redis
+                    # compatible variables into redis.
                     if isinstance(redis_vals[key], bool):
                         # bools are compared using lambda x: x == "True" later
                         redis_vals[key] = str(redis_vals[key])
