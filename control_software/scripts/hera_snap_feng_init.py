@@ -40,19 +40,17 @@ def main():
     parser.add_argument('-p', '--program', action='store_true', default=False,
                         help='Program FPGAs with the fpgfile specified in the config file'
                              'if not programmed already')
-    parser.add_argument('--noredistapcp', action='store_false', default=True,
-                        help='Don\'t use the redis-based SNAP comms protocol')
     parser.add_argument('-P', '--forceprogram', action='store_true', default=False,
                         help='Program FPGAs with the fpgfile specified in the config file'
                              'irrespective of whether they are programmed already')
-    parser.add_argument('--nomultithread', action='store_true', default=True,
-                        help='Don\'t multithread initialization')
+    parser.add_argument('--multithread', action='store_true', default=False,
+                        help='Multithread initialization (not recommended for a high number of SNAPs)')
     args = parser.parse_args()
 
     logger = handlers.add_default_log_handlers(logging.getLogger(__file__))
     handlers.log_notify(logger)  # send a NOTIFY level message that this script has started
 
-    corr = HeraCorrelator(redishost=args.redishost, config=args.config_file, use_redis=args.noredistapcp)  # noqa
+    corr = HeraCorrelator(redishost=args.redishost, config=args.config_file, use_redis=False)  # noqa
 
     if len(corr.fengs) == 0:
         logger.error("No F-Engines are connected. Is the power off?")
@@ -90,7 +88,7 @@ def main():
 
     if args.fast_initialize is not None:
         corr.disable_output()
-        corr.initialize(multithread=(not args.nomultithread),
+        corr.initialize(multithread=(args.multithread),
                         uninitialized_only=args.fast_initialize)
         # Now assign frequency slots to different X-engines as
         # per the config file. A total of 32 Xengs are assumed for
