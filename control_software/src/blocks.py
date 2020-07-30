@@ -497,7 +497,8 @@ class Input(Block):
         Switch to ADCs. Begin computing stats.
          """
         self.use_adc()
-        self.write_int('rms_enable', 1)
+        #rms code removed from current version of fpga software
+        #self.write_int('rms_enable', 1)
 
     def print_status(self):
         mean, power, rms = self.get_stats()
@@ -1354,7 +1355,7 @@ class RoachInput(Block):
 
     def initialize(self):
         self.use_adc()
-        self.write_int('rms_enable', 1)
+        #self.write_int('rms_enable', 1)
 
     def print_status(self):
         print self.get_stats()
