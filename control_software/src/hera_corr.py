@@ -729,6 +729,8 @@ class HeraCorrelator(object):
                 to_be_initialized = self.fengs
 
             for feng in to_be_initialized:
+                # disable monitoring each time to ensure we don't run out of time
+                self.disable_monitoring(60, wait=True)
                 self.logger.info('Initializing %s' % feng.host)
                 feng.initialize()
                 self.r.hset('status:snap:%s' % feng.host, 'last_initialized', time.ctime())
@@ -861,7 +863,6 @@ class HeraCorrelator(object):
             self.logger.info('Sync passed at time %.2f' % time.time())
         before_sync = time.time()
         for feng in self.fengs:
-            self.logger.info('Arming.... ')
             feng.sync.arm_sync()
         after_sync = time.time()
         if manual:
