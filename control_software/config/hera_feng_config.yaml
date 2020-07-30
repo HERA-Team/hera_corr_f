@@ -43,12 +43,11 @@ eth: False
 
 # FFT shift. One bit per FFT stage, the first stage is the LSB
 # If the FFT uses bit growth, some or all of the stages may be ignored
-fft_shift: 0b0001010101000000
+fft_shift: 0x0fff 
 
 # Specify a full path to an F-Engine fpg files
 # or redis:<fpg filename> if the fpg file has been uploaded to redis
-fpgfile: 'redis:snap_fengine_2020-06-15_1438.fpg'
-#fpgfile: 'redis:snap_fengine_2019-08-29_1717.fpg'
+fpgfile: 'redis:snap_fengine_2020-07-16_1253.fpg'
 
 # Destination port for SNAP data
 dest_port: 8511
