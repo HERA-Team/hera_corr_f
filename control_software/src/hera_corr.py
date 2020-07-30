@@ -34,7 +34,7 @@ class HeraCorrelator(object):
     """HERA Correlator control class."""
 
     def __init__(self, redishost='redishost', config=None, logger=LOGGER, passive=False,
-                 use_redis=True, block_monitoring=True):
+                 use_redis=False, block_monitoring=True):
         """
         Instantiate a HeraCorrelator instance.
 
@@ -190,6 +190,7 @@ class HeraCorrelator(object):
     def establish_connections(self):
         """Connect to SNAP boards listed in the current configuration."""
         # Instantiate CasperFpga connections to all the F-Engine.
+        self.logger.info("Connecting to SNAPs via single thread")
         self.fengs = []
         self.dead_fengs = {}
         ant_index = 0
@@ -230,6 +231,7 @@ class HeraCorrelator(object):
     def establish_connections_multithread(self):
         """Connect to SNAP boards listed in the current configuration."""
         # Instantiate CasperFpga connections to all the F-Engine.
+        self.logger.info("Connecting to SNAPs via multithread")
         self.fengs = []
         self.dead_fengs = {}
         ant_index = 0
@@ -700,7 +702,7 @@ class HeraCorrelator(object):
             except KeyError:
                 self.logger.error("Couldn't find fft_shift keyword in config file")
 
-    def initialize(self, multithread=True, timeout=120, uninitialized_only=True):
+    def initialize(self, multithread=False, timeout=120, uninitialized_only=True):
         """
         Initialize all F-Engines.
 
@@ -859,6 +861,7 @@ class HeraCorrelator(object):
             self.logger.info('Sync passed at time %.2f' % time.time())
         before_sync = time.time()
         for feng in self.fengs:
+            self.logger.info('Arming.... ')
             feng.sync.arm_sync()
         after_sync = time.time()
         if manual:
