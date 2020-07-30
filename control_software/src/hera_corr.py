@@ -73,8 +73,8 @@ class HeraCorrelator(object):
 
         self.config_is_valid = self._verify_config()
 
-    def do_for_all_f(self, method, block=None, block_index=None, args=(), kwargs={}, timeout=3,
-                     dead_count_threshold=3, check_programmed=False):
+    def do_for_all_f(self, method, block=None, block_index=None, args=(), kwargs={}, timeout=10,
+                     dead_count_threshold=10, check_programmed=False):
         """
         Call `method` against all F-Engine instances.
 
