@@ -60,7 +60,11 @@ class SnapFengine(object):
             self.phaseswitch,
         ]
 
-        self.initialized = False
+        if self.is_programmed():
+            self.initialized = self.is_initialized()
+        else:
+            self.initialized = False
+
         self.i2c_initialized = False
         # The I2C devices mess with FPGA registers
         # when instantiated. This will fail if the board
@@ -93,16 +97,65 @@ class SnapFengine(object):
         """
         return 'adc16_controller' in self.fpga.listdev()
 
+    def configure_adc(self):
+        """
+        Initialize the Synth and Adc blocks.
+        Calibrate the ADCs.
+        """        
+        self.synth.initialize()
+        if self.adc.initialize():
+            self.input.change_reg_bits('source_sel', 1, 14, 1)
+            return True
+        else:
+            self.input.change_reg_bits('source_sel', 0, 14, 1)
+            return False
+
+    def declare_adc_misconfigured(self):
+        self.input.change_reg_bits('source_sel', 0, 14, 1)    
+
+    def is_adc_configured(self):
+        """
+        15th bit from LSB (0x4000) of the source_sel register 
+        within the Input block is set when the ADC is configured. 
+        Look for this bit and return.
+        """
+        if (self.input.read_uint('source_sel') & 0x4000):
+           return True
+        else:
+           return False
+
+
     def initialize(self):
+
+        # Init PAMs and FEMs
         if not self.i2c_initialized:
             self._add_i2c()
-        for block in self.blocks:
+        
+        # Init all blocks other than Synth and ADC 
+        blocks_to_init = [blk for blk in self.blocks if blk not in [self.synth, self.adc]]
+
+        for block in blocks_to_init:
             self.logger.info("Initializing block: %s" % block.name)
             block.initialize()
-        self.initialized = True
+        
+        # Set the initialized flag -- arbit reg in the design.
+        self.input.change_reg_bits('source_sel', 1, 15, 1)
+
+        return True
+
+    def declare_uninit(self):
+        self.input.change_reg_bits('source_sel', 0, 15, 1)
 
     def is_initialized(self):
-        return self.initialized
+        """
+        16th bit from LSB (0x8000) of the source_sel register 
+        within the Input block is set when the Fengine is 
+        initialized. Look for this bit and return.
+        """
+        if (self.input.read_uint('source_sel') & 0x8000):
+           return True
+        else:
+           return False
 
     def get_fpga_stats(self):
         """
