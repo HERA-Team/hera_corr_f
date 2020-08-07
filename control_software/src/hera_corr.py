@@ -33,6 +33,7 @@ def _queue_instance_method(q, num, inst, method, args, kwargs):
 class HeraCorrelator(object):
     """HERA Correlator control class."""
 
+
     def __init__(self, redishost='redishost', config=None, logger=LOGGER, passive=False,
                  use_redis=True, block_monitoring=True):
         """
@@ -55,14 +56,20 @@ class HeraCorrelator(object):
         # values with byte-strings like the .fpg files
         self.r_bytes = redis.Redis(redishost, decode_responses=False)
         self.use_redis = use_redis
+        self.passive = passive
 
-        self.get_config(config)
-
-        # Lists of connected SnapFengine objects
-        self.fengs = []
+        # List of connected SnapFengine objects that are yet to
+        # be programmed and initialized
+        uninit_fengs = []
+    
+        # List of programmed and initialized SnapFengine objects
+        fengs = []
+    
         # Dictionary of {hostname: time (float)} where keys are hostnames
         # of dead boards and time entries are unix times when the host was declared dead
-        self.dead_fengs = {}
+        dead_fengs = {}
+
+        self.get_config(config)
 
         if not passive:
             if block_monitoring:
@@ -190,6 +197,7 @@ class HeraCorrelator(object):
     def establish_connections(self):
         """Connect to SNAP boards listed in the current configuration."""
         # Instantiate CasperFpga connections to all the F-Engine.
+        self.uninit_fengs = []
         self.fengs = []
         self.dead_fengs = {}
         ant_index = 0
@@ -203,7 +211,13 @@ class HeraCorrelator(object):
                 else:
                     feng = SnapFengine(host, ant_indices=ant_indices, redishost=None)
                 if feng.fpga.is_connected():
-                    self.fengs += [feng]
+                    if feng.is_programmed():
+                        if feng.is_adc_configured() and feng.is_initialized():
+                            self.fengs += [feng]
+                        else:
+                            self.uninit_fengs += [feng]
+                    else:
+                        self.uninit_fengs += [feng]
                     feng.error_count = 0
                 else:
                     self.logger.warning("Board %s is not connected" % host)
@@ -213,11 +227,11 @@ class HeraCorrelator(object):
                 self.dead_fengs[host] = time.time()
         self.fengs_by_name = {}
         self.fengs_by_ip = {}
-        for feng in self.fengs:
+        for feng in self.fengs + self.uninit_fengs:
             feng.ip = socket.gethostbyname(feng.host)
             self.fengs_by_name[feng.host] = feng
             self.fengs_by_ip[feng.ip] = feng
-        self.logger.info('SNAPs are: %s' % ', '.join([feng.host for feng in self.fengs]))
+        self.logger.info('SNAPs are: %s' % ', '.join([feng.host for feng in self.fengs + self.uninit_fengs]))
 
     def _try_to_connect(self, q, host, ant_indices, redishost):
         """
@@ -259,9 +273,15 @@ class HeraCorrelator(object):
                 self.logger.warning("Board %s is not connected" % feng.host)
             else:
                 feng.error_count = 0
+                if not feng.is_programmed():
+                   self.fengs.remove(feng)
+                   self.uninit_fengs += [feng]
+                elif not feng.is_adc_configured() or not feng.is_initialized():
+                   self.fengs.remove(feng)
+                   self.uninit_fengs += [feng]
         self.fengs_by_name = {}
         self.fengs_by_ip = {}
-        for feng in self.fengs:
+        for feng in self.fengs + self.uninit_fengs:
             feng.ip = socket.gethostbyname(feng.host)
             self.fengs_by_name[feng.host] = feng
             self.fengs_by_ip[feng.ip] = feng
@@ -307,7 +327,7 @@ class HeraCorrelator(object):
             self.logger.info('Re-established connections to SNAPs : %s' % ', '.join([feng.host for feng in new_fengs]))
 
         # Don't forget to actually add the new F-engines!
-        self.fengs += new_fengs
+        self.uninit_fengs += new_fengs
 
     def declare_feng_dead(self, feng):
         """
@@ -410,15 +430,18 @@ class HeraCorrelator(object):
 
         if unprogrammed_only:
             to_be_programmed = []
-            for feng in self.fengs:
+            for feng in self.uninit_fengs:
                 if not feng.is_programmed():
                     to_be_programmed += [feng]
             if len(to_be_programmed) == 0:
                 self.logger.info("Skipping programming because all boards seem ready")
                 return
         else:
-            to_be_programmed = self.fengs
-        self.logger.info("Actually programming %s" % ([f.host for f in self.fengs]))
+            self.uninit_fengs += self.fengs
+            self.fengs = []
+            to_be_programmed = self.uninit_fengs
+
+        self.logger.info("Actually programming %s" % ([f.host for f in to_be_programmed]))
         utils.program_fpgas([f.fpga for f in to_be_programmed], progfile, timeout=300.0)
         time.sleep(20)
         for f in to_be_programmed:
@@ -720,22 +743,69 @@ class HeraCorrelator(object):
         """
         if not multithread:
             if uninitialized_only:
-                to_be_initialized = [feng for feng in self.fengs if not feng.is_initialized()]
+                to_be_initialized = self.uninit_fengs 
                 if len(to_be_initialized) == 0:
+                    self.logger.info('All SNAPs initialized and ready to go!')
                     return
             else:
-                to_be_initialized = self.fengs
+                to_be_initialized = self.uninit_fengs + self.fengs
+                self.fengs = []
 
+            # Initialize all ADCs first. If the ADC cannot be configured, the other blocks
+            # can be ignored and the SNAP can be removed off the list.
+            self.logger.info('Init ADCs of SNAPs: %s' % ', '.join([feng.host for feng in to_be_initialized]))
             for feng in to_be_initialized:
-                self.logger.info('Initializing %s' % feng.host)
-                feng.initialize()
-                self.r.hset('status:snap:%s' % feng.host, 'last_initialized', time.ctime())
+                self.logger.info('ADC Host Board: %s' % feng.host)
+                if feng.is_adc_configured():
+                   self.logger.info('%s: ADC already configured. Skipping.' % feng.host)
+                   continue
+                try:
+                    if not feng.configure_adc():
+                        self.logger.error('Removing %s from SNAP list' % feng.host)
+                        feng.declare_adc_misconfigured()
+                        to_be_initialized.remove(feng)
+                        self.dead_fengs.update({feng.host:time.time()})
+                        self.logger.info('New SNAP list: %s' % ', '.join([feng.host for feng in to_be_initialized]))
+                        continue   
+                except(RuntimeError):
+                    self.logger.error('Runtime Error while initializing ADC')
+                    self.logger.error('Removing %s from SNAP list' % feng.host)
+                    to_be_initialized.remove(feng)
+                    self.logger.info('New SNAP list: %s' % ', '.join([feng.host for feng in to_be_initialized]))
+                    self.dead_fengs.update({feng.host:time.time()})
+            
+            # Initialize all other blocks
+            self.logger.info('Initializing SNAPs: %s' % ', '.join([feng.host for feng in to_be_initialized]))
+            for feng in to_be_initialized:
+                self.logger.info('Completing init for %s' % feng.host)
+                try: 
+                    if feng.initialize():
+                        self.fengs += [feng]
+                        self.r.hset('status:snap:%s' % feng.host, 'last_initialized', time.ctime())
+                    else:
+                        self.logger.error('Failed to initialize %s' % feng.host)
+                        feng.declare_uninit()
+                except(RuntimeError):
+                    self.logger.error('Runtime Error: Failed to initialize %s' % feng.host)
+                    self.dead_fengs.update({feng.host:time.time()})
+
         else:
             self.logger.info('Initializing all hosts using multithreading')
+            # Counterintuitively add uninit fengs to feng list because to_for_all by default 
+            # loops through feng list. Then check if they are configured and remove from feng
+            # list if they failed init.
+            self.fengs += self.uninit_fengs
+            self.uninit_fens = []
             init_time = time.ctime()
             self.do_for_all_f("initialize", timeout=timeout)
             for feng in self.fengs:
-                self.r.hset('status:snap:%s' % feng.host, 'last_initialized', init_time)
+                if not feng.is_initialized():
+                    self.logger.error('Failed to initialize %s' % feng.host)
+                    self.fengs.remove(feng)
+                    self.uninit_fengs += [feng]
+                else:
+                    self.r.hset('status:snap:%s' % feng.host, 'last_initialized', init_time)
+
         # TODO multithread these:
         self._initialize_fft_shift()
         self.noise_diode_disable()
@@ -764,7 +834,7 @@ class HeraCorrelator(object):
         for hooked_up_snap in hookup['snap_to_ant'].keys():
             try:
                 ip = socket.gethostbyname(hooked_up_snap)
-                for feng in self.fengs:
+                for feng in self.fengs + self.uninit_fengs:
                     if feng.ip == ip:
                         self.snap_to_ant[feng.host] = hookup['snap_to_ant'][hooked_up_snap]
                         feng.ants = self.snap_to_ant[feng.host]
@@ -830,10 +900,11 @@ class HeraCorrelator(object):
                     feng.packetizer.assign_slot(xn, chans, [ip_even,ip_odd], feng.reorder, feng.ant_indices[0])
                     feng.eth.add_arp_entry(ip_even, xparams['even']['mac'])
                     feng.eth.add_arp_entry(ip_odd, xparams['odd']['mac'])
-            else:
+            if multithread:
                 self.do_for_all_f("assign_slot", args=[xn, chans, [ip_even, ip_odd]])
                 self.do_for_all_f("add_arp_entry", block="eth", args=[ip_even, xparams['even']['mac']])
                 self.do_for_all_f("add_arp_entry", block="eth", args=[ip_odd, xparams['odd']['mac']])
+
         if not multithread:
             for fn, feng in enumerate(self.fengs):
                 feng.eth.set_source_port(source_port)
@@ -841,6 +912,7 @@ class HeraCorrelator(object):
         else:
             self.do_for_all_f("set_source_port", block="eth", args=[source_port])
             self.do_for_all_f("set_port", block="eth", args=[dest_port])
+                
         return True
 
     def resync(self, manual=False):
