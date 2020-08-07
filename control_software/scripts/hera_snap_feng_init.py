@@ -95,13 +95,8 @@ def main():
         # assigning slots- 16 for the even bank, 16 for the odd.
         # Channels not assigned to Xengs in the config file are
         # ignored. Following are the assumed globals:
-        if not corr.configure_freq_slots():
-            logger.info('Configuring frequency slots failed with multithreading.')
-            logger.info('Attempting without multithreading')
-            if corr.configure_freq_slots(multithread=False):
-               logger.info('Done setting frequency slots.')
-            else:
-               logger.error('Configuring frequency slots failed!')
+        if not corr.configure_freq_slots(multithread=False):
+            logger.info('Configuring frequency slots failed!')
 
     if args.tvg:
         logger.info('Enabling EQ TVGs...')
