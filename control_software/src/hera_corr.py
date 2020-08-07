@@ -35,7 +35,7 @@ class HeraCorrelator(object):
 
 
     def __init__(self, redishost='redishost', config=None, logger=LOGGER, passive=False,
-                 use_redis=True, block_monitoring=True):
+                 use_redis=False, block_monitoring=True):
         """
         Instantiate a HeraCorrelator instance.
 
@@ -80,8 +80,8 @@ class HeraCorrelator(object):
 
         self.config_is_valid = self._verify_config()
 
-    def do_for_all_f(self, method, block=None, block_index=None, args=(), kwargs={}, timeout=3,
-                     dead_count_threshold=3, check_programmed=False):
+    def do_for_all_f(self, method, block=None, block_index=None, args=(), kwargs={}, timeout=10,
+                     dead_count_threshold=10, check_programmed=False):
         """
         Call `method` against all F-Engine instances.
 
@@ -197,10 +197,13 @@ class HeraCorrelator(object):
     def establish_connections(self):
         """Connect to SNAP boards listed in the current configuration."""
         # Instantiate CasperFpga connections to all the F-Engine.
+        
         self.uninit_fengs = []
         self.fengs = []
         self.dead_fengs = {}
         ant_index = 0
+
+        self.logger.info("Connecting to SNAPs via single thread")
         for host in self.config['fengines'].keys():
             ant_indices = self.config['fengines'][host].get('ants', range(ant_index, ant_index + 3))
             ant_index += 3
@@ -244,6 +247,7 @@ class HeraCorrelator(object):
     def establish_connections_multithread(self):
         """Connect to SNAP boards listed in the current configuration."""
         # Instantiate CasperFpga connections to all the F-Engine.
+        self.logger.info("Connecting to SNAPs via multithread")
         self.fengs = []
         self.dead_fengs = {}
         ant_index = 0
@@ -723,7 +727,7 @@ class HeraCorrelator(object):
             except KeyError:
                 self.logger.error("Couldn't find fft_shift keyword in config file")
 
-    def initialize(self, multithread=True, timeout=120, uninitialized_only=True):
+    def initialize(self, multithread=False, timeout=120, uninitialized_only=True):
         """
         Initialize all F-Engines.
 
@@ -750,6 +754,9 @@ class HeraCorrelator(object):
             else:
                 to_be_initialized = self.uninit_fengs + self.fengs
                 self.fengs = []
+
+            # disable monitoring each time to ensure we don't run out of time
+            self.disable_monitoring(60, wait=True)
 
             # Initialize all ADCs first. If the ADC cannot be configured, the other blocks
             # can be ignored and the SNAP can be removed off the list.
