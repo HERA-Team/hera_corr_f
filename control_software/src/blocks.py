@@ -434,10 +434,8 @@ class Input(Block):
             stream (int): Which stream to switch. If None, switch all.
         """
         if stream is None:
-            v = 0
             for stream in range(self.ninput_mux_streams):
-                v += self.USE_NOISE << (2 * stream)
-            self.write_int('source_sel', v)
+                self.change_reg_bits('source_sel', self.USE_NOISE, 2*(self.ninput_mux_streams-1-stream), 2)
         else:
             self.change_reg_bits('source_sel', self.USE_NOISE, 2*(self.ninput_mux_streams-1-stream), 2)
 
@@ -448,10 +446,8 @@ class Input(Block):
             stream (int): Which stream to switch. If None, switch all.
         """
         if stream is None:
-            v = 0
             for stream in range(self.ninput_mux_streams):
-                v += self.USE_ADC << (2 * stream)
-            self.write_int('source_sel', v)
+                self.change_reg_bits('source_sel', self.USE_ADC, 2*(self.ninput_mux_streams-1-stream), 2)
         else:
             self.change_reg_bits('source_sel', self.USE_ADC, 2*(self.ninput_mux_streams-1-stream), 2)
 
@@ -462,10 +458,8 @@ class Input(Block):
             stream (int): Which stream to switch. If None, switch all.
         """
         if stream is None:
-            v = 0
             for stream in range(self.ninput_mux_streams):
-                v += self.USE_ZERO << (2 * stream)
-            self.write_int('source_sel', v)
+                self.change_reg_bits('source_sel', self.USE_ZERO, 2*(self.ninput_mux_streams-1-stream), 2)
         else:
             self.change_reg_bits('source_sel', self.USE_ZERO, 2*(self.ninput_mux_streams-1-stream), 2)
 
@@ -497,7 +491,9 @@ class Input(Block):
         Switch to ADCs. Begin computing stats.
          """
         self.use_adc()
-        self.write_int('rms_enable', 1)
+
+        #rms code removed from current version of fpga software
+        #self.write_int('rms_enable', 1)
 
     def print_status(self):
         mean, power, rms = self.get_stats()
@@ -1354,7 +1350,7 @@ class RoachInput(Block):
 
     def initialize(self):
         self.use_adc()
-        self.write_int('rms_enable', 1)
+        #self.write_int('rms_enable', 1)
 
     def print_status(self):
         print self.get_stats()
