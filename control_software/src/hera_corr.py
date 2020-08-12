@@ -760,6 +760,7 @@ class HeraCorrelator(object):
 
             # Initialize all ADCs first. If the ADC cannot be configured, the other blocks
             # can be ignored and the SNAP can be removed off the list.
+            failed_adc_snaps = []
             self.logger.info('Init ADCs of SNAPs: %s' % ', '.join([feng.host for feng in to_be_initialized]))
             for feng in to_be_initialized:
                 self.logger.info('ADC Host Board: %s' % feng.host)
@@ -770,17 +771,24 @@ class HeraCorrelator(object):
                     if not feng.configure_adc():
                         self.logger.error('Removing %s from SNAP list' % feng.host)
                         feng.declare_adc_misconfigured()
-                        to_be_initialized.remove(feng)
+                        failed_adc_snaps += [feng]
+                        #to_be_initialized.remove(feng)
                         self.dead_fengs.update({feng.host:time.time()})
                         self.logger.info('New SNAP list: %s' % ', '.join([feng.host for feng in to_be_initialized]))
                         continue   
                 except(RuntimeError):
                     self.logger.error('Runtime Error while initializing ADC')
                     self.logger.error('Removing %s from SNAP list' % feng.host)
-                    to_be_initialized.remove(feng)
-                    self.logger.info('New SNAP list: %s' % ', '.join([feng.host for feng in to_be_initialized]))
+                    failed_adc_snaps += [feng]
+                    #to_be_initialized.remove(feng)
                     self.dead_fengs.update({feng.host:time.time()})
-            
+
+            # Remove mis-configured ADCs
+            for feng in failed_adc_snaps:
+                self.uninit_fengs += [feng]
+                to_be_initialized.remove(feng)            
+            self.logger.info('New SNAP list: %s' % ', '.join([feng.host for feng in to_be_initialized]))
+
             # Initialize all other blocks
             self.logger.info('Initializing SNAPs: %s' % ', '.join([feng.host for feng in to_be_initialized]))
             for feng in to_be_initialized:
