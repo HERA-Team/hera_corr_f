@@ -275,7 +275,9 @@ if __name__ == "__main__":
         corr.r.hmset('version:%s:%s' % (__package__, os.path.basename(__file__)), {'version':__version__, 'timestamp':datetime.datetime.now().isoformat()})
 
         # Get antenna stats
-        input_stats = corr.do_for_all_f("get_stats", block="input", kwargs={"sum_cores": True})
+        # do_for_all_f breaking on adc stats, casting to None 25 Aug 2020
+        # input_stats = corr.do_for_all_f("get_stats", block="input", kwargs={"sum_cores": True})
+        input_stats = {}
         if corr.r.exists('disable_monitoring'):
             continue
         histograms = []
@@ -328,19 +330,21 @@ if __name__ == "__main__":
 
                 corr.r.hmset(status_key, snap_rf_stats)
 
-        for key, val in input_stats.iteritems():
+        for key, val in fft_of.iteritems():
             antpols = corr.fengs_by_name[key].ants
-            means, powers, rmss = val
+            # means, powers, rmss = val
             for antn, antpol in enumerate(antpols):
                 # Don't report inputs which aren't connected
                 if antpol is None:
                     continue
                 ant, pol = redis_cm.hera_antpol_to_ant_pol(antpol)
                 status_key = 'status:ant:%s:%s' % (ant, pol)
-                mean = means[antn]
-                power = powers[antn]
-                rms = rmss[antn]
-                redis_vals = {'adc_mean': mean, 'adc_power': power, 'adc_rms': rms}
+                # do_for_all_f breaking on adc stats, casting to None 25 Aug 2020
+                # mean = means[antn]
+                # power = powers[antn]
+                # rms = rmss[antn]
+                # redis_vals = {'adc_mean': mean, 'adc_power': power, 'adc_rms': rms}
+                redis_vals = {'adc_mean': None, 'adc_power': None, 'adc_rms': None}
                 # Give the antenna hash a key indicating the SNAP and input number it is associated with
                 redis_vals['f_host'] = key
                 redis_vals['host_ant_id'] = antn
