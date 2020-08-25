@@ -284,7 +284,7 @@ if __name__ == "__main__":
         for i in range(6):
             if corr.r.exists('disable_monitoring'):
                 continue
-            histograms += [corr.do_for_all_f("get_input_histogram", block="input", args=(i,))]
+            # histograms += [corr.do_for_all_f("get_input_histogram", block="input", args=(i,))]
             eq_coeffs += [corr.do_for_all_f("get_coeffs", block="eq", args=(i,))]
             autocorrs += [corr.do_for_all_f("get_new_corr", block="corr", args=(i, i))]
         # We only detect overflow once per FPGA (not per antenna).
@@ -302,7 +302,7 @@ if __name__ == "__main__":
 
         # Write spectra to snap-indexed keys. This means we'll get spectra even from
         # unconnected (according to the CM database) antennas
-        for snap in histograms[0].keys():
+        for snap in autocorrs[0].keys():
             for antn in range(6):
                 status_key = 'status:snaprf:%s:%d' % (snap, antn)
                 snap_rf_stats = {}
