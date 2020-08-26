@@ -302,7 +302,7 @@ if __name__ == "__main__":
                     )
                 except:  # noqa
                     logger.info(
-                        "Connection issue on snap {} ant {}"
+                        "Connection issue on snap {} ant {};"
                         "skipping adc data acquistion.".format(feng.host, i)
                     )
                     histograms[feng.host].append([None, None])
@@ -325,7 +325,6 @@ if __name__ == "__main__":
         for i in range(6):
             if corr.r.exists('disable_monitoring'):
                 continue
-            # histograms += [corr.do_for_all_f("get_input_histogram", block="input", args=(i,))]
             eq_coeffs += [corr.do_for_all_f("get_coeffs", block="eq", args=(i,))]
             autocorrs += [corr.do_for_all_f("get_new_corr", block="corr", args=(i, i))]
         # We only detect overflow once per FPGA (not per antenna).
@@ -363,14 +362,14 @@ if __name__ == "__main__":
                     snap_rf_stats['eq_coeffs'] = None
                 snap_rf_stats['timestamp'] = datetime.datetime.now().isoformat()
 
-                for key in snap_rf_stats:
-                    if snap_rf_stats[key] is None:
-                        snap_rf_stats[key] = json.dumps(snap_rf_stats[key])
+                for snap_key in snap_rf_stats:
+                    if snap_rf_stats[snap_key] is None:
+                        snap_rf_stats[snap_key] = json.dumps(snap_rf_stats[snap_key])
 
                 corr.r.hmset(status_key, snap_rf_stats)
-
-        for key in input_stats:
-            antpols = corr.fengs_by_name[key].ants
+        print(list(input_stats.keys()))
+        for host in input_stats:
+            antpols = corr.fengs_by_name[host].ants
 
             for antn, antpol in enumerate(antpols):
                 # Don't report inputs which aren't connected
@@ -379,24 +378,23 @@ if __name__ == "__main__":
                 ant, pol = redis_cm.hera_antpol_to_ant_pol(antpol)
                 status_key = 'status:ant:%s:%s' % (ant, pol)
 
-                mean, power, rms = input_stats[key][antn]
+                mean, power, rms = input_stats[host][antn]
 
                 redis_vals = {'adc_mean': mean, 'adc_power': power, 'adc_rms': rms}
-                # redis_vals = {'adc_mean': None, 'adc_power': None, 'adc_rms': None}
                 # Give the antenna hash a key indicating the SNAP and input number it is associated with
-                redis_vals['f_host'] = key
+                redis_vals['f_host'] = host
                 redis_vals['host_ant_id'] = antn
                 try:
-                    hist_bins, hist_vals = histograms[key][antn]
+                    hist_bins, hist_vals = histograms[host][antn]
                     redis_vals['histogram'] = json.dumps([hist_bins.tolist(), hist_vals.tolist()])
                 except:  # noqa
                     redis_vals['histogram'] = None
                 try:
-                    redis_vals['autocorrelation'] = json.dumps(autocorrs[antn][key].real.tolist())
+                    redis_vals['autocorrelation'] = json.dumps(autocorrs[antn][host].real.tolist())
                 except:  # noqa
                     redis_vals['autocorrelation'] = None
                 try:
-                    coeffs = eq_coeffs[antn][key]
+                    coeffs = eq_coeffs[antn][host]
                     redis_vals['eq_coeffs'] = json.dumps(coeffs.tolist())
                 except:
                     redis_vals['eq_coeffs'] = None
@@ -411,25 +409,25 @@ if __name__ == "__main__":
                 except KeyError:
                     pass
                 try:
-                    redis_vals["fft_of"] = fft_of[key]
+                    redis_vals["fft_of"] = fft_of[host]
                 except KeyError:
                     pass
 
                 redis_vals['timestamp'] = datetime.datetime.now().isoformat()
 
-                for key in redis_vals:
+                for redis_key in redis_vals:
                     # make a few explicit type conversions to coerce non-redis
                     # compatible variables into redis.
-                    if isinstance(redis_vals[key], bool):
+                    if isinstance(redis_vals[redis_key], bool):
                         # bools are compared using lambda x: x == "True" later
-                        redis_vals[key] = str(redis_vals[key])
-                    elif isinstance(redis_vals[key], list):
+                        redis_vals[redis_key] = str(redis_vals[redis_key])
+                    elif isinstance(redis_vals[redis_key], list):
                         # values that are appearing as lists as loaded
                         # with json.loads in corr_cm
-                        redis_vals[key] = json.dumps(redis_vals[key])
-                    elif redis_vals[key] is None:
+                        redis_vals[redis_key] = json.dumps(redis_vals[redis_key])
+                    elif redis_vals[redis_key] is None:
                         # newer redis-py does not accept Nonetype, wrap in json.dumps
-                        redis_vals[key] = json.dumps(redis_vals[key])
+                        redis_vals[redis_key] = json.dumps(redis_vals[redis_key])
 
                 corr.r.hmset(status_key, redis_vals)
 
