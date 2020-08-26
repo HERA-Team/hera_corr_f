@@ -367,7 +367,7 @@ if __name__ == "__main__":
                         snap_rf_stats[snap_key] = json.dumps(snap_rf_stats[snap_key])
 
                 corr.r.hmset(status_key, snap_rf_stats)
-        print(list(input_stats.keys()))
+
         for host in input_stats:
             antpols = corr.fengs_by_name[host].ants
 
