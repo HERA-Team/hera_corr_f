@@ -302,8 +302,8 @@ if __name__ == "__main__":
                     )
                 except:  # noqa
                     logger.info(
-                        "Connection issue on snap {}, "
-                        "skipping adc data acquistion.".format(feng.host)
+                        "Connection issue on snap {} ant {}"
+                        "skipping adc data acquistion.".format(feng.host, i)
                     )
                     histograms[feng.host].append([None, None])
                     histograms[feng.host].append([None, None])
@@ -369,7 +369,7 @@ if __name__ == "__main__":
 
                 corr.r.hmset(status_key, snap_rf_stats)
 
-        for key, val in fft_of.iteritems():
+        for key in input_stats:
             antpols = corr.fengs_by_name[key].ants
 
             for antn, antpol in enumerate(antpols):
