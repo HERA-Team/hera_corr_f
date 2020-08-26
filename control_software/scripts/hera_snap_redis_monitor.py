@@ -278,9 +278,48 @@ if __name__ == "__main__":
         # do_for_all_f breaking on adc stats, casting to None 25 Aug 2020
         # input_stats = corr.do_for_all_f("get_stats", block="input", kwargs={"sum_cores": True})
         input_stats = {}
+        histograms = {}
+        bins = np.arange(-128, 129)
+        for feng in corr.fengs:
+            histograms[feng.host] = []
+            input_stats[feng.host] = []
+            for i in range(3):
+                try:
+                    x, y = feng.input.get_adc_snapshot(i)
+                    hist_x, _ = np.histogram(x, bins=bins)
+                    hist_y, _ = np.histogram(x, bins=bins)
+                    histograms[feng.host].append([bins, hist_x])
+                    histograms[feng.host].append([bins, hist_y])
+                    input_stats[feng.host].append(
+                        [
+                            x.mean(), np.mean(x**2), np.sqrt(np.mean(x**2))
+                        ]
+                    )
+                    input_stats[feng.host].append(
+                        [
+                            y.mean(), np.mean(y**2), np.sqrt(np.mean(y**2))
+                        ]
+                    )
+                except:  # noqa
+                    logger.info(
+                        "Connection issue on snap {}, "
+                        "skipping adc data acquistion.".format(feng.host)
+                    )
+                    histograms[feng.host].append([None, None])
+                    histograms[feng.host].append([None, None])
+                    input_stats[feng.host].append(
+                        [None, None, None]
+                    )
+                    input_stats[feng.host].append(
+                        [None, None, None]
+                    )
+                # all the data throughput from this call can cause network issues
+                # a small sleep can help
+                time.sleep(0.1)
+
+
         if corr.r.exists('disable_monitoring'):
             continue
-        histograms = []
         eq_coeffs = []
         autocorrs = []
         for i in range(6):
@@ -309,7 +348,7 @@ if __name__ == "__main__":
                 status_key = 'status:snaprf:%s:%d' % (snap, antn)
                 snap_rf_stats = {}
                 try:
-                    hist_bins, hist_vals = histograms[antn][snap]
+                    hist_bins, hist_vals = histograms[snap][antn]
                     snap_rf_stats['histogram'] = json.dumps([hist_bins.tolist(), hist_vals.tolist()])
                 except:  # noqa
                     snap_rf_stats['histogram'] = None
@@ -332,24 +371,23 @@ if __name__ == "__main__":
 
         for key, val in fft_of.iteritems():
             antpols = corr.fengs_by_name[key].ants
-            # means, powers, rmss = val
+
             for antn, antpol in enumerate(antpols):
                 # Don't report inputs which aren't connected
                 if antpol is None:
                     continue
                 ant, pol = redis_cm.hera_antpol_to_ant_pol(antpol)
                 status_key = 'status:ant:%s:%s' % (ant, pol)
-                # do_for_all_f breaking on adc stats, casting to None 25 Aug 2020
-                # mean = means[antn]
-                # power = powers[antn]
-                # rms = rmss[antn]
-                # redis_vals = {'adc_mean': mean, 'adc_power': power, 'adc_rms': rms}
-                redis_vals = {'adc_mean': None, 'adc_power': None, 'adc_rms': None}
+
+                mean, power, rms = input_stats[key][antn]
+
+                redis_vals = {'adc_mean': mean, 'adc_power': power, 'adc_rms': rms}
+                # redis_vals = {'adc_mean': None, 'adc_power': None, 'adc_rms': None}
                 # Give the antenna hash a key indicating the SNAP and input number it is associated with
                 redis_vals['f_host'] = key
                 redis_vals['host_ant_id'] = antn
                 try:
-                    hist_bins, hist_vals = histograms[antn][key]
+                    hist_bins, hist_vals = histograms[key][antn]
                     redis_vals['histogram'] = json.dumps([hist_bins.tolist(), hist_vals.tolist()])
                 except:  # noqa
                     redis_vals['histogram'] = None
