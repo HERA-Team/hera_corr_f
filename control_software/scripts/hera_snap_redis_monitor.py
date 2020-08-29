@@ -288,8 +288,8 @@ if __name__ == "__main__":
                     x, y = feng.input.get_adc_snapshot(i)
                     hist_x, _ = np.histogram(x, bins=bins)
                     hist_y, _ = np.histogram(x, bins=bins)
-                    histograms[feng.host].append([bins.tolist(), hist_x.tolist()])
-                    histograms[feng.host].append([bins.tolist(), hist_y.tolist()])
+                    histograms[feng.host].append([bins, hist_x])
+                    histograms[feng.host].append([bins, hist_y])
                     input_stats[feng.host].append(
                         [
                             x.mean(), np.mean(x**2), np.sqrt(np.mean(x**2))
