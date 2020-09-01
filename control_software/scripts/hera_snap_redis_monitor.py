@@ -279,7 +279,8 @@ if __name__ == "__main__":
         # input_stats = corr.do_for_all_f("get_stats", block="input", kwargs={"sum_cores": True})
         input_stats = {}
         histograms = {}
-        bins = np.arange(-128, 128)
+        bins = np.arange(-128, 129)
+        bin_centers = (bins[1:] + bins[:1]) / 2
         for feng in corr.fengs:
             histograms[feng.host] = []
             input_stats[feng.host] = []
@@ -288,8 +289,8 @@ if __name__ == "__main__":
                     x, y = feng.input.get_adc_snapshot(i)
                     hist_x, _ = np.histogram(x, bins=bins)
                     hist_y, _ = np.histogram(x, bins=bins)
-                    histograms[feng.host].append([bins, hist_x])
-                    histograms[feng.host].append([bins, hist_y])
+                    histograms[feng.host].append([bin_centers, hist_x])
+                    histograms[feng.host].append([bin_centers, hist_y])
                     input_stats[feng.host].append(
                         [
                             x.mean(), np.mean(x**2), np.sqrt(np.mean(x**2))
