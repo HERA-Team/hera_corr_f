@@ -100,18 +100,19 @@ fengines:
         ants: [21, 22, 23]
 ## MJK: 21 AUG 2020 Node 9 completely unreachable wr-reports DOWN
 ## ARP 08/21/20 WR on Node9 not communicating, no phase lock, needs reboot
-#    heraNode9Snap0:
-#        phase_switch_index: [1,2,3,4,5,6]
-#        ants: [24, 25, 26]
-#    heraNode9Snap1:
-#        phase_switch_index: [7,8,9,10,11,12]
-#        ants: [27, 28, 29]
-#    heraNode9Snap2: # ARP 2/28/20 unpingable 3/3/20 restored
-#        phase_switch_index: [13,14,15,16,17,18]
-#        ants: [30, 31, 32]
-#    heraNode9Snap3: # ARP 2/28/20 failed to sync
-#        phase_switch_index: [19,20,21,22,23,24]
-#        ants: [33, 34, 35]
+## ARP 09/03/20 reboot successful; WR fixed
+    heraNode9Snap0:
+        phase_switch_index: [1,2,3,4,5,6]
+        ants: [24, 25, 26]
+    heraNode9Snap1:
+        phase_switch_index: [7,8,9,10,11,12]
+        ants: [27, 28, 29]
+    heraNode9Snap2: # ARP 2/28/20 unpingable 3/3/20 restored
+        phase_switch_index: [13,14,15,16,17,18]
+        ants: [30, 31, 32]
+    #heraNode9Snap3: # ARP 2/28/20 failed to sync 9/3/20 TFTP errors
+    #    phase_switch_index: [19,20,21,22,23,24]
+    #    ants: [33, 34, 35]
     heraNode7Snap0:
         phase_switch_index: [1,2,3,4,5,6]
         ants: [36, 37, 38]
@@ -164,18 +165,18 @@ fengines:
         phase_switch_index: [19,20,21,22,23,24]
         ants: [81, 82, 83]
 ## ARP 08/21/20 WR on Node3 not communicating, no phase lock
-#    heraNode3Snap0:
-#        phase_switch_index: [1,2,3,4,5,6]
-#        ants: [96, 97, 98]
-#    heraNode3Snap1:
-#        phase_switch_index: [7,8,9,10,11,12]
-#        ants: [99, 100, 101]
-#    heraNode3Snap2:
-#        phase_switch_index: [13,14,15,16,17,18]
-#        ants: [102, 103, 104]
-#    heraNode3Snap3:
-#        phase_switch_index: [19,20,21,22,23,24]
-#        ants: [105, 106, 107]
+    heraNode3Snap0:
+        phase_switch_index: [1,2,3,4,5,6]
+        ants: [96, 97, 98]
+    heraNode3Snap1:
+        phase_switch_index: [7,8,9,10,11,12]
+        ants: [99, 100, 101]
+    heraNode3Snap2:
+        phase_switch_index: [13,14,15,16,17,18]
+        ants: [102, 103, 104]
+    heraNode3Snap3:
+        phase_switch_index: [19,20,21,22,23,24]
+        ants: [105, 106, 107]
     heraNode10Snap0:
         phase_switch_index: [1,2,3,4,5,6]
         ants: [108, 109, 110]
