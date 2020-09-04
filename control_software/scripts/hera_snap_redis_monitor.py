@@ -275,7 +275,9 @@ if __name__ == "__main__":
         corr.r.hmset('version:%s:%s' % (__package__, os.path.basename(__file__)), {'version':__version__, 'timestamp':datetime.datetime.now().isoformat()})
 
         # Get antenna stats
-        # do_for_all_f breaking on adc stats, casting to None 25 Aug 2020
+        # 25 AUG 2020 do_for_all_f breaking on adc stats
+        # recent bitfile change has removed some blocks on the snap.
+        # must use adc snapshot now and build statistics in software instead.
         # input_stats = corr.do_for_all_f("get_stats", block="input", kwargs={"sum_cores": True})
         input_stats = {}
         histograms = {}
