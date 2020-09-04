@@ -303,8 +303,10 @@ if __name__ == "__main__":
                     )
                 except:  # noqa
                     logger.info(
-                        "Connection issue on snap {} ant {};"
-                        "skipping adc data acquistion.".format(feng.host, i)
+                        "Connection issue on snap {} ant {}; "
+                        "skipping adc data acquistion."
+                        "Full error output:".format(feng.host, i),
+                        exc_info=True,
                     )
                     histograms[feng.host].append([[None], [None]])
                     histograms[feng.host].append([[None], [None]])
@@ -351,15 +353,33 @@ if __name__ == "__main__":
                     hist_bins, hist_vals = histograms[snap][antn]
                     snap_rf_stats['histogram'] = json.dumps([hist_bins.tolist(), hist_vals.tolist()])
                 except:  # noqa
+                    logger.info(
+                        "Exception encountered filling snaprf_stats histogram "
+                        "for snap {} antenna index {}; Setting to None."
+                        "Full traceback attached.".format(snap, antn),
+                        exc_info=True,
+                    )
                     snap_rf_stats['histogram'] = None
                 try:
                     snap_rf_stats['autocorrelation'] = json.dumps(autocorrs[antn][snap].real.tolist())
                 except:  # noqa
+                    logger.info(
+                        "Exception encountered filling snaprf_stats autocorrelation "
+                        "for snap {} antenna index {}; Setting to None."
+                        "Full traceback attached.".format(snap, antn),
+                        exc_info=True,
+                    )
                     snap_rf_stats['autocorrelation'] = None
                 try:
                     coeffs = eq_coeffs[antn][snap]
                     snap_rf_stats['eq_coeffs'] = json.dumps(coeffs.tolist())
                 except:  # noqa
+                    logger.info(
+                        "Exception encountered filling snaprf_stats eq_coeffs "
+                        "for snap {} antenna index {}; Setting to None."
+                        "Full traceback attached.".format(snap, antn),
+                        exc_info=True,
+                    )
                     snap_rf_stats['eq_coeffs'] = None
                 snap_rf_stats['timestamp'] = datetime.datetime.now().isoformat()
 
@@ -389,29 +409,65 @@ if __name__ == "__main__":
                     hist_bins, hist_vals = histograms[host][antn]
                     redis_vals['histogram'] = json.dumps([hist_bins.tolist(), hist_vals.tolist()])
                 except:  # noqa
+                    logger.info(
+                        "Exception encountered filling antenna_status histogram "
+                        "for snap {} antenna index {}; Setting to None."
+                        "Full traceback attached.".format(snap, antn),
+                        exc_info=True,
+                    )
                     redis_vals['histogram'] = None
                 try:
                     redis_vals['autocorrelation'] = json.dumps(autocorrs[antn][host].real.tolist())
                 except:  # noqa
+                    logger.info(
+                        "Exception encountered filling antenna_status autocorrelation "
+                        "for snap {} antenna index {}; Setting to None."
+                        "Full traceback attached.".format(snap, antn),
+                        exc_info=True,
+                    )
                     redis_vals['autocorrelation'] = None
                 try:
                     coeffs = eq_coeffs[antn][host]
                     redis_vals['eq_coeffs'] = json.dumps(coeffs.tolist())
                 except:
+                    logger.info(
+                        "Exception encountered filling antenna_status autocorrelation "
+                        "for snap {} antenna index {}; Setting to None."
+                        "Full traceback attached.".format(snap, antn),
+                        exc_info=True,
+                    )
                     redis_vals['eq_coeffs'] = None
                 try:
                     redis_vals.update(pam_stats[ant][pol])
                 except KeyError:
+                    logger.info(
+                        "Exception encountered filling antenna_status pam statistics "
+                        "for snap {} antenna index {}; Setting to None."
+                        "Full traceback attached.".format(snap, antn),
+                        exc_info=True,
+                    )
                     # if a SNAP died between getting input stats (which is the dictionary we are looping over)
                     # and getting pam/fem stats, the appropriate PAM/FEM keys may not exist
                     pass
                 try:
                     redis_vals.update(fem_stats[ant][pol])
                 except KeyError:
+                    logger.info(
+                        "Exception encountered filling antenna_status fem statistics "
+                        "for snap {} antenna index {}; Setting to None."
+                        "Full traceback attached.".format(snap, antn),
+                        exc_info=True,
+                    )
                     pass
                 try:
                     redis_vals["fft_of"] = fft_of[host]
                 except KeyError:
+                    logger.info(
+                        "Exception encountered filling antenna_status fft_of "
+                        "for snap {} antenna index {}; Setting to None."
+                        "Full traceback attached.".format(snap, antn),
+                        exc_info=True,
+                    )
                     pass
 
                 redis_vals['timestamp'] = datetime.datetime.now().isoformat()
