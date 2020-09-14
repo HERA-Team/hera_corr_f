@@ -639,8 +639,19 @@ class Pfb(Block):
         self.PRESHIFT_WIDTH  = 2
         self.STAT_RST_BIT = 18
 
+    def get_fft_shift(self):
+        """
+        Return the current FFT shift schedule (LSB = stage 1, MSB = stage N).
+        """
+        return self.read_uint('ctrl', self.SHIFT_OFFSET)
+
     def set_fft_shift(self, shift):
+        """
+        Set the FFT shift schedule to the specified unsigned integer
+        (LSB = stage 1, MSB = stage N).
+        """
         self.change_reg_bits('ctrl', shift, self.SHIFT_OFFSET, self.SHIFT_WIDTH)
+        assert(self.get_fft_shift() == shift) # ensure write was successful
 
     def set_fft_preshift(self, shift):
         self.change_reg_bits('ctrl', shift, self.PRESHIFT_OFFSET, self.PRESHIFT_WIDTH)
