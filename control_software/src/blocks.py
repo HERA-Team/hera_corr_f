@@ -643,7 +643,9 @@ class Pfb(Block):
         """
         Return the current FFT shift schedule (LSB = stage 1, MSB = stage N).
         """
-        return self.read_uint('ctrl', self.SHIFT_OFFSET)
+        shift = self.read_uint('ctrl', self.SHIFT_OFFSET)
+        shift &= 0xffff # return only the bottom 16-bits of the 32b register
+        return shift
 
     def set_fft_shift(self, shift):
         """
