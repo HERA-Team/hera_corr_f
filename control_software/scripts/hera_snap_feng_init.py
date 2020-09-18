@@ -45,13 +45,17 @@ def main():
                              'irrespective of whether they are programmed already')
     parser.add_argument('--multithread', action='store_true', default=False,
                         help='Multithread initialization (not recommended for a high number of SNAPs)')
+    parser.add_argument('--allsnaps', action='store_true', default=False,
+                        help='Require communication with all snaps (exit if any are put in dead_fengs")')
     args = parser.parse_args()
 
     logger = handlers.add_default_log_handlers(logging.getLogger(__file__))
     handlers.log_notify(logger)  # send a NOTIFY level message that this script has started
 
     corr = HeraCorrelator(redishost=args.redishost, config=args.config_file, use_redis=False)  # noqa
-
+    if args.allsnaps and len(corr.dead_fengs) != 0:
+        logger.error("Requiring all SNAPS, but %d were dead." % len(corr.dead_fengs))
+        exit()
     if (len(corr.fengs) == 0) and (len(corr.uninit_fengs) == 0):
         logger.error("No F-Engines are connected. Is the power off?")
         exit()
