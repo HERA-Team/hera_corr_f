@@ -651,7 +651,6 @@ class Pfb(Block):
         (LSB = stage 1, MSB = stage N).
         """
         self.change_reg_bits('ctrl', shift, self.SHIFT_OFFSET, self.SHIFT_WIDTH)
-        assert(self.get_fft_shift() == shift) # ensure write was successful
 
     def set_fft_preshift(self, shift):
         self.change_reg_bits('ctrl', shift, self.PRESHIFT_OFFSET, self.PRESHIFT_WIDTH)
