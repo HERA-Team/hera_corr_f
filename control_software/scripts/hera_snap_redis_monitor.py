@@ -310,8 +310,8 @@ if __name__ == "__main__":
                         "Full error output:".format(feng.host, i),
                         exc_info=True,
                     )
-                    histograms[feng.host].append([[None], [None]])
-                    histograms[feng.host].append([[None], [None]])
+                    histograms[feng.host].append([np.array([None]), np.array([None])])
+                    histograms[feng.host].append([np.array([None]), np.array([None])])
                     input_stats[feng.host].append(
                         [None, None, None]
                     )
