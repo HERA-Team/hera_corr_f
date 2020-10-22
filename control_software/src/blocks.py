@@ -645,18 +645,32 @@ class Pfb(Block):
         Return the current FFT shift schedule (LSB = stage 1, MSB = stage N).
         """
         shift = self.read_uint('ctrl', self.SHIFT_OFFSET)
-        shift &= 0xffff # return only the bottom 16-bits of the 32b register
+        shift &= 2**self.SHIFT_WIDTH - 1 # mask to valid bits
         return shift
 
-    def set_fft_shift(self, shift):
+    def set_fft_shift(self, shift, verify=False):
         """
         Set the FFT shift schedule to the specified unsigned integer
         (LSB = stage 1, MSB = stage N).
         """
-        self.change_reg_bits('ctrl', shift, self.SHIFT_OFFSET, self.SHIFT_WIDTH)
+        self.change_reg_bits('ctrl', shift,
+                             self.SHIFT_OFFSET, self.SHIFT_WIDTH)
+        if verify:
+            assert(shift == self.get_fft_shift)
 
-    def set_fft_preshift(self, shift):
-        self.change_reg_bits('ctrl', shift, self.PRESHIFT_OFFSET, self.PRESHIFT_WIDTH)
+    def get_fft_preshift(self):
+        """
+        Return the current FFT preshift value.
+        """
+        shift = self.read_uint('ctrl', self.PRESHIFT_OFFSET)
+        shift &= 2**self.PRESHIFT_WIDTH - 1 # mask to valid bits
+        return shift
+
+    def set_fft_preshift(self, shift, verify=False):
+        self.change_reg_bits('ctrl', shift,
+                             self.PRESHIFT_OFFSET, self.PRESHIFT_WIDTH)
+        if verify:
+            assert(shift == self.get_fft_preshift)
 
     def rst_stats(self):
         self.change_reg_bits('ctrl', 1, self.STAT_RST_BIT)
@@ -665,9 +679,9 @@ class Pfb(Block):
     def is_overflowing(self):
         return self.read_uint('status') != 0
 
-    def initialize(self):
+    def initialize(self, fft_shift=0xb110101010101, verify=False):
         self.write_int('ctrl', 0)
-        self.set_fft_shift(0b110101010101)
+        self.set_fft_shift(fft_shift, verify=verify)
         self.rst_stats()
 
 class PhaseSwitch(Block):
@@ -860,13 +874,14 @@ class Eq(Block):
     def print_status(self):
         print('Number of times input got clipped: %d'%self.clip_count())
 
-    def initialize(self):
+    def initialize(self, coeffs=100):
         """
         Initialize block, setting coefficients to some nominally sane value.
         Currently, this is 100.0
         """
         for stream in range(self.nstreams):
-            self.set_coeffs(stream, 100*np.ones(self.ncoeffs,dtype='>%s'%self.format))
+            self.set_coeffs(stream, 
+               coeffs * np.ones(self.ncoeffs, dtype='>%s' % self.format))
 
 class EqTvg(Block):
     def __init__(self, host, name, nstreams=8, nchans=2**13, logger=None):
@@ -1117,8 +1132,17 @@ class Eth(Block):
     def __init__(self, host, name, port=10000, logger=None):
         super(Eth, self).__init__(host, name, logger)
         self.port = port
+        self.BASE_MAC_OFFSET = 0x3000
+        self.STATUS_OFFSET = 18
+        self.PORT_OFFSET = 2
+        self.PORT_WIDTH = 16
+        self.RESET_OFFSET = 0
+        self.ENABLE_OFFSET = 1
+        self.IP_OFFSET = 0x10
+        self.SOURCE_PORT_OFFSET = 0x20
+        self.PORT_FORMAT = '>BBH'
 
-    def set_arp_table(self, macs):
+    def set_arp_table(self, macs, verify=False):
         """
         Set the ARP table with a list of MAC addresses.
         The list, `macs`, is passed such that the zeroth
@@ -1128,7 +1152,16 @@ class Eth(Block):
         """
         macs = list(macs)
         macs_pack = struct.pack('>%dQ' % (len(macs)), *macs)
-        self.write('sw', macs_pack, offset=0x3000)
+        self.write('sw', macs_pack, offset=self.BASE_MAC_OFFSET)
+        if verify:
+            for mac1, mac2 in zip(macs, self.get_arp_table):
+                assert(mac1 == mac2)
+
+    def get_arp_table(self):
+        MAX_MACS = 256 # XXX is 256 the maximum number of macs?
+        macs_str = self.read('sw', MAX_MACS, offset=self.BASE_MAC_OFFSET)
+        macs = struct.unpack('>%dQ' % (MAX_MACS), macs_str)
+        return macs
 
     def add_arp_entry(self, ip, mac):
         """
@@ -1136,7 +1169,8 @@ class Eth(Block):
         """
         mac_pack = struct.pack('>Q', mac)
         ip_offset = ip % 256
-        self.write('sw', mac_pack, offset=0x3000 + ip_offset*8)
+        self.write('sw', mac_pack,
+                   offset=self.BASE_MAC_OFFSET + ip_offset*8)
 
     def get_status(self):
         stat = self.read_uint('sw_txs_ss_status')
@@ -1157,42 +1191,68 @@ class Eth(Block):
         return rv
 
     def status_reset(self):
-        self.change_reg_bits('ctrl', 0, 18)
-        self.change_reg_bits('ctrl', 1, 18)
-        self.change_reg_bits('ctrl', 0, 18)
+        self.change_reg_bits('ctrl', 0, self.STATUS_OFFSET)
+        self.change_reg_bits('ctrl', 1, self.STATUS_OFFSET)
+        self.change_reg_bits('ctrl', 0, self.STATUS_OFFSET)
 
-    def set_port(self, port):
+    def get_port(self):
+        port = self.read_uint('ctrl', self.PORT_OFFSET)
+        port &= 2**self.PORT_WIDTH - 1
+        return port
+
+    def set_port(self, port, verify=False):
         self.port = port
-        self.change_reg_bits('ctrl', port, 2, 16)
+        self.change_reg_bits('ctrl', port,
+                             self.PORT_OFFSET, self.PORT_WIDTH)
+        if verify:
+            assert(port == self.get_port())
 
     def reset(self):
         # stop traffic before reset
         self.disable_tx()
         # toggle reset
-        self.change_reg_bits('ctrl', 0, 0)
-        self.change_reg_bits('ctrl', 1, 0)
-        self.change_reg_bits('ctrl', 0, 0)
+        self.change_reg_bits('ctrl', 0, self.RESET_OFFSET)
+        self.change_reg_bits('ctrl', 1, self.RESET_OFFSET)
+        self.change_reg_bits('ctrl', 0, self.RESET_OFFSET)
 
-    def enable_tx(self):
-        self.change_reg_bits('ctrl', 1, 1)
+    def enable_tx(self, verify=False):
+        self.change_reg_bits('ctrl', 1, self.ENABLE_OFFSET)
+        if verify:
+            assert(self.check_enabled())
 
-    def disable_tx(self):
-        self.change_reg_bits('ctrl', 0, 1)
+    def disable_tx(self, verify=False):
+        self.change_reg_bits('ctrl', 0, self.ENABLE_OFFSET)
+        if verify:
+            assert(not self.check_enabled())
+
+    def check_enabled(self):
+        val = self.read_uint('ctrl', self.ENABLE_OFFSET)
+        val &= 0x1 # mask to one bit
+        return val
 
     def initialize(self):
         #Set ip address of the SNAP
         ipaddr = socket.inet_aton(socket.gethostbyname(self.host.host))
-        self.blindwrite('sw', ipaddr, offset=0x10)
+        self.blindwrite('sw', ipaddr, offset=self.IP_OFFSET)
         self.set_port(self.port)
 
-    def set_source_port(self, port):
+    def get_source_port(self):
         # see config_10gbe_core in katcp_wrapper
-        self.blindwrite('sw', struct.pack('>BBH', 0, 1, port), offset=0x20)
+        portstr = self.read('sw', struct.calcsize(self.PORT_FORMAT))
+        port = struct.unpack(self.PORT_FORMAT, portstr)
+        # Skipping first two bytes, which are 0, 1
+        return port[-1]
+
+    def set_source_port(self, port, verify=False):
+        # see config_10gbe_core in katcp_wrapper
+        self.blindwrite('sw', struct.pack(self.PORT_FORMAT, 0, 1, port),
+                        offset=self.SOURCE_PORT_OFFSET)
+        if verify:
+            assert(port == self.get_source_port())
 
     def print_status(self):
         rv = self.get_status()
-        for key in rv.keys():
-            print('%12s : %d'%(key,rv[key]))
+        print('\n'.join(['%12s : %d' % (k,v) for k,v in rv.items()]))
 
 
 class Corr(Block):
