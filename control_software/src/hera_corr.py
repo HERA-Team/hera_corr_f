@@ -17,25 +17,26 @@ import numpy as np
 from casperfpga import utils
 
 LOGGER = add_default_log_handlers(logging.getLogger(__name__))
+TEMP_BITSTREAM_STORE = "/tmp/" # location to store bitfiles from redis
 
 
-def _queue_instance_method(q, num, inst, method, args, kwargs):
-    """
-    Add an [num, inst.method(*args, **kwargs)] call to queue, q.
-
-    Use q.get() to get the return data from this call.
-    This function is used for parallelizing calls to multiple
-    roaches/engines.
-    """
-    q.put([num, getattr(inst, method)(*args, **kwargs)])
+#def _queue_instance_method(q, num, inst, method, args, kwargs):
+#    """
+#    Add an [num, inst.method(*args, **kwargs)] call to queue, q.
+#
+#    Use q.get() to get the return data from this call.
+#    This function is used for parallelizing calls to multiple
+#    roaches/engines.
+#    """
+#    q.put([num, getattr(inst, method)(*args, **kwargs)])
 
 
 class HeraCorrelator(object):
     """HERA Correlator control class."""
 
 
-    def __init__(self, redishost='redishost', config=None, logger=LOGGER, passive=False,
-                 use_redis=False, block_monitoring=True):
+    def __init__(self, redishost='redishost', config=None, logger=LOGGER,
+                 passive=False, use_redis=False, block_monitoring=True):
         """
         Instantiate a HeraCorrelator instance.
 
@@ -44,7 +45,7 @@ class HeraCorrelator(object):
             config (str): Path to configuration file. If None, config will be grabbed from redis.
             logger (logging.Logger): Logging object this class will use.
             passive (Boolean): If True, won't connect to SNAPs. If False, will establish
-            SNAP connections and check the connected boards are alive.
+                SNAP connections and check the connected boards are alive.
             use_redis (Boolean): If True, will use a redis proxy (at `redishost`) for talking to
             SNAP boards, rather than direct TFTP.
             block_monitoring (Boolean): If True, will disable monitoring before connecting to boards
@@ -58,18 +59,9 @@ class HeraCorrelator(object):
         self.use_redis = use_redis
         self.passive = passive
 
-        # List of connected SnapFengine objects that are yet to
-        # be programmed and initialized
-        uninit_fengs = []
-    
-        # List of programmed and initialized SnapFengine objects
-        fengs = []
-    
-        # Dictionary of {hostname: time (float)} where keys are hostnames
-        # of dead boards and time entries are unix times when the host was declared dead
-        dead_fengs = {}
-
-        self.get_config(config)
+        self.fengs = {}
+        self.get_config(config) # sets self.config with result
+        self.set_default_progfile() # sets self._progfile from config
 
         if not passive:
             if block_monitoring:
@@ -78,114 +70,28 @@ class HeraCorrelator(object):
             # Get antenna<->SNAP maps
             self.compute_hookup()
 
-        self.config_is_valid = self._verify_config()
 
-    def do_for_all_f(self, method, block=None, block_index=None, args=(), kwargs={}, timeout=10,
-                     dead_count_threshold=10, check_programmed=False):
+    def get_config(self, config=None, verify=True):
         """
-        Call `method` against all F-Engine instances.
+        Parse a configuration file and set self.config accordingly.
 
         inputs:
-            method (str): Method to call
-            block (str or None): What block should the method call
-                               -- eg SnapFengine.`block`.`method`(...).
-                         Use None to indicate that the call is against the SnapFengine
-                         instance directly
-            block_index (int): Use to specify an index if the SnapFengine.`block`
-                         attribute is a list
-            args (tuple): positional arguments to pass to the underlying method
-            kwargs (dict): keyword arguments to pass to the underlying method
-            timeout (float): Timeout in seconds
-            dead_count_threshold (int): Number of failed connection attempts allowed before
-                          declaring an F-Engine dead. Set to None to skip error tracking
-            check_programmed (bool): Set to True to call against only programmed F-Engines
-        returns:
-            dictionary of return values from the underlying method. Keys are f-engine hostnames.
-            If *any* fengines fail to return before timeout, then this method returns None
-        """
-        # If all fengs are dead, leave.
-        if len(self.fengs) == 0:
-            return {}
-        # Look for the block we're calling methods against
-        # If block is None, we're calling against SnapFengine objects. If it's a string,
-        # we're calling against some block class
-        # TODO: We only check the first instance, and assume the others are the same
-        if block is None:
-            if not check_programmed:
-                instances = self.fengs
-            else:
-                instances = [feng for feng in self.fengs if feng.is_programmed()]
-        else:
-            if not hasattr(self.fengs[0], block):
-                return None
-            if not check_programmed:
-                instances = [getattr(f, block) for f in self.fengs]
-            else:
-                instances = [getattr(f, block) for f in self.fengs if f.is_programmed()]
-        # If the instances are themselves lists, demand the user specify a block index
-        # TODO just checking the first entry
-        if isinstance(instances[0], list):
-            if block_index is None:
-                self.logger.error("Instances of block %s are lists, "
-                                  "but no block_index was specified!" % block)
-                return None
-            else:
-                temp = [instance[block_index] for instance in instances]
-                instances = temp
-
-        # Check that the method is an attribute (may or may not be callable)
-        if not hasattr(instances[0], method):
-            return None
-
-        rv = {}  # return value dictionary
-        # Check if the method is callable. If so, call
-        # if not, just get the attribute for all FEngines in a single-threaded manner
-        if not callable(getattr(instances[0], method)):
-            for instance in instances:
-                if isinstance(instance.host, basestring):
-                    rv[instance.host] = instance.__getattribute__(method)
-                else:
-                    rv[instance.host.host] = instance.__getattribute__(method)
-        else:
-            try:
-                x = utils.threaded_fpga_function(instances, timeout, (method, args, kwargs))
-                for x, val in x.iteritems():
-                    if not isinstance(x, basestring):
-                        host = x.host
-                    else:
-                        host = x
-                    rv[host] = val
-            except RuntimeError:
-                return None
-
-        if dead_count_threshold is not None:
-            # count dead engines
-            for feng in self.fengs:
-                if feng.host not in rv.keys():
-                    feng.error_count += 1
-                else:
-                    feng.error_count = 0
-                if feng.error_count > dead_count_threshold:
-                    self.logger.warning("Declaring %s dead after %d errors" % (feng.host, feng.error_count))  # noqa
-                    self.declare_feng_dead(feng)
-        return rv
-
-    def get_config(self, config=None):
-        """
-        Parse a configuration file.
-
-        inputs:
-            config (str): Path to configuration file. If None, a configuration will
-            be pulled from redis.
+            config (str): Path to configuration file. If None, 
+                configuration will be pulled from redis.
         """
         if config is None:
+            # Pull configuration from redis
             self.config_str = self.r.hget('snap_configuration', 'config')
             self.config_name = self.r.hget('snap_configuration', 'name')
             self.config_hash = self.r.hget('snap_configuration', 'md5')
-            self.config_time = float(self.r.hget('snap_configuration', 'upload_time'))
-            self.config_time_str = self.r.hget('snap_configuration', 'upload_time_str')
-            self.logger.info('Using configuration from redis, uploaded at %s' % self.config_time_str)  # noqa
+            self.config_time = float(self.r.hget('snap_configuration',
+                                                 'upload_time'))
+            self.config_time_str = self.r.hget('snap_configuration',
+                                               'upload_time_str')
+            self.logger.info('Using redis config (uploaded %s)' % 
+                             self.config_time_str)  # noqa
         else:
+            # Read configuration from file
             with open(config, 'r') as fp:
                 self.config_str = fp.read()
             self.config_name = config
@@ -193,201 +99,152 @@ class HeraCorrelator(object):
             self.config_time = time.time()
             self.config_time_str = time.ctime(self.config_time)
         self.config = yaml.load(self.config_str)
+        if verify:
+            self._verify_config()
 
-    def establish_connections(self):
+    def feng_connect(self, host, verify=True):
+        # XXX not supporting auto assignment of antenna indices
+        ant_indices = self.config('fengines'][host]['ants']
+        self.logger.info("Connecting %s with antenna indices %s" % 
+                         (host, ant_indices))
+        feng = SnapFengine(host, ant_indices=ant_indices,
+                           redishost=self.redishost)
+        if feng.fpga.is_connected():
+            self.fengs[host] = feng # single dict call is threadsafe
+        elif verify:
+            raise RuntimeError('Failed to connect: %s' % (host))
+
+    def _call_on_hosts(self, target, args, kwargs,
+                       hosts, multithread, timeout):
+        q = Queue.Queue()
+        def wrap_target(host, args, kwargs):
+            '''Wrapper to capture target output and exceptions.'''
+            try:
+                val = target(*args, **kwargs)
+                q.put((host,val))
+            except RuntimeError,AssertionError as e:
+                self.logger.warning('%s: %s' % (host, e.message()))
+        threads = {host: threading.Thread(
+                            target=wrap_target,
+                            args=(host, args, kwargs),
+                            daemon=multithread,
+                         ) for host in hosts}
+        for thread in threads.values():
+            thread.start()
+            # XXX add some sleep here?
+            # serialize execution if we are not multithreading
+            if not multithread:
+                thread.join(timeout)
+        if multithread:
+            for host,thread in threads.items():
+                thread.join(timeout)
+            # XXX think about killing live threads
+        successes = set([host for host,val in q])
+        failed = [host for host in hosts if not host in successes]
+        self.logger.warning('Call %s failed on: %s'
+                            % (target.__name__, ','.join(failed)))
+        return failed
+
+    def connect_fengs(self, hosts=None,
+                          multithread=False, timeout=300.):
         """Connect to SNAP boards listed in the current configuration."""
         # Instantiate CasperFpga connections to all the F-Engine.
         
-        self.uninit_fengs = []
-        self.fengs = []
-        self.dead_fengs = {}
-        ant_index = 0
-
-        self.logger.info("Connecting to SNAPs via single thread")
-        for host in self.config['fengines'].keys():
-            ant_indices = self.config['fengines'][host].get('ants', range(ant_index, ant_index + 3))
-            ant_index += 3
-            self.logger.info("Setting Feng %s antenna indices to %s" % (host, ant_indices))
-            try:
-                if self.use_redis:
-                    feng = SnapFengine(host, ant_indices=ant_indices, redishost=self.redishost)
-                else:
-                    feng = SnapFengine(host, ant_indices=ant_indices, redishost=None)
-                if feng.fpga.is_connected():
-                    if feng.is_programmed():
-                        if feng.is_adc_configured() and feng.is_initialized():
-                            self.fengs += [feng]
-                        else:
-                            self.uninit_fengs += [feng]
-                    else:
-                        self.uninit_fengs += [feng]
-                    feng.error_count = 0
-                else:
-                    self.logger.warning("Board %s is not connected" % host)
-                    self.dead_fengs[host] = time.time()
-            except:
-                self.logger.exception("Exception whilst connecting to board %s" % host)
-                self.dead_fengs[host] = time.time()
-        self.fengs_by_name = {}
-        self.fengs_by_ip = {}
-        for feng in self.fengs + self.uninit_fengs:
-            feng.ip = socket.gethostbyname(feng.host)
-            self.fengs_by_name[feng.host] = feng
-            self.fengs_by_ip[feng.ip] = feng
-        self.logger.info('SNAPs are: %s' % ', '.join([feng.host for feng in self.fengs + self.uninit_fengs]))
-
-    def _try_to_connect(self, q, host, ant_indices, redishost):
+        if hosts is None:
+            hosts = [host for host in self.config['fengines']
+                        if not host in self.fengs]
+        failed = self._call_on_hosts(
+                            target=self.feng_connect,
+                            args=(host,),
+                            kwargs={'verify': True},
+                            hosts=hosts,
+                            multithread=multithread,
+                            timeout=timeout,
+        )
+        return failed
+            
+    def set_default_progfile(self, progfile=None):
+        if progfile is None:
+            progfile = self.config['fpgfile']
+        if progfile.startswith("redis:"):
+            progfile = progfile.split(":")[-1]
+            bitstream = self.r_bytes.hget("fpg:%s" % progfile, "fpg")
+            progfile = os.path.join(TEMP_BITSTREAM_STORE, progfile)
+            with open(progfile, "wb") as fh:
+                fh.write(bitstream)
+        self._progfile = progfile
+        
+    def feng_program(self, host, progfile=None, force=False,
+                        verify=True, sleep=20):
         """
-        Try to connect to  a single SNAP.
-
-        Used in a multithreaded manner by `establish_connections`
-        """
-        q.put([host, SnapFengine(host, ant_indices=ant_indices, redishost=redishost)])
-
-    def establish_connections_multithread(self):
-        """Connect to SNAP boards listed in the current configuration."""
-        # Instantiate CasperFpga connections to all the F-Engine.
-        self.logger.info("Connecting to SNAPs via multithread")
-        self.fengs = []
-        self.dead_fengs = {}
-        ant_index = 0
-        # Build a queue to multithread over
-        q = Queue()
-        hosts = self.config['fengines'].keys()
-        for host_n, host in enumerate(hosts):
-            ant_indices = self.config['fengines'][host].get('ants', range(ant_index, ant_index + 3))
-            ant_index += 3
-            self.logger.info("Setting Feng %s antenna indices to %s" % (host, ant_indices))
-            if self.use_redis:
-                t = Thread(target=self._try_to_connect, args=(q, host, ant_indices, self.redishost))
-            else:
-                t = Thread(target=self._try_to_connect, args=(q, host, ant_indices, None))
-            t.daemon = True
-            t.start()
-        for host in hosts:
-            host, feng = q.get()
-            q.task_done()
-            self.fengs += [feng]
-        q.join()
-        is_connected = self.do_for_all_f('is_connected', block='fpga')
-        for feng in self.fengs:
-            if not is_connected.get(feng.host, False):
-                self.dead_fengs[feng.host] = time.time()
-                self.fengs.remove(feng)
-                self.logger.warning("Board %s is not connected" % feng.host)
-            else:
-                feng.error_count = 0
-                if not feng.is_programmed():
-                   self.fengs.remove(feng)
-                   self.uninit_fengs += [feng]
-                elif not feng.is_adc_configured() or not feng.is_initialized():
-                   self.fengs.remove(feng)
-                   self.uninit_fengs += [feng]
-        self.fengs_by_name = {}
-        self.fengs_by_ip = {}
-        for feng in self.fengs + self.uninit_fengs:
-            feng.ip = socket.gethostbyname(feng.host)
-            self.fengs_by_name[feng.host] = feng
-            self.fengs_by_ip[feng.ip] = feng
-        self.logger.info('SNAPs are: %s' % ', '.join([feng.host for feng in self.fengs]))
-
-    def reestablish_dead_connections(self, age=0.0, programmed_only=False):
-        """
-        Reconnect to all boards in `self.dead_fengs`.
-
-        If the board was declared dead more than `age` seconds ago.
-        Is non-disruptive to connected boards.
-        """
-        t_thresh = time.time() - age  # Try to connect to boards which were declared dead before this time  # noqa
-        new_fengs = []
-        for host, deadtime in self.dead_fengs.items():
-            if deadtime > t_thresh:
-                self.logger.info("Ignoring host %s, which was only declared dead %d seconds ago" % (time.time() - deadtime))
-                continue
-            try:
-                if self.use_redis:
-                    feng = SnapFengine(host, redishost=self.redishost)
-                else:
-                    feng = SnapFengine(host, redishost=None)
-                if feng.fpga.is_connected():
-                    if (not programmed_only) or (programmed_only and feng.is_programmed()):
-                        new_fengs += [feng]
-                        feng.error_count = 0
-                        self.dead_fengs.pop(host)
-                        self.logger.info("Tried to reconnect to host %s and succeeded!." % host)
-                    else:
-                        self.logger.info("Tried to reconnect to host %s. It is alive but not programmed." % host)
-                else:
-                    self.logger.info("Tried to reconnect to host %s and failed with 'not connected' response" % host)
-            except:
-                self.logger.exception("Tried to reconnect to host %s and failed with exception" % host)
-
-        for feng in new_fengs:
-            feng.ip = socket.gethostbyname(feng.host)
-            self.fengs_by_name[feng.host] = feng
-            self.fengs_by_ip[feng.ip] = feng
-
-        if len(new_fengs) > 0:
-            self.logger.info('Re-established connections to SNAPs : %s' % ', '.join([feng.host for feng in new_fengs]))
-
-        # Don't forget to actually add the new F-engines!
-        self.uninit_fengs += new_fengs
-
-    def declare_feng_dead(self, feng):
-        """
-        Declare the Fengine `feng` dead.
-
-        Remove it from the active list of connected boards. Add it to the list of dead boards
-        if it's not there already. `feng` can either be a SnapFengine object (i.e., an entry
-        from self.fengs) or a hostname.
-        """
-        deadfeng = None
-        # if `feng` is a string, find the object corresponding to the SNAP with that hostname
-        if isinstance(feng, str):
-            self.logger.info("Trying to declare SNAP %s dead" % feng)
-            for f in self.fengs:
-                if f.host == feng:
-                    deadfeng = f
-            if deadfeng is None:
-                self.logger.warning("Couldn't find SNAP %s by hostname" % feng)
-                return
-        # If `feng` is a SnapFengine instance, check it's known
-        else:
-            if feng not in self.fengs:
-                self.logger.warning("Couldn't find SNAP %s by object match" % feng.host)
-                return
-            deadfeng = feng
-
-        # If the SnapFengine instance has been found. Remove it from the active SNAP list
-        try:
-            self.fengs.remove(deadfeng)
-        except ValueError:
-            # Shouldn't be able to error here -- we've already checked the SNAP is there
-            self.logger("Tried to declare %s dead but couldn't remove it" % deadfeng.host)
-
-        self.dead_fengs[deadfeng.host] = time.time()
-
-    def disable_monitoring(self, expiry=60, wait=True):
-        """
-        Set the "disable_monitoring" key in redis.
-
-        Hopefully other processes will respect this key and stop monitoring.
-        Useful if you are going to hammer the TFTP connection and don't want interference
-        from the monitoring loop.
         Inputs:
-            expiry (float): Period (in seconds) for which the monitoring loop
-                            should be disabled.
-            wait (bool): If True, wait for the monitor script to confirm it is
-                         not running before returning
+            progfile (str): Path to fpga file to program. If None, the
+                bitstream in current config will be used.
+        """
+        feng = self.fengs[host]
+        if not force and feng.is_programmed():
+            # XXX might add a parameter for forcing a re-upload
+            # of the progfile
+            return
+        if progfile is None:
+            progfile = self._progfile
+        self.logger.info("Programming FPGA on %s with %s" % 
+                         (host, progfile))
+        # XXX need to check how this behaves in real life
+        # XXX it may lie and say it programmed when it didn't
+        # XXX it might also try multiple times and/or revert to golden image
+        # this call should block until succees
+        feng.fpga.upload_to_ram_and_program(progfile)
+        if verify:
+            #time.sleep(sleep) # probably unnecessary
+            # XXX could also check version of programmed image against
+            # XXX current version
+            if not feng.fpga.is_programmed():
+                raise RuntimeError('Failed to program FPGA: %s' % (host))
+            self.r.hset('status:snap:%s' % host,
+                        'last_programmed', time.ctime())
+
+    def program_fengs(self, hosts=None, progfile=None, force=False,
+                      multithread=True, timeout=300.):
+        """
+        Program SNAPs.
+
+        Inputs:
+            progfile (str): Path to fpga file to program. If None, the
+                bitstream in current config will be used.
+        """
+        if hosts is None:
+            hosts = self.fengs.keys()
+        failed = self._call_on_hosts(
+                            target=self.feng_program,
+                            args=(host,),
+                            kwargs={
+                                'progfile': progfile,
+                               'force': force, # prefiltered list
+                               'verify': True,
+                               'sleep': 0.,
+                            },
+                            hosts=hosts,
+                            multithread=multithread,
+                            timeout=timeout,
+        )
+        return failed
+
+    def disable_monitoring(self, expiry=60, verify=True, timeout=60):
+        """
+        Set the "disable_monitoring" key in redis. Asks other processes
+        to respect this key and stop monitoring (which can interfere
+        with TFTP traffic).
+        Inputs:
+            expiry (float): Period (in seconds) to disable monitoring
+            wait (bool): Wait for monitor script confirmation
         """
         self.r.set('disable_monitoring', 1, ex=expiry)
-        if wait:
-            TIMEOUT = 60
+        if verify: # XXX is this necessary
             start = time.time()
             while self.is_monitoring():
-                if time.time() > (start + TIMEOUT):
-                    self.logger.warning("Timed out waiting for monitor to stop")
-                    return
+                if time.time() > (start + timeout):
+                    raise RuntimeError('Timed out waiting for monitor to stop')
                 time.sleep(1)
             return
 
@@ -397,442 +254,388 @@ class HeraCorrelator(object):
 
     def is_monitoring(self):
         """
-        Check if monitoring.
-
-        Return True if the monitoring daemon is polling, False otherwise.
-        Note that a False return could either indicate either that the monitor
-        is suspended or that it is not running at all.
+        Check if monitoring daemon is polling. Returns False if monitor
+        is suspended or not running at all.
         """
         for key in self.r.scan_iter("status:*hera_snap_redis_monitor.py"):
             state = self.r.get(key)
             return state == "alive"
-        # If we get here there was no status key and the monitor isn't running
+        # no status key => monitor isn't running
         return False
 
-    def program(self, bitstream=None, unprogrammed_only=True):
-        """
-        Program SNAPs.
-
-        Inputs:
-            bitstream (str): Path to fpgfile to program. If None, the bitstream described in the
-                             current configuration will be used.
-            unprogrammed_only (Boolean): If True, only program boards which aren't yet programmed.
-        """
-        TEMP_BITSTREAM_STORE = "/tmp/"
-        progfile = bitstream or self.config['fpgfile']
-        self.logger.info('Programming all SNAPs with %s' % progfile)
-        if progfile.startswith("redis:"):
-            progfile = progfile.split(":")[-1]
-            try:
-                bitstream = self.r_bytes.hget("fpg:%s" % progfile, "fpg")
-            except KeyError:
-                self.logger.error("FPG file %s not available in redis. Cannot program" % progfile)
-                return
-            progfile = os.path.join(TEMP_BITSTREAM_STORE, progfile)
-            with open(progfile, "wb") as fh:
-                fh.write(bitstream)
-
-        if unprogrammed_only:
-            to_be_programmed = []
-            for feng in self.uninit_fengs:
-                if not feng.is_programmed():
-                    to_be_programmed += [feng]
-            if len(to_be_programmed) == 0:
-                self.logger.info("Skipping programming because all boards seem ready")
-                return
-        else:
-            self.uninit_fengs += self.fengs
-            self.fengs = []
-            to_be_programmed = self.uninit_fengs
-
-        self.logger.info("Actually programming %s" % ([f.host for f in to_be_programmed]))
-        utils.program_fpgas([f.fpga for f in to_be_programmed], progfile, timeout=300.0)
-        time.sleep(20)
-        for f in to_be_programmed:
-            self.r.hset('status:snap:%s' % f.host, 'last_programmed', time.ctime())
-
-    def phase_switch_disable(self):
+    def phase_switch_disable(self, host, verify=False):
+        self.logger.info('Disabling phase switch on %s' % (host))
+        feng = self.fengs[host]
+        feng.phase_switch.disable_mod(verify=verify)
+        feng.phase_switch.disable_demod(verify=verify)
+        
+    def disable_phase_switches(self, hosts=None, verify=True,
+                               multithread=False, timeout=300.):
         """Disable all phase switches."""
-        self.logger.info('Disabling all phase switches')
-        # Don't bother writing the modulation brams. Just hit the master disable
-        # for feng in self.fengs:
-        #    feng.phaseswitch.set_all_walsh(self.config['walsh_order'], [0]*feng.phaseswitch.nstreams, self.config['log_walsh_step_size'])
-        self.do_for_all_f("disable_mod", "phaseswitch")
-        self.do_for_all_f("disable_demod", "phaseswitch")
-        self.r.hmset('corr:status_phase_switch', {'state':'off', 'time':time.time()})
+        if hosts is None:
+            hosts = self.fengs.keys()
+            self.r.hmset('corr:status_phase_switch',
+                         {'state':'off', 'time':time.time()})
+        failed = self._call_on_hosts(
+                            target=self.phase_switch_disable,
+                            args=(host,),
+                            kwargs={'verify': verify},
+                            hosts=hosts,
+                            multithread=multithread,
+                            timeout=timeout,
+        )
+        return failed
 
-    def phase_switch_enable(self):
+    def phase_switch_enable(self, host, verify=False):
+        self.logger.info('Enabling phase switch on %s' % (host))
+        feng = self.fengs[host]
+        feng.phase_switch.set_all_walsh(
+            self.config['walsh_order'],
+            self.config['fengines'][host]['phase_switch_index'],
+            self.config['log_walsh_step_size'],
+            verify=verify,
+        )
+        feng.phase_switch.set_delay(self.config["walsh_delay"],
+                                    verify=verify)
+        feng.phase_switch.enable_mod(verify=verify)
+        feng.phase_switch.enable_demod(verify=verify)
+
+    def enable_phase_switches(self, hosts=None, verify=True,
+                               multithread=False, timeout=300.):
         """Enable all phase switches."""
-        self.logger.info('Enabling all phase switches')
-        for feng in self.fengs:
-            feng.phaseswitch.set_all_walsh(self.config['walsh_order'],
-                                           self.config['fengines'][feng.host]['phase_switch_index'],
-                                           self.config['log_walsh_step_size'])
-        self.do_for_all_f("set_delay", "phaseswitch", args=(self.config["walsh_delay"],))
-        self.do_for_all_f("enable_mod", "phaseswitch")
-        self.do_for_all_f("enable_demod", "phaseswitch")
-        self.r.hmset('corr:status_phase_switch', {'state': 'on', 'time': time.time()})
+        if hosts is None:
+            hosts = self.fengs.keys()
+            self.r.hmset('corr:status_phase_switch',
+                         {'state':'on', 'time':time.time()}
+            )
+        failed = self._call_on_hosts(
+                            target=self.phase_switch_enable,
+                            args=(host,),
+                            kwargs={'verify': True},
+                            hosts=hosts,
+                            multithread=multithread,
+                            timeout=timeout,
+        )
+        return failed
 
-    def noise_diode_enable(self):
-        """Enable all noise switches."""
-        self.logger.info('Enabling all noise inputs')
-        for retry in range(3):
-            for i in range(len(self.fengs[0].fems)):
-                self.do_for_all_f("switch", "fems", block_index=i, args=("noise",), timeout=10)
-        self.r.hmset('corr:status_noise_diode', {'state': 'on', 'time': time.time()})
-        self.r.hmset('corr:status_load', {'state': 'off', 'time': time.time()})
+    def switch_fems(self, mode, east=True, north=True, verify=True,
+                    hosts=None):
+        assert(mode in ('load', 'noise', 'antenna'))
+        if hosts is None:
+            hosts = self.fengs.keys()
+            # Assuming we will succeed in setting entire array to fem state
+            t = time.time()
+            self.r.hmset('corr:fem_switch_state',
+                         {'state': mode, 'time': t})
+        failed = []
+        for host in hosts:
+            for cnt,fem in enumerate(self.fengs[host].fems):
+                self.logger.info('Switching %s.fem[%d] to %s' %
+                                 (host, cnt, mode)) 
+                try:
+                    # will error if verification fails
+                    fem.switch(mode, east=east, north=north verify=verify)
+                except(RuntimeError,AssertionError):
+                    self.logger.warning('Failed to switch %s.fem[%d]' %
+                                        (host, cnt)) 
+                    # only logging failures at resolution of host
+                    failed.append(host))
+        return failed
 
-    def noise_diode_disable(self):
-        """Disable all noise switches."""
-        self.logger.info('Disabling all noise inputs')
-        self.antenna_enable()
-
-    def load_enable(self):
-        """Enable all load switches."""
-        self.logger.info('Enabling all load inputs')
-        for retry in range(3):
-            for i in range(len(self.fengs[0].fems)):
-                self.do_for_all_f("switch", "fems", block_index=i, args=("load",), timeout=10)
-        self.r.hmset('corr:status_load', {'state': 'on', 'time': time.time()})
-        self.r.hmset('corr:status_noise_diode', {'state': 'off', 'time': time.time()})
-
-    def load_disable(self):
-        """Disable all load switches."""
-        self.logger.info('Disabling all load inputs')
-        self.antenna_enable()
-
-    def antenna_enable(self):
-        """Set all switches to Antenna."""
-        self.logger.info('Enable all antenna inputs')
-        for retry in range(3):
-            for i in range(len(self.fengs[0].fems)):
-                self.do_for_all_f("switch", "fems", block_index=i, args=("antenna",), timeout=10)
-        self.r.hmset('corr:status_load', {'state': 'off', 'time': time.time()})
-        self.r.hmset('corr:status_noise_diode', {'state': 'off', 'time': time.time()})
-
-    def get_ant_snap_chan(self, ant, pol):
+    def get_ant_feng_stream(self, ant, pol):
         """
-        Get the input number and SnapFengine object for a given ant, pol.
+        Get the host and input number for a given ant, pol.
 
         Inputs:
-           ant: Antenna string. Eg. '0', for HH0
+           ant: Antenna string or integer. Eg. '0' or 0.
            pol: String polarization -- 'e' or 'n'
         Returns:
-           (snap_instance [SnapFengine], channel_num [int])
+           (host [str], stream_num [int])
         """
-        assert isinstance(ant, basestring), "`ant` input should be a string"
-        assert isinstance(pol, basestring), "`pol` input should be a string"
         pol = pol.lower()
-        assert pol in ['e', 'n'], "`pol` input should be 'e' or 'n'"
-        if ant not in self.ant_to_snap.keys():
-            self.logger.warning("Tried to find antenna %s but it is not on a known SNAP" % ant)
-            return None, None
-        if pol not in self.ant_to_snap[ant]:
-            self.logger.warning("Tried to find antenna %s:%s but it is not on a known SNAP" % (ant, pol))
-            return None, None
-        x = self.ant_to_snap[ant][pol]
+        assert(pol in 'en')
+        ant_hookup = self.ant_to_snap[str(ant)]
+        x = ant_hookup[pol]
         return x['host'], x['channel']
 
-    def set_pam_attenuation(self, ant, pol, val=None):
-        """
-        Set the PAM attenuation of Antenna `ant`, polarization `pol` to `val` dB.
+    def lookup_pam_attenuation(self, ant, pol):
+        redval, redtime = self.r.hmget("atten:ant:%s:%s" % (ant, pol),
+                                       "commanded", "command_time")
+        if redval is None:
+            raise RuntimeError('Failed to find PAM settings for (%s,%s)' %
+                               (str(ant), pol))
+        return int(redval)
 
-        Inputs:
-           ant: Antenna string. Eg. '0', for HH0
-           pol: String polarization -- 'e' or 'n'
-           val: Int attenuation value.
-                If None, an attempt will be made to load previous value from redis.
-        """
-        pol = pol.lower()
-        snap, chan = self.get_ant_snap_chan(ant, pol)
-        if snap is None:
-            self.logger.warning("Tried to set EQ for an antenna we don't recognize!")
-            return
-        elif not isinstance(snap, SnapFengine):
-            self.logger.warning("Tried to set EQ for an antenna whose SNAP can't be reached!")
-            return
-        else:
-            if val is None:
-                # Try to reload coefficients from redis
-                self.logger.debug("Trying to set PAM attenuation for Ant %s%s from redis" % (ant, pol))
-                redval, redtime = self.r.hmget("atten:ant:%s:%s" % (ant, pol), "commanded", "command_time")
-                if redval is not None:
-                    if redtime is None:
-                        redtime_str = "UNKNOWN"
-                    else:
-                        redtime_str = time.ctime(float(redtime))
-                    self.logger.debug("Loading attenuation of %ddB from time %s" % (int(redval), redtime_str))
-                    self.set_pam_attenuation(ant, pol, int(redval))
-                    return
-                # If there are no coeffs in redis. Look at whatever is actually loaded and update redis
-                else:
-                    self.logger.debug("Failed to find attenuation value in redis!")
-                    # update redis with the current values, but do not update the commanded value
-                    val = self.get_pam_attenuation(ant, pol)
-                    return
-            # Else if we have a value provided, update redis and try to load it
-            self.logger.info("Setting ant %s pol %s PAM attenuation to %d" % (ant, pol, val))
-            self.r.hmset('atten:ant:%s:%s' % (ant, pol), {'commanded': str(val), 'command_time': time.time()})
-            if pol == 'e':
-                snap.pams[chan//2].set_attenuation(east=val)
+    def store_pam_attenuation(self, ant, pol, attenuation):
+        self.logger.info("Commanding (%s,%s) PAM atten=%d dB in redis" \
+                         % (str(ant), pol, str(atten)))
+        self.r.hmset("atten:ant:%s:%s" % (ant, pol),
+                     {"commmanded": str(attenuation),
+                      "command_time": time.time()}
+        )
+
+    def get_pam_attenuation(self, ant, pol, log_to_redis=True):
+        host, stream = self.get_ant_feng_stream(ant, pol)
+        pam = self.fengs[host].pam[stream//2]
+        east, north = pam.get_attenuation()
+        atten = (east, north)[stream % 2]
+        if log_to_redis:
+            self.logger.info("Logging (%s,%s) PAM atten=%d dB to redis" \
+                             % (str(ant), pol, str(atten)))
+            self.r.hmset('atten:ant:%s:%s' % (ant, pol),
+                         {'value': str(atten), 'time': time.time()})
+        return atten
+
+    def set_pam_attenuation(self, ant, pol, attenuation,
+                            verify=True, safe=True, update_redis=True):
+        self.logger.info("Setting PAM for (%s,%s)" % (ant, pol))
+        host, stream = self.get_ant_feng_stream(ant, pol)
+        pam = self.fengs[host].pam[stream//2]
+        east_north = pam.get_attenuation()
+        if safe:
+            # make sure we read the same value as commanded
+            if pam._cached_atten is not None:
+                assert(east_north == pam._cached_atten)
             else:
-                snap.pams[chan//2].set_attenuation(north=val)
-            self.get_pam_attenuation(ant, pol)
+                other_stream = 2*(stream // 2) + ((stream + 1) % 2)
+                other = self.fengs[host].ants[other_stream]
+                # fails if PAM not reading value it was initialized to
+                assert(east_north[other_stream % 2] == \
+                       self.lookup_pam_attenuation(*other))
+        east_north[stream % 2] = attenuation
+        pam.set_attenuation(*east_north, verify=verify)
+        if update_redis:
+            self.store_pam_attenuation(ant, pol, attenuation)
 
-    def get_pam_attenuation(self, ant, pol):
+    def lookup_eq_coeffs(self, ant, pol):
         """
-        Get the PAM attenuation values of Antenna `ant`, polarization `pol`.
-
-        Optionally update the coefficients stored in redis
-        Inputs:
-           ant: Antenna string. Eg. '0', for HH0
-           pol: String polarization -- 'e' or 'n'
-        Returns:
-           Current attenuation value (int)
-        """
-        snap, chan = self.get_ant_snap_chan(ant, pol)
-        if snap is None:
-            self.logger.warning("Tried to set EQ for an antenna we don't recognize!")
-            return
-        elif not isinstance(snap, SnapFengine):
-            self.logger.warning("Tried to set EQ for an antenna whose SNAP can't be reached!")
-            return
-        else:
-            val_e, val_n = snap.pams[chan//2].get_attenuation()
-            if pol.lower() == 'e':
-                val = val_e
-            else:
-                val = val_n
-        self.r.hmset('atten:ant:%s:%s' % (ant, pol), {'value': str(val), 'time': time.time()})
-        time.sleep(0.01)
-        commanded, actual = self.r.hmget('atten:ant:%s:%s' % (ant, pol), 'commanded', 'value')
-        if (commanded is not None) and (actual is not None) and (commanded != actual):
-            self.logger.warning("%s%s: Commanded attenuation (%s) doesn't match read attenuation (%s)" % (ant, pol, commanded, actual))
-        return val
-
-    def tune_pam_attenuation(self, ant, pol, target_pow=None, target_rms=None):
-        """
-        Set the PAM attenuation values of Antenna.
-
-        Set values for `ant`, polarization `pol` so as to target either a PAM power
-        level `target_pow` dBm, or an ADC RMS of `target_rms` units.
-        Inputs:
-           ant: Antenna string. Eg. '0', for HH0
-           pol: String polarization -- 'e' or 'n'
-           target_pow (float): dBm target
-           target_rms (float): ADC RMS target
-        Returns:
-           True if tuning succeeded, else False
-        """
-        assert (target_pow is None) or (target_rms is None), "You may only target _either_ an ADC RMS _or_ a PAM power"
-        assert (target_pow is not None) or (target_rms is not None), "You must target _either_ an ADC RMS _or_ a PAM power"
-        assert pol in ['e', 'n']
-
-        snap, chan = self.get_ant_snap_chan(ant, pol)
-        if snap is None:
-            self.logger.warning("Tried to tune EQ for an antenna we don't recognize!")
-            return False
-        elif not isinstance(snap, SnapFengine):
-            self.logger.warning("Tried to tune EQ for an antenna whose SNAP can't be reached!")
-            return False
-        req_atten = snap.get_pam_atten_by_target(chan, target_pow=target_pow, target_rms=target_rms)
-        if req_atten is not False:
-            self.set_pam_attenuation(ant, pol, req_atten)
-        else:
-            self.logger.warning("Failed to get attenuation target")
-            return False
-
-    def set_eq(self, ant, pol, eq=None):
-        """
-        Set the EQ coefficients of Antenna `ant`, polarization `pol` to a constant or vector `eq`.
+        Lookup the EQ coefficients of an antenna and polarization from
+        redis.
 
         Inputs:
            ant: Antenna string. Eg. '0', for HH0
            pol: String polarization -- 'e' or 'n'
-            eq: Float/Int coefficients. If a single number, all coefficients will be
-                set to this value. If a vector, each entry is one coefficient.
-                If None, an attempt will be made to load coefficients from redis.
-        """
-        snap, chan = self.get_ant_snap_chan(ant, pol)
-        if snap is None:
-            self.logger.warning("Tried to set EQ for an antenna we don't recognize!")
-            return
-        elif not isinstance(snap, SnapFengine):
-            self.logger.warning("Tried to set EQ for an antenna whose SNAP can't be reached!")
-            return
-        else:
-            if eq is None:
-                # Try to reload coefficients from redis
-                self.logger.debug("Trying to set coeffs for Ant %s%s from redis" % (ant, pol))
-                redval = self.r.hgetall("eq:ant:%s:%s" % (ant, pol))
-                if redval != {}:
-                    self.logger.debug("Loading coeffs from time %s" % (time.ctime(float(redval['time']))))
-                    coeffs = np.array(json.loads(redval['values']))
-                    self.set_eq(ant, pol, coeffs)
-                    return
-                # If there are no coeffs in redis look at whatever is actually loaded and update redis
-                else:
-                    self.logger.debug("Failed to find coefficients in redis!")
-                    coeffs = self.get_eq(ant, pol, update_redis=True)
-                    return
-            elif not isinstance(eq, np.ndarray):
-                try:
-                    eq = np.ones(snap.eq.ncoeffs) * eq
-                except:
-                    self.logger.error("Couldn't understand EQ coefficients!")
-                    return
-            snap.eq.set_coeffs(chan, eq)
-            self.get_eq(ant, pol, update_redis=True)
-
-    def get_eq(self, ant, pol, update_redis=False):
-        """
-        Get the EQ coefficients of Antenna `ant`, polarization `pol`.
-
-        Optionally update the coefficients stored in redis
-        Inputs:
-           ant: Antenna string. Eg. '0', for HH0
-           pol: String polarization -- 'e' or 'n'
-           update_redis: Boolean. If True, update this antenna's redis eq vector key
         Returns:
            Current EQ vector (numpy.array)
         """
-        snap, chan = self.get_ant_snap_chan(ant, pol)
-        if snap is None:
-            self.logger.warning("Tried to set EQ for an antenna we don't recognize!")
-            return
-        elif not isinstance(snap, SnapFengine):
-            self.logger.warning("Tried to set EQ for an antenna whose SNAP can't be reached!")
-            return
-        else:
-            coeffs = snap.eq.get_coeffs(chan)
-        if update_redis:
-            self.r.hmset('eq:ant:%s:%s' % (ant, pol), {'values': json.dumps(coeffs.tolist()),
-                                                       'time': time.time()})
+        redval = self.r.hgetall("eq:ant:%s:%s" % (str(ant), pol))
+        if len(redval) == 0:
+            raise RuntimeError('Failed to find EQ coeffs for (%s,%s)' %
+                               (str(ant), pol))
+        coeffs = np.array(json.loads(redval['values']), dtype=np.float)
         return coeffs
 
-    def _initialize_all_eq(self):
-        """Initialize PAM attenuation and SNAP EQ settings to the values currently held in redis."""
-        for feng in self.fengs:
-            for antpol in feng.ants:
-                if antpol is not None:
-                    self.logger.info("Initializing EQ for %s" % antpol)
-                    ant, pol = redis_cm.hera_antpol_to_ant_pol(antpol)
-                    self.set_eq(str(ant), pol)
-                    self.set_pam_attenuation(str(ant), pol)
-
-    def _initialize_fft_shift(self):
-        for feng in self.fengs:
-            try:
-                feng.pfb.set_fft_shift(self.config['fft_shift'])
-            except KeyError:
-                self.logger.error("Couldn't find fft_shift keyword in config file")
-
-    def initialize(self, multithread=False, timeout=120, uninitialized_only=True):
+    def store_eq_coeffs(self, ant, pol, coeffs):
         """
-        Initialize all F-Engines.
+        Store the EQ coefficients of an antenna and polarization to
+        redis.
 
-        1. Initialize F-Eengine blocks.
-        2. Set FFT shift
-        3. Disable noise/phase switches
-        4. Return PAM attenuation and digital EQ to last known state.
-
-        If `multithread` is True, the underlying code will to use
-        this class's `do_for_all_f` method to intialize everyone.
-        In this case, the `timeout` parameter specifies (in seconds)
-        how long the threads should wait before timing out.
-        If `multithread` is False, `unitialized_only` will only attempt
-        to intiialize boards which weren't initialized already.
-        NB: initialization takes about 30 seconds if things are going well,
-        and longer if individual transactions fail and have to be retried.
+        Inputs:
+           ant: Antenna string. Eg. '0', for HH0
+           pol: String polarization -- 'e' or 'n'
+           coeffs: EQ vector (numpy.array)
         """
-        if not multithread:
-            if uninitialized_only:
-                to_be_initialized = self.uninit_fengs 
-                if len(to_be_initialized) == 0:
-                    self.logger.info('All SNAPs initialized and ready to go!')
-                    return
-            else:
-                to_be_initialized = self.uninit_fengs + self.fengs
-                self.fengs = []
+        self.r.hmset('eq:ant:%s:%s' % (ant, pol),
+                     {'values': json.dumps(coeffs.tolist()),
+                      'time': time.time()})
 
-            # disable monitoring each time to ensure we don't run out of time
-            self.disable_monitoring(60, wait=True)
+    def get_eq_coeffs(self, ant, pol):
+        """
+        Read the EQ coefficients of an antenna and polarization from
+        the FPGA stream mapped to it.
 
-            # Initialize all ADCs first. If the ADC cannot be configured, the other blocks
-            # can be ignored and the SNAP can be removed off the list.
-            failed_adc_snaps = []
-            self.logger.info('Init ADCs of SNAPs: %s' % ', '.join([feng.host for feng in to_be_initialized]))
-            for feng in to_be_initialized:
-                self.logger.info('ADC Host Board: %s' % feng.host)
-                if feng.is_adc_configured():
-                   self.logger.info('%s: ADC already configured. Skipping.' % feng.host)
-                   continue
+        Inputs:
+           ant: Antenna string. Eg. '0', for HH0
+           pol: String polarization -- 'e' or 'n'
+        Returns:
+           Current EQ vector (numpy.array)
+        """
+        host, stream = self.get_ant_feng_stream(ant, pol)
+        return self.fengs[host].eq.get_coeffs(stream)
+
+    def set_eq_coeffs(self, ant, pol, coeffs, verify=False):
+        """
+        Write the EQ coefficients of an antenna and polarization to
+        the FPGA stream mapped to it.
+
+        Inputs:
+           ant: Antenna string. Eg. '0', for HH0
+           pol: String polarization -- 'e' or 'n'
+           coeffs: EQ vector (numpy.array)
+        """
+        self.logger.info("Setting EQ for (%s,%s)" % (ant, pol))
+        host, stream = self.get_ant_feng_stream(ant, pol)
+        coeffs = np.ones(feng.eq.ncoeffs) * coeffs # broadcast shape
+        self.fengs[host].eq.set_coeffs(stream, coeffs, verify=verify)
+
+    def eq_initialize(self, host, verify=True):
+        self.logger.info("Initializing EQ on %s" % (host))
+        feng = self.fengs[host]
+        failed = []
+        for stream, (ant, pol) in enumerate(feng.ants):
+            if antpol is not None:
+                coeffs = self.lookup_eq_coeffs(ant, pol)
                 try:
-                    if not feng.configure_adc():
-                        self.logger.error('Removing %s from SNAP list' % feng.host)
-                        feng.declare_adc_misconfigured()
-                        failed_adc_snaps += [feng]
-                        #to_be_initialized.remove(feng)
-                        self.dead_fengs.update({feng.host:time.time()})
-                        self.logger.info('New SNAP list: %s' % ', '.join([feng.host for feng in to_be_initialized]))
-                        continue   
-                except(RuntimeError):
-                    self.logger.error('Runtime Error while initializing ADC')
-                    self.logger.error('Removing %s from SNAP list' % feng.host)
-                    failed_adc_snaps += [feng]
-                    #to_be_initialized.remove(feng)
-                    self.dead_fengs.update({feng.host:time.time()})
+                    feng.eq.set_coeffs(stream, coeffs, verify=verify)
+                except(AssertionError,RuntimeError):
+                    # Catch errs so an attempt is made for each stream
+                    failed.append((stream, (ant, pol)))
+        if len(failed) > 0:
+            raise RuntimeError('Failed to initialize EQ on %s: %s' %
+                               (host, ','.join(['%d=(%d%s)' % (ant,pol)
+                                      for stream,(ant,pol) in failed)))
 
-            # Remove mis-configured ADCs
-            for feng in failed_adc_snaps:
-                self.uninit_fengs += [feng]
-                to_be_initialized.remove(feng)            
-            self.logger.info('New SNAP list: %s' % ', '.join([feng.host for feng in to_be_initialized]))
+    def initialize_eqs(self, hosts=None, verify=True,
+                        multithread=False, timeout=300.):
+        if hosts is None:
+            hosts = self.fengs.keys()
+        failed = self._call_on_hosts(
+                            target=self.eq_initialize,
+                            args=(host,),
+                            kwargs={'verify': verify},
+                            hosts=hosts,
+                            multithread=multithread,
+                            timeout=timeout
+        )
+        return failed
 
-            # Initialize all other blocks
-            self.logger.info('Initializing SNAPs: %s' % ', '.join([feng.host for feng in to_be_initialized]))
-            for feng in to_be_initialized:
-                self.logger.info('Completing init for %s' % feng.host)
-                try: 
-                    if feng.initialize():
-                        self.fengs += [feng]
-                        self.r.hset('status:snap:%s' % feng.host, 'last_initialized', time.ctime())
-                    else:
-                        self.logger.error('Failed to initialize %s' % feng.host)
-                        feng.declare_uninit()
-                except(RuntimeError):
-                    self.logger.error('Runtime Error: Failed to initialize %s' % feng.host)
-                    self.dead_fengs.update({feng.host:time.time()})
+    def pam_initialize(self, host, verify=True):
+        self.logger.info("Initializing PAMs on %s" % (host))
+        feng = self.fengs[host]
+        failed = []
+        for cnt,pam in enumerate(feng.pams):
+            antpol_e, antpol_n = feng.ants[2*cnt], feng.ants[2*cnt + 1]
+            atten_e, atten_n = None, None
+            if antpol_e is not None:
+                atten_e = self.lookup_pam_attenuation(*antpol_e)
+            if antpol_n is not None:
+                atten_n = self.lookup_pam_attenuation(*antpol_n)
+            try:
+                pam.set_attenuation(atten_e, atten_n, verify=verify)
+            except(AssertionError, RuntimeError):
+                # Catch errs so an attempt is made for each pam
+                failed.append((cnt,)+ antpol_e + antpol_n))
+        if len(failed) > 0:
+            raise RuntimeError('Failed to initialize PAMs on %s: %s' % (
+                host, ','.join(['%d=(%d%s/%d%s)' % f for f in failed)))
 
-        else:
-            self.logger.info('Initializing all hosts using multithreading')
-            # Counterintuitively add uninit fengs to feng list because to_for_all by default 
-            # loops through feng list. Then check if they are configured and remove from feng
-            # list if they failed init.
-            self.fengs += self.uninit_fengs
-            self.uninit_fens = []
-            init_time = time.ctime()
-            self.do_for_all_f("initialize", timeout=timeout)
-            for feng in self.fengs:
-                if not feng.is_initialized():
-                    self.logger.error('Failed to initialize %s' % feng.host)
-                    self.fengs.remove(feng)
-                    self.uninit_fengs += [feng]
-                else:
-                    self.r.hset('status:snap:%s' % feng.host, 'last_initialized', init_time)
+    def initialize_pams(self, hosts=None, verify=True,
+                        multithread=False, timeout=300.):
+        if hosts is None:
+            hosts = self.fengs.keys()
+        failed = self._call_on_hosts(
+                            target=self.pam_initialize,
+                            args=(host,),
+                            kwargs={'verify': verify},
+                            hosts=hosts,
+                            multithread=multithread,
+                            timeout=timeout
+        )
+        return failed
 
-        # TODO multithread these:
-        self._initialize_fft_shift()
-        self.noise_diode_disable()
-        self.phase_switch_disable()
-        self._initialize_all_eq()
+    def fft_shift_pfbs(self, fft_shift=None, verify=True, hosts=None):
+        if fft_shift is None:
+            fft_shift = self.config['fft_shift']
+        self.logger.info('Setting fft_shift to %s' % (bin(fft_shift)))
+        if hosts is None:
+            hosts = self.fengs.keys()
+        failed = []
+        for host in hosts:
+            try:
+                self.fengs[host].pfb.set_fft_shift(fft_shift, verify=verify)
+            except(AssertionError):
+                self.logger.warning('Failed to set fft_shift on %s.pfb'
+                                    % (host)) 
+                failed.append(host)
+        return failed
+
+    def adc_initialize(self, host, force=False, verify=True):
+        feng = self.fengs[host]
+        if not force and not feng.adc_is_configured():
+            return
+        self.logger.info("Initializing ADC on %s" % (host))
+        feng.configure_adc()
+        if verify:
+            assert(feng.adc_is_configured())
+        
+    def initialize_adcs(self, hosts=None, verify=True, force=False,
+                        multithread=False, timeout=300.):
+        if hosts is None:
+            hosts = self.fengs.keys()
+        failed = self._call_on_hosts(
+                            target=self.adc_initialize,
+                            args=(host,),
+                            kwargs={
+                               'force': force,
+                               'verify': verify,
+                            },
+                            hosts=hosts,
+                            multithread=multithread,
+                            timeout=timeout
+        )
+        return failed
+
+    def dsp_initialize(self, host, force=False, verify=True):
+        feng = self.fengs[host]
+        if not force and not feng.is_initialized():
+            return
+        self.logger.info("Initializing DSP logic on %s" % (host))
+        feng.initialize(verify=verify)
+        self.r.hset('status:snap:%s' % host,
+                    'last_initialized', time.ctime())
+
+    def initialize_dsps(self, verify=True, hosts=None, force=False,
+                        multithread=False, timeout=300.):
+        if hosts is None:
+            hosts = self.fengs.keys()
+        failed = self._call_on_hosts(
+                            target=self.dsp_initialize,
+                            args=(host,),
+                            kwargs={
+                               'force': force,
+                               'verify': verify,
+                            },
+                            hosts=hosts,
+                            multithread=multithread,
+                            timeout=timeout
+        )
+        return failed
+
+    def initialize_all(self, adcs=True, dsps=True, pfbs=True, eqs=True,
+                       fems=True, phase_switches=True, pams=True,
+                       verify=True, force=False, multithread=False,
+                       timeout=300):
+        """
+        Initialize submodules for all F-Engines.
+        """
+
+        # disable monitoring each time to ensure we don't run out of time
+        self.disable_monitoring(600, wait=True)
+        kwargs = {'verify': verify, 'force': force,
+                  'multithread':multithread, 'timeout':timeout}
+        failed = []
+        if adcs:
+            failed += self.initialize_adcs(hosts, **kwargs)
+            hosts = [host for host in hosts if not host in failed]
+        if dsps:
+            failed += self.initialize_dsps(hosts, **kwargs)
+        if pfbs:
+            failed += self.fft_shift_pfbs(hosts, **kwargs)
+        if eqs:
+            failed += self.initialize_eqs(hosts, **kwargs)
+        if fems:
+            failed += self.switch_fems(hosts, 'antenna', **kwargs)
+        if phase_switches:
+            failed += self.disable_phase_switches(hosts, **kwargs)
+        if pams:
+            failed += self.initialize_pams(hosts, **kwargs)
+        self.enable_monitoring()
+        return failed
 
     def compute_hookup(self):
         """Generate an antenna-map from antenna names to Fengine instances."""
         hookup = redis_cm.read_maps_from_redis(self.r)
-        if hookup is None:
-            self.logger.error('Failed to compute antenna hookup from redis maps')
-            return
+        assert(hookup is not None) # antenna hookup missing in redis
         self.ant_to_snap = hookup['ant_to_snap']
         self.snap_to_ant = hookup['snap_to_ant']
         for ant in self.ant_to_snap.keys():
@@ -863,178 +666,257 @@ class HeraCorrelator(object):
     def _verify_config(self):
         """
         Do some basic sanity checking on the currently loaded config.
-
-        Returns:
-            Bool : True if tests pass, False otherwise.
         """
-        test_passed = True
         # Check that there are only three antennas per board
-        for fn, (host, params) in enumerate(self.config['fengines'].items()):
-            if 'ants' in params.keys():
-                if len(params['ants']) != 3:
-                    self.logger.warning("%s: Number of antennas is not 3!" % host)
-                    test_passed = False
+        for host, prms in self.config['fengines'].items():
+            if 'ants' in prms.keys():
+                assert(len(prms['ants']) == 3)
         # Check that there are only 48 channels per x-engine.
         for host, params in self.config['xengines'].items():
             if 'chan_range' in params.keys():
                 chan_range = params['chan_range']
-                chans = np.arange(chan_range[0], chan_range[1])
-                if len(chans) > 384:
-                    self.logger.warning("%s: Cannot process >384 channels." % host)
-                    test_passed = False
-        return test_passed
+                assert(chan_range[1] - chan_range[0] <= 384)
 
-    def configure_freq_slots(self, multithread=True):
+    def _eth_config_dest(self, host, source_port, dest_port, xinfo,
+                         verify=False):
         """Configure F-Engine destination packet slots."""
-        n_xengs = self.config.get('n_xengs', 16)
-        chans_per_packet = self.config.get('chans_per_packet', 384)  # Hardcoded in firmware
-        self.logger.info('Configuring frequency slots for %d X-engines, %d channels per packet' % (n_xengs, chans_per_packet))
+        feng = self.fengs[host]
+        for xn, xval in xinfo.items():
+            chans = xval['chans']
+            ip_even = xval['ip_even']
+            ip_odd = xval['ip_odd']
+            mac_even = xval['mac_even']
+            mac_odd = xval['mac_odd']
+
+            self.logger.info(
+                '%s: Setting Xengine %d: ch %d-%d: %s (even) / %s (odd)' \
+                % (host, xn, chans[0], chans[-1], ip_even, ip_odd)
+            )
+            # Update redis to reflect current assignments
+            self.r.hset("corr:snap_ants", host,
+                        json.dumps(feng.ant_indices))
+            feng.packetizer.assign_slot(xn, chans, [ip_even,ip_odd],
+                        feng.reorder, feng.ant_indices[0], verify=verify)
+            feng.eth.add_arp_entry(ip_even, mac_even, verify=verify)
+            feng.eth.add_arp_entry(ip_odd, mac_odd, verify=verify)
+            feng.eth.set_source_port(source_port, verify=verify)
+            feng.eth.set_port(dest_port, verify=verify)
+
+    def config_dest_eths(self, hosts=None, verify=True, force=False,
+                        multithread=False, timeout=300.):
+        if hosts is None:
+            hosts = self.fengs.keys()
         dest_port = self.config['dest_port']
-        self.r.delete("corr:snap_ants")
-        self.r.delete("corr:xeng_chans")
+        # Map fengs to ports
+        source_ports = {
+            # if source port unspecified, auto-increment mod 4
+            h: self.config['fengines'][h].get('source_port',
+                                              dest_port + (cnt % 4))
+            for cnt,h in enumerate(self.fengs.keys())
+        }
+        # Extract xeng channel mappings, ips, and macs
+        n_xengs = self.config.get('n_xengs', 16)
+        assert(len(self.config['xengines'].items()) == n_xengs)
+        chans_per_packet = self.config.get('chans_per_packet', 384)
+        assert(chans_per_packet == 384) # Hardcoded in firmware
+        xinfo = {} # holds what an feng needs to be configured
         for xn, xparams in self.config['xengines'].items():
-            chan_range = xparams.get('chan_range', [xn*384, (xn+1)*384])
-            chans = range(chan_range[0], chan_range[1])
+            xinfo[xn] = {}
+            ch0,ch1 = xparams.get('chan_range', (xn*384, (xn+1)*384))
+            xinfo[xn]['chans'] = chans = range(ch0, ch1)
             self.r.hset("corr:xeng_chans", str(xn), json.dumps(chans))
-            if (xn > n_xengs):
-                self.logger.error("Cannot have more than %d X-engs!!" % n_xengs)
-                return False
             ip = [int(i) for i in xparams['even']['ip'].split('.')]
             ip_even = (ip[0] << 24) + (ip[1] << 16) + (ip[2] << 8) + ip[3]
+            xinfo[xn]['ip_even'] = ip_even
             ip = [int(i) for i in xparams['odd']['ip'].split('.')]
             ip_odd = (ip[0] << 24) + (ip[1] << 16) + (ip[2] << 8) + ip[3]
+            xinfo[xn]['ip_odd'] = ip_odd
+            xinfo[xn]['mac_even'] = xparams['even']['mac']
+            xinfo[xn]['mac_odd'] = xparams['odd']['mac']
+        # Clear current mapping and generate new one
+        self.r.delete("corr:snap_ants")
+        self.r.delete("corr:xeng_chans")
+        failed = self._call_on_hosts(
+                            target=self._eth_config_dest,
+                            args=(host, source_port, dest_port, xinfo),
+                            kwargs={'verify': verify},
+                            hosts=hosts,
+                            multithread=multithread,
+                            timeout=timeout
+        )
+        return failed
 
-            for fn, feng in enumerate(self.fengs):
-                self.logger.info('%s: Setting Xengine %d: chans %d-%d: %s (even) / %s (odd)' % (feng.fpga.host, xn, chans[0], chans[-1], xparams['even']['ip'], xparams['odd']['ip']))
-                # Update redis to reflect current assignments
-                self.r.hset("corr:snap_ants", feng.host, json.dumps(feng.ant_indices))
-                # if the user hasn't specified a source port, auto increment mod 4
-                source_port = self.config['fengines'][feng.host].get('source_port', dest_port + (fn % 4))
-                if not multithread:
-                    # if not multithreading use the original packetizer method, which is known good.
-                    feng.packetizer.assign_slot(xn, chans, [ip_even,ip_odd], feng.reorder, feng.ant_indices[0])
-                    feng.eth.add_arp_entry(ip_even, xparams['even']['mac'])
-                    feng.eth.add_arp_entry(ip_odd, xparams['odd']['mac'])
-            if multithread:
-                self.do_for_all_f("assign_slot", args=[xn, chans, [ip_even, ip_odd]])
-                self.do_for_all_f("add_arp_entry", block="eth", args=[ip_even, xparams['even']['mac']])
-                self.do_for_all_f("add_arp_entry", block="eth", args=[ip_odd, xparams['odd']['mac']])
 
-        if not multithread:
-            for fn, feng in enumerate(self.fengs):
-                feng.eth.set_source_port(source_port)
-                feng.eth.set_port(dest_port)
-        else:
-            self.do_for_all_f("set_source_port", block="eth", args=[source_port])
-            self.do_for_all_f("set_port", block="eth", args=[dest_port])
-                
-        return True
+#    def configure_freq_slots(self, multithread=True):
+#        """Configure F-Engine destination packet slots."""
+#        n_xengs = self.config.get('n_xengs', 16)
+#        chans_per_packet = self.config.get('chans_per_packet', 384)
+#        assert(chans_per_packet == 384) # Hardcoded in firmware
+#        self.logger.info('Configuring frequency slots for %d X-engines, %d channels per packet' % (n_xengs, chans_per_packet))
+#        dest_port = self.config['dest_port']
+#        self.r.delete("corr:snap_ants")
+#        self.r.delete("corr:xeng_chans")
+#        for xn, xparams in self.config['xengines'].items():
+#            chan_range = xparams.get('chan_range', [xn*384, (xn+1)*384])
+#            chans = range(chan_range[0], chan_range[1])
+#            self.r.hset("corr:xeng_chans", str(xn), json.dumps(chans))
+#            assert(xn <= n_xengs) # Too many x-engines listed
+#            ip = [int(i) for i in xparams['even']['ip'].split('.')]
+#            ip_even = (ip[0] << 24) + (ip[1] << 16) + (ip[2] << 8) + ip[3]
+#            ip = [int(i) for i in xparams['odd']['ip'].split('.')]
+#            ip_odd = (ip[0] << 24) + (ip[1] << 16) + (ip[2] << 8) + ip[3]
+#
+#            for fn, feng in enumerate(self.fengs):
+#                self.logger.info('%s: Setting Xengine %d: chans %d-%d: %s (even) / %s (odd)' % (feng.fpga.host, xn, chans[0], chans[-1], xparams['even']['ip'], xparams['odd']['ip']))
+#                # Update redis to reflect current assignments
+#                self.r.hset("corr:snap_ants", feng.host, json.dumps(feng.ant_indices))
+#                # if the user hasn't specified a source port, auto increment mod 4
+#                source_port = self.config['fengines'][feng.host].get('source_port', dest_port + (fn % 4))
+#                if not multithread:
+#                    # if not multithreading use the original packetizer method, which is known good.
+#                    feng.packetizer.assign_slot(xn, chans, [ip_even,ip_odd], feng.reorder, feng.ant_indices[0])
+#                    feng.eth.add_arp_entry(ip_even, xparams['even']['mac'])
+#                    feng.eth.add_arp_entry(ip_odd, xparams['odd']['mac'])
+#            if multithread:
+#                self.do_for_all_f("assign_slot", args=[xn, chans, [ip_even, ip_odd]])
+#                self.do_for_all_f("add_arp_entry", block="eth", args=[ip_even, xparams['even']['mac']])
+#                self.do_for_all_f("add_arp_entry", block="eth", args=[ip_odd, xparams['odd']['mac']])
+#
+#        if not multithread:
+#            for fn, feng in enumerate(self.fengs):
+#                feng.eth.set_source_port(source_port)
+#                feng.eth.set_port(dest_port)
+#        else:
+#            self.do_for_all_f("set_source_port", block="eth", args=[source_port])
+#            self.do_for_all_f("set_port", block="eth", args=[dest_port])
+#                
+#        return True
 
-    def resync(self, manual=False):
+    def sync(self, manual=False, maxtime=0.8):
         """
-        Resynchronize boards to PPS.
+        Synchronize boards to PPS.
 
         Inputs:
-            manual (Boolean): True if you want to synchronize on a software trigger.
-            False (default) to sync on an external PPS.
+            manual (Boolean): synchronize to software trigger instead of
+                external PPS.
         """
-        self.logger.info('Sync-ing Fengines')
+        self.logger.info('Synchronizing F-Engines')
         self.do_for_all_f("set_delay", block="sync", args=(0,))
         if not manual:
-            self.logger.info('Waiting for PPS at time %.2f' % time.time())
+            self.logger.info('    Waiting for PPS (t=%.2f)' % time.time())
             self.fengs[0].sync.wait_for_sync()
-            self.logger.info('Sync passed at time %.2f' % time.time())
-        before_sync = time.time()
+        start = time.time()
+        self.logger.info('    Sync passed (t=%.2f)' % (start))
+        # Consider multithreading if gets too slow
         for feng in self.fengs:
             feng.sync.arm_sync()
-        after_sync = time.time()
-        if manual:
-            self.logger.warning('Using manual sync trigger')
-            for i in range(3):  # takes 3 syncs to trigger
-                for feng in self.fengs:
-                    feng.sync.sw_sync()
-            sync_time = int(time.time())  # roughly
-        else:
-            sync_time = int(before_sync) + 1 + 3  # Takes 3 PPS pulses to arm
-        # Store sync time in ms!!!
-        self.r['corr:feng_sync_time'] = 1000*sync_time
-        self.r['corr:feng_sync_time_str'] = time.ctime(sync_time)
-        self.logger.info('Syncing took %.2f seconds' % (after_sync - before_sync))
-        if after_sync - before_sync > 0.5:
-            self.logger.warning("It took longer than expected to arm sync!")
-
-    def sync_with_delay(self, sync_time_s, delay_ms, adc_clk_rate=500e6, adc_demux=2):
-        """
-        Resync all boards at the integer UNIX time `sync_time_s`.
-
-        Delays the internal trigger until `delay_clocks` fpga
-        clocks after the PPS pulse.
-        """
-        if (delay_ms > 1000):
-            self.logger.error("I refuse to sync with a delay > 1 second")
-            return
-        sync_delay_fpga_clocks = (delay_ms / 1e3) / (adc_clk_rate / adc_demux)
-        target_sync_time_ms = sync_time_s*1000 + (sync_delay_fpga_clocks*(adc_clk_rate / adc_demux))  # sync time in unix ms
-        self.do_for_all_f("set_delay", block="sync", args=(sync_delay_fpga_clocks,))
-        if (time.time()+5) > (target_sync_time_ms/1000.):
-            self.logger.error("I refuse to sync less than 5s in the future")
-            return
-        if (time.time()+120) < (target_sync_time_ms/1000.):
-            self.logger.error("I refuse to sync more than 120s in the future")
-            return
-        # it takes 3 PPS pulses to arm. Arm should occur < 4 seconds and > 3 seconds before sync target
-        now = time.time()
-        time_to_sync = sync_time_s - now - 4
-        time.sleep(time_to_sync + 0.1)  # This should be 3.9 seconds before target PPS
-        time_before_arm = time.time()
-        self.logger.info("Arming sync at %.2f" % time_before_arm)
-        self.do_for_all_f("arm_sync", "sync")
-        time_after_arm = time.time()
-        self.logger.info("Finished arming sync at %.2f" % time_after_arm)
-        self.logger.info('Syncing took %.2f seconds' % (time_after_arm - time_before_arm))
-        if time_after_arm - time_before_arm > 0.5:
-            self.logger.warning("It took longer than expected to arm sync!")
-        # Update sync time -- in ms!!!!
-        sync_time_ms = 1000*(int(time_before_arm) + 1 + 3) + delay_ms
-        self.r['corr:feng_sync_time'] = sync_time_ms
-        self.r['corr:feng_sync_time_str'] = time.ctime(sync_time_ms/1000.)
-        return sync_time_ms
-
-    def sync_noise(self, manual=False):
-        """
-        Resynchronize internal noise generators to PPS.
-
-        Inputs:
-            manual (Boolean): True if you want to synchronize on a software trigger.
-            False (default) to sync on an external PPS.
-        """
-        self.logger.info('Sync-ing noise generators')
+        sync_time = time.time() - start
         if not manual:
-            self.logger.info('Waiting for PPS at time %.2f' % time.time())
-            self.fengs[0].sync.wait_for_sync()
-            self.logger.info('Sync passed at time %.2f' % time.time())
-        before_sync = time.time()
-        for feng in self.fengs:
-            feng.sync.arm_noise()
-        after_sync = time.time()
-        if manual:
+            if sync_time > maxtime:
+                raise RuntimeError("Sync time (%.2f) exceeded max (%.2f)" %
+                                   (sync_time, maxtime))
+            sync_time = int(start) + 1 + 3  # Takes 3 PPS pulses to arm
+        else:
             self.logger.warning('Using manual sync trigger')
             for i in range(3):  # takes 3 syncs to trigger
                 for feng in self.fengs:
                     feng.sync.sw_sync()
             sync_time = int(time.time())  # roughly  # noqa
-        self.logger.info('Syncing took %.2f seconds' % (after_sync - before_sync))
-        if after_sync - before_sync > 0.5:
-            self.logger.warning("It took longer than expected to arm sync!")
+        # Store sync time in ms
+        self.r['corr:feng_sync_time'] = 1000 * sync_time # ms
+        self.r['corr:feng_sync_time_str'] = time.ctime(sync_time)
 
-    def enable_output(self):
+#    def sync_with_delay(self, sync_time_s, delay_ms, adc_clk_rate=500e6, adc_demux=2):
+#        """
+#        Resync all boards at the integer UNIX time `sync_time_s`.
+#
+#        Delays the internal trigger until `delay_clocks` fpga
+#        clocks after the PPS pulse.
+#        """
+#        if (delay_ms > 1000):
+#            self.logger.error("I refuse to sync with a delay > 1 second")
+#            return
+#        sync_delay_fpga_clocks = (delay_ms / 1e3) / (adc_clk_rate / adc_demux)
+#        target_sync_time_ms = sync_time_s*1000 + (sync_delay_fpga_clocks*(adc_clk_rate / adc_demux))  # sync time in unix ms
+#        self.do_for_all_f("set_delay", block="sync", args=(sync_delay_fpga_clocks,))
+#        if (time.time()+5) > (target_sync_time_ms/1000.):
+#            self.logger.error("I refuse to sync less than 5s in the future")
+#            return
+#        if (time.time()+120) < (target_sync_time_ms/1000.):
+#            self.logger.error("I refuse to sync more than 120s in the future")
+#            return
+#        # it takes 3 PPS pulses to arm. Arm should occur < 4 seconds and > 3 seconds before sync target
+#        now = time.time()
+#        time_to_sync = sync_time_s - now - 4
+#        time.sleep(time_to_sync + 0.1)  # This should be 3.9 seconds before target PPS
+#        time_before_arm = time.time()
+#        self.logger.info("Arming sync at %.2f" % time_before_arm)
+#        self.do_for_all_f("arm_sync", "sync")
+#        time_after_arm = time.time()
+#        self.logger.info("Finished arming sync at %.2f" % time_after_arm)
+#        self.logger.info('Syncing took %.2f seconds' % (time_after_arm - time_before_arm))
+#        if time_after_arm - time_before_arm > 0.5:
+#            self.logger.warning("It took longer than expected to arm sync!")
+#        # Update sync time -- in ms!!!!
+#        sync_time_ms = 1000*(int(time_before_arm) + 1 + 3) + delay_ms
+#        self.r['corr:feng_sync_time'] = sync_time_ms
+#        self.r['corr:feng_sync_time_str'] = time.ctime(sync_time_ms/1000.)
+#        return sync_time_ms
+
+    def sync_noise(self, manual=False, maxtime=0.8):
+        """
+        Synchronize internal noise generators to PPS.
+
+        Inputs:
+            manual (Boolean): synchronize to software trigger instead of
+                external PPS.
+        """
+        self.logger.info('Synchronizing noise generators')
+        if not manual:
+            self.logger.info('    Waiting for PPS (t=%.2f)' % time.time())
+            self.fengs[0].sync.wait_for_sync()
+        start = time.time()
+        self.logger.info('    Sync passed (t=%.2f)' % (start))
+        for feng in self.fengs:
+            feng.sync.arm_noise()
+        sync_time = time.time() - start
+        if not manual:
+            if sync_time > maxtime:
+                raise RuntimeError("Sync time (%.2f) > maximum (%.2f)" %
+                                   (sync_time, maxtime))
+        else:
+            self.logger.warning('Using manual sync trigger')
+            for i in range(3):  # takes 3 syncs to trigger
+                for feng in self.fengs:
+                    feng.sync.sw_sync()
+            sync_time = int(time.time())  # roughly  # noqa
+        self.logger.info('    Synchronized in %.2f seconds' % 
+                         (after_sync - before_sync))
+
+    def enable_eths(self, hosts=None, verify=True):
         """Enable all ethernet outputs."""
         self.logger.info('Enabling ethernet output')
-        for feng in self.fengs:
-            feng.eth.enable_tx()
+        if hosts is None:
+            hosts = self.fengs.keys()
+        failed = []
+        for host in hosts:
+            try:
+                self.fengs[host].eth.enable_tx(verify=verify)
+            except(AssertionError):
+                self.logger.warning('Failed to enable %s.eth' % (host)) 
+                failed.append(host)
+        return failed
 
-    def disable_output(self):
+    def disable_eths(self, hosts=None, verify=True):
         """Disable all ethernet outputs."""
         self.logger.info('Disabling ethernet output')
-        for feng in self.fengs:
-            feng.eth.disable_tx()
+        if hosts is None:
+            hosts = self.fengs.keys()
+        failed = []
+        for host in hosts:
+            try:
+                self.fengs[host].eth.disable_tx(verify=verify)
+            except(AssertionError):
+                self.logger.warning('Failed to enable %s.eth' % (host)) 
+                failed.append(host)
+        return failed

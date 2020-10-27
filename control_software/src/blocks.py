@@ -656,7 +656,7 @@ class Pfb(Block):
         self.change_reg_bits('ctrl', shift,
                              self.SHIFT_OFFSET, self.SHIFT_WIDTH)
         if verify:
-            assert(shift == self.get_fft_shift)
+            assert(shift == self.get_fft_shift())
 
     def get_fft_preshift(self):
         """
@@ -670,7 +670,7 @@ class Pfb(Block):
         self.change_reg_bits('ctrl', shift,
                              self.PRESHIFT_OFFSET, self.PRESHIFT_WIDTH)
         if verify:
-            assert(shift == self.get_fft_preshift)
+            assert(shift == self.get_fft_preshift())
 
     def rst_stats(self):
         self.change_reg_bits('ctrl', 1, self.STAT_RST_BIT)
@@ -722,7 +722,7 @@ class PhaseSwitch(Block):
         self.write('gpio_switch_states', struct.pack('>%dB' % self.depth, *new_bram_vec))
         self.write('sw_switch_states', struct.pack('>%dB' % self.depth, *new_bram_vec))
 
-    def set_all_walsh(self, N, n, stepperiod):
+    def set_all_walsh(self, N, n, stepperiod, verify=False):
         """
         Set multiple walsh patterns simultaneously.
         N: order of walsh matrix
@@ -747,8 +747,14 @@ class PhaseSwitch(Block):
             vec = np.array(walsh_func_stretch.tolist() * (self.depth/ 2**stepperiod / N_round), dtype=np.int)
             bram_array += (vec << stream)
         #Modify the appropriate bits of the bram
-        self.write('gpio_switch_states', struct.pack('>%dB' % self.depth, *bram_array))
-        self.write('sw_switch_states', struct.pack('>%dB' % self.depth, *bram_array))
+        gpio_str = struct.pack('>%dB' % self.depth, *bram_array)
+        self.write('gpio_switch_states', gpio_str)
+        self.write('sw_switch_states', gpio_str)
+        if verify:
+            assert(gpio_str == self.read('gpio_switch_states',
+                                         len(gpio_str)))
+            assert(gpio_str == self.read('sw_switch_states',
+                                         len(gpio_str)))
 
     def set_gpio_high(self, stream):
         #Modify the appropriate bits of the bram
@@ -771,25 +777,31 @@ class PhaseSwitch(Block):
         curr_bram_vec = np.array(struct.unpack('>%dB' % self.depth, self.read('sw_switch_states', self.depth)))
         return (curr_bram_vec & (1 << stream)) >> stream
 
-    def set_delay(self, delay):
+    def set_delay(self, delay, verify=verify):
         """
         set the delay (in FPGA clock cycles) between
         the modulation and demodulation patterns
         (to take into account cable latency)
         """
         self.write_int('gpio_switch_offset', delay)
+        if verify:
+            assert(delay == self.read_int('gpio_switch_offset'))
 
-    def enable_mod(self):
+    def enable_mod(self, verify=False):
         """
         Turn on the modulation patterns
         """
         self.write_int('enable_mod', 1)
+        if verify:
+            assert(1 == self.read_int('enable_mod'))
 
-    def disable_mod(self):
+    def disable_mod(self, verify=False):
         """
         Turn off the modulation patterns
         """
         self.write_int('enable_mod', 0)
+        if verify:
+            assert(0 == self.read_int('enable_mod'))
 
     def enable_demod(self):
         """
@@ -828,42 +840,50 @@ class Eq(Block):
         self.nstreams = nstreams
         self.ncoeffs = ncoeffs
         self.width = 16
-        self.bp = 5
+        self.bin_point = 5
         self.format = 'H'#'L'
         self.streamsize = struct.calcsize(self.format)*self.ncoeffs
 
-    def set_coeffs(self, stream, coeffs):
+    def set_coeffs(self, stream, coeffs, verify=False):
         """
-        Set the coefficients for a data stream. Clipping and saturation will be applied before
-        loading.
+        Set coefficients for a data stream.
 
         Inputs
-           stream (int): Which stream to manipulate
-           coeffs (list or numpy array): Coefficients to load.
+           stream (int): stream to manipulate
+           coeffs (float/int iterable): coefficients to load
         """
-        coeffs *= 2**self.bp
-        if np.any(coeffs > (2**self.width - 1)):
-            self._warning("Some coefficients out of range")
-        # Make integer
-        coeffs = np.array(coeffs, dtype=np.int64)
-        # saturate coefficients
-        coeffs[coeffs>(2**self.width - 1)] = 2**self.width - 1
-        coeffs = list(coeffs)
-        assert len(coeffs) == self.ncoeffs, "Length of provided coefficient vector should be %d" % self.ncoeffs
-        coeffs_str = struct.pack('>%d%s' % (len(coeffs), self.format), *coeffs)
-        self.write('coeffs', coeffs_str, offset= self.streamsize * stream)
+        # convert to fixed-point integer
+        coeffs = np.around(coeffs * 2**self.bin_point).astype(np.int64)
+        # ensure all coefficients in range
+        assert(np.all(coeffs <= 2**self.width - 1))
+        assert(np.all(coeffs >= 0))
+        assert(coeffs.size = self.ncoeffs)
+        coeffs_str = struct.pack('>%d%s' % (self.ncoeffs, self.format),
+                                 *coeffs)
+        self._raw_write(stream, coeffs_str, verify=verify)
+
+    def _raw_write(self, stream, data, verify=False):
+        self.write('coeffs', data, offset=(self.streamsize * stream))
+        if verify:
+            assert(data == self._raw_read(stream))
+        
+    def _raw_read(self, stream):
+        data = self.read('coeffs', self.streamsize,
+                         offset=(self.streamsize * stream))
+        return data
 
     def get_coeffs(self, stream):
         """
-        Get the coefficients currently loaded. Reads the actual coefficients from the board.
+        Read the coefficients being used from the board.
         Inputs:
             stream (int): Stream index to query
         Returns
-            numpy array of `self.ncoeffs` coefficients currently being applied to this stream.
+            numpy array (float, length self.ncoeffs)
         """
-        coeffs_str = self.read('coeffs', self.streamsize, offset= self.streamsize * stream)
-        coeffs = np.array(struct.unpack('>%d%s' % (self.ncoeffs, self.format), coeffs_str))
-        return coeffs / (2.**self.bp)
+        coeffs_str = self._raw_read(stream)
+        coeffs = struct.unpack('>%d%s' % (self.ncoeffs, self.format),
+                               coeffs_str)
+        return np.array(coeffs, dtype=np.float) / (2.**self.bin_point)
 
     def clip_count(self):
         """
@@ -1154,7 +1174,7 @@ class Eth(Block):
         macs_pack = struct.pack('>%dQ' % (len(macs)), *macs)
         self.write('sw', macs_pack, offset=self.BASE_MAC_OFFSET)
         if verify:
-            for mac1, mac2 in zip(macs, self.get_arp_table):
+            for mac1, mac2 in zip(macs, self.get_arp_table()):
                 assert(mac1 == mac2)
 
     def get_arp_table(self):
@@ -1163,7 +1183,7 @@ class Eth(Block):
         macs = struct.unpack('>%dQ' % (MAX_MACS), macs_str)
         return macs
 
-    def add_arp_entry(self, ip, mac):
+    def add_arp_entry(self, ip, mac, verify=False):
         """
         Set a single arp entry.
         """
@@ -1171,6 +1191,9 @@ class Eth(Block):
         ip_offset = ip % 256
         self.write('sw', mac_pack,
                    offset=self.BASE_MAC_OFFSET + ip_offset*8)
+        if verify:
+            assert(mac_pack == self.read('sw', 1,
+                        offset=self.BASE_MAC_OFFSET + 8*ip_offset))
 
     def get_status(self):
         stat = self.read_uint('sw_txs_ss_status')
@@ -1230,11 +1253,21 @@ class Eth(Block):
         val &= 0x1 # mask to one bit
         return val
 
-    def initialize(self):
+    def get_ipaddr(self):
+        # read a 32b word containing the IP address
+        ipaddr = self.read('sw', 4, offset=self.IP_OFFSET)
+        return ipaddr
+
+    def set_ipaddr(self, ipaddr, verify=False):
+        self.blindwrite('sw', ipaddr, offset=self.IP_OFFSET)
+        if verify:
+            assert(ipaddr = self.get_ipaddr())
+
+    def initialize(self, verify=False):
         #Set ip address of the SNAP
         ipaddr = socket.inet_aton(socket.gethostbyname(self.host.host))
-        self.blindwrite('sw', ipaddr, offset=self.IP_OFFSET)
-        self.set_port(self.port)
+        self.set_ipaddr(ipaddr, verify=verify)
+        self.set_port(self.port, verify=verify)
 
     def get_source_port(self):
         # see config_10gbe_core in katcp_wrapper
@@ -1540,23 +1573,21 @@ class Pam(Block):
 
     def __init__(self, host, name, logger=None):
         """ Post Amplifier Module (PAM) digital control class
+        Features
+        attenuation Attenuation for East and North Pol
+        shunt       Voltage and current of the power supply
+        rom         Memo
+        id          Device ID
+        power       Power level of East and North Pol
 
-            Features:
-            attenuation Digital controlled Attenuation for East and North Pol
-            shunt       Voltage and current of the power supply
-            rom         Memo
-            id          Device ID
-            power       Power level of East and North Pol
-
-        host    CasperFpga instance
-        name    Select one of the three PAMs(/Antennas) under the control of
-                a SNAP board. Recommended values are: 'i2c_ant1', 'i2c_ant2'
-                or 'i2c_ant3'. Please refer to the f-engine model for correct
-                value.
+        host: CasperFpga instance
+        name: Select one of the three PAMs(/Antennas) under the control of
+                a SNAP board: 'i2c_ant1', 'i2c_ant2' or 'i2c_ant3'.
         """
         super(Pam, self).__init__(host, name, logger)
 
         self.i2c = i2c.I2C(host, name, retry=self.I2C_RETRY)
+        self._cached_atten = None # for checking I2C stability
 
     def _warning(self, msg, *args, **kwargs):
         self.logger.log(I2CWARNING, self._prefix_log(msg), *args, **kwargs)
@@ -1569,60 +1600,33 @@ class Pam(Block):
 
 
     def get_attenuation(self):
-        """ Get East and North attenuation
-            returns: (east attenuation (dB, int), north attenuation (dB, int)
+        """Get East and North attenuation
+            returns: (east attenuation (dB int), north (dB int)
         """
         if not hasattr(self, "_atten"):
-            try:
-                # Attenuator
-                self._atten = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
-            except:
-                self._warning("Failed to initialize I2C attenuator")
-                return None, None
+            self._atten = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
+        val = self._atten.read()
+        east, north = self._gpio2db(val)
+        if self._cached_atten is not None and \
+                self._cached_atten != (east, north):
+            self._warning('Read value (%d, %d) != written value (%d, %d)'
+                          % (east, north) + self._cached_atten
+        return = self._gpio2db(val)
 
-        try:
-            val=self._atten.read()
-            ve,vn=self._gpio2db(val)
-            return ve,vn
-        except Exception:
-            self._warning('Failed to read I2C attenuator')
-            return None,None
-
-    def set_attenuation(self, east=None, north=None):
+    def set_attenuation(self, east, north, verify=False):
         """ Set East and North attenuation in dB
-            attenuation value must be integer in range(16)
+            attenuation values must be integers in range(16)
 
             Example:
             attenuation(east=0,north=15)
-            attenuation(east=12)
-
-            If only one pol is specified, a read is issued to
-            figure out what the other value should be.
         """
         if not hasattr(self, "_atten"):
-            try:
-                # Attenuator
-                self._atten = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
-            except:
-                self._warning("Failed to initialize I2C attenuator")
+            self._atten = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
 
-        try:
-            if (east is None) or (north is None):
-                # Get current attenuation
-                ve,vn=self.get_attenuation()
-                if (ve is None) or (vn is None):
-                    raise Exception('Failed to read I2C attenuator')
-                ve = east or ve
-                vn = north or vn
-                self.set_attenuation(east=ve, north=vn)
-            elif isinstance(east,int) and east in range(16) and \
-                isinstance(north,int) and north in range(16):
-                # Set attenuation
-                self._atten.write(self._db2gpio(east,north))
-            else:
-                raise ValueError('Invalid parameter.')
-        except Exception:
-            self._warning('Failed to write I2C attenuator')
+        self._atten.write(self._db2gpio(east, north))
+        self._cached_atten = (east, north) # cache for stability check
+        if verify:
+            assert((east,north) == self.get_attenuation())
 
     def shunt(self, name='i'):
         """ Get current/voltage of the power supply
@@ -1746,7 +1750,8 @@ class Pam(Block):
         return 15-ae, 15-an
 
     def _dc2dbm(self, val, slope, intercept):
-        assert val>=0 and val<=3.3, "Input value {} out range of 0-3.3V".format(val)
+        assert val>=0 and val<=3.3, \
+            "Input value {} out range of 0-3.3V".format(val)
         res = val * slope + intercept
         return res
 
@@ -1924,7 +1929,7 @@ class Fem(Block):
             return None
 
 
-    def switch(self,name=None, **kwargs):
+    def switch(self, mode=None, east=None, north=None, verify=False):
         """ Switch between antenna, noise and load mode
 
             Example:
@@ -1939,44 +1944,34 @@ class Fem(Block):
         """
         if not hasattr(self, "_sw"):
             try:
-                # Switch
+                # instantiate switch
                 self._sw = i2c_gpio.PCF8574(self.i2c,self.ADDR_GPIO)
             except:
-                self._warning("Failed to initialize I2C RF switch")
-                return None
-
+                raise RuntimeError('Failed to initialize I2C RF switch')
         try:
             val = self._sw.read()
         except:
-            self._warning("I2C RF switch read failure")
-            return None
-
-        if name == None and 'east' not in kwargs and 'north' not in kwargs:
-            east  = bool(val & 0b00010000)
-            north = bool(val & 0b00001000)
-            mode  = self.SWMODE_REV.get(val & 0b00000111, 'Unknown mode')
-            return mode, east, north
-
-        if name in self.SWMODE:
-            self._sw.write((val & 0b11111000) | self.SWMODE[name])
-        elif name != None:
-            raise ValueError('Invalid parameter.')
-
-        if 'east' in kwargs:
-            if kwargs['east'] == True:
-                self._sw.write(val | 0b00010000)
-            elif kwargs['east'] == False:
-                self._sw.write(val & 0b11101111)
-            else:
-                raise ValueError('Invalid parameter.')
-
-        if 'north' in kwargs:
-            if kwargs['north'] == True:
-                self._sw.write(val | 0b00001000)
-            elif kwargs['north'] == False:
-                self._sw.write(val & 0b11110111)
-            else:
-                raise ValueError('Invalid parameter.')
+            raise RuntimeError("I2C RF switch read failure")
+        cur_e = bool(val & 0b00010000)
+        cur_n = bool(val & 0b00001000)
+        cur_mode = self.SWMODE_REV.get(val & 0b00000111, 'Unknown')
+        if mode is None and east is None and north is None:
+            return cur_mode, cur_e, cur_n
+        if east is None:
+            east = east or cur_e
+        if north is None:
+            north = cur_n
+        if mode is None:
+            mode = cur_mode
+        new_val = 0b00000000
+        if east:
+            new_val |= 0b00010000
+        if north:
+            new_val |= 0b00001000
+        new_val |= self.SWMODE.get(mode, val & 0b00000111)
+        self._sw.write(new_val)
+        if verify:
+            assert(new_val == self._sw.read())
 
     def humidity(self):
         """ Get relative humidity in percentage
