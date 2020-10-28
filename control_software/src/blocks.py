@@ -777,7 +777,7 @@ class PhaseSwitch(Block):
         curr_bram_vec = np.array(struct.unpack('>%dB' % self.depth, self.read('sw_switch_states', self.depth)))
         return (curr_bram_vec & (1 << stream)) >> stream
 
-    def set_delay(self, delay, verify=verify):
+    def set_delay(self, delay, verify=False):
         """
         set the delay (in FPGA clock cycles) between
         the modulation and demodulation patterns
@@ -803,17 +803,21 @@ class PhaseSwitch(Block):
         if verify:
             assert(0 == self.read_int('enable_mod'))
 
-    def enable_demod(self):
+    def enable_demod(self, verify=False):
         """
         Turn on the demodulation patterns
         """
         self.write_int('enable_demod', 1)
+        if verify:
+            assert(1 == self.read_int('enable_demod'))
 
-    def disable_demod(self):
+    def disable_demod(self, verify=False):
         """
         Turn off the demodulation patterns
         """
         self.write_int('enable_demod', 0)
+        if verify:
+            assert(0 == self.read_int('enable_demod'))
 
     def initialize(self):
         """
@@ -857,7 +861,7 @@ class Eq(Block):
         # ensure all coefficients in range
         assert(np.all(coeffs <= 2**self.width - 1))
         assert(np.all(coeffs >= 0))
-        assert(coeffs.size = self.ncoeffs)
+        assert(coeffs.size == self.ncoeffs)
         coeffs_str = struct.pack('>%d%s' % (self.ncoeffs, self.format),
                                  *coeffs)
         self._raw_write(stream, coeffs_str, verify=verify)
@@ -1261,7 +1265,7 @@ class Eth(Block):
     def set_ipaddr(self, ipaddr, verify=False):
         self.blindwrite('sw', ipaddr, offset=self.IP_OFFSET)
         if verify:
-            assert(ipaddr = self.get_ipaddr())
+            assert(ipaddr == self.get_ipaddr())
 
     def initialize(self, verify=False):
         #Set ip address of the SNAP
@@ -1610,8 +1614,8 @@ class Pam(Block):
         if self._cached_atten is not None and \
                 self._cached_atten != (east, north):
             self._warning('Read value (%d, %d) != written value (%d, %d)'
-                          % (east, north) + self._cached_atten
-        return = self._gpio2db(val)
+                          % (east, north) + self._cached_atten)
+        return east, north
 
     def set_attenuation(self, east, north, verify=False):
         """ Set East and North attenuation in dB

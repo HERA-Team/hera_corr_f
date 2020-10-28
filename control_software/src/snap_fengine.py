@@ -128,7 +128,7 @@ class SnapFengine(object):
         within the Input block is set when the ADC is configured. 
         Look for this bit and return.
         """
-        return self.input.read_uint('source_sel') & 2**ADC_CONFIG_BIT)
+        return self.input.read_uint('source_sel') & 2**ADC_CONFIG_BIT
 
     def initialize(self, verify=False):
 

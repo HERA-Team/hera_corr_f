@@ -65,8 +65,8 @@ class HeraCorrelator(object):
 
         if not passive:
             if block_monitoring:
-                self.disable_monitoring(60, wait=True)
-            self.establish_connections()
+                self.disable_monitoring(60, verify=True)
+            self._unconnected = self.connect_fengs()
             # Get antenna<->SNAP maps
             self.compute_hookup()
 
@@ -104,7 +104,7 @@ class HeraCorrelator(object):
 
     def feng_connect(self, host, verify=True):
         # XXX not supporting auto assignment of antenna indices
-        ant_indices = self.config('fengines'][host]['ants']
+        ant_indices = self.config['fengines'][host]['ants']
         self.logger.info("Connecting %s with antenna indices %s" % 
                          (host, ant_indices))
         feng = SnapFengine(host, ant_indices=ant_indices,
@@ -116,20 +116,22 @@ class HeraCorrelator(object):
 
     def _call_on_hosts(self, target, args, kwargs,
                        hosts, multithread, timeout):
-        q = Queue.Queue()
+        q = Queue()
         def wrap_target(host, args, kwargs):
             '''Wrapper to capture target output and exceptions.'''
             try:
-                val = target(*args, **kwargs)
+                # Automatically puts host as first argument
+                val = target(host, *args, **kwargs)
                 q.put((host,val))
-            except RuntimeError,AssertionError as e:
-                self.logger.warning('%s: %s' % (host, e.message()))
-        threads = {host: threading.Thread(
+            except(RuntimeError,AssertionError) as e:
+                self.logger.warning('%s: %s' % (host, e.message))
+        threads = {host: Thread(
                             target=wrap_target,
                             args=(host, args, kwargs),
-                            daemon=multithread,
                          ) for host in hosts}
         for thread in threads.values():
+            if multithread:
+                thread.daemon = True
             thread.start()
             # XXX add some sleep here?
             # serialize execution if we are not multithreading
@@ -139,7 +141,7 @@ class HeraCorrelator(object):
             for host,thread in threads.items():
                 thread.join(timeout)
             # XXX think about killing live threads
-        successes = set([host for host,val in q])
+        successes = set([q.get()[0] for i in range(q.qsize())])
         failed = [host for host in hosts if not host in successes]
         self.logger.warning('Call %s failed on: %s'
                             % (target.__name__, ','.join(failed)))
@@ -155,7 +157,7 @@ class HeraCorrelator(object):
                         if not host in self.fengs]
         failed = self._call_on_hosts(
                             target=self.feng_connect,
-                            args=(host,),
+                            args=(),
                             kwargs={'verify': True},
                             hosts=hosts,
                             multithread=multithread,
@@ -199,7 +201,7 @@ class HeraCorrelator(object):
             #time.sleep(sleep) # probably unnecessary
             # XXX could also check version of programmed image against
             # XXX current version
-            if not feng.fpga.is_programmed():
+            if not feng.fpga.is_running():
                 raise RuntimeError('Failed to program FPGA: %s' % (host))
             self.r.hset('status:snap:%s' % host,
                         'last_programmed', time.ctime())
@@ -217,7 +219,7 @@ class HeraCorrelator(object):
             hosts = self.fengs.keys()
         failed = self._call_on_hosts(
                             target=self.feng_program,
-                            args=(host,),
+                            args=(),
                             kwargs={
                                 'progfile': progfile,
                                'force': force, # prefiltered list
@@ -278,7 +280,7 @@ class HeraCorrelator(object):
                          {'state':'off', 'time':time.time()})
         failed = self._call_on_hosts(
                             target=self.phase_switch_disable,
-                            args=(host,),
+                            args=(),
                             kwargs={'verify': verify},
                             hosts=hosts,
                             multithread=multithread,
@@ -310,7 +312,7 @@ class HeraCorrelator(object):
             )
         failed = self._call_on_hosts(
                             target=self.phase_switch_enable,
-                            args=(host,),
+                            args=(),
                             kwargs={'verify': True},
                             hosts=hosts,
                             multithread=multithread,
@@ -334,13 +336,13 @@ class HeraCorrelator(object):
                                  (host, cnt, mode)) 
                 try:
                     # will error if verification fails
-                    fem.switch(mode, east=east, north=north verify=verify)
-                except(RuntimeError,AssertionError):
+                    fem.switch(mode, east=east, north=north, verify=verify)
+                except(RuntimeError,AssertionError,IOError):
                     self.logger.warning('Failed to switch %s.fem[%d]' %
                                         (host, cnt)) 
                     # only logging failures at resolution of host
-                    failed.append(host))
-        return failed
+                    failed.append(host)
+        return set(failed) # only return unique hosts
 
     def get_ant_feng_stream(self, ant, pol):
         """
@@ -483,7 +485,7 @@ class HeraCorrelator(object):
         if len(failed) > 0:
             raise RuntimeError('Failed to initialize EQ on %s: %s' %
                                (host, ','.join(['%d=(%d%s)' % (ant,pol)
-                                      for stream,(ant,pol) in failed)))
+                                      for stream,(ant,pol) in failed])))
 
     def initialize_eqs(self, hosts=None, verify=True,
                         multithread=False, timeout=300.):
@@ -491,7 +493,7 @@ class HeraCorrelator(object):
             hosts = self.fengs.keys()
         failed = self._call_on_hosts(
                             target=self.eq_initialize,
-                            args=(host,),
+                            args=(),
                             kwargs={'verify': verify},
                             hosts=hosts,
                             multithread=multithread,
@@ -514,10 +516,10 @@ class HeraCorrelator(object):
                 pam.set_attenuation(atten_e, atten_n, verify=verify)
             except(AssertionError, RuntimeError):
                 # Catch errs so an attempt is made for each pam
-                failed.append((cnt,)+ antpol_e + antpol_n))
+                failed.append((cnt,)+ antpol_e + antpol_n)
         if len(failed) > 0:
             raise RuntimeError('Failed to initialize PAMs on %s: %s' % (
-                host, ','.join(['%d=(%d%s/%d%s)' % f for f in failed)))
+                host, ','.join(['%d=(%d%s/%d%s)' % f for f in failed])))
 
     def initialize_pams(self, hosts=None, verify=True,
                         multithread=False, timeout=300.):
@@ -525,13 +527,13 @@ class HeraCorrelator(object):
             hosts = self.fengs.keys()
         failed = self._call_on_hosts(
                             target=self.pam_initialize,
-                            args=(host,),
+                            args=(),
                             kwargs={'verify': verify},
                             hosts=hosts,
                             multithread=multithread,
                             timeout=timeout
         )
-        return failed
+        return set(failed) # only return unique hosts
 
     def fft_shift_pfbs(self, fft_shift=None, verify=True, hosts=None):
         if fft_shift is None:
@@ -564,7 +566,7 @@ class HeraCorrelator(object):
             hosts = self.fengs.keys()
         failed = self._call_on_hosts(
                             target=self.adc_initialize,
-                            args=(host,),
+                            args=(),
                             kwargs={
                                'force': force,
                                'verify': verify,
@@ -590,7 +592,7 @@ class HeraCorrelator(object):
             hosts = self.fengs.keys()
         failed = self._call_on_hosts(
                             target=self.dsp_initialize,
-                            args=(host,),
+                            args=(),
                             kwargs={
                                'force': force,
                                'verify': verify,
@@ -641,27 +643,18 @@ class HeraCorrelator(object):
         for ant in self.ant_to_snap.keys():
             for pol in self.ant_to_snap[ant].keys():
                 host = self.ant_to_snap[ant][pol]['host']
-                if host in self.fengs_by_name:
-                    try:
-                        self.ant_to_snap[ant][pol]['host'] = self.fengs_by_ip[socket.gethostbyname(host)]
-                    except socket.gaierror:
-                        self.logger.debug("Failed to get hostname for SNAP %s. Using this name" % host)
-                        self.ant_to_snap[ant][pol]['host'] = host
+                if host in self.fengs:
+                    self.ant_to_snap[ant][pol]['host'] = host
         # Make the snap->ant dict, but make sure the hostnames match what
         # is expected by this class's Fengines
         for hooked_up_snap in hookup['snap_to_ant'].keys():
-            try:
-                ip = socket.gethostbyname(hooked_up_snap)
-                for feng in self.fengs + self.uninit_fengs:
-                    if feng.ip == ip:
-                        self.snap_to_ant[feng.host] = hookup['snap_to_ant'][hooked_up_snap]
-                        feng.ants = self.snap_to_ant[feng.host]
-            except socket.gaierror:
-                self.logger.debug("Failed to get hostname for SNAP %s" % hooked_up_snap)
-        # Fill any unconnected SNAPs with Nones
-        for feng in self.fengs:
-            if feng.host not in self.snap_to_ant.keys():
-                self.snap_to_ant[feng.host] = [None] * 6
+                for host in self.fengs:
+                    self.snap_to_ant[host] = hookup['snap_to_ant'][hooked_up_snap]
+                    self.fengs[host].ants = self.snap_to_ant[host]
+        ## Fill any unconnected SNAPs with Nones
+        #for host in self.fengs:
+        #    if host not in self.snap_to_ant.keys():
+        #        self.snap_to_ant[host] = [None] * 6
 
     def _verify_config(self):
         """
@@ -738,7 +731,7 @@ class HeraCorrelator(object):
         self.r.delete("corr:xeng_chans")
         failed = self._call_on_hosts(
                             target=self._eth_config_dest,
-                            args=(host, source_port, dest_port, xinfo),
+                            args=(source_port, dest_port, xinfo),
                             kwargs={'verify': verify},
                             hosts=hosts,
                             multithread=multithread,
