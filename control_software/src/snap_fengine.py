@@ -52,8 +52,6 @@ class SnapFengine(object):
         self.corr = Corr(self.fpga,'corr_0')
         self.phase_switch = PhaseSwitch(self.fpga, 'phase_switch')
 
-        # store antenna names of board inputs
-        self.ants = [None] * 6
         # store antenna numbers used in packet headers
         self.ant_indices = ant_indices or range(3)
 

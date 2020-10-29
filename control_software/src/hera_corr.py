@@ -66,9 +66,8 @@ class HeraCorrelator(object):
         if not passive:
             if block_monitoring:
                 self.disable_monitoring(60, verify=True)
+            self._hookup_from_redis()
             self._unconnected = self.connect_fengs()
-            # Get antenna<->SNAP maps
-            self.compute_hookup()
 
 
     def get_config(self, config=None, verify=True):
@@ -143,8 +142,9 @@ class HeraCorrelator(object):
             # XXX think about killing live threads
         successes = set([q.get()[0] for i in range(q.qsize())])
         failed = [host for host in hosts if not host in successes]
-        self.logger.warning('Call %s failed on: %s'
-                            % (target.__name__, ','.join(failed)))
+        if len(failed) > 0:
+            self.logger.warning('Call %s failed on: %s'
+                                % (target.__name__, ','.join(failed)))
         return failed
 
     def connect_fengs(self, hosts=None,
@@ -344,7 +344,7 @@ class HeraCorrelator(object):
                     failed.append(host)
         return set(failed) # only return unique hosts
 
-    def get_ant_feng_stream(self, ant, pol):
+    def lookup_ant_host_stream(self, ant, pol):
         """
         Get the host and input number for a given ant, pol.
 
@@ -354,11 +354,8 @@ class HeraCorrelator(object):
         Returns:
            (host [str], stream_num [int])
         """
-        pol = pol.lower()
-        assert(pol in 'en')
-        ant_hookup = self.ant_to_snap[str(ant)]
-        x = ant_hookup[pol]
-        return x['host'], x['channel']
+        hookup = self.ant_to_snap[str(ant)][pol.lower()]
+        return hookup['host'], hookup['channel']
 
     def lookup_pam_attenuation(self, ant, pol):
         redval, redtime = self.r.hmget("atten:ant:%s:%s" % (ant, pol),
@@ -377,7 +374,7 @@ class HeraCorrelator(object):
         )
 
     def get_pam_attenuation(self, ant, pol, log_to_redis=True):
-        host, stream = self.get_ant_feng_stream(ant, pol)
+        host, stream = self.lookup_ant_host_stream(ant, pol)
         pam = self.fengs[host].pam[stream//2]
         east, north = pam.get_attenuation()
         atten = (east, north)[stream % 2]
@@ -391,7 +388,7 @@ class HeraCorrelator(object):
     def set_pam_attenuation(self, ant, pol, attenuation,
                             verify=True, safe=True, update_redis=True):
         self.logger.info("Setting PAM for (%s,%s)" % (ant, pol))
-        host, stream = self.get_ant_feng_stream(ant, pol)
+        host, stream = self.lookup_ant_host_stream(ant, pol)
         pam = self.fengs[host].pam[stream//2]
         east_north = pam.get_attenuation()
         if safe:
@@ -452,7 +449,7 @@ class HeraCorrelator(object):
         Returns:
            Current EQ vector (numpy.array)
         """
-        host, stream = self.get_ant_feng_stream(ant, pol)
+        host, stream = self.lookup_ant_host_stream(ant, pol)
         return self.fengs[host].eq.get_coeffs(stream)
 
     def set_eq_coeffs(self, ant, pol, coeffs, verify=False):
@@ -466,16 +463,17 @@ class HeraCorrelator(object):
            coeffs: EQ vector (numpy.array)
         """
         self.logger.info("Setting EQ for (%s,%s)" % (ant, pol))
-        host, stream = self.get_ant_feng_stream(ant, pol)
+        host, stream = self.lookup_ant_host_stream(ant, pol)
         coeffs = np.ones(feng.eq.ncoeffs) * coeffs # broadcast shape
         self.fengs[host].eq.set_coeffs(stream, coeffs, verify=verify)
 
     def eq_initialize(self, host, verify=True):
         self.logger.info("Initializing EQ on %s" % (host))
         feng = self.fengs[host]
+        antpols = self.snap_to_ant[host]
         failed = []
-        for stream, (ant, pol) in enumerate(feng.ants):
-            if antpol is not None:
+        for stream, (ant, pol) in enumerate(antpols):
+            if ant is not None:
                 coeffs = self.lookup_eq_coeffs(ant, pol)
                 try:
                     feng.eq.set_coeffs(stream, coeffs, verify=verify)
@@ -504,22 +502,26 @@ class HeraCorrelator(object):
     def pam_initialize(self, host, verify=True):
         self.logger.info("Initializing PAMs on %s" % (host))
         feng = self.fengs[host]
+        antpols = self.snap_to_ant[host]
         failed = []
         for cnt,pam in enumerate(feng.pams):
-            antpol_e, antpol_n = feng.ants[2*cnt], feng.ants[2*cnt + 1]
+            (ant_e, pol_e) = antpols[2*cnt]
+            (ant_n, pol_n) = antpols[2*cnt + 1]
             atten_e, atten_n = None, None
-            if antpol_e is not None:
-                atten_e = self.lookup_pam_attenuation(*antpol_e)
-            if antpol_n is not None:
-                atten_n = self.lookup_pam_attenuation(*antpol_n)
+            if ant_e is not None:
+                atten_e = self.lookup_pam_attenuation(ant_e, pol_e)
+            if ant_n is not None:
+                atten_n = self.lookup_pam_attenuation(ant_n, pol_n)
+            if atten_e is None and atten_n is None:
+                continue
             try:
                 pam.set_attenuation(atten_e, atten_n, verify=verify)
-            except(AssertionError, RuntimeError):
+            except(AssertionError, RuntimeError, IOError):
                 # Catch errs so an attempt is made for each pam
-                failed.append((cnt,)+ antpol_e + antpol_n)
+                failed.append((cnt, ant_e, pol_e, ant_n, pol_n))
         if len(failed) > 0:
             raise RuntimeError('Failed to initialize PAMs on %s: %s' % (
-                host, ','.join(['%d=(%d%s/%d%s)' % f for f in failed])))
+                host, ','.join(['%d=(%s%s/%s%s)' % f for f in failed])))
 
     def initialize_pams(self, hosts=None, verify=True,
                         multithread=False, timeout=300.):
@@ -634,23 +636,26 @@ class HeraCorrelator(object):
         self.enable_monitoring()
         return failed
 
-    def compute_hookup(self):
+    def _hookup_from_redis(self):
         """Generate an antenna-map from antenna names to Fengine instances."""
         hookup = redis_cm.read_maps_from_redis(self.r)
         assert(hookup is not None) # antenna hookup missing in redis
         self.ant_to_snap = hookup['ant_to_snap']
-        self.snap_to_ant = hookup['snap_to_ant']
-        for ant in self.ant_to_snap.keys():
-            for pol in self.ant_to_snap[ant].keys():
-                host = self.ant_to_snap[ant][pol]['host']
-                if host in self.fengs:
-                    self.ant_to_snap[ant][pol]['host'] = host
+        self.snap_to_ant = {key: [(int(v[2:-1]), v[-1].lower())
+                                        if v is not None else (None, None)
+                                        for v in val]
+                            for key,val in hookup['snap_to_ant'].items()}
+        #for ant in self.ant_to_snap.keys():
+        #    for pol in self.ant_to_snap[ant].keys():
+        #        host = self.ant_to_snap[ant][pol]['host']
+        #        if host in self.fengs:
+        #            self.ant_to_snap[ant][pol]['host'] = host
         # Make the snap->ant dict, but make sure the hostnames match what
         # is expected by this class's Fengines
-        for hooked_up_snap in hookup['snap_to_ant'].keys():
-                for host in self.fengs:
-                    self.snap_to_ant[host] = hookup['snap_to_ant'][hooked_up_snap]
-                    self.fengs[host].ants = self.snap_to_ant[host]
+        #for hooked_up_snap in hookup['snap_to_ant'].keys():
+        #        for host in self.fengs:
+        #            self.snap_to_ant[host] = hookup['snap_to_ant'][hooked_up_snap]
+        #            self.fengs[host].ants = self.snap_to_ant[host]
         ## Fill any unconnected SNAPs with Nones
         #for host in self.fengs:
         #    if host not in self.snap_to_ant.keys():
@@ -670,10 +675,12 @@ class HeraCorrelator(object):
                 chan_range = params['chan_range']
                 assert(chan_range[1] - chan_range[0] <= 384)
 
-    def _eth_config_dest(self, host, source_port, dest_port, xinfo,
+    def _eth_config_dest(self, host, source_ports, dest_port, xinfo,
                          verify=False):
         """Configure F-Engine destination packet slots."""
         feng = self.fengs[host]
+        source_port = source_ports[host]
+        failed = []
         for xn, xval in xinfo.items():
             chans = xval['chans']
             ip_even = xval['ip_even']
@@ -688,12 +695,18 @@ class HeraCorrelator(object):
             # Update redis to reflect current assignments
             self.r.hset("corr:snap_ants", host,
                         json.dumps(feng.ant_indices))
-            feng.packetizer.assign_slot(xn, chans, [ip_even,ip_odd],
-                        feng.reorder, feng.ant_indices[0], verify=verify)
-            feng.eth.add_arp_entry(ip_even, mac_even, verify=verify)
-            feng.eth.add_arp_entry(ip_odd, mac_odd, verify=verify)
-            feng.eth.set_source_port(source_port, verify=verify)
-            feng.eth.set_port(dest_port, verify=verify)
+            try:
+                feng.packetizer.assign_slot(xn, chans, [ip_even,ip_odd],
+                            feng.reorder, feng.ant_indices[0], verify=verify)
+                feng.eth.add_arp_entry(ip_even, mac_even, verify=verify)
+                feng.eth.add_arp_entry(ip_odd, mac_odd, verify=verify)
+                feng.eth.set_source_port(source_port, verify=verify)
+                feng.eth.set_port(dest_port, verify=verify)
+            except(AssertionError, RuntimeError) as e:
+                failed.append((xn, e.message))
+        if len(failed) > 0:
+            raise RuntimeError('Failed to configure %s.eth: %s' % (
+                host, '\n'.join(['xeng[%d]: %s' % f for f in failed])))
 
     def config_dest_eths(self, hosts=None, verify=True, force=False,
                         multithread=False, timeout=300.):
@@ -731,7 +744,7 @@ class HeraCorrelator(object):
         self.r.delete("corr:xeng_chans")
         failed = self._call_on_hosts(
                             target=self._eth_config_dest,
-                            args=(source_port, dest_port, xinfo),
+                            args=(source_ports, dest_port, xinfo),
                             kwargs={'verify': verify},
                             hosts=hosts,
                             multithread=multithread,

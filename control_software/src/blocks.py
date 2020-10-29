@@ -996,8 +996,11 @@ class ChanReorder(Block):
         else:
             return reorder
 
-    def reindex_channel(self, actual_index, output_index):
+    def reindex_channel(self, actual_index, output_index, verify=False):
         self.write_int('reorder3_map1', actual_index, word_offset=output_index)
+        if verify:
+            assert(actual_index == self.read_int('reorder3_map1', 
+                                                 word_offset=output_index))
 
     def initialize(self):
         self.set_channel_order(np.arange(self.nchans))
@@ -1009,26 +1012,35 @@ class Packetizer(Block):
         self.n_time_demux = n_time_demux
         self.n_slots = 16
 
-    def set_dest_ip(self, ip, slot_offset=0):
+    def set_dest_ip(self, ip, slot_offset=0, verify=False):
         for time_slot in range(self.n_time_demux):
-            self.write_int('ips',ip[time_slot], word_offset=(time_slot * self.n_slots + slot_offset))
+            off = time_slot * self.n_slots + slot_offset
+            self.write_int('ips',ip[time_slot], word_offset=off)
+            if verify:
+                assert(ip[time_slot] == self.read_int('ips', word_offset=off))
 
-    def set_ant_header(self, ant, slot_offset=0):
+    def set_ant_header(self, ant, slot_offset=0, verify=False):
         for time_slot in range(self.n_time_demux):
-            self.write_int('ants', ant, word_offset=(time_slot * self.n_slots + slot_offset))
+            off = time_slot * self.n_slots + slot_offset
+            self.write_int('ants', ant, word_offset=off)
+            if verify:
+                assert(ant == self.read_int('ants', word_offset=off))
 
-    def set_chan_header(self, chan, slot_offset=0):
+    def set_chan_header(self, chan, slot_offset=0, verify=False):
         for time_slot in range(self.n_time_demux):
-            self.write_int('chans', chan, word_offset=(time_slot*self.n_slots + slot_offset))
+            off = time_slot*self.n_slots + slot_offset
+            self.write_int('chans', chan, word_offset=off)
+            if verify:
+                assert(chan == self.read_int('chans', word_offset=off))
 
-
-    def initialize(self):
+    def initialize(self, verify=False):
         for time_slot in range(self.n_slots):
-            self.set_dest_ip([0,0], time_slot)
-            self.set_ant_header(0, time_slot)
-            self.set_chan_header(0, time_slot)
+            self.set_dest_ip([0,0], time_slot, verify=verify)
+            self.set_ant_header(0, time_slot, verify=verify)
+            self.set_chan_header(0, time_slot, verify=verify)
 
-    def assign_slot(self, slot_num, chans, dests, reorder_block, ant):
+    def assign_slot(self, slot_num, chans, dests, reorder_block, ant,
+                    verify=False):
         """
         The F-engine generates 8192 channels, but can only
         output 6144(=8192 * 3/4), in order to keep within the output data rate cap.
@@ -1056,19 +1068,19 @@ class Packetizer(Block):
             raise ValueError("Packetizer requires a list of desitination IPs with %d entries" % self.n_time_demux)
 
         # Set the frequency header of this slot to be the first specified channel
-        self.set_chan_header(chans[0], slot_offset=slot_num)
+        self.set_chan_header(chans[0], slot_offset=slot_num, verify=verify)
 
         # Set the antenna header of this slot (every slot represents 3 antennas
-        self.set_ant_header(ant=ant, slot_offset=slot_num)
+        self.set_ant_header(ant=ant, slot_offset=slot_num, verify=verify)
 
         # Set the destination address of this slot to be the specified IP address
-        self.set_dest_ip(dests, slot_offset=slot_num)
+        self.set_dest_ip(dests, slot_offset=slot_num, verify=verify)
 
         # set the channel orders
         # The channels supplied need to emerge in the first 384 channels of a block
         # of 512 (first 192 clks of 256clks for 2 pols)
         for cn, chan in enumerate(chans[::8]):
-            reorder_block.reindex_channel(chan//8, slot_num*64 + cn)
+            reorder_block.reindex_channel(chan//8, slot_num*64 + cn, verify=verify)
 
 class Rotator(Block):
     coeff_bits = 32
@@ -1196,7 +1208,7 @@ class Eth(Block):
         self.write('sw', mac_pack,
                    offset=self.BASE_MAC_OFFSET + ip_offset*8)
         if verify:
-            assert(mac_pack == self.read('sw', 1,
+            assert(mac_pack == self.read('sw', len(mac_pack),
                         offset=self.BASE_MAC_OFFSET + 8*ip_offset))
 
     def get_status(self):
@@ -1223,7 +1235,8 @@ class Eth(Block):
         self.change_reg_bits('ctrl', 0, self.STATUS_OFFSET)
 
     def get_port(self):
-        port = self.read_uint('ctrl', self.PORT_OFFSET)
+        port = self.read_uint('ctrl')
+        port /= 2**self.PORT_OFFSET
         port &= 2**self.PORT_WIDTH - 1
         return port
 
@@ -1275,7 +1288,8 @@ class Eth(Block):
 
     def get_source_port(self):
         # see config_10gbe_core in katcp_wrapper
-        portstr = self.read('sw', struct.calcsize(self.PORT_FORMAT))
+        portstr = self.read('sw', struct.calcsize(self.PORT_FORMAT),
+                            offset=self.SOURCE_PORT_OFFSET)
         port = struct.unpack(self.PORT_FORMAT, portstr)
         # Skipping first two bytes, which are 0, 1
         return port[-1]
@@ -1613,8 +1627,8 @@ class Pam(Block):
         east, north = self._gpio2db(val)
         if self._cached_atten is not None and \
                 self._cached_atten != (east, north):
-            self._warning('Read value (%d, %d) != written value (%d, %d)'
-                          % (east, north) + self._cached_atten)
+            self._warning('Read value %s != written value %s'
+                          % ((east, north), self._cached_atten))
         return east, north
 
     def set_attenuation(self, east, north, verify=False):
