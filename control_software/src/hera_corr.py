@@ -614,7 +614,7 @@ class HeraCorrelator(object):
         """
 
         # disable monitoring each time to ensure we don't run out of time
-        self.disable_monitoring(600, wait=True)
+        self.disable_monitoring(600, verify=True)
         kwargs = {'verify': verify, 'force': force,
                   'multithread':multithread, 'timeout':timeout}
         failed = []
@@ -807,12 +807,14 @@ class HeraCorrelator(object):
                 external PPS.
         """
         self.logger.info('Synchronizing F-Engines')
-        self.do_for_all_f("set_delay", block="sync", args=(0,))
+        for host in self.fengs:
+            self.fengs[host].sync.set_delay(0)
         if not manual:
-            self.logger.info('    Waiting for PPS (t=%.2f)' % time.time())
-            self.fengs[0].sync.wait_for_sync()
+            self.logger.info('Waiting for PPS (t=%.2f)' % time.time())
+            # XXX this is hanging forever
+            self.fengs.values()[0].sync.wait_for_sync()
         start = time.time()
-        self.logger.info('    Sync passed (t=%.2f)' % (start))
+        self.logger.info('Sync passed (t=%.2f)' % (start))
         # Consider multithreading if gets too slow
         for feng in self.fengs:
             feng.sync.arm_sync()
@@ -879,10 +881,10 @@ class HeraCorrelator(object):
         """
         self.logger.info('Synchronizing noise generators')
         if not manual:
-            self.logger.info('    Waiting for PPS (t=%.2f)' % time.time())
-            self.fengs[0].sync.wait_for_sync()
+            self.logger.info('Waiting for PPS (t=%.2f)' % time.time())
+            self.fengs.values()[0].sync.wait_for_sync()
         start = time.time()
-        self.logger.info('    Sync passed (t=%.2f)' % (start))
+        self.logger.info('Sync passed (t=%.2f)' % (start))
         for feng in self.fengs:
             feng.sync.arm_noise()
         sync_time = time.time() - start
@@ -896,7 +898,7 @@ class HeraCorrelator(object):
                 for feng in self.fengs:
                     feng.sync.sw_sync()
             sync_time = int(time.time())  # roughly  # noqa
-        self.logger.info('    Synchronized in %.2f seconds' % 
+        self.logger.info('Synchronized in %.2f seconds' % 
                          (after_sync - before_sync))
 
     def enable_eths(self, hosts=None, verify=True):
