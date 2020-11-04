@@ -198,27 +198,104 @@ class Adc(casperfpga.snapadc.SNAPADC):
 
         self.adc.write((gain_map[gain]<<4) + gain_map[gain], 0x2b)
 
+    # OVERWRITING casperfpga.snapadc.SNAPADC.init
+    def init(self):
+        """ Get SNAP ADCs into working condition
 
-    def initialize(self):
-        """
-        Initialize the configuration of the ADC chip.
-        Returns True if initialization was successful. False otherwise.
-        """
-        status = True
-        self.init(self.sample_rate, self.num_chans)
+        Supported frequency range: 60MHz ~ 1000MHz. Set resolution to
+        None to let init() automatically decide the best resolution.
+
+        1. configuring frequency synthesizer LMX2581
+        2. configuring clock source switch HMC922
+        3. configuring ADCs HMCAD1511 (support HMCAD1520 in future)
+        4. configuring IDELAYE2 and ISERDESE2 inside of FPGA """
+
+        samplingRate = self.sample_rate
+        numChannel = self.num_chans
+        if self.lmx is not None:
+            self.logger.debug("Reseting frequency synthesizer")
+            self.lmx.init()
+            self.logger.debug("Disabling Synth output A")
+            self.lmx.setWord(1, "OUTA_PD")
+            self.logger.debug("Configuring frequency synthesizer")
+            assert(self.lmx.setFreq(samplingRate)) # Error if failed
+
+        self.logger.debug("Configuring clock source switch")
+        if self.lmx is not None:
+            self.clksw.setSwitch('a')
+        else:
+            self.clksw.setSwitch('b')
+
+        time.sleep(0.5) # XXX what is actual timing?
+
+        self.logger.debug("Reseting adc_unit")
+        self.reset()
         self.selectADC()
-        self.adc.selectInput([1,1,3,3])
-        self.set_gain(4)
-        return status
+        self.logger.debug("Initialising ADCs")
+        self.adc.init() # resets: don't set ADC registers before here
 
-    def align_channels(self):
-        assert(self.alignLineClock())
-        assert(self.alignFrameClock())
-        assert(self.rampTest())
-        assert(self.isLaneBonded())
-        # Finally place ADC in "correct" mode
-        self.setDemux(numChannel=self.num_chans)
+        # SNAP only uses one of the 3 ADC chips to provide clocks, 
+        # set others to lowest drive strength possible and terminate them
+        self.selectADC([1,2]) # Talk to the 2nd and 3rd ADCs
+        # Please refer to HMCAD1511 datasheet for more details
+        # LCLK Termination
+        rid, mask = self.adc._getMask('en_lvds_term')
+        val = self.adc._set(0x0, 0b1, mask)          # Enable termination.
+        rid, mask = self.adc._getMask('term_lclk')
+        val = self.adc._set(val, 0b011, mask)        # 94 ohm
+        # Frame CLK termination
+        rid, mask = self.adc._getMask('term_frame')
+        val = self.adc._set(val, 0b011, mask)        # 94 ohm
+        self.adc.write(val, rid)
+        # LCLK Drive Strength
+        rid, mask = self.adc._getMask('ilvds_lclk')
+        val = self.adc._set(0x0, 0b011, mask) # 0.5 mA (default)
+        # Frame CLK Drive Strength
+        rid, mask = self.adc._getMask('ilvds_frame')
+        val = self.adc._set(val, 0b011, mask)        # 0.5 mA
+        self.adc.write(val, rid)
+        # Select all ADCs and continue initialization
+        self.selectADC()
 
+        if numChannel==1 and samplingRate<240:
+            lowClkFreq = True
+        elif numChannel==2 and samplingRate<120:
+            lowClkFreq = True
+        elif numChannel==4 and samplingRate<60:
+            lowClkFreq = True
+        # XXX this case already covered above
+        elif numChannel==4 and self.RESOLUTION==14 and samplingRate<30:
+            lowClkFreq = True
+        else:
+            lowClkFreq = False
+
+        self.logger.debug("Configuring ADC operating mode")
+        if type(self.adc) is HMCAD1511:
+            self.adc.setOperatingMode(numChannel, 1, lowClkFreq)
+        elif type(self.adc) is HMCAD1520:
+            self.adc.setOperatingMode(numChannel, 1, lowClkFreq,
+                                      self.RESOLUTION)
+
+        # ADC init/lmx select messes with FPGA clock, so reprogram
+        self.logger.debug('Reprogramming the FPGA for ADCs')
+        self.interface.transport.prog_user_image()
+        self.selectADC()
+        time.sleep(0.5) # XXX actual timing?
+        self.logger.debug('Reprogrammed')
+
+        # Select the clock source switch again. The reprogramming 
+        # seems to lose this information
+        self.logger.debug('Configuring clock source switch')
+        if self.lmx is not None:
+            self.clksw.setSwitch('a')
+        else:
+            self.clksw.setSwitch('b')
+
+        time.sleep(0.5) # XXX necessary?
+
+        # Snipped off ADC calibration here; it's now in
+        # snap_fengine.
+        return
 
 class Sync(Block):
     def __init__(self, host, name, logger=None):

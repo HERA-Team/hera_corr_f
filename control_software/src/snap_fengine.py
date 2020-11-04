@@ -5,8 +5,8 @@ import datetime
 import casperfpga
 from blocks import *
 
-# 'source_sel' register only has lowest 2 bits used
-# so we will use the others to mark status bits
+# 'source_sel' register only on fpga only uses lowest 2 bits
+# using the others to mark status bits
 ADC_LINE_ALIGNED_BIT = 11
 ADC_FRAME_ALIGNED_BIT = 12
 ADC_RAMP_TEST_BIT = 13
@@ -115,81 +115,72 @@ class SnapFengine(object):
         """
         return 'adc16_controller' in self.fpga.listdev()
 
-    def configure_adc(self):
+    def initialize_adc(self):
         """
-        Initialize the Synth and Adc blocks.  Calibrate the ADCs.
+        Initialize the Synth and Adc blocks, then reprogram FPGA.
         """        
         self.synth.initialize()
-        if self.adc.initialize():
-            self._set_adc_status(1, 1, 1, 1)
-        else:
-            self._set_adc_status(0, 0, 0, 0)
+        self.adc.init()
+        # Mark ADC as uncalibrated
+        self._set_adc_status(0, 0, 0, 0)
 
-    def _set_adc_status(self, line=None, frame=None, ramp=None, bonded=None):
+    def align_adc(self, force=False, verify=True):
+        if force:
+            self._set_adc_status(0, 0, 0, 0)
+        status = self.get_adc_status()
+        if all(status.values()):
+            return
+        self.adc.setDemux(numChannel=1)
+        if not status['line']:
+            status['line'] = self.adc.alignLineClock())
+        if status['line'] and not status['frame']:
+            status['frame'] = self.adc.alignFrameClock())
+        if status['line'] and status['frame'] and not status['ramp']:
+            status['ramp'] = self.adc.rampTest()
+        if status['line'] and status['frame'] and not status['bonded']:
+            status['bonded'] = self.adc.isLaneBonded()
+        self.adc.setDemux(numChannel=self.adc.num_chans)
+        self._set_adc_status(**status) # record status
+        if verify:
+            assert(all(status.values())) # errors if anything failed
+        # Otherwise, finish up here.
+        self.adc.selectADC()
+        self.adc.selectInput([1,1,3,3])
+        self.adc.set_gain(4)
+        
+
+    def _set_adc_status(self, line=None, frame=None, ramp=None,
+                        bonded=None):
+        def setbit(reg, bit, val):
+            reg &= 0xFFFFFFFF - 2**bit
+            reg |= int(val) * 2**bin
+            return reg
+        reg = self.input.read_uint('source_sel')
         if line is not None:
-            self.input.change_reg_bits('source_sel', line,
-                                       ADC_LINE_ALIGNED_BIT, 1)
+            reg = setbit(reg, ADC_LINE_ALIGNED_BIT, int(line))
         if frame is not None:
-            self.input.change_reg_bits('source_sel', frame,
-                                       ADC_FRAME_ALIGNED_BIT, 1)
+            reg = setbit(reg, ADC_FRAME_ALIGNED_BIT, int(frame)
         if ramp is not None:
-            self.input.change_reg_bits('source_sel', ramp,
-                                       ADC_RAMP_TEST_BIT, 1)
+            reg = setbit(reg, ADC_RAMP_TEST_BIT, int(ramp)
         if bonded is not None:
-            self.input.change_reg_bits('source_sel', bonded,
-                                       ADC_LANE_BONDED_BIT, 1)
+            reg = setbit(reg, ADC_LAND_BONDED_BIT, int(bonded)
+        self.input.write_uint('source_sel', val)
 
     def get_adc_status(self):
+        val = self.input.read_uint('source_sel')
         status = {}
-        status['LINE'] = self.input.read_uint('source_sel') & \
-                                    2**ADC_LINE_ALIGNED_BIT
-        status['FRAME'] = self.input.read_uint('source_sel') & \
-                                    2**ADC_FRAME_ALIGNED_BIT
-        status['RAMP'] = self.input.read_uint('source_sel') & \
-                                    2**ADC_RAMP_TEST_BIT
-        status['BOND'] = self.input.read_uint('source_sel') & \
-                                    2**ADC_LANE_BONDED_BIT
+        status['line']  = bool(val & 2**ADC_LINE_ALIGNED_BIT)
+        status['frame'] = bool(val & 2**ADC_FRAME_ALIGNED_BIT)
+        status['ramp']  = bool(val & 2**ADC_RAMP_TEST_BIT)
+        status['bonded']  = bool(val & 2**ADC_LANE_BONDED_BIT)
         return status
-
-    def align_adc_line_clock(self):
-        self.adc.setDemux(numChannel=1) # calibrate in full interleave mode
-        try:
-            assert(self.alignLineClock())
-            self._set_adc_status(line=1)
-        finally:
-            self.setDemux(numChannel=self.adc.num_chans)
-
-    def align_adc_frame_clock(self):
-        self.adc.setDemux(numChannel=1) # calibrate in full interleave mode
-        try:
-            assert(self.alignFrameClock())
-            self._set_adc_status(frame=1)
-        finally:
-            self.setDemux(numChannel=self.adc.num_chans)
-
-    def adc_ramp_test(self):
-        self.adc.setDemux(numChannel=1) # calibrate in full interleave mode
-        try:
-            assert(self.rampTest())
-            self._set_adc_status(ramp=1)
-        finally:
-            self.setDemux(numChannel=self.adc.num_chans)
-
-    def adc_is_lane_bonded(self):
-        self.adc.setDemux(numChannel=1) # calibrate in full interleave mode
-        try:
-            assert(self.isLaneBonded())
-            self._set_adc_status(bonded=1)
-        finally:
-            self.setDemux(numChannel=self.adc.num_chans)
 
     def adc_is_configured(self):
         """
-        15th bit from LSB (0x4000) of the source_sel register 
-        within the Input block is set when the ADC is configured. 
-        Look for this bit and return.
+        Read the source_sel register 
+        within the Input block is see if the ADC is configured. 
         """
-        return self.input.read_uint('source_sel') & 2**ADC_CONFIG_BIT
+        return all(self.get_adc_status().values())
 
     def initialize(self, verify=False):
 

@@ -20,17 +20,6 @@ LOGGER = add_default_log_handlers(logging.getLogger(__name__))
 TEMP_BITSTREAM_STORE = "/tmp/" # location to store bitfiles from redis
 
 
-#def _queue_instance_method(q, num, inst, method, args, kwargs):
-#    """
-#    Add an [num, inst.method(*args, **kwargs)] call to queue, q.
-#
-#    Use q.get() to get the return data from this call.
-#    This function is used for parallelizing calls to multiple
-#    roaches/engines.
-#    """
-#    q.put([num, getattr(inst, method)(*args, **kwargs)])
-
-
 class HeraCorrelator(object):
     """HERA Correlator control class."""
 
@@ -195,8 +184,9 @@ class HeraCorrelator(object):
         # XXX need to check how this behaves in real life
         # XXX it may lie and say it programmed when it didn't
         # XXX it might also try multiple times and/or revert to golden image
-        # this call should block until succees
+        # this call should block until success
         feng.fpga.upload_to_ram_and_program(progfile)
+        feng.initialize_adc() # configures synth/clk and reprograms FPGA
         if verify:
             #time.sleep(sleep) # probably unnecessary
             # XXX could also check version of programmed image against
@@ -553,21 +543,17 @@ class HeraCorrelator(object):
                 failed.append(host)
         return failed
 
-    def adc_initialize(self, host, force=False, verify=True):
+    def adc_align(self, host, force=False, verify=True):
         feng = self.fengs[host]
-        if not force and feng.adc_is_configured():
-            return
         self.logger.info("Initializing ADC on %s" % (host))
-        feng.configure_adc()
-        if verify:
-            assert(feng.adc_is_configured())
+        feng.align_adc(force=force, verify=verify)
         
-    def initialize_adcs(self, hosts=None, verify=True, force=False,
+    def align_adcs(self, hosts=None, verify=True, force=False,
                         multithread=False, timeout=300.):
         if hosts is None:
             hosts = self.fengs.keys()
         failed = self._call_on_hosts(
-                            target=self.adc_initialize,
+                            target=self.adc_align,
                             args=(),
                             kwargs={
                                'force': force,
@@ -619,7 +605,7 @@ class HeraCorrelator(object):
                   'multithread':multithread, 'timeout':timeout}
         failed = []
         if adcs:
-            failed += self.initialize_adcs(hosts, **kwargs)
+            failed += self.align_adcs(hosts, **kwargs)
             hosts = [host for host in hosts if not host in failed]
         if dsps:
             failed += self.initialize_dsps(hosts, **kwargs)
