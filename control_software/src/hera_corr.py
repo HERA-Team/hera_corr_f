@@ -555,7 +555,7 @@ class HeraCorrelator(object):
 
     def adc_initialize(self, host, force=False, verify=True):
         feng = self.fengs[host]
-        if not force and not feng.adc_is_configured():
+        if not force and feng.adc_is_configured():
             return
         self.logger.info("Initializing ADC on %s" % (host))
         feng.configure_adc()
@@ -798,7 +798,7 @@ class HeraCorrelator(object):
 #                
 #        return True
 
-    def sync(self, manual=False, maxtime=0.8):
+    def sync(self, manual=False, hosts=None, maxtime=0.8):
         """
         Synchronize boards to PPS.
 
@@ -807,11 +807,18 @@ class HeraCorrelator(object):
                 external PPS.
         """
         self.logger.info('Synchronizing F-Engines')
-        for host in self.fengs:
+        if hosts is None:
+            hosts = self.fengs.keys()
+        unconfigured = [host for host in hosts
+                            if not self.fengs[host].adc_is_configured()]
+        if len(unconfigured) > 0:
+            raise RuntimeError('ADCs not initialized on: %s'
+                               % (','.join(unconfigured)))
+        for host in hosts:
             self.fengs[host].sync.set_delay(0)
         if not manual:
             self.logger.info('Waiting for PPS (t=%.2f)' % time.time())
-            # XXX this is hanging forever
+            # this is hanging forever if ADC is not configured
             self.fengs.values()[0].sync.wait_for_sync()
         start = time.time()
         self.logger.info('Sync passed (t=%.2f)' % (start))
@@ -820,6 +827,7 @@ class HeraCorrelator(object):
             feng.sync.arm_sync()
         sync_time = time.time() - start
         if not manual:
+            # XXX use sync.count to verify no sync has passed
             if sync_time > maxtime:
                 raise RuntimeError("Sync time (%.2f) exceeded max (%.2f)" %
                                    (sync_time, maxtime))

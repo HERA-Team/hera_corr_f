@@ -205,21 +205,20 @@ class Adc(casperfpga.snapadc.SNAPADC):
         Returns True if initialization was successful. False otherwise.
         """
         status = True
-        for i in range(self._retry):
-            if self.init(self.sample_rate, self.num_chans):
-                if i == 0:
-                    self.logger.info("ADC configured OK")
-                if i > 0:
-                    self.logger.warning("ADC took %d attempts to configure" % (i+1))
-                break
-            if i == self._retry - 1:
-                self.logger.error("ADC failed to configure after %d attempts" % (i+1))
-                status = False
-
+        self.init(self.sample_rate, self.num_chans)
         self.selectADC()
         self.adc.selectInput([1,1,3,3])
         self.set_gain(4)
         return status
+
+    def align_channels(self):
+        assert(self.alignLineClock())
+        assert(self.alignFrameClock())
+        assert(self.rampTest())
+        assert(self.isLaneBonded())
+        # Finally place ADC in "correct" mode
+        self.setDemux(numChannel=self.num_chans)
+
 
 class Sync(Block):
     def __init__(self, host, name, logger=None):

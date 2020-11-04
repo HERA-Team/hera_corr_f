@@ -120,6 +120,8 @@ class SnapFengine(object):
         else:
             self.input.change_reg_bits('source_sel', 0, ADC_CONFIG_BIT, 1)    
 
+    def align_adc
+
     def adc_is_configured(self):
         """
         15th bit from LSB (0x4000) of the source_sel register 
