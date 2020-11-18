@@ -186,6 +186,7 @@ class HeraCorrelator(object):
         # XXX it might also try multiple times and/or revert to golden image
         # this call should block until success
         feng.fpga.upload_to_ram_and_program(progfile)
+        # XXX maybe not do this b/c of multithreading
         feng.initialize_adc() # configures synth/clk and reprograms FPGA
         if verify:
             #time.sleep(sleep) # probably unnecessary
@@ -543,9 +544,11 @@ class HeraCorrelator(object):
                 failed.append(host)
         return failed
 
-    def adc_align(self, host, force=False, verify=True):
+    def adc_align(self, host, reinit=False, force=False, verify=True):
         feng = self.fengs[host]
         self.logger.info("Initializing ADC on %s" % (host))
+        if reinit:
+            feng.initialize_adc()
         feng.align_adc(force=force, verify=verify)
         
     def align_adcs(self, hosts=None, verify=True, force=False,

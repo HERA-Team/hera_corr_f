@@ -130,11 +130,17 @@ class SnapFengine(object):
         status = self.get_adc_status()
         if all(status.values()):
             return
-        self.adc.setDemux(numChannel=1)
         if not status['line']:
-            status['line'] = self.adc.alignLineClock())
+            fails = self.adc.alignLineClock()
+            status['line'] = bool(len(fails) == 0)
+            if not status['line']:
+                self.logger.warning("alignLineClock failed on: " + str(fails))
         if status['line'] and not status['frame']:
-            status['frame'] = self.adc.alignFrameClock())
+            fails = self.adc.alignFrameClock()
+            status['frame'] = bool(len(fails) == 0)
+            if not status['frame']:
+                self.logger.warning("alignFrameClock failed on: " + str(fails))
+        self.adc.setDemux(numChannel=1)
         if status['line'] and status['frame'] and not status['ramp']:
             status['ramp'] = self.adc.rampTest()
         if status['line'] and status['frame'] and not status['bonded']:
@@ -145,7 +151,7 @@ class SnapFengine(object):
             assert(all(status.values())) # errors if anything failed
         # Otherwise, finish up here.
         self.adc.selectADC()
-        self.adc.selectInput([1,1,3,3])
+        self.adc.adc.selectInput([1,1,3,3])
         self.adc.set_gain(4)
         
 
@@ -153,18 +159,18 @@ class SnapFengine(object):
                         bonded=None):
         def setbit(reg, bit, val):
             reg &= 0xFFFFFFFF - 2**bit
-            reg |= int(val) * 2**bin
+            reg |= int(val) * 2**bit
             return reg
         reg = self.input.read_uint('source_sel')
         if line is not None:
             reg = setbit(reg, ADC_LINE_ALIGNED_BIT, int(line))
         if frame is not None:
-            reg = setbit(reg, ADC_FRAME_ALIGNED_BIT, int(frame)
+            reg = setbit(reg, ADC_FRAME_ALIGNED_BIT, int(frame))
         if ramp is not None:
-            reg = setbit(reg, ADC_RAMP_TEST_BIT, int(ramp)
+            reg = setbit(reg, ADC_RAMP_TEST_BIT, int(ramp))
         if bonded is not None:
-            reg = setbit(reg, ADC_LAND_BONDED_BIT, int(bonded)
-        self.input.write_uint('source_sel', val)
+            reg = setbit(reg, ADC_LANE_BONDED_BIT, int(bonded))
+        self.input.write_uint('source_sel', reg)
 
     def get_adc_status(self):
         val = self.input.read_uint('source_sel')

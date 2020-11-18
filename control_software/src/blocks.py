@@ -270,9 +270,9 @@ class Adc(casperfpga.snapadc.SNAPADC):
             lowClkFreq = False
 
         self.logger.debug("Configuring ADC operating mode")
-        if type(self.adc) is HMCAD1511:
+        if type(self.adc) is casperfpga.snapadc.HMCAD1511:
             self.adc.setOperatingMode(numChannel, 1, lowClkFreq)
-        elif type(self.adc) is HMCAD1520:
+        elif type(self.adc) is casperfpga.snapadc.HMCAD1520:
             self.adc.setOperatingMode(numChannel, 1, lowClkFreq,
                                       self.RESOLUTION)
 
@@ -296,6 +296,74 @@ class Adc(casperfpga.snapadc.SNAPADC):
         # Snipped off ADC calibration here; it's now in
         # snap_fengine.
         return
+
+    def alignLineClock(self):
+        NTAPS = 32
+        NLANES = len(self.laneList)
+        dist_ker = np.exp(-(NTAPS - np.arange(2*NTAPS-1))**2)
+        failed_chips = {}
+        self.setDemux(numChannel=1)
+        for chip in self.adcList:
+            self.selectADC(chip)
+            self.adc.test('pat_deskew')
+            match = np.empty((NTAPS, NLANES), dtype=np.float)
+            for t in range(NTAPS):
+                self.delay(t, chip)
+                self.snapshot()
+                d = self.readRAM(chip).reshape(-1, NLANES)
+                for L in self.laneList:
+                    match[t,L] = np.unique(d[:,L], return_counts=True)[1].max()
+            miss_rate = 1. - match / d.shape[0]
+            for L in self.laneList:
+                marginal = np.convolve(miss_rate[:,L], dist_ker, 'full')
+                marginal = marginal[NTAPS-1:-(NTAPS-1)]
+                best_tap = np.argmin(marginal)
+                self.delay(best_tap, chip, L)
+            self.snapshot()
+            self.adc.test('off')
+            d = self.readRAM(chip).reshape(-1, NLANES)
+            failed_lanes = [L for L in self.laneList
+                if np.unique(d[:,L],return_counts=True)[1].max() != d.shape[0]]
+            if len(failed_lanes) > 0:
+                failed_chips[chip] = failed_lanes
+        self.setDemux(numChannel=self.num_chans)
+        return failed_chips
+
+    def alignFrameClock(self):
+        """Align frame clock with data frame."""
+        failed_chips = {}
+        offset = {
+            self._signed(0b11110000, 8): 0,
+            self._signed(0b01111000, 8): 1,
+            self._signed(0b00111100, 8): 2,
+            self._signed(0b00011110, 8): 3,
+            self._signed(0b00001111, 8): 4,
+            self._signed(0b10000111, 8): 5,
+            self._signed(0b11000011, 8): 6,
+            self._signed(0b11100001, 8): 7,
+        }
+        self.setDemux(numChannel=1)
+        for chip in self.adcList:
+            self.selectADC(chip)
+            self.adc.test('pat_sync')
+            self.snapshot()
+            d = self.readRAM(chip).reshape(-1, self.RESOLUTION)
+            for lane in self.laneList:
+                # sanity check that alignLineClock succeeded
+                assert(np.all(d[:,lane] == d[0,lane]))
+                for cnt in range(offset[d[0,lane]]):
+                    self.bitslip(chip, lane)
+                    self.snapshot() # make bitslip "take" (?!) XXX
+            self.snapshot()
+            self.adc.test('off')
+            d = self.readRAM(chip).reshape(-1, self.RESOLUTION)
+            failed_lanes = [L for L in self.laneList
+                if np.any(d[:,L] != self._signed(0b11110000, 8))]
+            if len(failed_lanes) > 0:
+                failed_chips[chip] = failed_lanes
+        self.setDemux(numChannel=self.num_chans)
+        return failed_chips
+
 
 class Sync(Block):
     def __init__(self, host, name, logger=None):
