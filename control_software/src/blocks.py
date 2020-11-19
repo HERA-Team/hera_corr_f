@@ -332,33 +332,30 @@ class Adc(casperfpga.snapadc.SNAPADC):
     def alignFrameClock(self):
         """Align frame clock with data frame."""
         failed_chips = {}
-        offset = {
-            self._signed(0b11110000, 8): 0,
-            self._signed(0b01111000, 8): 1,
-            self._signed(0b00111100, 8): 2,
-            self._signed(0b00011110, 8): 3,
-            self._signed(0b00001111, 8): 4,
-            self._signed(0b10000111, 8): 5,
-            self._signed(0b11000011, 8): 6,
-            self._signed(0b11100001, 8): 7,
-        }
         self.setDemux(numChannel=1)
         for chip in self.adcList:
             self.selectADC(chip)
+            self.adc.test('dual_custom_pat', self.p1, self.p2)
+            ans1 = self.adc._signed(self.p1, self.RESOLUTION)
+            ans2 = self.adc._signed(self.p2, self.RESOLUTION)
+            for cnt in range(2 * self.RESOLUTION):
+                slipped = False
+                self.snapshot() # make bitslip "take" (?!) XXX
+                d = self.readRAM(chip).reshape(-1, self.RESOLUTION)
+                for lane in self.laneList:
+                    # sanity check that alignLineClock succeeded
+                    assert(np.all(d[0::2,lane] == d[0,lane]))
+                    assert(np.all(d[1::2,lane] == d[1,lane]))
+                    if not d[0,lane] in [ans1, ans2]:
+                        self.bitslip(chip, lane)
+                        slipped = True
+                if not slipped:
+                    break
             self.adc.test('pat_sync')
             self.snapshot()
             d = self.readRAM(chip).reshape(-1, self.RESOLUTION)
-            for lane in self.laneList:
-                # sanity check that alignLineClock succeeded
-                assert(np.all(d[:,lane] == d[0,lane]))
-                for cnt in range(offset[d[0,lane]]):
-                    self.bitslip(chip, lane)
-                    self.snapshot() # make bitslip "take" (?!) XXX
-            self.snapshot()
-            self.adc.test('off')
-            d = self.readRAM(chip).reshape(-1, self.RESOLUTION)
-            failed_lanes = [L for L in self.laneList
-                if np.any(d[:,L] != self._signed(0b11110000, 8))]
+            failed_lanes = [lane for lane in self.laneList
+                if np.any(d[:,lane] != self._signed(0b11110000, 8))]
             if len(failed_lanes) > 0:
                 failed_chips[chip] = failed_lanes
         self.setDemux(numChannel=self.num_chans)
