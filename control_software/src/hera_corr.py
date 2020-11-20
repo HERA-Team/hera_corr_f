@@ -551,7 +551,7 @@ class HeraCorrelator(object):
             feng.initialize_adc()
         feng.align_adc(force=force, verify=verify)
         
-    def align_adcs(self, hosts=None, verify=True, force=False,
+    def align_adcs(self, hosts=None, reinit=False, verify=True, force=False,
                         multithread=False, timeout=300.):
         if hosts is None:
             hosts = self.fengs.keys()
@@ -559,6 +559,7 @@ class HeraCorrelator(object):
                             target=self.adc_align,
                             args=(),
                             kwargs={
+                               'reinit': reinit,
                                'force': force,
                                'verify': verify,
                             },

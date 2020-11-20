@@ -226,8 +226,6 @@ class Adc(casperfpga.snapadc.SNAPADC):
         else:
             self.clksw.setSwitch('b')
 
-        time.sleep(0.5) # XXX what is actual timing?
-
         self.logger.debug("Reseting adc_unit")
         self.reset()
         self.selectADC()
@@ -264,8 +262,8 @@ class Adc(casperfpga.snapadc.SNAPADC):
         elif numChannel==4 and samplingRate<60:
             lowClkFreq = True
         # XXX this case already covered above
-        elif numChannel==4 and self.RESOLUTION==14 and samplingRate<30:
-            lowClkFreq = True
+        #elif numChannel==4 and self.RESOLUTION==14 and samplingRate<30:
+        #    lowClkFreq = True
         else:
             lowClkFreq = False
 
@@ -280,7 +278,6 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.logger.debug('Reprogramming the FPGA for ADCs')
         self.interface.transport.prog_user_image()
         self.selectADC()
-        time.sleep(0.5) # XXX actual timing?
         self.logger.debug('Reprogrammed')
 
         # Select the clock source switch again. The reprogramming 
@@ -291,74 +288,254 @@ class Adc(casperfpga.snapadc.SNAPADC):
         else:
             self.clksw.setSwitch('b')
 
-        time.sleep(0.5) # XXX necessary?
-
         # Snipped off ADC calibration here; it's now in
         # snap_fengine.
         return
 
-    def alignLineClock(self):
+    def bitslip(self, chipSel=None, laneSel=None, verify=False):
+        if chipSel == None:
+            chipSel = self.adcList
+        elif chipSel in self.adcList:
+            chipSel = [chipSel]
+
+        if not isinstance(chipSel,list):
+            raise ValueError("Invalid parameter")
+        elif isinstance(chipSel,list) and any(cs not in self.adcList for cs in chipSel):
+            raise ValueError("Invalid parameter")
+        if laneSel == None:
+            laneSel = self.laneList
+        elif laneSel in self.laneList:
+            laneSel = [laneSel]
+
+        if not isinstance(laneSel,list):
+            raise ValueError("Invalid parameter")
+        elif isinstance(laneSel,list) and any(cs not in self.laneList for cs in laneSel):
+            raise ValueError("Invalid parameter")
+
+        self.logger.debug('Bitslip lane {0} of chip {1}'.format(str(laneSel),str(chipSel)))
+
+        for cs in chipSel:
+            for ls in laneSel:
+                val = self._set(0x0, 0b1 << cs, self.M_WB_W_ISERDES_BITSLIP_CHIP_SEL)
+                val = self._set(val, ls, self.M_WB_W_ISERDES_BITSLIP_LANE_SEL)
+
+                # The registers related to reset, request, bitslip, and other
+                # commands after being set will not be automatically cleared.  
+                # Therefore we have to clear them by ourselves.
+                self.adc._write(0x0, self.A_WB_W_CTRL)
+                if verify:
+                    assert(self.adc._read(self.A_WB_W_CTRL) & self.M_WB_W_DELAY_TAP == 0x00)
+                self.adc._write(val, self.A_WB_W_CTRL)
+                if verify:
+                    rv = self.adc._read(self.A_WB_W_CTRL)
+                    assert(rv & self.M_WB_W_ISERDES_BITSLIP_CHIP_SEL == val & self.M_WB_W_ISERDES_BITSLIP_CHIP_SEL)
+                    assert(rv & self.M_WB_W_ISERDES_BITSLIP_LANE_SEL == val & self.M_WB_W_ISERDES_BITSLIP_LANE_SEL)
+                self.adc._write(0x0, self.A_WB_W_CTRL)
+                if verify:
+                    assert(self.adc._read(self.A_WB_W_CTRL) & self.M_WB_W_DELAY_TAP == 0x00)
+
+
+    # The ADC16 controller word (the offset in write_int method) 2 and 3 are for delaying 
+    # taps of A and B lanes, respectively.
+    #
+    # Refer to the memory map word 2 and word 3 for clarification.  The memory map was made 
+    # for a ROACH design so it has chips A-H.  SNAP 1 design has three chips.
+    def delay(self, tap, chipSel=None, laneSel=None, verify=False):
+        if chipSel==None:
+            chipSel = self.adcList
+        elif chipSel in self.adcList:
+            chipSel = [chipSel]
+        elif isinstance(chipSel, list) and any(s not in self.adcList for s in chipSel):
+            raise ValueError("Invalid parameter")
+
+        if laneSel==None:
+            laneSel = self.laneList
+        elif laneSel in self.laneList:
+            laneSel = [laneSel]
+        elif isinstance(laneSel,list) and any(s not in self.laneList for s in laneSel):
+            raise ValueError("Invalid parameter")
+        elif laneSel not in self.laneList:
+            raise ValueError("Invalid parameter")
+
+        if not isinstance(tap, int):
+            raise ValueError("Invalid parameter")
+
+        strl = ','.join([str(c) for c in laneSel])
+        strc = ','.join([str(c) for c in chipSel])
+        self.logger.debug('Set DelayTap of lane {0} of chip {1} to {2}'
+                .format(str(laneSel),str(chipSel),tap))
+
+        matc = np.array([(cs*4) for cs in chipSel])
+
+        matla = np.array([int(l/2) for l in laneSel if l%2==0])
+        if matla.size:
+            mata =  np.repeat(matc.reshape(-1,1),matla.size,1) + \
+                np.repeat(matla.reshape(1,-1),matc.size,0)
+            vala = np.bitwise_or.reduce([0b1 << s for s in mata.flat])
+        else:
+            vala = 0
+
+        matlb = np.array([int(l/2) for l in laneSel if l%2==1])
+        if matlb.size:
+            matb =  np.repeat(matc.reshape(-1,1),matlb.size,1) + \
+                np.repeat(matlb.reshape(1,-1),matc.size,0)
+            valb = np.bitwise_or.reduce([0b1 << s for s in matb.flat])
+        else:
+            valb = 0
+
+        valt = self._set(0x0, tap, self.M_WB_W_DELAY_TAP)
+
+        # Don't be misled by the naming - "DELAY_STROBE" in casper repo.  It doesn't 
+        # generate strobe at all.  You have to manually clear the bits that you set.
+        self.adc._write(0x00, self.A_WB_W_CTRL)
+        self.adc._write(0x00, self.A_WB_W_DELAY_STROBE_L)
+        self.adc._write(0x00, self.A_WB_W_DELAY_STROBE_H)
+        if verify:
+            assert(self.adc._read(self.A_WB_W_CTRL) & self.M_WB_W_DELAY_TAP == 0x00)
+            assert(self.adc._read(self.A_WB_W_DELAY_STROBE_L) == 0x00)
+            assert(self.adc._read(self.A_WB_W_DELAY_STROBE_H) == 0x00)
+        self.adc._write(valt, self.A_WB_W_CTRL)
+        self.adc._write(vala, self.A_WB_W_DELAY_STROBE_L)
+        self.adc._write(valb, self.A_WB_W_DELAY_STROBE_H)
+        if verify:
+            assert(self.adc._read(self.A_WB_W_CTRL) & self.M_WB_W_DELAY_TAP == valt)
+            assert(self.adc._read(self.A_WB_W_DELAY_STROBE_L) == vala)
+            assert(self.adc._read(self.A_WB_W_DELAY_STROBE_H) == valb)
+        self.adc._write(0x00, self.A_WB_W_CTRL)
+        self.adc._write(0x00, self.A_WB_W_DELAY_STROBE_L)
+        self.adc._write(0x00, self.A_WB_W_DELAY_STROBE_H)
+        if verify:
+            assert(self.adc._read(self.A_WB_W_CTRL) & self.M_WB_W_DELAY_TAP == 0x00)
+            assert(self.adc._read(self.A_WB_W_DELAY_STROBE_L) == 0x00)
+            assert(self.adc._read(self.A_WB_W_DELAY_STROBE_H) == 0x00)
+
+        for cs in chipSel:
+            for ls in laneSel:
+                self.curDelay[cs,ls] = tap
+
+
+    def alignLineClock(self, chips_lanes=None, max_tries=100, ncapture=5):
+        if chips_lanes is None:
+            chips_lanes = {chip:self.laneList for chip in self.adcList}
+        self.logger.debug('Aligning line clock on ADCs/lanes: %s' % \
+                          str(chips_lanes))
         NTAPS = 32
         NLANES = len(self.laneList)
-        dist_ker = np.exp(-(NTAPS - np.arange(2*NTAPS-1))**2)
         failed_chips = {}
         self.setDemux(numChannel=1)
-        for chip in self.adcList:
+        for chip, lanes in chips_lanes.items():
             self.selectADC(chip)
             self.adc.test('pat_deskew')
-            match = np.empty((NTAPS, NLANES), dtype=np.float)
-            for t in range(NTAPS):
-                self.delay(t, chip)
+            taps = np.arange(1, NTAPS-1)
+            np.random.shuffle(taps)
+            match = {L: np.zeros(NTAPS, dtype=np.int) for L in lanes}
+            tries = {L: np.zeros(NTAPS, dtype=np.int) for L in lanes}
+            lane_taps = {L:0 for L in lanes}
+            for cnt in range(max_tries):
+                self.logger.debug('ADC=%d, iter=%d lane/taps: %s' % \
+                                  (chip, cnt, lane_taps))
+                for L,i in lane_taps.items():
+                    self.delay(taps[i], chip, L)
                 self.snapshot()
                 d = self.readRAM(chip).reshape(-1, NLANES)
-                for L in self.laneList:
-                    match[t,L] = np.unique(d[:,L], return_counts=True)[1].max()
-            miss_rate = 1. - match / d.shape[0]
-            for L in self.laneList:
-                marginal = np.convolve(miss_rate[:,L], dist_ker, 'full')
-                marginal = marginal[NTAPS-1:-(NTAPS-1)]
-                best_tap = np.argmin(marginal)
-                self.delay(best_tap, chip, L)
-            self.snapshot()
+                for L,i in lane_taps.items():
+                    t = taps[i]
+                    m = np.unique(d[:,L], return_counts=True)[1].max()
+                    match[L][t] += m
+                    tries[L][t] += d.shape[0]
+                    if match[L][t] != tries[L][t]:
+                        # bit error happened, try a new tap
+                        lane_taps[L] = (i + 1) % len(taps)
+                has_winner = {L: np.where(tries[L] >= ncapture * d.shape[0],
+                                     match[L] == tries[L], 0) for L in lanes}
+                if np.all([np.any(has_winner[L]) for L in lanes]):
+                    # everyone has a winning tap, so we are done
+                    break
             self.adc.test('off')
-            d = self.readRAM(chip).reshape(-1, NLANES)
-            failed_lanes = [L for L in self.laneList
-                if np.unique(d[:,L],return_counts=True)[1].max() != d.shape[0]]
+            # time to pick our best choice
+            match = {L: np.where(match[L] == tries[L], match[L], 0)
+                        for L in lanes}
+            winner = {L: np.argmax(match[L], axis=0) for L in lanes}
+            self.logger.info('ADC=%d lane/taps: %s' % (chip, winner))
+            failed_lanes = []
+            for L,tap in winner.items():
+                self.delay(tap, chip, L)
+                if match[L][tap] == 0:
+                    failed_lanes.append(L)
             if len(failed_lanes) > 0:
                 failed_chips[chip] = failed_lanes
         self.setDemux(numChannel=self.num_chans)
         return failed_chips
 
-    def alignFrameClock(self):
+    def alignFrameClock(self, chips_lanes=None):
         """Align frame clock with data frame."""
+        if chips_lanes is None:
+            chips_lanes = {chip:self.laneList for chip in self.adcList}
+        self.logger.debug('Aligning frame clock on ADCs/lanes: %s' % \
+                          str(chips_lanes))
         failed_chips = {}
         self.setDemux(numChannel=1)
-        for chip in self.adcList:
+        for chip, lanes in chips_lanes.items():
             self.selectADC(chip)
             self.adc.test('dual_custom_pat', self.p1, self.p2)
-            ans1 = self.adc._signed(self.p1, self.RESOLUTION)
-            ans2 = self.adc._signed(self.p2, self.RESOLUTION)
+            ans1 = self._signed(self.p1, self.RESOLUTION)
+            ans2 = self._signed(self.p2, self.RESOLUTION)
+            failed_lanes = []
             for cnt in range(2 * self.RESOLUTION):
                 slipped = False
                 self.snapshot() # make bitslip "take" (?!) XXX
                 d = self.readRAM(chip).reshape(-1, self.RESOLUTION)
-                for lane in self.laneList:
-                    # sanity check that alignLineClock succeeded
-                    assert(np.all(d[0::2,lane] == d[0,lane]))
-                    assert(np.all(d[1::2,lane] == d[1,lane]))
+                # sanity check: these failures mean line clock errors
+                failed_lanes += [L for L in lanes
+                        if np.any(d[0::2,L] != d[0,L]) or \
+                           np.any(d[1::2,L] != d[1,L])]
+                lanes = [L for L in lanes if L not in failed_lanes]
+                for lane in lanes:
                     if not d[0,lane] in [ans1, ans2]:
                         self.bitslip(chip, lane)
                         slipped = True
                 if not slipped:
                     break
-            self.adc.test('pat_sync')
-            self.snapshot()
-            d = self.readRAM(chip).reshape(-1, self.RESOLUTION)
-            failed_lanes = [lane for lane in self.laneList
-                if np.any(d[:,lane] != self._signed(0b11110000, 8))]
+            self.adc.test('off')
             if len(failed_lanes) > 0:
                 failed_chips[chip] = failed_lanes
         self.setDemux(numChannel=self.num_chans)
+        if len(failed_chips) > 0:
+            if self._retry > 0:
+                self._retry -= 1
+                self.logger.debug('retry=%d redo Line on ADCs/lanes: %s' % \
+                            (self._retry, failed_chips))
+                self.alignLineClock(failed_chips)
+                return self.alignFrameClock(failed_chips)
+        return failed_chips
+
+    def rampTest(self, chips=None):
+        if chips is None:
+            chips = self.adcList
+        self.logger.debug('Ramp test on ADCs: %s' % str(chips))
+        failed_chips = {}
+        self.setDemux(numChannel=1)
+        for chip in chips:
+            self.selectADC(chip)
+            self.adc.test("en_ramp")
+            self.snapshot()
+            d = self.readRAM(chip).reshape(-1, self.RESOLUTION)
+            start = np.median(d[0])
+            ans = np.arange(start, start+d.shape[0])
+            ans = np.where(ans > 127, ans - 256, ans)
+            failed_lanes = [L for L in self.laneList if np.any(d[:,L] != ans)]
+            self.adc.test('off')
+            if len(failed_lanes) > 0:
+                failed_chips[chip] = failed_lanes
+        self.setDemux(numChannel=self.num_chans)
+        if len(failed_chips) > 0:
+            if self._retry > 0:
+                self._retry -= 1
+                self.logger.debug('retry=%d redo Line/Frame on ADCs: %s' % \
+                            (self._retry, failed_chips))
+                self.alignLineClock(failed_chips)
+                self.alignFrameClock(failed_chips)
+                return self.rampTest(failed_chips.keys())
         return failed_chips
 
 

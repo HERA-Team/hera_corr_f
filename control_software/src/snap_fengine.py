@@ -10,7 +10,6 @@ from blocks import *
 ADC_LINE_ALIGNED_BIT = 11
 ADC_FRAME_ALIGNED_BIT = 12
 ADC_RAMP_TEST_BIT = 13
-ADC_LANE_BONDED_BIT = 14
 INITIALIZED_BIT = 15
 PAM_MAX = 15
 PAM_MIN = 0
@@ -122,11 +121,11 @@ class SnapFengine(object):
         self.synth.initialize()
         self.adc.init()
         # Mark ADC as uncalibrated
-        self._set_adc_status(0, 0, 0, 0)
+        self._set_adc_status(0, 0, 0)
 
     def align_adc(self, force=False, verify=True):
         if force:
-            self._set_adc_status(0, 0, 0, 0)
+            self._set_adc_status(0, 0, 0)
         status = self.get_adc_status()
         if all(status.values()):
             return
@@ -140,12 +139,11 @@ class SnapFengine(object):
             status['frame'] = bool(len(fails) == 0)
             if not status['frame']:
                 self.logger.warning("alignFrameClock failed on: " + str(fails))
-        self.adc.setDemux(numChannel=1)
         if status['line'] and status['frame'] and not status['ramp']:
-            status['ramp'] = self.adc.rampTest()
-        if status['line'] and status['frame'] and not status['bonded']:
-            status['bonded'] = self.adc.isLaneBonded()
-        self.adc.setDemux(numChannel=self.adc.num_chans)
+            fails = self.adc.rampTest()
+            status['ramp'] = bool(len(fails) == 0)
+            if not status['ramp']:
+                self.logger.warning("rampTest failed on: " + str(fails))
         self._set_adc_status(**status) # record status
         if verify:
             assert(all(status.values())) # errors if anything failed
@@ -155,8 +153,7 @@ class SnapFengine(object):
         self.adc.set_gain(4)
         
 
-    def _set_adc_status(self, line=None, frame=None, ramp=None,
-                        bonded=None):
+    def _set_adc_status(self, line=None, frame=None, ramp=None):
         def setbit(reg, bit, val):
             reg &= 0xFFFFFFFF - 2**bit
             reg |= int(val) * 2**bit
@@ -168,8 +165,6 @@ class SnapFengine(object):
             reg = setbit(reg, ADC_FRAME_ALIGNED_BIT, int(frame))
         if ramp is not None:
             reg = setbit(reg, ADC_RAMP_TEST_BIT, int(ramp))
-        if bonded is not None:
-            reg = setbit(reg, ADC_LANE_BONDED_BIT, int(bonded))
         self.input.write_uint('source_sel', reg)
 
     def get_adc_status(self):
@@ -178,7 +173,6 @@ class SnapFengine(object):
         status['line']  = bool(val & 2**ADC_LINE_ALIGNED_BIT)
         status['frame'] = bool(val & 2**ADC_FRAME_ALIGNED_BIT)
         status['ramp']  = bool(val & 2**ADC_RAMP_TEST_BIT)
-        status['bonded']  = bool(val & 2**ADC_LANE_BONDED_BIT)
         return status
 
     def adc_is_configured(self):
