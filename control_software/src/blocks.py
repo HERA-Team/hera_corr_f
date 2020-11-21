@@ -1584,7 +1584,7 @@ class Eth(Block):
             assert(not self.check_enabled())
 
     def check_enabled(self):
-        val = self.read_uint('ctrl', self.ENABLE_OFFSET)
+        val = self.read_uint('ctrl') >> self.ENABLE_OFFSET
         val &= 0x1 # mask to one bit
         return val
 
