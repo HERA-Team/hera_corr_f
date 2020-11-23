@@ -37,10 +37,11 @@ def main():
                         help='Use this flag to switch to Noise inputs')
     parser.add_argument('-e', dest='eth', action='store_true', default=False,
                         help='Use this flag to switch on the Ethernet outputs')
-    parser.add_argument('-p', '--program', action='store_true', default=False,
+    group_prog = parser.add_mutually_exclusive_group()
+    group_prog.add_argument('-p', '--program', action='store_true', default=False,
                         help='Program FPGAs with the fpgfile specified in the config file'
                              'if not programmed already')
-    parser.add_argument('-P', '--forceprogram', action='store_true', default=False,
+    group_prog.add_argument('-P', '--forceprogram', action='store_true', default=False,
                         help='Program FPGAs with the fpgfile specified in the config file'
                              'irrespective of whether they are programmed already')
     parser.add_argument('--multithread', action='store_true', default=False,
@@ -53,16 +54,13 @@ def main():
     handlers.log_notify(logger)  # send a NOTIFY level message that this script has started
 
     corr = HeraCorrelator(redishost=args.redishost, config=args.config_file, use_redis=False)  # noqa
-    if args.allsnaps and len(corr.dead_fengs) != 0:
-        logger.error("Requiring all SNAPS, but %d were dead." % len(corr.dead_fengs))
+    if args.allsnaps and len(corr._unconnected) != 0:
+        logger.error("Requiring all SNAPS, but %d were dead." % len(corr._unconnected))
         exit()
-    if (len(corr.fengs) == 0) and (len(corr.uninit_fengs) == 0):
+    if len(corr.fengs) == 0:
         logger.error("No F-Engines are connected. Is the power off?")
         exit()
 
-    if not corr.config_is_valid:
-        logger.error('Currently loaded config is invalid')
-        exit()
 
     # Write the parameters this script used to redis
     init_time = time.time()
@@ -82,10 +80,10 @@ def main():
     # Before we start manipulating boards, prevent monitoing scripts from
     # sending TFTP traffic. Expire the key after 5 minutes to lazily account for
     # issues with this script crashing.
-    corr.disable_monitoring(expiry=600, wait=True)
+    corr.disable_monitoring(expiry=600)
 
     if args.program or args.forceprogram:
-        corr.program(unprogrammed_only=(not args.forceprogram))  # This should multithread the programming process.  # noqa
+        corr.program_fengs(force=args.forceprogram)  # This should multithread the programming process.  # noqa
         if args.fast_initialize is None:
             logger.warning('Programming but *NOT* initializing. '
                            'This is unlikely to be what you want')

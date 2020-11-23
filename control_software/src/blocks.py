@@ -168,7 +168,8 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.sample_rate     = sample_rate
         self.resolution      = resolution
         self.host = host # the SNAPADC class doesn't directly expose this
-        self._retry = kwargs.get('retry',5)
+        self._retry_cnt = 0
+        self._retry = kwargs.get('retry',7)
         self._retry_wait = kwargs.get('retry_wait',1)
 
     def set_gain(self, gain):
@@ -290,6 +291,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
 
         # Snipped off ADC calibration here; it's now in
         # snap_fengine.
+        self._retry_cnt = 0
         return
 
     def bitslip(self, chipSel=None, laneSel=None, verify=False):
@@ -501,10 +503,10 @@ class Adc(casperfpga.snapadc.SNAPADC):
                 failed_chips[chip] = failed_lanes
         self.setDemux(numChannel=self.num_chans)
         if len(failed_chips) > 0:
-            if self._retry > 0:
-                self._retry -= 1
-                self.logger.debug('retry=%d redo Line on ADCs/lanes: %s' % \
-                            (self._retry, failed_chips))
+            if self._retry_cnt < self._retry:
+                self._retry_cnt += 1
+                self.logger.debug('retry=%d/%d redo Line on ADCs/lanes: %s' % \
+                            (self._retry_cnt, self._retry, failed_chips))
                 self.alignLineClock(failed_chips)
                 return self.alignFrameClock(failed_chips)
         return failed_chips
@@ -529,10 +531,10 @@ class Adc(casperfpga.snapadc.SNAPADC):
                 failed_chips[chip] = failed_lanes
         self.setDemux(numChannel=self.num_chans)
         if len(failed_chips) > 0:
-            if self._retry > 0:
-                self._retry -= 1
-                self.logger.debug('retry=%d redo Line/Frame on ADCs: %s' % \
-                            (self._retry, failed_chips))
+            if self._retry_cnt < self._retry:
+                self._retry_cnt += 1
+                self.logger.debug('retry=%d/%d redo Line/Frame on ADCs/lanes: %s' % \
+                            (self._retry_cnt, self._retry, failed_chips))
                 self.alignLineClock(failed_chips)
                 self.alignFrameClock(failed_chips)
                 return self.rampTest(failed_chips.keys())

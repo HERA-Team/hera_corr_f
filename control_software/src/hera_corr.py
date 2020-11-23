@@ -595,7 +595,8 @@ class HeraCorrelator(object):
         )
         return failed
 
-    def initialize_all(self, adcs=True, dsps=True, pfbs=True, eqs=True,
+    def initialize_all(self, hosts=None,
+                       adcs=True, dsps=True, pfbs=True, eqs=True,
                        fems=True, phase_switches=True, pams=True,
                        verify=True, force=False, multithread=False,
                        timeout=300):
@@ -604,6 +605,8 @@ class HeraCorrelator(object):
         """
 
         # disable monitoring each time to ensure we don't run out of time
+        if hosts is None:
+            hosts = self.fengs.keys()
         self.disable_monitoring(600, verify=True)
         kwargs = {'verify': verify, 'force': force,
                   'multithread':multithread, 'timeout':timeout}
