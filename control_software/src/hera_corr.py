@@ -95,8 +95,12 @@ class HeraCorrelator(object):
         ant_indices = self.config['fengines'][host]['ants']
         self.logger.info("Connecting %s with antenna indices %s" % 
                          (host, ant_indices))
+        if self.use_redis:
+            redishost = self.redisthost
+        else:
+            redishost = None
         feng = SnapFengine(host, ant_indices=ant_indices,
-                           redishost=self.redishost)
+                           redishost=redishost)
         if feng.fpga.is_connected():
             self.fengs[host] = feng # single dict call is threadsafe
         elif verify:
@@ -312,7 +316,7 @@ class HeraCorrelator(object):
         return failed
 
     def switch_fems(self, mode, east=True, north=True, verify=True,
-                    hosts=None):
+                    hosts=None, multithread=False, timeout=300.):
         assert(mode in ('load', 'noise', 'antenna'))
         if hosts is None:
             hosts = self.fengs.keys()
@@ -528,7 +532,8 @@ class HeraCorrelator(object):
         )
         return set(failed) # only return unique hosts
 
-    def fft_shift_pfbs(self, fft_shift=None, verify=True, hosts=None):
+    def fft_shift_pfbs(self, fft_shift=None, verify=True, hosts=None,
+                       multithread=False, timeout=300.):
         if fft_shift is None:
             fft_shift = self.config['fft_shift']
         self.logger.info('Setting fft_shift to %s' % (bin(fft_shift)))
@@ -808,6 +813,7 @@ class HeraCorrelator(object):
             raise RuntimeError('ADCs not initialized on: %s'
                                % (','.join(unconfigured)))
         for host in hosts:
+            self.fengs[host].sync.change_period(0)
             self.fengs[host].sync.set_delay(0)
         if not manual:
             self.logger.info('Waiting for PPS (t=%.2f)' % time.time())
