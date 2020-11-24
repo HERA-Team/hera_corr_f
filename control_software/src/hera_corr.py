@@ -576,7 +576,7 @@ class HeraCorrelator(object):
 
     def dsp_initialize(self, host, force=False, verify=True):
         feng = self.fengs[host]
-        if not force and not feng.is_initialized():
+        if not force and feng.is_initialized():
             return
         self.logger.info("Initializing DSP logic on %s" % (host))
         feng.initialize(verify=verify)
@@ -813,7 +813,7 @@ class HeraCorrelator(object):
             raise RuntimeError('ADCs not initialized on: %s'
                                % (','.join(unconfigured)))
         for host in hosts:
-            self.fengs[host].sync.change_period(0)
+            # self.fengs[host].sync.change_period(0) # already done in initialize_dsps
             self.fengs[host].sync.set_delay(0)
         if not manual:
             self.logger.info('Waiting for PPS (t=%.2f)' % time.time())

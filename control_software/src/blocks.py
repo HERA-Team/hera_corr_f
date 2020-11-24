@@ -70,12 +70,6 @@ class Block(object):
         """
         pass
 
-    def initialize(self):
-        """
-        Individual blocks should override this
-        method to configure themselves appropriately
-        """
-
     def listdev(self):
         """
         return a list of all register names within
@@ -89,7 +83,7 @@ class Block(object):
         """
         pass
 
-    def initialize(self):
+    def initialize(self, verify=False):
         """
         Individual blocks should override this
         method to configure themselves appropriately
@@ -124,11 +118,17 @@ class Block(object):
     def blindwrite(self, reg, val, **kwargs):
         self.host.blindwrite(self.prefix + reg, val, **kwargs)
 
-    def change_reg_bits(self, reg, val, start, width=1):
+    def set_reg_bits(self, reg, val, start, width=1):
         orig_val = self.read_uint(reg)
         masked = orig_val & (0xffffffff - ((2**width - 1) << start))
         new_val = masked + (val << start)
-        self.write_int(reg, new_val)
+        self.write_uint(reg, new_val)
+
+    def get_reg_bits(self, reg, start, width=1):
+        val = self.read_uint(reg)
+        val = val >> start
+        val &= (2**width - 1)
+        return val
 
 
 class Synth(casperfpga.synth.LMX2581):
@@ -137,7 +137,7 @@ class Synth(casperfpga.synth.LMX2581):
         super(Synth, self).__init__(host, name)
         self.host = host
 
-    def initialize(self):
+    def initialize(self, verify=False):
         """
         Seem to have to do this if reference
         was not present when board was powered up(?)
@@ -569,12 +569,12 @@ class Sync(Block):
         """
         return self.read_uint('period')
 
-    def change_period(self,period):
+    def change_period(self, period):
         """
         Change the period of the sync pulse
         """
-        self.host.write_int('timebase_sync_period',period)
-        self._info("Changed sync period to %.2f"%period)
+        #self.host.write_int('timebase_sync_period', period)
+        self._info("Changed sync period to %.2f" % period)
 
     def count(self):
         """
@@ -594,38 +594,43 @@ class Sync(Block):
         """
         Arm sync pulse generator.
         """
-        self.change_reg_bits('arm', 0, self.OFFSET_ARM_SYNC)
-        self.change_reg_bits('arm', 1, self.OFFSET_ARM_SYNC)
-        self.change_reg_bits('arm', 0, self.OFFSET_ARM_SYNC)
+        # XXX will be changed soon; sync with JK
+        self.set_reg_bits('arm', 0, self.OFFSET_ARM_SYNC)
+        self.set_reg_bits('arm', 1, self.OFFSET_ARM_SYNC)
+        self.set_reg_bits('arm', 0, self.OFFSET_ARM_SYNC)
 
     def arm_noise(self):
         """
         Arm noise generator resets
         """
-        self.change_reg_bits('arm', 0, self.OFFSET_ARM_NOISE)
-        self.change_reg_bits('arm', 1, self.OFFSET_ARM_NOISE)
-        self.change_reg_bits('arm', 0, self.OFFSET_ARM_NOISE)
+        # XXX will be changed soon; sync with JK
+        self.set_reg_bits('arm', 0, self.OFFSET_ARM_NOISE)
+        self.set_reg_bits('arm', 1, self.OFFSET_ARM_NOISE)
+        self.set_reg_bits('arm', 0, self.OFFSET_ARM_NOISE)
 
     def sw_sync(self):
         """
         Issue a software sync pulse
         """
-        self.change_reg_bits('arm', 0, self.OFFSET_SW_SYNC)
-        self.change_reg_bits('arm', 1, self.OFFSET_SW_SYNC)
-        self.change_reg_bits('arm', 0, self.OFFSET_SW_SYNC)
+        # XXX will be changed soon; sync with JK
+        self.set_reg_bits('arm', 0, self.OFFSET_SW_SYNC)
+        self.set_reg_bits('arm', 1, self.OFFSET_SW_SYNC)
+        self.set_reg_bits('arm', 0, self.OFFSET_SW_SYNC)
 
     def print_status(self):
         print('Sync block: %s: Uptime: %d seconds' % (self.name, self.uptime()))
         print('Sync block: %s: Period: %d FPGA clocks' % (self.name, self.period()))
         print('Sync block: %s: Count : %d' % (self.name, self.count()))
 
-    def initialize(self):
+    def initialize(self, verify=False):
         """
         Initialize this block. Set sync period to 0.
         """
         self.write_int('arm', 0)
         #self.change_period(2**16 * 9*7*6*5*3)
         self.change_period(0)
+        if verify:
+            assert(self.read_int('arm') == 0)
 
 class NoiseGen(Block):
     def __init__(self, host, name, nstreams=6, logger=None):
@@ -644,7 +649,7 @@ class NoiseGen(Block):
             return
         stream = 2*stream # latest block counts in antennas
         regname = 'seed_%d' % (stream // 4)
-        self.change_reg_bits(regname, seed, 8 * (stream % 4), 8)
+        self.set_reg_bits(regname, seed, 8 * (stream % 4), 8)
 
     def get_seed(self, stream):
         """
@@ -658,9 +663,11 @@ class NoiseGen(Block):
         return (self.read_uint(regname) >> (8 * stream % 4)) & 0xff
 
 
-    def initialize(self):
+    def initialize(self, verify=False):
         for stream in range(self.nstreams):
-            self.set_seed(0, stream)
+            self.set_seed(stream, 0)
+            if verify:
+                assert(self.get_seed(stream) == 0)
 
     def print_status(self):
         for stream in range(self.nstreams):
@@ -748,29 +755,31 @@ class Input(Block):
             Y += np.abs(np.fft.rfft(y))**2
         return X, Y
 
-    def use_noise(self, stream=None):
+    def _select_input(self, input_code, stream=None, verify=False):
+        if stream is None:
+            streams = list(range(self.ninput_mux_streams))
+        else:
+            streams = [stream]
+        for stream in streams:
+            self.set_reg_bits('source_sel', input_code, 2*(self.ninput_mux_streams-1-stream), 2)
+            if verify:
+                assert(self.get_reg_bits('source_sel', 2*(self.ninput_mux_streams-1-stream), 2) == input_code)
+
+    def use_noise(self, stream=None, verify=False):
         """
         Switch input to internal noise source.
         Inputs:
             stream (int): Which stream to switch. If None, switch all.
         """
-        if stream is None:
-            for stream in range(self.ninput_mux_streams):
-                self.change_reg_bits('source_sel', self.USE_NOISE, 2*(self.ninput_mux_streams-1-stream), 2)
-        else:
-            self.change_reg_bits('source_sel', self.USE_NOISE, 2*(self.ninput_mux_streams-1-stream), 2)
+        self._select_input(self.USE_NOISE, stream=stream, verify=verify)
 
-    def use_adc(self, stream=None):
+    def use_adc(self, stream=None, verify=False):
         """
         Switch input to ADC.
         Inputs:
             stream (int): Which stream to switch. If None, switch all.
         """
-        if stream is None:
-            for stream in range(self.ninput_mux_streams):
-                self.change_reg_bits('source_sel', self.USE_ADC, 2*(self.ninput_mux_streams-1-stream), 2)
-        else:
-            self.change_reg_bits('source_sel', self.USE_ADC, 2*(self.ninput_mux_streams-1-stream), 2)
+        self._select_input(self.USE_ADC, stream=stream, verify=verify)
 
     def use_zero(self, stream=None):
         """
@@ -778,11 +787,7 @@ class Input(Block):
         Inputs:
             stream (int): Which stream to switch. If None, switch all.
         """
-        if stream is None:
-            for stream in range(self.ninput_mux_streams):
-                self.change_reg_bits('source_sel', self.USE_ZERO, 2*(self.ninput_mux_streams-1-stream), 2)
-        else:
-            self.change_reg_bits('source_sel', self.USE_ZERO, 2*(self.ninput_mux_streams-1-stream), 2)
+        self._select_input(self.USE_ZERO, stream=stream, verify=verify)
 
     def get_stats(self, sum_cores=False):
         """
@@ -807,11 +812,11 @@ class Input(Block):
             rmss = np.sqrt(powers)
         return means, powers, rmss
 
-    def initialize(self):
+    def initialize(self, verify=False):
         """
         Switch to ADCs. Begin computing stats.
          """
-        self.use_adc()
+        self.use_adc(verify=verify)
 
         #rms code removed from current version of fpga software
         #self.write_int('rms_enable', 1)
@@ -932,7 +937,7 @@ class Delay(Block):
         super(Delay, self).__init__(host, name, logger)
         self.nstreams = nstreams
 
-    def set_delay(self, stream, delay):
+    def set_delay(self, stream, delay, verify=False):
         """
         Insert a delay to a given input stream.
 
@@ -943,13 +948,16 @@ class Delay(Block):
         if stream > self.nstreams:
             self._error('Tried to set delay for stream %d > nstreams (%d)' % (stream, self.nstreams))
         # MSBs of 232-bit register are for stream 0, etc...
-        self.change_reg_bits('delays', delay, 32-4-(4*stream), 4)
+        self.set_reg_bits('delays', delay, 32-4-(4*stream), 4)
+        if verify:
+            assert(self.get_reg_bits('delays', 32-4-(4*stream), 4) == delay)
 
-    def initialize(self):
+    def initialize(self, verify=False):
         """
         Initialize all delays to 0.
         """
-        self.write_int('delays', 0)
+        for stream in range(self.nstreams):
+            self.set_delay(stream, 0, verify=verify)
 
 class Pfb(Block):
     def __init__(self, host, name, logger=None):
@@ -964,17 +972,14 @@ class Pfb(Block):
         """
         Return the current FFT shift schedule (LSB = stage 1, MSB = stage N).
         """
-        shift = self.read_uint('ctrl', self.SHIFT_OFFSET)
-        shift &= 2**self.SHIFT_WIDTH - 1 # mask to valid bits
-        return shift
+        return self.get_reg_bits('ctrl', self.SHIFT_OFFSET, self.SHIFT_WIDTH)
 
     def set_fft_shift(self, shift, verify=False):
         """
         Set the FFT shift schedule to the specified unsigned integer
         (LSB = stage 1, MSB = stage N).
         """
-        self.change_reg_bits('ctrl', shift,
-                             self.SHIFT_OFFSET, self.SHIFT_WIDTH)
+        self.set_reg_bits('ctrl', shift, self.SHIFT_OFFSET, self.SHIFT_WIDTH)
         if verify:
             assert(shift == self.get_fft_shift())
 
@@ -982,24 +987,21 @@ class Pfb(Block):
         """
         Return the current FFT preshift value.
         """
-        shift = self.read_uint('ctrl', self.PRESHIFT_OFFSET)
-        shift &= 2**self.PRESHIFT_WIDTH - 1 # mask to valid bits
-        return shift
+        return self.get_reg_bits('ctrl', self.PRESHIFT_OFFSET, self.PRESHIFT_WIDTH)
 
     def set_fft_preshift(self, shift, verify=False):
-        self.change_reg_bits('ctrl', shift,
-                             self.PRESHIFT_OFFSET, self.PRESHIFT_WIDTH)
+        self.set_reg_bits('ctrl', shift, self.PRESHIFT_OFFSET, self.PRESHIFT_WIDTH)
         if verify:
             assert(shift == self.get_fft_preshift())
 
     def rst_stats(self):
-        self.change_reg_bits('ctrl', 1, self.STAT_RST_BIT)
-        self.change_reg_bits('ctrl', 0, self.STAT_RST_BIT)
+        self.set_reg_bits('ctrl', 1, self.STAT_RST_BIT)
+        self.set_reg_bits('ctrl', 0, self.STAT_RST_BIT)
 
     def is_overflowing(self):
         return self.read_uint('status') != 0
 
-    def initialize(self, fft_shift=0xb110101010101, verify=False):
+    def initialize(self, fft_shift=0b110101010101, verify=False):
         self.write_int('ctrl', 0)
         self.set_fft_shift(fft_shift, verify=verify)
         self.rst_stats()
@@ -1139,15 +1141,15 @@ class PhaseSwitch(Block):
         if verify:
             assert(0 == self.read_int('enable_demod'))
 
-    def initialize(self):
+    def initialize(self, verify=False):
         """
         Initialize, turning off walshing
         """
         for stream in range(self.nstreams):
-            self.set_walsh(stream, 1, 0, 1)
-        self.disable_mod()
-        self.disable_demod()
-        self.set_delay(0)
+            self.set_walsh(stream, 1, 0, 1, verify=verify)
+        self.disable_mod(verify=verify)
+        self.disable_demod(verify=verify)
+        self.set_delay(0, verify=verify)
 
 class Eq(Block):
     def __init__(self, host, name, nstreams=8, ncoeffs=2**10, logger=None):
@@ -1218,14 +1220,15 @@ class Eq(Block):
     def print_status(self):
         print('Number of times input got clipped: %d'%self.clip_count())
 
-    def initialize(self, coeffs=100):
+    def initialize(self, coeffs=100, verify=False):
         """
         Initialize block, setting coefficients to some nominally sane value.
         Currently, this is 100.0
         """
         for stream in range(self.nstreams):
             self.set_coeffs(stream, 
-               coeffs * np.ones(self.ncoeffs, dtype='>%s' % self.format))
+               coeffs * np.ones(self.ncoeffs, dtype='>%s' % self.format),
+               verify=verify)
 
 class EqTvg(Block):
     def __init__(self, host, name, nstreams=8, nchans=2**13, logger=None):
@@ -1234,13 +1237,17 @@ class EqTvg(Block):
         self.nchans = nchans
         self.format = 'B'
 
-    def tvg_enable(self):
+    def tvg_enable(self, verify=False):
         self.write_int('tvg_en', 1)
+        if verify:
+            assert(self.read_int('tvg_en') == 1)
 
-    def tvg_disable(self):
+    def tvg_disable(self, verify=False):
         self.write_int('tvg_en', 0)
+        if verify:
+            assert(self.read_int('tvg_en') == 0)
 
-    def write_const_ants(self,equal_pols=False):
+    def write_const_ants(self, equal_pols=False, verify=False):
         """
             Write a constant to all the channels of a polarization unless
             equal_pols is set, then a constant is written to all pols of
@@ -1258,9 +1265,12 @@ class EqTvg(Block):
             for stream in range(self.nstreams):
                 tv[stream*self.nchans:(stream+1)*self.nchans] = stream
         for i in range(self.nstreams // 2):
-            self.write('tv%d' % i,tv.tostring()[i*self.nchans*2:(i+1)*self.nchans*2])
+            val = tv.tostring()[i*self.nchans*2:(i+1)*self.nchans*2]
+            self.write('tv%d' % i, val)
+            if verify:
+                assert(self.read('tv%d' % i, len(val)) == val)
 
-    def write_freq_ramp(self,equal_pols=False):
+    def write_freq_ramp(self, equal_pols=False, verify=False):
         """ Write a frequency ramp to the test vector
             that is repeated for all antennas.
             equal_pols: Write the same ramp to both pols
@@ -1276,7 +1286,10 @@ class EqTvg(Block):
             for stream in range(self.nstreams):
                 tv[stream*self.nchans: (stream+1)*self.nchans] = ramp + stream
         for i in range(self.nstreams // 2):
-            self.write('tv%d' % i,tv.tostring()[i*self.nchans*2:(i+1)*self.nchans*2])
+            val = tv.tostring()[i*self.nchans*2:(i+1)*self.nchans*2]
+            self.write('tv%d' % i, val)
+            if verify:
+                assert(self.read('tv%d' % i, len(val)) == val)
 
     def read_tvg(self):
         """ Read the test vector written to the sw bram """
@@ -1286,9 +1299,9 @@ class EqTvg(Block):
         tvg = struct.unpack('>%d%s'%(self.nchans*self.nstreams, self.format), s)
         return tvg
 
-    def initialize(self):
-        self.tvg_disable()
-        self.write_freq_ramp()
+    def initialize(self, verify=False):
+        self.tvg_disable(verify=verify)
+        self.write_freq_ramp(verify=verify)
 
 class ChanReorder(Block):
     def __init__(self, host, name, nchans=2**10, logger=None):
@@ -1296,7 +1309,7 @@ class ChanReorder(Block):
         self.nchans = nchans
         self.format = 'L'
 
-    def set_channel_order(self, order):
+    def set_channel_order(self, order, verify=False):
         """
         Re-order the channels to that they are
         sent with the order in the specified map
@@ -1307,6 +1320,8 @@ class ChanReorder(Block):
             return
         order_str = struct.pack('>%d%s' %(self.nchans,self.format), *order)
         self.write('reorder3_map1', order_str)
+        if verify:
+            assert(self.read('reorder3_map1', len(order_str)) == order_str)
 
     def read_reorder(self, slot_num=None):
         reorder = self.read('reorder3_map1',1024*4)
@@ -1322,8 +1337,8 @@ class ChanReorder(Block):
             assert(actual_index == self.read_int('reorder3_map1', 
                                                  word_offset=output_index))
 
-    def initialize(self):
-        self.set_channel_order(np.arange(self.nchans))
+    def initialize(self, verify=False):
+        self.set_channel_order(np.arange(self.nchans), verify=verify)
 
 
 class Packetizer(Block):
@@ -1429,7 +1444,7 @@ class Rotator(Block):
         """
         return (self.coeff_bits // 8) * self.n_slots * ant
 
-    def set_ant_phases(self, ant, phases):
+    def set_ant_phases(self, ant, phases, verify=False):
         """
         Set the coefficients for `ant` to `phases`.
         The latter should be a numpy array of phases. It
@@ -1457,6 +1472,8 @@ class Rotator(Block):
         phases_str = struct.pack('>%dl' % (phases_scaled.shape[0]), *phases_scaled)
 
         self.write("phases", phases_str, offset=self._get_ant_offset_bytes(ant))
+        if verify:
+            assert(self.read('phases', offset=self._get_ant_offset_bytes(ant)) == phases_str)
 
     def get_ant_phases(self, ant):
         """
@@ -1466,19 +1483,23 @@ class Rotator(Block):
         return np.array(struct.unpack('>%dl' % (len(phases_str)//4), phases_str), dtype=np.float64) / 2**self.coeff_bp
 
 
-    def enable(self):
+    def enable(self, verify=False):
         self.write_int('en', 1)
+        if verify:
+            assert(self.read_int('en') == 1)
 
-    def disable(self):
+    def disable(self, verify=False):
         self.write_int('en', 0)
+        if verify:
+            assert(self.read_int('en') == 0)
 
     def is_enabled(self):
         return self.read_int('en') == 1
 
-    def initialize(self):
-        self.disable()
+    def initialize(self, verify=False):
+        self.disable(verify=verify)
         for ant in range(self.n_streams // 2):
-            self.set_ant_phases(ant, [0])
+            self.set_ant_phases(ant, [0], verify=verify)
 
     def print_status(self):
         print("Is enabled?", self.is_enabled)
@@ -1550,9 +1571,9 @@ class Eth(Block):
         return rv
 
     def status_reset(self):
-        self.change_reg_bits('ctrl', 0, self.STATUS_OFFSET)
-        self.change_reg_bits('ctrl', 1, self.STATUS_OFFSET)
-        self.change_reg_bits('ctrl', 0, self.STATUS_OFFSET)
+        self.set_reg_bits('ctrl', 0, self.STATUS_OFFSET)
+        self.set_reg_bits('ctrl', 1, self.STATUS_OFFSET)
+        self.set_reg_bits('ctrl', 0, self.STATUS_OFFSET)
 
     def get_port(self):
         port = self.read_uint('ctrl')
@@ -1562,7 +1583,7 @@ class Eth(Block):
 
     def set_port(self, port, verify=False):
         self.port = port
-        self.change_reg_bits('ctrl', port,
+        self.set_reg_bits('ctrl', port,
                              self.PORT_OFFSET, self.PORT_WIDTH)
         if verify:
             assert(port == self.get_port())
@@ -1571,17 +1592,17 @@ class Eth(Block):
         # stop traffic before reset
         self.disable_tx()
         # toggle reset
-        self.change_reg_bits('ctrl', 0, self.RESET_OFFSET)
-        self.change_reg_bits('ctrl', 1, self.RESET_OFFSET)
-        self.change_reg_bits('ctrl', 0, self.RESET_OFFSET)
+        self.set_reg_bits('ctrl', 0, self.RESET_OFFSET)
+        self.set_reg_bits('ctrl', 1, self.RESET_OFFSET)
+        self.set_reg_bits('ctrl', 0, self.RESET_OFFSET)
 
     def enable_tx(self, verify=False):
-        self.change_reg_bits('ctrl', 1, self.ENABLE_OFFSET)
+        self.set_reg_bits('ctrl', 1, self.ENABLE_OFFSET)
         if verify:
             assert(self.check_enabled())
 
     def disable_tx(self, verify=False):
-        self.change_reg_bits('ctrl', 0, self.ENABLE_OFFSET)
+        self.set_reg_bits('ctrl', 0, self.ENABLE_OFFSET)
         if verify:
             assert(not self.check_enabled())
 
@@ -1728,168 +1749,170 @@ class Corr(Block):
         self.acc_len = self.read_int('acc_len') // 1024
         return self.acc_len
 
-    def set_acc_len(self,acc_len):
+    def set_acc_len(self, acc_len, verify=False):
         """
         Set the number of spectra to accumulate to `acc_len`
         """
-        assert isinstance(acc_len, int), "Cannot set accumulation length to type %r" % type(acc_len)
         self.acc_len = acc_len
-        acc_len = 1024*acc_len  #Convert to clks from spectra. See Firmware for reasoning behind 1024
-        self.write_int('acc_len',acc_len)
+        # Convert to clks from spectra. FFT output length = 8192 
+        # with 8 samples in parallel = 8192/8 clocks per spectrum
+        self.write_int('acc_len', 1024 * self.acc_len)
+        if verify:
+            assert(self.get_acc_len() == self.acc_len)
 
-    def initialize(self):
-        self.set_acc_len(self.acc_len)
-
-
-class RoachInput(Block):
-    def __init__(self, host, name, nstreams=32, logger=None):
-        super(RoachInput, self).__init__(host, name, logger)
-        self.nstreams  = nstreams
-        self.nregs     = nstreams // 8
-        self.nstreams_per_reg = 8
-        self.USE_ADC   = 0
-    # There are two separate noise streams we can switch in. TODO: figure out how (and why) to use these.
-        self.USE_NOISE = 1
-        self.USE_ZERO  = 3
-
-    def use_noise(self, stream=None):
-        if stream is None:
-            for reg in range(self.nregs):
-                v = 0
-                for stream in range(self.nstreams_per_reg):
-                    v += self.USE_NOISE << (4 * stream)
-                self.write_int('sel%d' % reg, v)
-        else:
-            raise NotImplementedError('Different input selects not supported yet!')
-
-    def use_adc(self, stream=None):
-        if stream is None:
-            for reg in range(self.nregs):
-                v = 0
-                for stream in range(self.nstreams_per_reg):
-                    v += self.USE_ADC << (4 * stream)
-                self.write_int('sel%d' % reg, v)
-        else:
-            raise NotImplementedError('Different input selects not supported yet!')
-
-    def use_zero(self, stream=None):
-        if stream is None:
-            for reg in range(self.nregs):
-                v = 0
-                for stream in range(self.nstreams_per_reg):
-                    v += self.USE_ZERO << (4 * stream)
-                self.write_int('sel%d' % reg, v)
-        else:
-            raise NotImplementedError('Different input selects not supported yet!')
-
-    def get_stats(self):
-        self.write_int('rms_enable', 1)
-        time.sleep(0.01)
-        self.write_int('rms_enable', 0)
-        x = np.array(struct.unpack('>%dl' % (2*self.nstreams), self.read('rms_levels', self.nstreams * 8)))
-        self.write_int('rms_enable', 1)
-        means = x[0::2]
-        sds   = x[1::2]
-        return {'means':means, 'sds':sds}
-
-    def initialize(self):
-        self.use_adc()
-        #self.write_int('rms_enable', 1)
-
-    def print_status(self):
-        print(self.get_stats())
-
-class RoachDelay(Block):
-    def __init__(self, host, name, nstreams=6, logger=None):
-        super(RoachDelay, self).__init__(host, name, logger)
-        self.nstreams = nstreams
-        self.nregs = nstreams // 4
-
-    def set_delay(self, stream, delay):
-        if stream > self.nstreams:
-            self._error('Tried to set delay for stream %d > nstreams (%d)' % (stream, self.nstreams))
-        delay_reg = stream // 4
-        reg_pos   = stream % 4
-        self.change_reg_bits('%d' % delay_reg, delay, 8*reg_pos, 8)
-
-    def initialize(self):
-        for i in range(self.nregs):
-            self.write_int('%d' % i, 0)
-
-class RoachPfb(Block):
-    def __init__(self, host, name, logger=None):
-        super(RoachPfb, self).__init__(host, name, logger)
-        self.host = host
-        self.SHIFT_OFFSET = 0
-        self.SHIFT_WIDTH  = 11
-        self.PRESHIFT_OFFSET = 11
-        self.PRESHIFT_WIDTH  = 2
-        #self.STAT_RST_BIT = 14
-
-    def set_fft_shift(self, shift):
-        self.change_reg_bits('fft_shift', shift, self.SHIFT_OFFSET, self.SHIFT_WIDTH)
-
-    def set_fft_preshift(self, shift):
-        self.change_reg_bits('fft_shift', shift, self.PRESHIFT_OFFSET, self.PRESHIFT_WIDTH)
-
-    def initialize(self):
-        self.host.write_int('fft_shift', 0)
-
-class RoachEth(Block):
-    def __init__(self, host, name, port=10000, logger=None):
-        super(RoachEth, self).__init__(host, name, logger)
-        self.port = port
-
-    def set_arp_table(self, macs):
-        """
-        Set the ARP table with a list of MAC addresses.
-        The list, `macs`, is passed such that the zeroth
-        element is the MAC address of the device with
-        IP XXX.XXX.XXX.0, and element N is the MAC
-        address of the device with IP XXX.XXX.XXX.N
-        """
-        macs = list(macs)
-        macs_pack = struct.pack('>%dQ' % (len(macs)), *macs)
-        self.write('sw', macs_pack, offset=0x3000)
+    def initialize(self, verify=False):
+        self.set_acc_len(self.acc_len, verify=verify)
 
 
-    def get_core_status(self, core=0):
-        stat = self.read_uint('%d_sw_status' % core)
-        rv = {}
-        rv['rx_overrun'  ] = (stat >> 0) & 1
-        rv['rx_bad_frame'] = (stat >> 1) & 1
-        rv['tx_of'       ] = (stat >> 2) & 1
-        rv['tx_afull'    ] = (stat >> 3) & 1
-        rv['tx_led'      ] = (stat >> 4) & 1
-        rv['rx_led'      ] = (stat >> 5) & 1
-        rv['up'          ] = (stat >> 6) & 1
-        rv['eof_cnt'     ] = (stat >> 7) & (2**25-1)
-        return rv
+#class RoachInput(Block):
+#    def __init__(self, host, name, nstreams=32, logger=None):
+#        super(RoachInput, self).__init__(host, name, logger)
+#        self.nstreams  = nstreams
+#        self.nregs     = nstreams // 8
+#        self.nstreams_per_reg = 8
+#        self.USE_ADC   = 0
+#    # There are two separate noise streams we can switch in. TODO: figure out how (and why) to use these.
+#        self.USE_NOISE = 1
+#        self.USE_ZERO  = 3
+#
+#    def use_noise(self, stream=None):
+#        if stream is None:
+#            for reg in range(self.nregs):
+#                v = 0
+#                for stream in range(self.nstreams_per_reg):
+#                    v += self.USE_NOISE << (4 * stream)
+#                self.write_int('sel%d' % reg, v)
+#        else:
+#            raise NotImplementedError('Different input selects not supported yet!')
+#
+#    def use_adc(self, stream=None):
+#        if stream is None:
+#            for reg in range(self.nregs):
+#                v = 0
+#                for stream in range(self.nstreams_per_reg):
+#                    v += self.USE_ADC << (4 * stream)
+#                self.write_int('sel%d' % reg, v)
+#        else:
+#            raise NotImplementedError('Different input selects not supported yet!')
+#
+#    def use_zero(self, stream=None):
+#        if stream is None:
+#            for reg in range(self.nregs):
+#                v = 0
+#                for stream in range(self.nstreams_per_reg):
+#                    v += self.USE_ZERO << (4 * stream)
+#                self.write_int('sel%d' % reg, v)
+#        else:
+#            raise NotImplementedError('Different input selects not supported yet!')
+#
+#    def get_stats(self):
+#        self.write_int('rms_enable', 1)
+#        time.sleep(0.01)
+#        self.write_int('rms_enable', 0)
+#        x = np.array(struct.unpack('>%dl' % (2*self.nstreams), self.read('rms_levels', self.nstreams * 8)))
+#        self.write_int('rms_enable', 1)
+#        means = x[0::2]
+#        sds   = x[1::2]
+#        return {'means':means, 'sds':sds}
+#
+#    def initialize(self):
+#        self.use_adc()
+#        #self.write_int('rms_enable', 1)
+#
+#    def print_status(self):
+#        print(self.get_stats())
+#
+#class RoachDelay(Block):
+#    def __init__(self, host, name, nstreams=6, logger=None):
+#        super(RoachDelay, self).__init__(host, name, logger)
+#        self.nstreams = nstreams
+#        self.nregs = nstreams // 4
+#
+#    def set_delay(self, stream, delay):
+#        if stream > self.nstreams:
+#            self._error('Tried to set delay for stream %d > nstreams (%d)' % (stream, self.nstreams))
+#        delay_reg = stream // 4
+#        reg_pos   = stream % 4
+#        self.set_reg_bits('%d' % delay_reg, delay, 8*reg_pos, 8)
+#
+#    def initialize(self):
+#        for i in range(self.nregs):
+#            self.write_int('%d' % i, 0)
 
-    def status_reset(self):
-        self.change_reg_bits('ctrl', 0, 8)
-        self.change_reg_bits('ctrl', 1, 8)
-        self.change_reg_bits('ctrl', 0, 8)
+#class RoachPfb(Block):
+#    def __init__(self, host, name, logger=None):
+#        super(RoachPfb, self).__init__(host, name, logger)
+#        self.host = host
+#        self.SHIFT_OFFSET = 0
+#        self.SHIFT_WIDTH  = 11
+#        self.PRESHIFT_OFFSET = 11
+#        self.PRESHIFT_WIDTH  = 2
+#        #self.STAT_RST_BIT = 14
+#
+#    def set_fft_shift(self, shift):
+#        self.set_reg_bits('fft_shift', shift, self.SHIFT_OFFSET, self.SHIFT_WIDTH)
+#
+#    def set_fft_preshift(self, shift):
+#        self.set_reg_bits('fft_shift', shift, self.PRESHIFT_OFFSET, self.PRESHIFT_WIDTH)
+#
+#    def initialize(self):
+#        self.host.write_int('fft_shift', 0)
 
-    def set_port(self, port):
-        self.change_reg_bits('ctrl', port, 2, 16)
-
-    def reset(self):
-        # disable core before resetting
-        self.disable_tx()
-        # toggle reset
-        self.change_reg_bits('ctrl', 0, 4)
-        self.change_reg_bits('ctrl', 1, 4)
-        self.change_reg_bits('ctrl', 0, 4)
-
-    def enable_tx(self):
-        self.change_reg_bits('ctrl', 1, 0)
-
-    def disable_tx(self):
-        self.change_reg_bits('ctrl', 0, 0)
-
-    def config_tge_core(self, core_num, mac, ip, port, arp_table):
-        self.host.config_10gbe_core(self.name + '_%d_sw' % core_num, mac, ip, port, arp_table)
+#class RoachEth(Block):
+#    def __init__(self, host, name, port=10000, logger=None):
+#        super(RoachEth, self).__init__(host, name, logger)
+#        self.port = port
+#
+#    def set_arp_table(self, macs):
+#        """
+#        Set the ARP table with a list of MAC addresses.
+#        The list, `macs`, is passed such that the zeroth
+#        element is the MAC address of the device with
+#        IP XXX.XXX.XXX.0, and element N is the MAC
+#        address of the device with IP XXX.XXX.XXX.N
+#        """
+#        macs = list(macs)
+#        macs_pack = struct.pack('>%dQ' % (len(macs)), *macs)
+#        self.write('sw', macs_pack, offset=0x3000)
+#
+#
+#    def get_core_status(self, core=0):
+#        stat = self.read_uint('%d_sw_status' % core)
+#        rv = {}
+#        rv['rx_overrun'  ] = (stat >> 0) & 1
+#        rv['rx_bad_frame'] = (stat >> 1) & 1
+#        rv['tx_of'       ] = (stat >> 2) & 1
+#        rv['tx_afull'    ] = (stat >> 3) & 1
+#        rv['tx_led'      ] = (stat >> 4) & 1
+#        rv['rx_led'      ] = (stat >> 5) & 1
+#        rv['up'          ] = (stat >> 6) & 1
+#        rv['eof_cnt'     ] = (stat >> 7) & (2**25-1)
+#        return rv
+#
+#    def status_reset(self):
+#        self.set_reg_bits('ctrl', 0, 8)
+#        self.set_reg_bits('ctrl', 1, 8)
+#        self.set_reg_bits('ctrl', 0, 8)
+#
+#    def set_port(self, port):
+#        self.set_reg_bits('ctrl', port, 2, 16)
+#
+#    def reset(self):
+#        # disable core before resetting
+#        self.disable_tx()
+#        # toggle reset
+#        self.set_reg_bits('ctrl', 0, 4)
+#        self.set_reg_bits('ctrl', 1, 4)
+#        self.set_reg_bits('ctrl', 0, 4)
+#
+#    def enable_tx(self):
+#        self.set_reg_bits('ctrl', 1, 0)
+#
+#    def disable_tx(self):
+#        self.set_reg_bits('ctrl', 0, 0)
+#
+#    def config_tge_core(self, core_num, mac, ip, port, arp_table):
+#        self.host.config_10gbe_core(self.name + '_%d_sw' % core_num, mac, ip, port, arp_table)
 
 class Pam(Block):
 
@@ -1930,7 +1953,7 @@ class Pam(Block):
     def _warning(self, msg, *args, **kwargs):
         self.logger.log(I2CWARNING, self._prefix_log(msg), *args, **kwargs)
 
-    def initialize(self):
+    def initialize(self, verify=False):
 
         self.i2c.enable_core()
         # set i2c bus to 10 kHz
@@ -2143,7 +2166,7 @@ class Fem(Block):
     def _warning(self, msg, *args, **kwargs):
         self.logger.log(I2CWARNING, self._prefix_log(msg), *args, **kwargs)
 
-    def initialize(self):
+    def initialize(self, verify=False):
         self.i2c.enable_core()
         # set i2c bus to 10 kHz
         self.i2c.setClock(self.CLK_I2C_BUS, self.CLK_I2C_REF)

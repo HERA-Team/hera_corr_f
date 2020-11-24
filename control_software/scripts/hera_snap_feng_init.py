@@ -173,6 +173,7 @@ def main():
     corr.enable_monitoring()
 
     logger.info('Initialization complete')
+    import IPython; IPython.embed()
 
 
 if __name__ == "__main__":
