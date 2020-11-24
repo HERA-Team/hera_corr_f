@@ -63,25 +63,11 @@ class Block(object):
     def _exception(self, msg, *args, **kwargs):
         self.logger.exception(self._prefix_log(msg), *args, **kwargs)
 
-    def print_status(self):
-        """
-        Individual blocks should override this
-        method to print some useful information.
-        """
-        pass
-
     def listdev(self):
         """
         return a list of all register names within
         the block.
         """
-
-    def print_status(self):
-        """
-        Individual blocks should override this
-        method to print some useful information.
-        """
-        pass
 
     def initialize(self, verify=False):
         """
@@ -617,11 +603,6 @@ class Sync(Block):
         self.set_reg_bits('arm', 1, self.OFFSET_SW_SYNC)
         self.set_reg_bits('arm', 0, self.OFFSET_SW_SYNC)
 
-    def print_status(self):
-        print('Sync block: %s: Uptime: %d seconds' % (self.name, self.uptime()))
-        print('Sync block: %s: Period: %d FPGA clocks' % (self.name, self.period()))
-        print('Sync block: %s: Count : %d' % (self.name, self.count()))
-
     def initialize(self, verify=False):
         """
         Initialize this block. Set sync period to 0.
@@ -668,10 +649,6 @@ class NoiseGen(Block):
             self.set_seed(stream, 0)
             if verify:
                 assert(self.get_seed(stream) == 0)
-
-    def print_status(self):
-        for stream in range(self.nstreams):
-            print('NoiseGen block: %s: stream %d seed: %d' % (self.name, stream, self.get_seed(stream)))
 
 
 class Input(Block):
@@ -821,18 +798,6 @@ class Input(Block):
         #rms code removed from current version of fpga software
         #self.write_int('rms_enable', 1)
 
-    def print_status(self):
-        mean, power, rms = self.get_stats()
-        print('mean:',)
-        for i in mean: print('%3f'%i,)
-        print('')
-        print('power:',)
-        for i in power: print('%3f'%i,)
-        print('')
-        print('rms:',)
-        for i in rms: print('%3f'%i,)
-        print('')
-
     def set_input(self, i):
         """
         Set input of histogram block.
@@ -901,27 +866,6 @@ class Input(Block):
         for stream in range(self.nstreams/2):
             x, out[stream,:] = self.get_input_histogram(stream)
         return x, out
-
-    def print_histograms(self):
-        x, hist = self.get_all_histograms()
-        hist /= 1024.*1024
-        for vn, v in enumerate(x):
-            print('%5d:'%v,)
-            for an, ant in enumerate(hist):
-                print('%.3f'%ant[vn],)
-            print('')
-
-    def plot_histogram(self, input, show=False):
-        from matplotlib import pyplot as plt
-        bins, d = self.get_input_histogram(input)
-        #plt.hist(d, bins=bins)
-        plt.bar(bins-0.5, d, width=1)
-        if show:
-            plt.show()
-
-    def show_histogram_plot(self):
-        from matplotlib import pyplot as plt
-        plt.show()
 
 
 class Delay(Block):
@@ -1221,9 +1165,6 @@ class Eq(Block):
         """
         return self.read_uint('clip_cnt')
 
-    def print_status(self):
-        print('Number of times input got clipped: %d'%self.clip_count())
-
     def initialize(self, coeffs=100, verify=False):
         """
         Initialize block, setting coefficients to some nominally sane value.
@@ -1505,9 +1446,6 @@ class Rotator(Block):
         for ant in range(self.n_streams // 2):
             self.set_ant_phases(ant, [0], verify=verify)
 
-    def print_status(self):
-        print("Is enabled?", self.is_enabled)
-
 
 class Eth(Block):
     def __init__(self, host, name, port=10000, logger=None):
@@ -1651,10 +1589,6 @@ class Eth(Block):
                         offset=self.SOURCE_PORT_OFFSET)
         if verify:
             assert(port == self.get_source_port())
-
-    def print_status(self):
-        rv = self.get_status()
-        print('\n'.join(['%12s : %d' % (k,v) for k,v in rv.items()]))
 
 
 class Corr(Block):
@@ -1828,9 +1762,6 @@ class Corr(Block):
 #    def initialize(self):
 #        self.use_adc()
 #        #self.write_int('rms_enable', 1)
-#
-#    def print_status(self):
-#        print(self.get_stats())
 #
 #class RoachDelay(Block):
 #    def __init__(self, host, name, nstreams=6, logger=None):
