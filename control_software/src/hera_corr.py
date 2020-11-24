@@ -24,7 +24,7 @@ class HeraCorrelator(object):
     """HERA Correlator control class."""
 
 
-    def __init__(self, redishost='redishost', config=None, logger=LOGGER,
+    def __init__(self, hosts=None, redishost='redishost', config=None, logger=LOGGER,
                  passive=False, use_redis=False, block_monitoring=True):
         """
         Instantiate a HeraCorrelator instance.
@@ -56,7 +56,7 @@ class HeraCorrelator(object):
             if block_monitoring:
                 self.disable_monitoring(60, verify=True)
             self._hookup_from_redis()
-            self._unconnected = self.connect_fengs()
+            self._unconnected = self.connect_fengs(hosts=hosts)
 
 
     def get_config(self, config=None, verify=True):
@@ -576,10 +576,8 @@ class HeraCorrelator(object):
 
     def dsp_initialize(self, host, force=False, verify=True):
         feng = self.fengs[host]
-        if not force and feng.is_initialized():
-            return
         self.logger.info("Initializing DSP logic on %s" % (host))
-        feng.initialize(verify=verify)
+        feng.initialize(force=force, verify=verify)
         self.r.hset('status:snap:%s' % host,
                     'last_initialized', time.ctime())
 
@@ -598,40 +596,6 @@ class HeraCorrelator(object):
                             multithread=multithread,
                             timeout=timeout
         )
-        return failed
-
-    def initialize_all(self, hosts=None,
-                       adcs=True, dsps=True, pfbs=True, eqs=True,
-                       fems=True, phase_switches=True, pams=True,
-                       verify=True, force=False, multithread=False,
-                       timeout=300):
-        """
-        Initialize submodules for all F-Engines.
-        """
-
-        # disable monitoring each time to ensure we don't run out of time
-        if hosts is None:
-            hosts = self.fengs.keys()
-        self.disable_monitoring(600, verify=True)
-        kwargs = {'verify': verify, 'force': force,
-                  'multithread':multithread, 'timeout':timeout}
-        failed = []
-        if adcs:
-            failed += self.align_adcs(hosts, **kwargs)
-            hosts = [host for host in hosts if not host in failed]
-        if dsps:
-            failed += self.initialize_dsps(hosts, **kwargs)
-        if pfbs:
-            failed += self.fft_shift_pfbs(hosts, **kwargs)
-        if eqs:
-            failed += self.initialize_eqs(hosts, **kwargs)
-        if fems:
-            failed += self.switch_fems(hosts, 'antenna', **kwargs)
-        if phase_switches:
-            failed += self.disable_phase_switches(hosts, **kwargs)
-        if pams:
-            failed += self.initialize_pams(hosts, **kwargs)
-        self.enable_monitoring()
         return failed
 
     def _hookup_from_redis(self):
@@ -816,13 +780,15 @@ class HeraCorrelator(object):
             # self.fengs[host].sync.change_period(0) # already done in initialize_dsps
             self.fengs[host].sync.set_delay(0)
         if not manual:
+            # Wait for a sync to pass to arm between 1PPS edges
             self.logger.info('Waiting for PPS (t=%.2f)' % time.time())
             # this is hanging forever if ADC is not configured
+            # consider adding a timeout
             self.fengs.values()[0].sync.wait_for_sync()
         start = time.time()
         self.logger.info('Sync passed (t=%.2f)' % (start))
         # Consider multithreading if gets too slow
-        for feng in self.fengs:
+        for host,feng in self.fengs.items():
             feng.sync.arm_sync()
         sync_time = time.time() - start
         if not manual:
@@ -834,7 +800,7 @@ class HeraCorrelator(object):
         else:
             self.logger.warning('Using manual sync trigger')
             for i in range(3):  # takes 3 syncs to trigger
-                for feng in self.fengs:
+                for host,feng in self.fengs.items():
                     feng.sync.sw_sync()
             sync_time = int(time.time())  # roughly  # noqa
         # Store sync time in ms

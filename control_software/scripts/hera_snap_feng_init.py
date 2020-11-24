@@ -16,6 +16,8 @@ def main():
     parser = argparse.ArgumentParser(description='Interact with a programmed SNAP board for'
                                      'testing and networking. FLAGS OVERRIDE CONFIG FILE!',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--hosts', type=str, nargs='+', default=None,
+                        help='Specific SNAPs to run on')
     parser.add_argument('--config_file', type=str, default=None,
                         help='YAML configuration file with hosts and channels list')
     parser.add_argument('-r', dest='redishost', type=str, default='redishost',
@@ -48,12 +50,14 @@ def main():
                         help='Multithread initialization (not recommended for a high number of SNAPs)')
     parser.add_argument('--allsnaps', action='store_true', default=False,
                         help='Require communication with all snaps (exit if any are put in dead_fengs")')
+    parser.add_argument('--ipython', action='store_true', default=False,
+                        help='Drop into IPython prompt at end of script')
     args = parser.parse_args()
 
     logger = handlers.add_default_log_handlers(logging.getLogger(__file__))
     handlers.log_notify(logger)  # send a NOTIFY level message that this script has started
 
-    corr = HeraCorrelator(redishost=args.redishost, config=args.config_file, use_redis=False)
+    corr = HeraCorrelator(hosts=args.hosts, redishost=args.redishost, config=args.config_file, use_redis=False)
     if args.allsnaps:
         t = time.time()
         while len(corr._unconnected) != 0 and time.time() - t < TIMEOUT:
@@ -173,7 +177,9 @@ def main():
     corr.enable_monitoring()
 
     logger.info('Initialization complete')
-    import IPython; IPython.embed()
+    if args.ipython:
+        import IPython
+        IPython.embed()
 
 
 if __name__ == "__main__":

@@ -7,9 +7,7 @@ from blocks import *
 
 # 'source_sel' register only on fpga only uses lowest 2 bits
 # using the others to mark status bits
-ADC_LINE_ALIGNED_BIT = 11
-ADC_FRAME_ALIGNED_BIT = 12
-ADC_RAMP_TEST_BIT = 13
+ADC_ALIGNED_BIT = 14
 INITIALIZED_BIT = 15
 PAM_MAX = 15
 PAM_MIN = 0
@@ -116,72 +114,52 @@ class SnapFengine(object):
         self.synth.initialize()
         self.adc.init()
         # Mark ADC as uncalibrated
-        self._set_adc_status(0, 0, 0)
+        self._set_adc_status(0)
 
     def align_adc(self, force=False, verify=True):
         if force:
-            self._set_adc_status(0, 0, 0)
-        status = self.get_adc_status()
-        if all(status.values()):
+            self._set_adc_status(0)
+        if self.adc_is_configured():
             return
-        if not status['line']:
-            fails = self.adc.alignLineClock()
-            status['line'] = bool(len(fails) == 0)
-            if not status['line']:
-                self.logger.warning("alignLineClock failed on: " + str(fails))
-        if status['line'] and not status['frame']:
-            fails = self.adc.alignFrameClock()
-            status['frame'] = bool(len(fails) == 0)
-            if not status['frame']:
-                self.logger.warning("alignFrameClock failed on: " + str(fails))
-        if status['line'] and status['frame'] and not status['ramp']:
-            fails = self.adc.rampTest()
-            status['ramp'] = bool(len(fails) == 0)
-            if not status['ramp']:
-                self.logger.warning("rampTest failed on: " + str(fails))
-        self._set_adc_status(**status) # record status
+        fails = self.adc.alignLineClock()
+        if len(fails) > 0:
+            self.logger.warning("alignLineClock failed on: " + str(fails))
+        fails = self.adc.alignFrameClock()
+        if len(fails) > 0:
+            self.logger.warning("alignFrameClock failed on: " + str(fails))
+        fails = self.adc.rampTest()
+        if len(fails) > 0:
+            self.logger.warning("rampTest failed on: " + str(fails))
+        else:
+            self._set_adc_status(1) # record status
         if verify:
-            assert(all(status.values())) # errors if anything failed
+            assert(self.adc_is_configured()) # errors if anything failed
         # Otherwise, finish up here.
         self.adc.selectADC()
         self.adc.adc.selectInput([1,1,3,3])
         self.adc.set_gain(4)
         
 
-    def _set_adc_status(self, line=None, frame=None, ramp=None):
-        def setbit(reg, bit, val):
-            reg &= 0xFFFFFFFF - 2**bit
-            reg |= int(val) * 2**bit
-            return reg
-        reg = self.input.read_uint('source_sel')
-        if line is not None:
-            reg = setbit(reg, ADC_LINE_ALIGNED_BIT, int(line))
-        if frame is not None:
-            reg = setbit(reg, ADC_FRAME_ALIGNED_BIT, int(frame))
-        if ramp is not None:
-            reg = setbit(reg, ADC_RAMP_TEST_BIT, int(ramp))
-        self.input.write_uint('source_sel', reg)
-
-    def get_adc_status(self):
-        val = self.input.read_uint('source_sel')
-        status = {}
-        status['line']  = bool(val & 2**ADC_LINE_ALIGNED_BIT)
-        status['frame'] = bool(val & 2**ADC_FRAME_ALIGNED_BIT)
-        status['ramp']  = bool(val & 2**ADC_RAMP_TEST_BIT)
-        return status
+    def _set_adc_status(self, val):
+        self.input.set_reg_bits('source_sel', val, ADC_ALIGNED_BIT, 1)
 
     def adc_is_configured(self):
         """
         Read the source_sel register 
         within the Input block is see if the ADC is configured. 
         """
-        return all(self.get_adc_status().values())
+        return self.input.get_reg_bits('source_sel', ADC_ALIGNED_BIT, 1)
 
-    def initialize(self, verify=False):
+    def initialize(self, force=False, verify=False):
 
+        if force:
+            self._set_initialized(0)
+            self.i2c_initialized = False
         # Init PAMs and FEMs
         if not self.i2c_initialized:
             self._add_i2c()
+        if self.is_initialized():
+            return
         
         # Init all blocks other than Synth and ADC 
         blocks_to_init = [blk for blk in self.blocks
@@ -195,10 +173,7 @@ class SnapFengine(object):
 
     def _set_initialized(self, value):
         # Set the initialized flag -- arbit reg in the design.
-        self.input.change_reg_bits('source_sel', value, INITIALIZED_BIT, 1)
-
-    def declare_uninit(self):
-        self._set_initialized(0)
+        self.input.set_reg_bits('source_sel', value, INITIALIZED_BIT, 1)
 
     def is_initialized(self):
         """
@@ -206,7 +181,7 @@ class SnapFengine(object):
         within the Input block is set when the Fengine is 
         initialized. Look for this bit and return.
         """
-        return self.input.read_uint('source_sel') & 2**INITIALIZED_BIT
+        return self.input.get_reg_bits('source_sel', INITIALIZED_BIT, 1)
 
     def get_fpga_stats(self):
         """

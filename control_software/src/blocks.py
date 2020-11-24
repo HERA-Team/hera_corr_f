@@ -1013,7 +1013,7 @@ class PhaseSwitch(Block):
         self.depth = depth           # number of brams steps in a period
         self.periodbase = periodbase # number of clock cycles in one bram step
 
-    def set_walsh(self, stream, N, n, stepperiod):
+    def set_walsh(self, stream, N, n, stepperiod, verify=False):
         """
         N: order of walsh matrix
         stream: stream to set
@@ -1041,8 +1041,12 @@ class PhaseSwitch(Block):
         curr_bram_vec = np.array(struct.unpack('>%dB' % self.depth, self.read('gpio_switch_states', self.depth)))
         new_bram_vec  = curr_bram_vec & (0xff - (1 << stream)) # zero the stream we are writing
         new_bram_vec  = new_bram_vec + (vec << stream)
-        self.write('gpio_switch_states', struct.pack('>%dB' % self.depth, *new_bram_vec))
-        self.write('sw_switch_states', struct.pack('>%dB' % self.depth, *new_bram_vec))
+        new_bram_vec = struct.pack('>%dB' % self.depth, *new_bram_vec)
+        self.write('gpio_switch_states', new_bram_vec)
+        self.write('sw_switch_states', new_bram_vec)
+        if verify:
+            assert(self.read('gpio_switch_states', len(new_bram_vec)) == new_bram_vec)
+            assert(self.read('sw_switch_states', len(new_bram_vec)) == new_bram_vec)
 
     def set_all_walsh(self, N, n, stepperiod, verify=False):
         """
@@ -1509,14 +1513,20 @@ class Eth(Block):
     def __init__(self, host, name, port=10000, logger=None):
         super(Eth, self).__init__(host, name, logger)
         self.port = port
-        self.BASE_MAC_OFFSET = 0x3000
+        if True: # 2019 "modern" 10gbe
+            self.BASE_ARP_OFFSET = 0x1000
+            self.IP_OFFSET = 0x14
+            self.SOURCE_PORT_OFFSET = 0x30 # or is it 0x2C as declared in mmap?
+        else: # 2016 "legacy" 10gbe
+            self.BASE_ARP_OFFSET = 0x3000
+            self.IP_OFFSET = 0x10
+            self.SOURCE_PORT_OFFSET = 0x20 # or is it 0x22 as declared in mmap?
+        # These are bit offsets within ctrl register
         self.STATUS_OFFSET = 18
         self.PORT_OFFSET = 2
         self.PORT_WIDTH = 16
         self.RESET_OFFSET = 0
         self.ENABLE_OFFSET = 1
-        self.IP_OFFSET = 0x10
-        self.SOURCE_PORT_OFFSET = 0x20
         self.PORT_FORMAT = '>BBH'
 
     def set_arp_table(self, macs, verify=False):
@@ -1529,14 +1539,14 @@ class Eth(Block):
         """
         macs = list(macs)
         macs_pack = struct.pack('>%dQ' % (len(macs)), *macs)
-        self.write('sw', macs_pack, offset=self.BASE_MAC_OFFSET)
+        self.write('sw', macs_pack, offset=self.BASE_ARP_OFFSET)
         if verify:
             for mac1, mac2 in zip(macs, self.get_arp_table()):
                 assert(mac1 == mac2)
 
     def get_arp_table(self):
         MAX_MACS = 256 # XXX is 256 the maximum number of macs?
-        macs_str = self.read('sw', MAX_MACS, offset=self.BASE_MAC_OFFSET)
+        macs_str = self.read('sw', MAX_MACS, offset=self.BASE_ARP_OFFSET)
         macs = struct.unpack('>%dQ' % (MAX_MACS), macs_str)
         return macs
 
@@ -1547,10 +1557,10 @@ class Eth(Block):
         mac_pack = struct.pack('>Q', mac)
         ip_offset = ip % 256
         self.write('sw', mac_pack,
-                   offset=self.BASE_MAC_OFFSET + ip_offset*8)
+                   offset=self.BASE_ARP_OFFSET + ip_offset*8)
         if verify:
             assert(mac_pack == self.read('sw', len(mac_pack),
-                        offset=self.BASE_MAC_OFFSET + 8*ip_offset))
+                        offset=self.BASE_ARP_OFFSET + 8*ip_offset))
 
     def get_status(self):
         stat = self.read_uint('sw_txs_ss_status')
