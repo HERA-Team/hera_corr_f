@@ -18,7 +18,7 @@ from casperfpga import utils
 
 LOGGER = add_default_log_handlers(logging.getLogger(__name__))
 TEMP_BITSTREAM_STORE = "/tmp/" # location to store bitfiles from redis
-
+MAJOR_VERSION = 4
 
 class HeraCorrelator(object):
     """HERA Correlator control class."""
@@ -170,7 +170,7 @@ class HeraCorrelator(object):
         self._progfile = progfile
         
     def feng_program(self, host, progfile=None, force=False,
-                        verify=True, sleep=20):
+                        verify=True, timeout=10):
         """
         Inputs:
             progfile (str): Path to fpga file to program. If None, the
@@ -188,18 +188,9 @@ class HeraCorrelator(object):
         # XXX need to check how this behaves in real life
         # XXX it may lie and say it programmed when it didn't
         # XXX it might also try multiple times and/or revert to golden image
-        # this call should block until success
-        feng.fpga.upload_to_ram_and_program(progfile)
-        # XXX maybe not do this b/c of multithreading
-        feng.initialize_adc() # configures synth/clk and reprograms FPGA
-        if verify:
-            #time.sleep(sleep) # probably unnecessary
-            # XXX could also check version of programmed image against
-            # XXX current version
-            if not feng.fpga.is_running():
-                raise RuntimeError('Failed to program FPGA: %s' % (host))
-            self.r.hset('status:snap:%s' % host,
-                        'last_programmed', time.ctime())
+        feng.program(progfile, force=force, verify=verify, timeout=timeout)
+        feng.initialize_adc(verify=verify) # configures synth/clk and reprograms FPGA
+        self.r.hset('status:snap:%s' % host, 'last_programmed', time.ctime())
 
     def program_fengs(self, hosts=None, progfile=None, force=False,
                       multithread=True, timeout=300.):
@@ -219,7 +210,32 @@ class HeraCorrelator(object):
                                 'progfile': progfile,
                                'force': force, # prefiltered list
                                'verify': True,
-                               'sleep': 0.,
+                            },
+                            hosts=hosts,
+                            multithread=multithread,
+                            timeout=timeout,
+        )
+        return failed
+
+    def feng_check_version(self, host, major=MAJOR_VERSION, minor=None):
+        """Ensure SNAPs are programmed with a compatible bitfile version."""
+        feng = self.fengs[host]
+        _maj,_min = feng.version()
+        if major is not None:
+            assert(_maj == major)
+        if minor is not None:
+            assert(_min == minor)
+
+    def check_version_fengs(self, hosts=None, major=MAJOR_VERSION, minor=None,
+                            multithread=False, timeout=300.):
+        if hosts is None:
+            hosts = self.fengs.keys()
+        failed = self._call_on_hosts(
+                            target=self.feng_check_version,
+                            args=(),
+                            kwargs={
+                                'major': major,
+                                'minor': minor,
                             },
                             hosts=hosts,
                             multithread=multithread,
@@ -638,10 +654,16 @@ class HeraCorrelator(object):
                 assert(chan_range[1] - chan_range[0] <= 384)
 
     def _eth_config_dest(self, host, source_ports, dest_port, xinfo,
-                         verify=False):
+                         force=False, verify=False):
         """Configure F-Engine destination packet slots."""
         feng = self.fengs[host]
+        if force:
+            feng._set_dest_configured(0)
+        if feng.dest_is_configured():
+            return
         source_port = source_ports[host]
+        feng.eth.set_source_port(source_port, verify=verify)
+        feng.eth.set_port(dest_port, verify=verify)
         failed = []
         for xn, xval in xinfo.items():
             chans = xval['chans']
@@ -658,17 +680,16 @@ class HeraCorrelator(object):
             self.r.hset("corr:snap_ants", host,
                         json.dumps(feng.ant_indices))
             try:
-                feng.packetizer.assign_slot(xn, chans, [ip_even,ip_odd],
-                            feng.reorder, feng.ant_indices[0], verify=verify)
+                feng.assign_dest(xn, chans, [ip_even,ip_odd], verify=verify)
                 feng.eth.add_arp_entry(ip_even, mac_even, verify=verify)
                 feng.eth.add_arp_entry(ip_odd, mac_odd, verify=verify)
-                feng.eth.set_source_port(source_port, verify=verify)
-                feng.eth.set_port(dest_port, verify=verify)
             except(AssertionError, RuntimeError) as e:
                 failed.append((xn, e.message))
         if len(failed) > 0:
             raise RuntimeError('Failed to configure %s.eth: %s' % (
                 host, '\n'.join(['xeng[%d]: %s' % f for f in failed])))
+        else:
+            feng._set_dest_configured(1)
 
     def config_dest_eths(self, hosts=None, verify=True, force=False,
                         multithread=False, timeout=300.):
@@ -707,7 +728,7 @@ class HeraCorrelator(object):
         failed = self._call_on_hosts(
                             target=self._eth_config_dest,
                             args=(source_ports, dest_port, xinfo),
-                            kwargs={'verify': verify},
+                            kwargs={'verify': verify, 'force': force},
                             hosts=hosts,
                             multithread=multithread,
                             timeout=timeout

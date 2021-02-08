@@ -7,6 +7,7 @@ from blocks import *
 
 # 'source_sel' register only on fpga only uses lowest 2 bits
 # using the others to mark status bits
+DEST_CONFIG_BIT = 13
 ADC_ALIGNED_BIT = 14
 INITIALIZED_BIT = 15
 PAM_MAX = 15
@@ -62,7 +63,7 @@ class SnapFengine(object):
             self.synth,
             self.adc,
             self.sync,
-            #self.noise,
+            #self.noise, # temporarily removed
             self.input,
             self.delay,
             self.pfb,
@@ -99,24 +100,37 @@ class SnapFengine(object):
         self.i2c_initialized = True
 
     def is_programmed(self):
-        """
-        Check if board is programmed by lazily reading 
-        "adc16_controller" register.
-        Returns:
-            True if programmed, False otherwise
-        """
+        """Check if programmed by reading "adc16_controller" register."""
         return 'adc16_controller' in self.fpga.listdev()
 
-    def initialize_adc(self):
-        """
-        Initialize the Synth and Adc blocks, then reprogram FPGA.
-        """        
-        self.synth.initialize()
-        self.adc.init()
+    def version(self):
+        """Read the version of the FPGA bitstream."""
+        val = self.fpga.read_uint('version_version')
+        major = val >> 16
+        minor = val & 0xffff
+        return major, minor
+
+    def program(self, progfile, force=False, verify=False, timeout=10):
+        """Program the FPGA of this board."""
+        if not force and self.is_programmed():
+            return
+        self.logger.info("Programming FPGA with: %s" % progfile)
+        self.fpga.upload_to_ram_and_program(progfile)
+        if verify:
+            t = time.time()
+            while not self.fpga.is_running() and time.time() - t < timeout:
+                time.sleep(0.1)
+            assert(self.fpga.is_running())
+
+    def initialize_adc(self, verify=False):
+        """Initialize Synth and Adc blocks, then reprogram FPGA."""        
+        self.synth.initialize(verify=verify)
+        self.adc.init(verify=verify)
         # Mark ADC as uncalibrated
         self._set_adc_status(0)
 
     def align_adc(self, force=False, verify=True):
+        """Align clock and data lanes of ADC."""
         if force:
             self._set_adc_status(0)
         if self.adc_is_configured():
@@ -138,7 +152,6 @@ class SnapFengine(object):
         self.adc.selectADC()
         self.adc.adc.selectInput([1,1,3,3])
         self.adc.set_gain(4)
-        
 
     def _set_adc_status(self, val):
         self.input.set_reg_bits('source_sel', val, ADC_ALIGNED_BIT, 1)
@@ -197,7 +210,7 @@ class SnapFengine(object):
         stat['pmb_alert'] = self.fpga.read_uint('pmbus_alert')
         return stat
 
-    def assign_slot(self, slot_num, chans, dests):
+    def assign_dest(self, slot_num, chans, dests, verify=False):
         """
         Choose which 6144 channels (of 8192) to output via 10GbE.
         Each output packet contains 384 freq channels for a single antenna,
@@ -218,20 +231,29 @@ class SnapFengine(object):
         assert(len(dests) == self.packetizer.n_time_demux)
 
         # Set frequency header of slot to the first specified channel
-        self.packetizer.set_chan_header(chans[0], slot_offset=slot_num)
+        self.packetizer.set_chan_header(chans[0], slot_offset=slot_num, verify=verify)
 
         # Set antenna header of slot (every slot represents 3 antennas
         self.packetizer.set_ant_header(ant=self.ant_indices[0],
-                                       slot_offset=slot_num)
+                                       slot_offset=slot_num, verify=verify)
 
         # Set destination address of slot to be the specified IP address
-        self.packetizer.set_dest_ip(dests, slot_offset=slot_num)
+        self.packetizer.set_dest_ip(dests, slot_offset=slot_num, verify=verify)
 
         # set the channel orders
         # channels supplied must emerge in first 384 channels of a block
         # of 512 (first 192 clks of 256clks for 2 pols)
         for cnt, chan in enumerate(chans[::8]):
-            self.reorder.reindex_channel(chan//8, slot_num*64 + cnt)
+            self.reorder.reindex_channel(chan//8, slot_num*64 + cnt, verify=verify)
+
+    def _set_dest_configured(self, value):
+        # Set the initialized flag -- arbit reg in the design.
+        self.input.set_reg_bits('source_sel', value, DEST_CONFIG_BIT, 1)
+
+    def dest_is_configured(self):
+        """
+        """
+        return self.input.get_reg_bits('source_sel', DEST_CONFIG_BIT, 1)
 
 #    def get_pam_atten_by_target(self, chan, target_pow=None,
 #                                target_rms=None):
