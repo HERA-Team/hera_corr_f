@@ -709,6 +709,8 @@ class HeraCorrelator(object):
         chans_per_packet = self.config.get('chans_per_packet', 384)
         assert(chans_per_packet == 384) # Hardcoded in firmware
         xinfo = {} # holds what an feng needs to be configured
+        # Clear current mapping and generate new one
+        self.r.delete("corr:xeng_chans")
         for xn, xparams in self.config['xengines'].items():
             xinfo[xn] = {}
             ch0,ch1 = xparams.get('chan_range', (xn*384, (xn+1)*384))
@@ -724,7 +726,6 @@ class HeraCorrelator(object):
             xinfo[xn]['mac_odd'] = xparams['odd']['mac']
         # Clear current mapping and generate new one
         self.r.delete("corr:snap_ants")
-        self.r.delete("corr:xeng_chans")
         failed = self._call_on_hosts(
                             target=self._eth_config_dest,
                             args=(source_ports, dest_port, xinfo),
