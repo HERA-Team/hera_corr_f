@@ -18,7 +18,7 @@ from casperfpga import utils
 
 LOGGER = add_default_log_handlers(logging.getLogger(__name__))
 TEMP_BITSTREAM_STORE = "/tmp/" # location to store bitfiles from redis
-MAJOR_VERSION = 4
+MAJOR_VERSION = 0
 
 class HeraCorrelator(object):
     """HERA Correlator control class."""
