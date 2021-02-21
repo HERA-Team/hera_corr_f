@@ -3,7 +3,7 @@ from hera_corr_cm.handlers import add_default_log_handlers
 import numpy as np
 import datetime
 import casperfpga
-from blocks import *
+from .blocks import *
 
 
 class SnapFengine(object):
