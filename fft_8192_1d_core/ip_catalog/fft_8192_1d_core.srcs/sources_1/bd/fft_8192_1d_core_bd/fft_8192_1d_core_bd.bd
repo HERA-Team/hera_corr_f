@@ -1,0 +1,558 @@
+{
+  "design": {
+    "design_info": {
+      "boundary_crc": "0x9154D8BD3FBBE1A7",
+      "design_src": "SYSGEN",
+      "device": "xc7k160tffg676-2",
+      "name": "fft_8192_1d_core_bd",
+      "synth_flow_mode": "Hierarchical",
+      "tool_version": "2019.1.1",
+      "validated": "true"
+    },
+    "design_tree": {
+      "fft_8192_1d_core_1": ""
+    },
+    "ports": {
+      "clk": {
+        "type": "clk",
+        "direction": "I",
+        "parameters": {
+          "CLK_DOMAIN": {
+            "value": "fft_8192_1d_core_bd_clk",
+            "value_src": "default"
+          },
+          "FREQ_HZ": {
+            "value": "100000000",
+            "value_src": "default"
+          },
+          "INSERT_VIP": {
+            "value": "0",
+            "value_src": "default"
+          },
+          "PHASE": {
+            "value": "0.000",
+            "value_src": "default"
+          }
+        }
+      },
+      "out0": {
+        "type": "data",
+        "direction": "O",
+        "left": "35",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}",
+            "value_src": "const_prop"
+          }
+        }
+      },
+      "out1": {
+        "type": "data",
+        "direction": "O",
+        "left": "35",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}",
+            "value_src": "const_prop"
+          }
+        }
+      },
+      "out2": {
+        "type": "data",
+        "direction": "O",
+        "left": "35",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}",
+            "value_src": "const_prop"
+          }
+        }
+      },
+      "out3": {
+        "type": "data",
+        "direction": "O",
+        "left": "35",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}",
+            "value_src": "const_prop"
+          }
+        }
+      },
+      "out4": {
+        "type": "data",
+        "direction": "O",
+        "left": "35",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}",
+            "value_src": "const_prop"
+          }
+        }
+      },
+      "out5": {
+        "type": "data",
+        "direction": "O",
+        "left": "35",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}",
+            "value_src": "const_prop"
+          }
+        }
+      },
+      "out6": {
+        "type": "data",
+        "direction": "O",
+        "left": "35",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}",
+            "value_src": "const_prop"
+          }
+        }
+      },
+      "out7": {
+        "type": "data",
+        "direction": "O",
+        "left": "35",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}",
+            "value_src": "const_prop"
+          }
+        }
+      },
+      "overflow": {
+        "type": "data",
+        "direction": "O",
+        "left": "3",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 4} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}",
+            "value_src": "const_prop"
+          }
+        }
+      },
+      "pol0_in0": {
+        "type": "data",
+        "direction": "I",
+        "left": "17",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "pol0_in1": {
+        "type": "data",
+        "direction": "I",
+        "left": "17",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "pol0_in10": {
+        "type": "data",
+        "direction": "I",
+        "left": "17",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "pol0_in11": {
+        "type": "data",
+        "direction": "I",
+        "left": "17",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "pol0_in12": {
+        "type": "data",
+        "direction": "I",
+        "left": "17",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "pol0_in13": {
+        "type": "data",
+        "direction": "I",
+        "left": "17",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "pol0_in14": {
+        "type": "data",
+        "direction": "I",
+        "left": "17",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "pol0_in15": {
+        "type": "data",
+        "direction": "I",
+        "left": "17",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "pol0_in2": {
+        "type": "data",
+        "direction": "I",
+        "left": "17",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "pol0_in3": {
+        "type": "data",
+        "direction": "I",
+        "left": "17",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "pol0_in4": {
+        "type": "data",
+        "direction": "I",
+        "left": "17",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "pol0_in5": {
+        "type": "data",
+        "direction": "I",
+        "left": "17",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "pol0_in6": {
+        "type": "data",
+        "direction": "I",
+        "left": "17",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "pol0_in7": {
+        "type": "data",
+        "direction": "I",
+        "left": "17",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "pol0_in8": {
+        "type": "data",
+        "direction": "I",
+        "left": "17",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "pol0_in9": {
+        "type": "data",
+        "direction": "I",
+        "left": "17",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "shift": {
+        "type": "data",
+        "direction": "I",
+        "left": "15",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "sync": {
+        "type": "data",
+        "direction": "I",
+        "left": "31",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "undef",
+            "value_src": "default"
+          }
+        }
+      },
+      "sync_out": {
+        "type": "data",
+        "direction": "O",
+        "left": "0",
+        "right": "0",
+        "parameters": {
+          "LAYERED_METADATA": {
+            "value": "xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 1} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}",
+            "value_src": "const_prop"
+          }
+        }
+      }
+    },
+    "components": {
+      "fft_8192_1d_core_1": {
+        "vlnv": "User_Company:SysGen:fft_8192_1d_core:1.0",
+        "xci_name": "fft_8192_1d_core_bd_fft_8192_1d_core_1_0"
+      }
+    },
+    "nets": {
+      "clk_1": {
+        "ports": [
+          "clk",
+          "fft_8192_1d_core_1/clk"
+        ]
+      },
+      "fft_8192_1d_core_1_out0": {
+        "ports": [
+          "fft_8192_1d_core_1/out0",
+          "out0"
+        ]
+      },
+      "fft_8192_1d_core_1_out1": {
+        "ports": [
+          "fft_8192_1d_core_1/out1",
+          "out1"
+        ]
+      },
+      "fft_8192_1d_core_1_out2": {
+        "ports": [
+          "fft_8192_1d_core_1/out2",
+          "out2"
+        ]
+      },
+      "fft_8192_1d_core_1_out3": {
+        "ports": [
+          "fft_8192_1d_core_1/out3",
+          "out3"
+        ]
+      },
+      "fft_8192_1d_core_1_out4": {
+        "ports": [
+          "fft_8192_1d_core_1/out4",
+          "out4"
+        ]
+      },
+      "fft_8192_1d_core_1_out5": {
+        "ports": [
+          "fft_8192_1d_core_1/out5",
+          "out5"
+        ]
+      },
+      "fft_8192_1d_core_1_out6": {
+        "ports": [
+          "fft_8192_1d_core_1/out6",
+          "out6"
+        ]
+      },
+      "fft_8192_1d_core_1_out7": {
+        "ports": [
+          "fft_8192_1d_core_1/out7",
+          "out7"
+        ]
+      },
+      "fft_8192_1d_core_1_overflow": {
+        "ports": [
+          "fft_8192_1d_core_1/overflow",
+          "overflow"
+        ]
+      },
+      "pol0_in0_1": {
+        "ports": [
+          "pol0_in0",
+          "fft_8192_1d_core_1/pol0_in0"
+        ]
+      },
+      "pol0_in1_1": {
+        "ports": [
+          "pol0_in1",
+          "fft_8192_1d_core_1/pol0_in1"
+        ]
+      },
+      "pol0_in10_1": {
+        "ports": [
+          "pol0_in10",
+          "fft_8192_1d_core_1/pol0_in10"
+        ]
+      },
+      "pol0_in11_1": {
+        "ports": [
+          "pol0_in11",
+          "fft_8192_1d_core_1/pol0_in11"
+        ]
+      },
+      "pol0_in12_1": {
+        "ports": [
+          "pol0_in12",
+          "fft_8192_1d_core_1/pol0_in12"
+        ]
+      },
+      "pol0_in13_1": {
+        "ports": [
+          "pol0_in13",
+          "fft_8192_1d_core_1/pol0_in13"
+        ]
+      },
+      "pol0_in14_1": {
+        "ports": [
+          "pol0_in14",
+          "fft_8192_1d_core_1/pol0_in14"
+        ]
+      },
+      "pol0_in15_1": {
+        "ports": [
+          "pol0_in15",
+          "fft_8192_1d_core_1/pol0_in15"
+        ]
+      },
+      "pol0_in2_1": {
+        "ports": [
+          "pol0_in2",
+          "fft_8192_1d_core_1/pol0_in2"
+        ]
+      },
+      "pol0_in3_1": {
+        "ports": [
+          "pol0_in3",
+          "fft_8192_1d_core_1/pol0_in3"
+        ]
+      },
+      "pol0_in4_1": {
+        "ports": [
+          "pol0_in4",
+          "fft_8192_1d_core_1/pol0_in4"
+        ]
+      },
+      "pol0_in5_1": {
+        "ports": [
+          "pol0_in5",
+          "fft_8192_1d_core_1/pol0_in5"
+        ]
+      },
+      "pol0_in6_1": {
+        "ports": [
+          "pol0_in6",
+          "fft_8192_1d_core_1/pol0_in6"
+        ]
+      },
+      "pol0_in7_1": {
+        "ports": [
+          "pol0_in7",
+          "fft_8192_1d_core_1/pol0_in7"
+        ]
+      },
+      "pol0_in8_1": {
+        "ports": [
+          "pol0_in8",
+          "fft_8192_1d_core_1/pol0_in8"
+        ]
+      },
+      "pol0_in9_1": {
+        "ports": [
+          "pol0_in9",
+          "fft_8192_1d_core_1/pol0_in9"
+        ]
+      },
+      "shift_1": {
+        "ports": [
+          "shift",
+          "fft_8192_1d_core_1/shift"
+        ]
+      },
+      "sync_1": {
+        "ports": [
+          "sync",
+          "fft_8192_1d_core_1/sync"
+        ]
+      },
+      "fft_8192_1d_core_1_sync_out": {
+        "ports": [
+          "fft_8192_1d_core_1/sync_out",
+          "sync_out"
+        ]
+      }
+    }
+  }
+}
