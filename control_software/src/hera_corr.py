@@ -96,7 +96,7 @@ class HeraCorrelator(object):
         self.logger.info("Connecting %s with antenna indices %s" % 
                          (host, ant_indices))
         if self.use_redis:
-            redishost = self.redisthost
+            redishost = self.redishost
         else:
             redishost = None
         feng = SnapFengine(host, ant_indices=ant_indices,
@@ -475,7 +475,7 @@ class HeraCorrelator(object):
         """
         self.logger.info("Setting EQ for (%s,%s)" % (ant, pol))
         host, stream = self.lookup_ant_host_stream(ant, pol)
-        coeffs = np.ones(feng.eq.ncoeffs) * coeffs # broadcast shape
+        coeffs = np.ones(self.fengs[host].eq.ncoeffs) * coeffs # broadcast shape
         self.fengs[host].eq.set_coeffs(stream, coeffs, verify=verify)
 
     def eq_initialize(self, host, verify=True):
