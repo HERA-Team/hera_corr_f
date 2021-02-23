@@ -47,8 +47,7 @@ fft_shift: 0x3aee
 
 # Specify a full path to an F-Engine fpg files
 # or redis:<fpg filename> if the fpg file has been uploaded to redis
-#fpgfile: '/home/hera/src/hera_corr_f/snap_fengine/outputs/snap_f_10g_rte_v4_2021-02-05_1652.fpg'
-fpgfile: '/home/hera/foo/misc/snap_f_10g_rte_v4_2021-02-11_1042.fpg'
+fpgfile: '/home/hera/src/hera_corr_f/snap_fengine/outputs/snap_fengine.fpg'
 
 # Destination port for SNAP data
 dest_port: 8511
