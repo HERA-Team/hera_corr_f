@@ -445,6 +445,13 @@ if __name__ == "__main__":
             # all the fengs one after another anymore
             time.sleep(0.1)
 
+        # If the retry period has been exceeded, try to reconnect to dead boards:
+        if time.time() > (retry_tick + args.retrytime):
+            if len(corr._unconnected) > 0:
+                logger.debug('Trying to reconnect to unreachable boards')
+                corr._unconnected = corr.connect_fengs(hosts=corr._unconnected)
+                retry_tick = time.time()
+
         # If executing the loop hasn't already taken longer than the loop delay time, add extra wait.
         extra_delay = args.delay - (time.time() - tick)
         if extra_delay > 0:
