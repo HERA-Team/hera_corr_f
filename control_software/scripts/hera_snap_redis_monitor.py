@@ -1,218 +1,236 @@
 #! /usr/bin/env python
+
 import os
-import time
-import datetime
-import argparse
-import logging
+import sys
 import json
+import time
 import socket
-from hera_corr_f import HeraCorrelator, SnapFengine, __version__, __package__
-from hera_corr_cm import redis_cm
-from hera_corr_cm.handlers import add_default_log_handlers
+import logging
+import argparse
+import datetime
 import numpy as np
 
+from hera_corr_f import HeraCorrelator, __version__, __package__
+from hera_corr_cm.handlers import add_default_log_handlers
+
 logger = add_default_log_handlers(logging.getLogger(__file__))
-FAIL_COUNT_LIMIT = 5
 
 hostname = socket.gethostname()
 
+pol_name_from_char = {"e": "east", "n": "north"}
 
-def get_all_pam_stats(corr):
+
+def validate_redis_dict(in_dict, recursion_depth=1):
+    if recursion_depth == sys.getrecursionlimit():
+        raise RuntimeError("Max Recursion reached during dictionary validation.")
+
+    for redis_key in in_dict:
+        # make a few explicit type conversions to coerce non-redis
+        # compatible variables into redis.
+        if isinstance(in_dict[redis_key], bool):
+            # bools are compared using lambda x: x == "True" later
+            in_dict[redis_key] = str(in_dict[redis_key])
+        elif isinstance(in_dict[redis_key], list):
+            # values that are appearing as lists as loaded
+            # with json.loads in corr_cm
+            in_dict[redis_key] = json.dumps(in_dict[redis_key])
+        elif in_dict[redis_key] is None:
+            # newer redis-py does not accept Nonetype, wrap in json.dumps
+            in_dict[redis_key] = json.dumps(in_dict[redis_key])
+        elif isinstance(in_dict[redis_key], dict):
+            # just in case! who doesn't like recursion
+            validate_redis_dict(in_dict[redis_key], recursion_depth=recursion_depth + 1)
+
+    return in_dict
+
+
+def get_pam_stats(corr, host, stream):
     """
-    Get PAM stats.
+    Get PAM stats for the given hostname and stream.
 
-    returns: Dictionary of dictionaries
-    dict[key1][key2][key3] = value
-    where key1 is an antenna name, key2 is a polarization, key3 is a stat type (eg. "pam_power")
+    Parameters
+    ----------
+    host : str
+        hostname of the snap
+    stream : int
+        lane number (stream) where the antenna is plugged into the ADC
+
+    Returns
+    -------
+    Dictionary of PAM statistics.
     """
     rv = {}
-    sensors = {}
-    sensors["pam_east_powers"]  = []
-    sensors["pam_north_powers"] = []
-    sensors["pam_attens"]       = []
-    sensors["pam_voltages"]     = []
-    sensors["pam_currents"]     = []
-    sensors["pam_ids"]          = []
-    for i in range(3):
-        sensors["pam_east_powers"]  += [corr.do_for_all_f("power", block="pams", block_index=i, kwargs={"name":"east"})]
-        sensors["pam_north_powers"] += [corr.do_for_all_f("power", block="pams", block_index=i, kwargs={"name":"north"})]
-        sensors["pam_attens"]       += [corr.do_for_all_f("get_attenuation", block="pams", block_index=i)]
-        sensors["pam_voltages"]     += [corr.do_for_all_f("shunt", block="pams", block_index=i, kwargs={"name":"u"})]
-        sensors["pam_currents"]     += [corr.do_for_all_f("shunt", block="pams", block_index=i, kwargs={"name":"i"})]
-        sensors["pam_ids"]          += [corr.do_for_all_f("id", block="pams", block_index=i)]
+    feng = corr.fengs[host]
+    pam = feng.pams[stream // 2]
 
-    for feng in corr.fengs:
-        for antn, antpol in enumerate(feng.ants):
-            if antpol is None:
-                continue
-            try:
-                host = feng.host
-            except:  # noqa
-                continue
-            ant, pol = redis_cm.hera_antpol_to_ant_pol(antpol)
-            if ant not in rv.keys():
-                rv[ant] = {"e": {}, "n": {}}
+    try:
+        rv["pam_atten"] = pam.get_attenuation()[stream % 2]
+    except:  # noqa
+        logger.info(
+            "Error getting PAM attenuation on snap {} ant {}; "
+            "Setting to None. "
+            "Full error output:".format(host, stream // 2),
+            exc_info=True,
+        )
+        rv["pam_atten"] = None
 
-            block_index = antn // 2
-            if pol == "e":
-                try:
-                    rv[ant][pol]["pam_power"] = sensors["pam_east_powers"][block_index][host]
-                except KeyError:
-                    rv[ant][pol]["pam_power"] = None
-                try:
-                    rv[ant][pol]["pam_atten"] = sensors["pam_attens"][block_index][host][0]
-                except KeyError:
-                    rv[ant][pol]["pam_atten"] = None
-            elif pol == "n":
-                try:
-                    rv[ant][pol]["pam_power"] = sensors["pam_north_powers"][block_index][host]
-                except KeyError:
-                    rv[ant][pol]["pam_power"] = None
-                try:
-                    rv[ant][pol]["pam_atten"] = sensors["pam_attens"][block_index][host][1]
-                except KeyError:
-                    rv[ant][pol]["pam_atten"] = None
+    try:
+        rv["pam_power"] = pam.power(name=pol_name_from_char[pol])
+    except:  # noqa
+        logger.info(
+            "Error getting PAM Power on snap {} ant {}; "
+            "Setting to None. "
+            "Full error output:".format(host, stream // 2),
+            exc_info=True,
+        )
+        rv["pam_power"] = None
 
-            try:
-                rv[ant][pol]["pam_voltage"] = sensors["pam_voltages"][block_index][host]
-            except KeyError:
-                rv[ant][pol]["pam_voltage"] = None
-            try:
-                rv[ant][pol]["pam_current"] = sensors["pam_currents"][block_index][host]
-            except KeyError:
-                rv[ant][pol]["pam_current"] = None
-            try:
-                rv[ant][pol]["pam_id"] = sensors["pam_ids"][block_index][host]
-            except KeyError:
-                rv[ant][pol]["pam_id"] = None
+    try:
+        rv["pam_voltage"] = pam.shunt("u")
+    except:  # noqa
+        logger.info(
+            "Error getting PAM Voltage on snap {} ant {}; "
+            "Setting to None. "
+            "Full error output:".format(host, stream // 2),
+            exc_info=True,
+        )
+        rv["pam_voltage"] = None
+
+    try:
+        rv["pam_current"] = pam.shunt("i")
+    except:  # noqa
+        logger.info(
+            "Error getting PAM Current on snap {} ant {}; "
+            "Setting to None. "
+            "Full error output:".format(host, stream // 2),
+            exc_info=True,
+        )
+        rv["pam_current"] = None
+
+    try:
+        rv["pam_id"] = pam.id()
+    except:  # noqa
+        logger.info(
+            "Error getting PAM ID on snap {} ant {}; "
+            "Setting to None. "
+            "Full error output:".format(host, stream // 2),
+            exc_info=True,
+        )
+        rv["pam_id"] = None
     return rv
 
 
-def get_all_fem_stats(corr):
+def get_fem_stats(corr, host, stream):
     """
-    Get FEM stats.
+    Get FEM stats for the given hostname and stream.
 
-    returns: Dictionary of dictionaries
-    dict[key1][key2][key3] = value
-    where key1 is an antenna name, key2 is a polarization, key3 is a stat type (eg. "fem_power")
+    Parameters
+    ----------
+    host : str
+        hostname of the snap
+    stream : int
+        lane number (stream) where the antenna is plugged into the ADC
+
+    Returns
+    -------
+    Dictionary of FEM statistics.
     """
     rv = {}
-    sensors = {}
-    sensors["fem_switches"] = []
-    sensors["fem_temps"]    = []
-    sensors["fem_currents"] = []
-    sensors["fem_voltages"] = []
-    sensors["fem_ids"]      = []
-    sensors["fem_imu"]      = []
-    for i in range(3):
-        sensors["fem_switches"] += [corr.do_for_all_f("switch", block="fems", block_index=i)]
-        sensors["fem_temps"]    += [corr.do_for_all_f("temperature", block="fems", block_index=i)]
-        sensors["fem_currents"] += [corr.do_for_all_f("shunt", block="fems", block_index=i, kwargs={"name":"i"})]
-        sensors["fem_voltages"] += [corr.do_for_all_f("shunt", block="fems", block_index=i, kwargs={"name":"u"})]
-        sensors["fem_ids"]      += [corr.do_for_all_f("id", block="fems", block_index=i)]
-        sensors["fem_imu"]      += [corr.do_for_all_f("imu", block="fems", block_index=i)]
+    feng = corr.fengs[host]
+    fem = feng.fems[stream // 2]
+    try:
+        switch, east, north = fem.switch()
+        rv["fem_switch"] = switch
+        rv["fem_e_lna_power"] = east
+        rv["fem_n_lna_power"] = north
+    except:  # noqa
+        logger.info(
+            "Error getting FEM switch status on snap {} ant {}; "
+            "Setting to None. "
+            "Full error output:".format(host, stream // 2),
+            exc_info=True,
+        )
+        rv["fem_switch"] = None
+        rv["fem_e_lna_power"] = None
+        rv["fem_n_lna_power"] = None
 
-    for feng in corr.fengs:
-        for antn, antpol in enumerate(feng.ants):
-            if antpol is None:
-                continue
-            try:
-                host = feng.host
-            except:  # noqa
-                continue
-            ant, pol = redis_cm.hera_antpol_to_ant_pol(antpol)
-            if ant not in rv.keys():
-                rv[ant] = {"e": {}, "n": {}}
+    try:
+        rv["fem_temp"] = fem.temperature()
+    except:  # noqa
+        logger.info(
+            "Error getting FEM temperature on snap {} ant {}; "
+            "Setting to None. "
+            "Full error output:".format(host, stream // 2),
+            exc_info=True,
+        )
+        rv["fem_temp"] = None
 
-            block_index = antn // 2
-            try:
-                if sensors["fem_switches"][block_index][host] is None:
-                    switch_state = None
-                    e_powered = None
-                    n_powered = None
-                else:
-                    switch_state, e_powered, n_powered = sensors["fem_switches"][block_index][host]
-                rv[ant][pol]["fem_switch"] = switch_state
-                rv[ant][pol]["fem_e_lna_power"] = e_powered
-                rv[ant][pol]["fem_n_lna_power"] = n_powered
-            except KeyError:
-                rv[ant][pol]["fem_switch"] = None
-                rv[ant][pol]["fem_e_lna_power"] = None
-                rv[ant][pol]["fem_n_lna_power"] = None
-            try:
-                rv[ant][pol]["fem_temp"] = sensors["fem_temps"][block_index][host]
-            except KeyError:
-                rv[ant][pol]["fem_temp"] = None
-            try:
-                rv[ant][pol]["fem_current"] = sensors["fem_currents"][block_index][host]
-            except KeyError:
-                rv[ant][pol]["fem_current"] = None
-            try:
-                rv[ant][pol]["fem_voltage"] = sensors["fem_voltages"][block_index][host]
-            except KeyError:
-                rv[ant][pol]["fem_voltage"] = None
-            try:
-                rv[ant][pol]["fem_id"] = sensors["fem_ids"][block_index][host]
-            except KeyError:
-                rv[ant][pol]["fem_id"] = None
-            try:
-                rv[ant][pol]["fem_imu_theta"], rv[ant][pol]["fem_imu_phi"] = sensors["fem_imu"][block_index][host]  # noqa
-            except KeyError:
-                rv[ant][pol]["fem_imu_theta"], rv[ant][pol]["fem_imu_phi"] = None, None
+    try:
+        rv["fem_voltage"] = fem.shunt("u")
+    except:  # noqa
+        logger.info(
+            "Error getting FEM voltage on snap {} ant {}; "
+            "Setting to None. "
+            "Full error output:".format(host, stream // 2),
+            exc_info=True,
+        )
+        rv["fem_voltage"] = None
+
+    try:
+        rv["fem_current"] = fem.shunt("i")
+    except:  # noqa
+        logger.info(
+            "Error getting FEM current on snap {} ant {}; "
+            "Setting to None. "
+            "Full error output:".format(host, stream // 2),
+            exc_info=True,
+        )
+        rv["fem_current"] = None
+
+    try:
+        rv["fem_id"] = fem.id()
+    except:  # noqa
+        logger.info(
+            "Error getting FEM ID on snap {} ant {}; "
+            "Setting to None. "
+            "Full error output:".format(host, stream // 2),
+            exc_info=True,
+        )
+        rv["fem_id"] = None
+
+    try:
+        theta, phi = fem.imu()
+        rv["fem_imu_theta"] = theta
+        rv["fem_imu_phi"] = phi
+    except:  # noqa
+        logger.info(
+            "Error getting FEM IMU information on snap {} ant {}; "
+            "Setting to None. "
+            "Full error output:".format(host, stream // 2),
+            exc_info=True,
+        )
+        rv["fem_imu_theta"] = None
+        rv["fem_imu_phi"] = None
+
     return rv
-
-
-def get_poco_output(feng, redishost):
-    """
-    Get pocket correlator output.
-
-    Antennas and integration time polled from redis database.
-    Params:  feng: SnapFengine object that maps to a SNAP board
-             redishost: Redis database to upload the data to.
-    Returns: Dict: {'data':shape(fqs, pols),
-                    'times':list of unix times}
-    """
-    int_time = int(redishost.hget('poco', 'integration_time'))
-    acc_len = int_time * 250e6 / (8192 * feng.corr.spec_per_acc)
-
-    if (acc_len != feng.corr.get_acc_len()):
-        feng.corr.set_acc_len(acc_len)
-
-    antenna_pairs = ([[0, 0], [0, 1], [0, 2], [1, 1], [1, 2], [2, 2]])
-    pair = (int(redishost.hget('poco', 'ant1')), int(redishost.hget('poco', 'ant2')))
-    idx = antenna_pairs.index(pair)
-    ant1, ant2 = antenna_pairs[(idx+1) % len(antenna_pairs)]
-    redishost.hset('poco', 'ant1', ant1)
-    redishost.hset('poco', 'ant2', ant2)
-
-    ant1 *= 2; ant2 *= 2
-    xcorr = []; times = []
-    for i in range(4):
-        xcorr.append(feng.corr.get_new_corr(ant1+i % 2, (ant2+(i//2+i % 2) % 2)))
-        times.append(time.time())
-    xcorr = np.asarray(xcorr); times = np.asarray(times)
-    redishost.hset('poco', 'corr',  xcorr.tostring())
-    redishost.hset('poco', 'times', times.tostring())
-
-    # to unpack from string: c = struct.unpack('<8192d'); xcorr = (c[::2] + 1j*c[1::2]).reshape(4,1024)
-
-    return {'data': xcorr, 'times': times}
 
 
 def print_ant_log_messages(corr):
     for ant, antval in corr.ant_to_snap.iteritems():
         for pol, polval in antval.iteritems():
             # Skip if the antenna is associated with a board we can't reach
-            if polval['host'] in corr.dead_fengs.keys():
-                logger.warning("Won't get data from Ant %s, Pol %s because host %s is dead" % (ant, pol, polval['host']))
-                continue
-            else:
-                if isinstance(polval['host'], SnapFengine):
-                    host = polval['host'].host  # the dictionary contains FEngine instances
-                    chan = polval['channel']
+            if polval['host'] is not None:
+                host = polval['host']
+                chan = polval['channel']
+                try:
+                    _ = corr.fengs[host]
                     logger.debug("Expecting data from Ant %s, Pol %s from host %s input %d" % (ant, pol, host, chan))
-                else:
+                except KeyError:
+                    # If the entry is set to a bogus hostname I suppose.
                     logger.warning("Failed to find F-Engine %s associated with ant/pol %s/%s" % (polval['host'], ant, pol))
+
+            else:
+                logger.warning("Failed to find F-Engine %s associated with ant/pol %s/%s" % (polval['host'], ant, pol))
 
 
 if __name__ == "__main__":
@@ -239,13 +257,12 @@ if __name__ == "__main__":
         for handler in logger.handlers:
             handler.setLevel(getattr(logging, args.loglevel))
 
-
     corr = HeraCorrelator(redishost=args.redishost, use_redis=(not args.noredistapcp), block_monitoring=False)
     upload_time = corr.r.hget('snap_configuration', 'upload_time')
     print_ant_log_messages(corr)
 
     retry_tick = time.time()
-    script_redis_key = "status:script:%s:%s" % (hostname, __file__)
+    script_redis_key = "status:script:{:s}:{:s}".format(hostname, __file__)
     locked_out = False
     logger.info('Starting SNAP redis monitor')
     while(True):
@@ -269,241 +286,167 @@ if __name__ == "__main__":
             print_ant_log_messages(corr)
 
         # Recompute the hookup every time. It's fast
-        corr.compute_hookup()
+        corr._hookup_from_redis()
 
         # load this module's version into redis
-        corr.r.hmset('version:%s:%s' % (__package__, os.path.basename(__file__)), {'version':__version__, 'timestamp':datetime.datetime.now().isoformat()})
+        corr.r.hmset(
+            "version:{:s}:{:s}".format(__package__, os.path.basename(__file__)),
+            {"version": __version__, "timestamp": datetime.datetime.now().isoformat()}
+        )
 
-        # Get antenna stats
-        # 25 AUG 2020 do_for_all_f breaking on adc stats
-        # recent bitfile change has removed some blocks on the snap.
-        # must use adc snapshot now and build statistics in software instead.
-        # input_stats = corr.do_for_all_f("get_stats", block="input", kwargs={"sum_cores": True})
-        input_stats = {}
-        histograms = {}
         bins = np.arange(-128, 128)
         bin_centers = (bins[1:] + bins[:1]) / 2
-        for feng in corr.fengs:
-            histograms[feng.host] = []
-            input_stats[feng.host] = []
-            for i in range(3):
-                try:
-                    x, y = feng.input.get_adc_snapshot(i)
-                    hist_x, _ = np.histogram(x, bins=bins)
-                    hist_y, _ = np.histogram(y, bins=bins)
-                    histograms[feng.host].append([bin_centers, hist_x])
-                    histograms[feng.host].append([bin_centers, hist_y])
-                    input_stats[feng.host].append(
-                        [
-                            x.mean(), np.mean(x**2), np.sqrt(np.mean(x**2))
-                        ]
-                    )
-                    input_stats[feng.host].append(
-                        [
-                            y.mean(), np.mean(y**2), np.sqrt(np.mean(y**2))
-                        ]
-                    )
-                except:  # noqa
-                    logger.info(
-                        "Connection issue on snap {} ant {}; "
-                        "skipping adc data acquistion."
-                        "Full error output:".format(feng.host, i),
-                        exc_info=True,
-                    )
-                    histograms[feng.host].append([np.array([None]), np.array([None])])
-                    histograms[feng.host].append([np.array([None]), np.array([None])])
-                    input_stats[feng.host].append(
-                        [None, None, None]
-                    )
-                    input_stats[feng.host].append(
-                        [None, None, None]
-                    )
-                # all the data throughput from this call can cause network issues
-                # a small sleep can help
-                time.sleep(0.1)
-
-
-        if corr.r.exists('disable_monitoring'):
-            continue
-        eq_coeffs = []
-        autocorrs = []
-        for i in range(6):
-            if corr.r.exists('disable_monitoring'):
+        adc_x = None
+        adc_y = None
+        adc_val = None
+        for host in corr.fengs:
+            if corr.r.exists("disable_monitoring"):
                 continue
-            eq_coeffs += [corr.do_for_all_f("get_coeffs", block="eq", args=(i,))]
-            autocorrs += [corr.do_for_all_f("get_new_corr", block="corr", args=(i, i))]
-        # We only detect overflow once per FPGA (not per antenna).
-        # Get the overflow flag and reset it
-        fft_of = corr.do_for_all_f("is_overflowing", block="pfb")
-        corr.do_for_all_f("rst_stats", block="pfb")
 
-        # Get FEM/PAM sensor values
-        fem_stats = get_all_fem_stats(corr)
-        if corr.r.exists('disable_monitoring'):
-            continue
-        pam_stats = get_all_pam_stats(corr)
-        if corr.r.exists('disable_monitoring'):
-            continue
+            fpga_stats = corr.fengs[host].get_fpga_stats()
+            corr.r.hmset("status:snap:{:s}".format(host), fpga_stats)
 
-        # Write spectra to snap-indexed keys. This means we'll get spectra even from
-        # unconnected (according to the CM database) antennas
-        for snap in autocorrs[0].keys():
-            for antn in range(6):
-                status_key = 'status:snaprf:%s:%d' % (snap, antn)
-                snap_rf_stats = {}
-                try:
-                    hist_bins, hist_vals = histograms[snap][antn]
-                    snap_rf_stats['histogram'] = json.dumps([hist_bins.tolist(), hist_vals.tolist()])
-                except:  # noqa
-                    logger.info(
-                        "Exception encountered filling snaprf_stats histogram "
-                        "for snap {} antenna index {}; Setting to None."
-                        "Full traceback attached.".format(snap, antn),
-                        exc_info=True,
-                    )
-                    snap_rf_stats['histogram'] = None
-                try:
-                    snap_rf_stats['autocorrelation'] = json.dumps(autocorrs[antn][snap].real.tolist())
-                except:  # noqa
-                    logger.info(
-                        "Exception encountered filling snaprf_stats autocorrelation "
-                        "for snap {} antenna index {}; Setting to None."
-                        "Full traceback attached.".format(snap, antn),
-                        exc_info=True,
-                    )
-                    snap_rf_stats['autocorrelation'] = None
-                try:
-                    coeffs = eq_coeffs[antn][snap]
-                    snap_rf_stats['eq_coeffs'] = json.dumps(coeffs.tolist())
-                except:  # noqa
-                    logger.info(
-                        "Exception encountered filling snaprf_stats eq_coeffs "
-                        "for snap {} antenna index {}; Setting to None."
-                        "Full traceback attached.".format(snap, antn),
-                        exc_info=True,
-                    )
-                    snap_rf_stats['eq_coeffs'] = None
-                snap_rf_stats['timestamp'] = datetime.datetime.now().isoformat()
-
-                for snap_key in snap_rf_stats:
-                    if snap_rf_stats[snap_key] is None:
-                        snap_rf_stats[snap_key] = json.dumps(snap_rf_stats[snap_key])
-
-                corr.r.hmset(status_key, snap_rf_stats)
-
-        for host in input_stats:
-            antpols = corr.fengs_by_name[host].ants
-
-            for antn, antpol in enumerate(antpols):
-                # Don't report inputs which aren't connected
-                if antpol is None:
+            antpols = corr.snap_to_ant[host]
+            # there are 6 antpols possibly attached to each feng
+            for stream in range(6):
+                if corr.r.exists("disable_monitoring"):
                     continue
-                ant, pol = redis_cm.hera_antpol_to_ant_pol(antpol)
-                status_key = 'status:ant:%s:%s' % (ant, pol)
 
-                mean, power, rms = input_stats[host][antn]
+                if stream % 2 == 0:
+                    # every other antplot we need to get a new ADC snapshot
+                    # because we will be on a new antenna
+                    # we could do this for every stream but the function
+                    # returns both polarization and we don't need to overload
+                    # the network
 
-                redis_vals = {'adc_mean': mean, 'adc_power': power, 'adc_rms': rms}
-                # Give the antenna hash a key indicating the SNAP and input number it is associated with
-                redis_vals['f_host'] = host
-                redis_vals['host_ant_id'] = antn
+                    # 25 AUG 2020
+                    # recent bitfile change has removed some blocks on the snap.
+                    # must use adc snapshot now and build statistics in software instead.
+                    try:
+                        adc_x, adc_y = corr.fengs[host].input.get_adc_snapshot(stream // 2)
+                    except:  # noqa
+                        logger.info(
+                            "Connection issue on snap {} ant {}; "
+                            "Skipping adc data acquistion. "
+                            "Full error output:".format(host, stream // 2),
+                            exc_info=True,
+                        )
+                        adc_x = None
+                        adc_y = None
+                    adc_val = adc_x
+                else:
+                    adc_val = adc_y
+
+                if adc_val is not None:
+                    hist, _ = np.histogram(adc_val, bins=bins)
+                    hist = [bin_centers.tolist(), hist.tolist()]
+                    adc_mean = adc_val.mean()
+                    adc_power = np.mean(adc_val ** 2)
+                    adc_rms = np.sqrt(adc_power)
+                else:
+                    histogram = [[None], [None]]
+                    adc_mean = None
+                    adc_power = None
+                    adc_rms = None
+
                 try:
-                    hist_bins, hist_vals = histograms[host][antn]
-                    redis_vals['histogram'] = json.dumps([hist_bins.tolist(), hist_vals.tolist()])
+                    autocorrelation = corr.fengs[host].get_new_corr(stream, stream)
+                    autocorrelation = json.dumps(autocorrelation.real.tolist())
                 except:  # noqa
                     logger.info(
-                        "Exception encountered filling antenna_status histogram "
-                        "for snap {} antenna index {}; Setting to None."
-                        "Full traceback attached.".format(snap, antn),
+                        "Error getting autocorrelation on snap {} ant {}; "
+                        "Setting to None. "
+                        "Full error output:".format(host, stream // 2),
                         exc_info=True,
                     )
-                    redis_vals['histogram'] = None
+                    autocorrelation = None
+
                 try:
-                    redis_vals['autocorrelation'] = json.dumps(autocorrs[antn][host].real.tolist())
+                    eq_coeffs = corr.fengs[host].eq.get_coeffs(stream)
+                    eq_coeffs = json.dumps(eq_coeffs.tolist())
                 except:  # noqa
                     logger.info(
-                        "Exception encountered filling antenna_status autocorrelation "
-                        "for snap {} antenna index {}; Setting to None."
-                        "Full traceback attached.".format(snap, antn),
+                        "Error getting equalization coefficietns on snap {} ant {}; "
+                        "Setting to None. "
+                        "Full error output:".format(host, stream // 2),
                         exc_info=True,
                     )
-                    redis_vals['autocorrelation'] = None
+                    eq_coeffs = None
+
                 try:
-                    coeffs = eq_coeffs[antn][host]
-                    redis_vals['eq_coeffs'] = json.dumps(coeffs.tolist())
-                except:
+                    fft_of = corr.fengs[host].pfb.is_overflowing()
+                except:  # noqa
                     logger.info(
-                        "Exception encountered filling antenna_status autocorrelation "
-                        "for snap {} antenna index {}; Setting to None."
-                        "Full traceback attached.".format(snap, antn),
+                        "Error getting fft overflow on snap {} ant {}; "
+                        "Setting to None."
+                        "Full error output:".format(host, stream // 2),
                         exc_info=True,
                     )
-                    redis_vals['eq_coeffs'] = None
-                try:
-                    redis_vals.update(pam_stats[ant][pol])
-                except KeyError:
-                    logger.info(
-                        "Exception encountered filling antenna_status pam statistics "
-                        "for snap {} antenna index {}; Setting to None."
-                        "Full traceback attached.".format(snap, antn),
-                        exc_info=True,
-                    )
-                    # if a SNAP died between getting input stats (which is the dictionary we are looping over)
-                    # and getting pam/fem stats, the appropriate PAM/FEM keys may not exist
-                    pass
-                try:
-                    redis_vals.update(fem_stats[ant][pol])
-                except KeyError:
-                    logger.info(
-                        "Exception encountered filling antenna_status fem statistics "
-                        "for snap {} antenna index {}; Setting to None."
-                        "Full traceback attached.".format(snap, antn),
-                        exc_info=True,
-                    )
-                    pass
-                try:
-                    redis_vals["fft_of"] = fft_of[host]
-                except KeyError:
-                    logger.info(
-                        "Exception encountered filling antenna_status fft_of "
-                        "for snap {} antenna index {}; Setting to None."
-                        "Full traceback attached.".format(snap, antn),
-                        exc_info=True,
-                    )
-                    pass
+                    fft_of = None
+                finally:
+                    try:
+                        # this call resets the fft overflow boolean.
+                        corr.fengs[host].pfb.rst_stats()
+                    except:  # noqa
+                        logger.info(
+                            "Error resetting fft overflow on snap {} ant {}. "
+                            "Full error output:".format(host, stream // 2),
+                            exc_info=True,
+                        )
 
-                redis_vals['timestamp'] = datetime.datetime.now().isoformat()
+                timestamp = datetime.datetime.now().isoformat()
 
-                for redis_key in redis_vals:
-                    # make a few explicit type conversions to coerce non-redis
-                    # compatible variables into redis.
-                    if isinstance(redis_vals[redis_key], bool):
-                        # bools are compared using lambda x: x == "True" later
-                        redis_vals[redis_key] = str(redis_vals[redis_key])
-                    elif isinstance(redis_vals[redis_key], list):
-                        # values that are appearing as lists as loaded
-                        # with json.loads in corr_cm
-                        redis_vals[redis_key] = json.dumps(redis_vals[redis_key])
-                    elif redis_vals[redis_key] is None:
-                        # newer redis-py does not accept Nonetype, wrap in json.dumps
-                        redis_vals[redis_key] = json.dumps(redis_vals[redis_key])
+                snaprf_status_redis_key = "status:snaprf:{:s}:{:d}".format(host, stream)
+                snap_rf_stats = {}
 
-                corr.r.hmset(status_key, redis_vals)
+                snap_rf_stats["histogram"] = histogram
+                snap_rf_stats["autocorrelation"] = autocorrelation
+                snap_rf_stats["eq_coeffs"] = eq_coeffs
+                snap_rf_stats["fft_of"] = fft_of
+                snap_rf_stats["timestamp"] = timestamp
 
-        # Get FPGA stats
-        fpga_stats = corr.do_for_all_f("get_fpga_stats")
-        for key, val in fpga_stats.iteritems():
-            corr.r.hmset("status:snap:%s" % key, val)
+                snap_rf_stats = validate_redis_dict(snap_rf_stats)
+                corr.r.hmset(snaprf_status_redis_key, snap_rf_stats)
 
-        # If the retry period has been exceeded, try to reconnect to dead boards:
-        if time.time() > (retry_tick + args.retrytime):
-            if len(corr.dead_fengs) > 0:
-                logger.debug('Trying to reconnect to dead boards')
-                corr.reestablish_dead_connections(programmed_only=True)
-                retry_tick = time.time()
+                # lookup if this is known to cm
+                ant, pol = antpols[stream]
+                if ant is None or pol is None:
+                    # this snap has no listed antenna on this stream.
+                    # do not try to make an antenna status and move to the
+                    # next stream.
+                    continue
+
+                ant_status_redis_key = "status:ant:{:s}:{:s}".format(ant, pol)
+
+                ant_status = {}
+
+                ant_status["adc_mean"] = adc_mean
+                ant_status["adc_power"] = adc_power
+                ant_status["adc_rms"] = adc_rms
+                ant_status['f_host'] = host
+                ant_status['host_ant_id'] = stream
+                ant_status['histogram'] = histogram
+                ant_status["autocorrelation"] = autocorrelation
+                ant_status["eq_coeffs"] = eq_coeffs
+
+                ant_status.update(get_pam_stats(corr, host, stream))
+                ant_status.update(get_fem_stats(corr, host, stream))
+
+                ant_status["fft_of"] = fft_of
+
+                ant_status['timestamp'] = timestamp
+
+                ant_status = validate_redis_dict(ant_status)
+                corr.r.hmset(ant_status_redis_key, ant_status)
+
+            # all the data throughput from the adc call can cause network issues
+            # a small sleep can help
+            # 02/24/2021 MJK: is this sleep still necessary, we're not slamming
+            # all the fengs one after another anymore
+            time.sleep(0.1)
 
         # If executing the loop hasn't already taken longer than the loop delay time, add extra wait.
         extra_delay = args.delay - (time.time() - tick)
         if extra_delay > 0:
-            logger.debug("Sleeping for %.2f seconds" % extra_delay)
+            logger.debug("Sleeping for {:.2f} seconds".format(extra_delay))
             time.sleep(extra_delay)
