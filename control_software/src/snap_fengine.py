@@ -207,7 +207,9 @@ class SnapFengine(object):
         stat['uptime'] = self.sync.uptime()
         stat['pps_count'] = self.sync.count()
         stat['serial'] = self.serial
-        stat['pmb_alert'] = self.fpga.read_uint('pmbus_alert')
+        # 25 Feb 2021 MJK: according to jKocz this is no longer available
+        # but I'm not comfortable just deleting things this far down in the correlator.
+        # stat['pmb_alert'] = self.fpga.read_uint('pmbus_alert')
         return stat
 
     def assign_dest(self, slot_num, chans, dests, verify=False):
