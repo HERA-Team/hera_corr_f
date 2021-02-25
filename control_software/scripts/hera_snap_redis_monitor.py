@@ -339,7 +339,7 @@ if __name__ == "__main__":
 
                 if adc_val is not None:
                     hist, _ = np.histogram(adc_val, bins=bins)
-                    hist = [bin_centers.tolist(), hist.tolist()]
+                    histogram = [bin_centers.tolist(), hist.tolist()]
                     adc_mean = adc_val.mean()
                     adc_power = np.mean(adc_val ** 2)
                     adc_rms = np.sqrt(adc_power)
@@ -350,7 +350,7 @@ if __name__ == "__main__":
                     adc_rms = None
 
                 try:
-                    autocorrelation = corr.fengs[host].get_new_corr(stream, stream)
+                    autocorrelation = corr.fengs[host].corr.get_new_corr(stream, stream)
                     autocorrelation = json.dumps(autocorrelation.real.tolist())
                 except:  # noqa
                     logger.info(
@@ -416,7 +416,7 @@ if __name__ == "__main__":
                     # next stream.
                     continue
 
-                ant_status_redis_key = "status:ant:{:s}:{:s}".format(ant, pol)
+                ant_status_redis_key = "status:ant:{:d}:{:s}".format(ant, pol)
 
                 ant_status = {}
 
