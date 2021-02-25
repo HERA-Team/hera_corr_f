@@ -102,18 +102,18 @@ fengines:
 ## ARP 08/21/20 WR on Node9 not communicating, no phase lock, needs reboot
 ## ARP 09/03/20 reboot successful; WR fixed
 ## ARP 10/07/20 node power was left off, removing Node9 for next obs session
-#    heraNode9Snap0:
-#        phase_switch_index: [1,2,3,4,5,6]
-#        ants: [24, 25, 26]
-#    heraNode9Snap1:
-#        phase_switch_index: [7,8,9,10,11,12]
-#        ants: [27, 28, 29]
-#    heraNode9Snap2: # ARP 2/28/20 unpingable 3/3/20 restored
-#        phase_switch_index: [13,14,15,16,17,18]
-#        ants: [30, 31, 32]
-#    #heraNode9Snap3: # ARP 2/28/20 failed to sync 9/3/20 TFTP errors
-#    #    phase_switch_index: [19,20,21,22,23,24]
-#    #    ants: [33, 34, 35]
+    heraNode9Snap0:
+        phase_switch_index: [1,2,3,4,5,6]
+        ants: [24, 25, 26]
+    heraNode9Snap1:
+        phase_switch_index: [7,8,9,10,11,12]
+        ants: [27, 28, 29]
+    heraNode9Snap2: # ARP 2/28/20 unpingable 3/3/20 restored
+        phase_switch_index: [13,14,15,16,17,18]
+        ants: [30, 31, 32]
+    heraNode9Snap3: # ARP 2/28/20 failed to sync 9/3/20 TFTP errors
+        phase_switch_index: [19,20,21,22,23,24]
+        ants: [33, 34, 35]
     heraNode7Snap0:
         phase_switch_index: [1,2,3,4,5,6]
         ants: [36, 37, 38]
@@ -209,33 +209,31 @@ fengines:
     heraNode14Snap3:
         phase_switch_index: [19,20,21,22,23,24]
         ants: [129, 130, 131]
-# JK; Turning off Node1 as it is not in the turn on/off scripts
-#    heraNode1Snap0:
-#        phase_switch_index: [1,2,3,4,5,6]
-#        ants: [132, 133, 134]
-#    heraNode1Snap1:
-#        phase_switch_index: [7,8,9,10,11,12]
-#        ants: [135, 136, 137]
-#    heraNode1Snap2:
-#        phase_switch_index: [13,14,15,16,17,18]
-#        ants: [138, 139, 140]
-#    heraNode1Snap3:
-#        phase_switch_index: [19,20,21,22,23,24]
-#        ants: [141, 142, 143]
+    heraNode1Snap0:
+        phase_switch_index: [1,2,3,4,5,6]
+        ants: [132, 133, 134]
+    heraNode1Snap1:
+        phase_switch_index: [7,8,9,10,11,12]
+        ants: [135, 136, 137]
+    heraNode1Snap2:
+        phase_switch_index: [13,14,15,16,17,18]
+        ants: [138, 139, 140]
+    heraNode1Snap3:
+        phase_switch_index: [19,20,21,22,23,24]
+        ants: [141, 142, 143]
 # JK: MMCM not locking 22-Jan-21
-#    heraNode15Snap0:
-#        phase_switch_index: [1,2,3,4,5,6]
-#        ants: [144, 145, 146]
-# JK: Turning off remaining Node 15 as not in auto turn on/off scripts
-#    heraNode15Snap1:
-#        phase_switch_index: [7,8,9,10,11,12]
-#        ants: [147, 148, 149]
-#    heraNode15Snap2:
-#        phase_switch_index: [13,14,15,16,17,18]
-#        ants: [150, 151, 152]
-#    heraNode15Snap3:
-#        phase_switch_index: [19,20,21,22,23,24]
-#        ants: [153, 154, 155]
+    heraNode15Snap0:
+        phase_switch_index: [1,2,3,4,5,6]
+        ants: [144, 145, 146]
+    heraNode15Snap1:
+        phase_switch_index: [7,8,9,10,11,12]
+        ants: [147, 148, 149]
+    heraNode15Snap2:
+        phase_switch_index: [13,14,15,16,17,18]
+        ants: [150, 151, 152]
+    heraNode15Snap3:
+        phase_switch_index: [19,20,21,22,23,24]
+        ants: [153, 154, 155]
 #
 # Data is sent assuming a total of 32 Xengines and
 # a maximum of 48 channels per Xengine. If all the
