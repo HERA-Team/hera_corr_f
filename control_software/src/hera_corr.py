@@ -377,43 +377,35 @@ class HeraCorrelator(object):
         return int(redval)
 
     def store_pam_attenuation(self, ant, pol, attenuation):
-        self.logger.info("Commanding (%s,%s) PAM atten=%d dB in redis" \
-                         % (str(ant), pol, str(atten)))
+        self.logger.info("Commanding (%s,%s) PAM atten=%s dB in redis" \
+                         % (str(ant), pol, str(attenuation)))
         self.r.hmset("atten:ant:%s:%s" % (ant, pol),
                      {"commmanded": str(attenuation),
                       "command_time": time.time()}
         )
 
-    def get_pam_attenuation(self, ant, pol, log_to_redis=True):
+    def get_pam_attenuation(self, ant, pol):
         host, stream = self.lookup_ant_host_stream(ant, pol)
-        pam = self.fengs[host].pam[stream//2]
-        east, north = pam.get_attenuation()
-        atten = (east, north)[stream % 2]
-        if log_to_redis:
-            self.logger.info("Logging (%s,%s) PAM atten=%d dB to redis" \
-                             % (str(ant), pol, str(atten)))
-            self.r.hmset('atten:ant:%s:%s' % (ant, pol),
-                         {'value': str(atten), 'time': time.time()})
-        return atten
+        pam = self.fengs[host].pams[stream//2]
+        atten = dict(zip('en', pam.get_attenuation()))
+        return atten[pol]
 
     def set_pam_attenuation(self, ant, pol, attenuation,
-                            verify=True, safe=True, update_redis=True):
+                            verify=True, safe=True, update_redis=False):
         self.logger.info("Setting PAM for (%s,%s)" % (ant, pol))
         host, stream = self.lookup_ant_host_stream(ant, pol)
-        pam = self.fengs[host].pam[stream//2]
+        pam = self.fengs[host].pams[stream//2]
         east_north = pam.get_attenuation()
         if safe:
             # make sure we read the same value as commanded
-            if pam._cached_atten is not None:
-                assert(east_north == pam._cached_atten)
-            else:
-                other_stream = 2*(stream // 2) + ((stream + 1) % 2)
-                other = self.fengs[host].ants[other_stream]
-                # fails if PAM not reading value it was initialized to
-                assert(east_north[other_stream % 2] == \
-                       self.lookup_pam_attenuation(*other))
-        east_north[stream % 2] = attenuation
-        pam.set_attenuation(*east_north, verify=verify)
+            commanded = pam._cached_atten # commanded values stored here
+            if commanded is None:
+                commanded = (self.lookup_pam_attenuation(ant, 'e'),
+                             self.lookup_pam_attenuation(ant, 'n'))
+            assert(east_north == commanded)
+        atten = dict(zip('en', east_north))
+        atten[pol] = attenuation
+        pam.set_attenuation(atten['e'], atten['n'], verify=verify)
         if update_redis:
             self.store_pam_attenuation(ant, pol, attenuation)
 
@@ -463,7 +455,7 @@ class HeraCorrelator(object):
         host, stream = self.lookup_ant_host_stream(ant, pol)
         return self.fengs[host].eq.get_coeffs(stream)
 
-    def set_eq_coeffs(self, ant, pol, coeffs, verify=False):
+    def set_eq_coeffs(self, ant, pol, coeffs, verify=False, update_redis=False):
         """
         Write the EQ coefficients of an antenna and polarization to
         the FPGA stream mapped to it.
@@ -477,6 +469,8 @@ class HeraCorrelator(object):
         host, stream = self.lookup_ant_host_stream(ant, pol)
         coeffs = np.ones(self.fengs[host].eq.ncoeffs) * coeffs # broadcast shape
         self.fengs[host].eq.set_coeffs(stream, coeffs, verify=verify)
+        if update_redis:
+            self.store_eq_coeffs(ant, pol, coeffs)
 
     def eq_initialize(self, host, verify=True):
         self.logger.info("Initializing EQ on %s" % (host))
