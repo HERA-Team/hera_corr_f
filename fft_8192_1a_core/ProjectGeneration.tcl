@@ -24,7 +24,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set IP_LifeCycle_Menu {2}
 	set IP_Logo {sysgen_icon_100.png}
 	set IP_Name {}
-	set IP_Revision {223232072}
+	set IP_Revision {237138321}
 	set IP_Socket_IP {0}
 	set IP_Socket_IP_Proj_Path {}
 	set IP_Vendor_Text {User_Company}
@@ -85,7 +85,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set SynthesisTool {Vivado}
 	set TargetDir {/data/home/kocz/casper/models/hera_corr_f/fft_8192_1a_core}
 	set TopLevelModule {fft_8192_1a_core}
-	set TopLevelSimulinkHandle 76286
+	set TopLevelSimulinkHandle 85353
 	set VHDLLib {xil_defaultlib}
 	set TopLevelPortInterface {}
 	dict set TopLevelPortInterface sync Name {sync}

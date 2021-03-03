@@ -1,7 +1,7 @@
 --Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.
 ----------------------------------------------------------------------------------
 --Tool Version: Vivado v.2019.1.1 (lin64) Build 2580384 Sat Jun 29 08:04:45 MDT 2019
---Date        : Tue Jun 16 16:57:31 2020
+--Date        : Tue Nov 24 15:48:20 2020
 --Host        : acme1 running 64-bit Ubuntu 16.04.2 LTS
 --Command     : generate_target fft_8192_1a_core_bd_wrapper.bd
 --Design      : fft_8192_1a_core_bd_wrapper

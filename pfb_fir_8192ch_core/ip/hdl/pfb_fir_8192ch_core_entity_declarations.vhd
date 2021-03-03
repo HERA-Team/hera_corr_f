@@ -1275,6 +1275,181 @@ end behavior;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
 
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+entity sysgen_counter_70a3bbe4e5 is
+  port (
+    op : out std_logic_vector((13 - 1) downto 0);
+    clk : in std_logic;
+    ce : in std_logic;
+    clr : in std_logic);
+end sysgen_counter_70a3bbe4e5;
+architecture behavior of sysgen_counter_70a3bbe4e5
+is
+  signal count_reg_20_23: unsigned((13 - 1) downto 0) := "0000000000000";
+  signal count_reg_20_23_rst: std_logic;
+  signal rel_34_8: boolean;
+  signal rst_limit_join_34_5: boolean;
+  signal bool_44_4: boolean;
+  signal count_reg_join_44_1: unsigned((14 - 1) downto 0);
+  signal count_reg_join_44_1_rst: std_logic;
+  signal rst_limit_join_44_1: boolean;
+begin
+  proc_count_reg_20_23: process (clk)
+  is
+  begin
+    if (clk'event and (clk = '1')) then
+      if ((ce = '1') and (count_reg_20_23_rst = '1')) then
+        count_reg_20_23 <= "0000000000000";
+      elsif (ce = '1') then 
+        count_reg_20_23 <= count_reg_20_23 + std_logic_vector_to_unsigned("0000000000001");
+      end if;
+    end if;
+  end process proc_count_reg_20_23;
+  rel_34_8 <= count_reg_20_23 = std_logic_vector_to_unsigned("1111111111101");
+  proc_if_34_5: process (rel_34_8)
+  is
+  begin
+    if rel_34_8 then
+      rst_limit_join_34_5 <= true;
+    else 
+      rst_limit_join_34_5 <= false;
+    end if;
+  end process proc_if_34_5;
+  bool_44_4 <= false or rst_limit_join_34_5;
+  proc_if_44_1: process (bool_44_4, count_reg_20_23, rst_limit_join_34_5)
+  is
+  begin
+    if bool_44_4 then
+      count_reg_join_44_1_rst <= '1';
+    else 
+      count_reg_join_44_1_rst <= '0';
+    end if;
+    if bool_44_4 then
+      rst_limit_join_44_1 <= false;
+    else 
+      rst_limit_join_44_1 <= rst_limit_join_34_5;
+    end if;
+  end process proc_if_44_1;
+  count_reg_20_23_rst <= count_reg_join_44_1_rst;
+  op <= unsigned_to_std_logic_vector(count_reg_20_23);
+end behavior;
+
+library xil_defaultlib;
+use xil_defaultlib.conv_pkg.all;
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+entity sysgen_constant_bad8a75cb5 is
+  port (
+    op : out std_logic_vector((14 - 1) downto 0);
+    clk : in std_logic;
+    ce : in std_logic;
+    clr : in std_logic);
+end sysgen_constant_bad8a75cb5;
+architecture behavior of sysgen_constant_bad8a75cb5
+is
+begin
+  op <= "00000000000001";
+end behavior;
+
+library xil_defaultlib;
+use xil_defaultlib.conv_pkg.all;
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+entity sysgen_constant_6c7e003559 is
+  port (
+    op : out std_logic_vector((14 - 1) downto 0);
+    clk : in std_logic;
+    ce : in std_logic;
+    clr : in std_logic);
+end sysgen_constant_6c7e003559;
+architecture behavior of sysgen_constant_6c7e003559
+is
+begin
+  op <= "00000000000000";
+end behavior;
+
+library xil_defaultlib;
+use xil_defaultlib.conv_pkg.all;
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+entity sysgen_constant_da390adeb9 is
+  port (
+    op : out std_logic_vector((14 - 1) downto 0);
+    clk : in std_logic;
+    ce : in std_logic;
+    clr : in std_logic);
+end sysgen_constant_da390adeb9;
+architecture behavior of sysgen_constant_da390adeb9
+is
+begin
+  op <= "10000000000000";
+end behavior;
+
+library xil_defaultlib;
+use xil_defaultlib.conv_pkg.all;
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+entity sysgen_relational_34fa202604 is
+  port (
+    a : in std_logic_vector((14 - 1) downto 0);
+    b : in std_logic_vector((14 - 1) downto 0);
+    op : out std_logic_vector((1 - 1) downto 0);
+    clk : in std_logic;
+    ce : in std_logic;
+    clr : in std_logic);
+end sysgen_relational_34fa202604;
+architecture behavior of sysgen_relational_34fa202604
+is
+  signal a_1_31: unsigned((14 - 1) downto 0);
+  signal b_1_34: unsigned((14 - 1) downto 0);
+  signal result_12_3_rel: boolean;
+begin
+  a_1_31 <= std_logic_vector_to_unsigned(a);
+  b_1_34 <= std_logic_vector_to_unsigned(b);
+  result_12_3_rel <= a_1_31 = b_1_34;
+  op <= boolean_to_vector(result_12_3_rel);
+end behavior;
+
+library xil_defaultlib;
+use xil_defaultlib.conv_pkg.all;
+
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+entity sysgen_relational_b390b4fdeb is
+  port (
+    a : in std_logic_vector((14 - 1) downto 0);
+    b : in std_logic_vector((14 - 1) downto 0);
+    op : out std_logic_vector((1 - 1) downto 0);
+    clk : in std_logic;
+    ce : in std_logic;
+    clr : in std_logic);
+end sysgen_relational_b390b4fdeb;
+architecture behavior of sysgen_relational_b390b4fdeb
+is
+  signal a_1_31: unsigned((14 - 1) downto 0);
+  signal b_1_34: unsigned((14 - 1) downto 0);
+  signal result_14_3_rel: boolean;
+begin
+  a_1_31 <= std_logic_vector_to_unsigned(a);
+  b_1_34 <= std_logic_vector_to_unsigned(b);
+  result_14_3_rel <= a_1_31 /= b_1_34;
+  op <= boolean_to_vector(result_14_3_rel);
+end behavior;
+
+library xil_defaultlib;
+use xil_defaultlib.conv_pkg.all;
+
 -------------------------------------------------------------------
  -- System Generator VHDL source file.
  --
@@ -1578,6 +1753,17 @@ entity pfb_fir_8192ch_core_xlcounter_free is
  		  ); 
  end component;
 
+ component pfb_fir_8192ch_core_c_counter_binary_v12_0_i2
+    port ( 
+      clk: in std_logic;
+      ce: in std_logic;
+      SINIT: in std_logic;
+      load: in std_logic;
+      l: in std_logic_vector(op_width - 1 downto 0);
+      q: out std_logic_vector(op_width - 1 downto 0) 
+ 		  ); 
+ end component;
+
 -- synthesis translate_off
    constant zeroVec: std_logic_vector(op_width - 1 downto 0) := (others => '0');
    constant oneVec: std_logic_vector(op_width - 1 downto 0) := (others => '1');
@@ -1608,6 +1794,18 @@ entity pfb_fir_8192ch_core_xlcounter_free is
 
  comp1: if ((core_name0 = "pfb_fir_8192ch_core_c_counter_binary_v12_0_i1")) generate 
   core_instance1:pfb_fir_8192ch_core_c_counter_binary_v12_0_i1
+   port map ( 
+        clk => clk,
+        ce => core_ce,
+        SINIT => core_sinit,
+        load => load(0),
+        l => din,
+        q => op_net
+  ); 
+   end generate;
+
+ comp2: if ((core_name0 = "pfb_fir_8192ch_core_c_counter_binary_v12_0_i2")) generate 
+  core_instance2:pfb_fir_8192ch_core_c_counter_binary_v12_0_i2
    port map ( 
         clk => clk,
         ce => core_ce,
