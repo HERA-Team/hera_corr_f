@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Product Version: Vivado v2019.1.1 (64-bit)              -->
+<!-- Product Version: Vivado v2019.1 (64-bit)              -->
 <!--                                                         -->
 <!-- Copyright 1986-2019 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="40" Path="/data/home/kocz/casper/models/hera_corr_f/pfb_fir_8192ch_core/ip_catalog/pfb_fir_8192ch_core.xpr">
+<Project Version="7" Minor="40" Path="/home/jkocz/casper/models/hera_corr_f/pfb_fir_8192ch_core/ip_catalog/pfb_fir_8192ch_core.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
-    <Option Name="Id" Val="b90b54c33a1c48ca9f0e72894c3938ce"/>
+    <Option Name="Id" Val="31716eb100524ae9bc7bca8729497b92"/>
     <Option Name="Part" Val="xc7k325tfbg676-3"/>
     <Option Name="CompiledLibDir" Val="$PCACHEDIR/compile_simlib"/>
     <Option Name="CompiledLibDirXSim" Val=""/>
@@ -71,7 +71,7 @@
       <File Path="$PSRCDIR/sources_1/imports/hdl/pfb_fir_8192ch_core_bd_wrapper.vhd">
         <FileInfo>
           <Attr Name="ImportPath" Val="$PSRCDIR/sources_1/bd/pfb_fir_8192ch_core_bd/hdl/pfb_fir_8192ch_core_bd_wrapper.vhd"/>
-          <Attr Name="ImportTime" Val="1614813437"/>
+          <Attr Name="ImportTime" Val="1614815204"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -88,7 +88,7 @@
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="ImportPath" Val="$PPRDIR/../sysgen/pfb_fir_8192ch_core_mod.vhd"/>
-          <Attr Name="ImportTime" Val="1614813435"/>
+          <Attr Name="ImportTime" Val="1614815202"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
@@ -103,7 +103,7 @@
       <File Path="$PSRCDIR/constrs_1/imports/sysgen/pfb_fir_8192ch_core_clock.xdc">
         <FileInfo>
           <Attr Name="ImportPath" Val="$PPRDIR/../sysgen/pfb_fir_8192ch_core_clock.xdc"/>
-          <Attr Name="ImportTime" Val="1614813418"/>
+          <Attr Name="ImportTime" Val="1614815189"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>
@@ -111,7 +111,7 @@
       <File Path="$PSRCDIR/constrs_1/imports/sysgen/pfb_fir_8192ch_core.xdc">
         <FileInfo>
           <Attr Name="ImportPath" Val="$PPRDIR/../sysgen/pfb_fir_8192ch_core.xdc"/>
-          <Attr Name="ImportTime" Val="1614813418"/>
+          <Attr Name="ImportTime" Val="1614815189"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
         </FileInfo>

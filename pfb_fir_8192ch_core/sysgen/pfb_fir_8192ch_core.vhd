@@ -17,16 +17,16 @@ entity pfb_fir_8192ch_core_adder_1_1 is
   );
 end pfb_fir_8192ch_core_adder_1_1;
 architecture structural of pfb_fir_8192ch_core_adder_1_1 is 
-  signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
   signal sync_delay_q_net : std_logic_vector( 1-1 downto 0 );
-  signal ce_net : std_logic;
-  signal addr1_s_net : std_logic_vector( 26-1 downto 0 );
-  signal mult_p_net_x1 : std_logic_vector( 26-1 downto 0 );
+  signal addr3_s_net : std_logic_vector( 26-1 downto 0 );
   signal delay_q_net : std_logic_vector( 1-1 downto 0 );
+  signal mult_p_net : std_logic_vector( 26-1 downto 0 );
+  signal mult_p_net_x1 : std_logic_vector( 26-1 downto 0 );
   signal mult_p_net_x2 : std_logic_vector( 26-1 downto 0 );
   signal mult_p_net_x0 : std_logic_vector( 26-1 downto 0 );
   signal clk_net : std_logic;
+  signal ce_net : std_logic;
+  signal addr1_s_net : std_logic_vector( 26-1 downto 0 );
   signal addr2_s_net : std_logic_vector( 26-1 downto 0 );
 begin
   sync_out <= sync_delay_q_net;
@@ -46,14 +46,6 @@ begin
     clk => clk_net,
     ce => ce_net,
     s => addr1_s_net
-  );
-  sync_delay_x44 : entity xil_defaultlib.sysgen_delay_5d6cce76f2 
-  port map (
-    clr => '0',
-    d => delay_q_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => sync_delay_q_net
   );
   addr2 : entity xil_defaultlib.sysgen_addsub_9af72ccc35 
   port map (
@@ -94,6 +86,14 @@ begin
     clk => clk_net,
     ce => ce_net,
     s => addr3_s_net
+  );
+  sync_delay_x44 : entity xil_defaultlib.sysgen_delay_5d6cce76f2 
+  port map (
+    clr => '0',
+    d => delay_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => sync_delay_q_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_8192ch_core/pfb_fir_real/adder_1_10
@@ -1622,15 +1622,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x32 is
+entity pfb_fir_8192ch_core_delay_bram_x26 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x32;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x32 is 
+end pfb_fir_8192ch_core_delay_bram_x26;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x26 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -1650,7 +1650,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_c03116c7b4 
+  counter : entity xil_defaultlib.sysgen_counter_aac6c8a472 
   port map (
     clr => '0',
     clk => clk_net,
@@ -1727,7 +1727,7 @@ begin
   register_q_net <= coeffs;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x32 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x26 
   port map (
     din => delay1_q_net,
     clk_1 => clk_net,
@@ -1841,15 +1841,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x29 is
+entity pfb_fir_8192ch_core_delay_bram_x25 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x29;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x29 is 
+end pfb_fir_8192ch_core_delay_bram_x25;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x25 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -1869,7 +1869,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -1943,7 +1943,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x29 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x25 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -2003,15 +2003,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x31 is
+entity pfb_fir_8192ch_core_delay_bram_x24 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x31;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x31 is 
+end pfb_fir_8192ch_core_delay_bram_x24;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x24 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -2031,7 +2031,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -2105,7 +2105,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x31 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x24 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -2426,22 +2426,22 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x30 is
+entity pfb_fir_8192ch_core_delay_bram_x23 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x30;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x30 is 
+end pfb_fir_8192ch_core_delay_bram_x23;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x23 is 
+  signal ram_data_out_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
   signal ce_net : std_logic;
   signal constant_op_net : std_logic_vector( 1-1 downto 0 );
   signal counter_op_net : std_logic_vector( 10-1 downto 0 );
-  signal ram_data_out_net : std_logic_vector( 8-1 downto 0 );
 begin
   dout <= d1_q_net;
   delay1_q_net <= din;
@@ -2454,7 +2454,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_c03116c7b4 
+  counter : entity xil_defaultlib.sysgen_counter_aac6c8a472 
   port map (
     clr => '0',
     clk => clk_net,
@@ -2531,7 +2531,7 @@ begin
   register_q_net <= coeffs;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x30 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x23 
   port map (
     din => delay1_q_net,
     clk_1 => clk_net,
@@ -2645,15 +2645,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x36 is
+entity pfb_fir_8192ch_core_delay_bram_x18 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x36;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x36 is 
+end pfb_fir_8192ch_core_delay_bram_x18;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x18 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -2673,7 +2673,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -2747,7 +2747,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x36 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x18 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -2807,15 +2807,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x35 is
+entity pfb_fir_8192ch_core_delay_bram_x17 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x35;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x35 is 
+end pfb_fir_8192ch_core_delay_bram_x17;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x17 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -2835,7 +2835,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -2909,7 +2909,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x35 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x17 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -3230,15 +3230,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x34 is
+entity pfb_fir_8192ch_core_delay_bram_x16 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x34;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x34 is 
+end pfb_fir_8192ch_core_delay_bram_x16;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x16 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -3258,7 +3258,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_c03116c7b4 
+  counter : entity xil_defaultlib.sysgen_counter_aac6c8a472 
   port map (
     clr => '0',
     clk => clk_net,
@@ -3335,7 +3335,7 @@ begin
   register_q_net <= coeffs;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x34 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x16 
   port map (
     din => delay1_q_net,
     clk_1 => clk_net,
@@ -3449,15 +3449,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x33 is
+entity pfb_fir_8192ch_core_delay_bram_x14 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x33;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x33 is 
+end pfb_fir_8192ch_core_delay_bram_x14;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x14 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -3477,7 +3477,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -3551,7 +3551,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x33 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x14 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -3611,15 +3611,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x26 is
+entity pfb_fir_8192ch_core_delay_bram_x13 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x26;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x26 is 
+end pfb_fir_8192ch_core_delay_bram_x13;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x13 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -3639,7 +3639,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -3713,7 +3713,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x26 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x13 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -4034,15 +4034,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x5 is
+entity pfb_fir_8192ch_core_delay_bram_x15 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x5;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x5 is 
+end pfb_fir_8192ch_core_delay_bram_x15;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x15 is 
   signal ram_data_out_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 8-1 downto 0 );
@@ -4062,7 +4062,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_c03116c7b4 
+  counter : entity xil_defaultlib.sysgen_counter_aac6c8a472 
   port map (
     clr => '0',
     clk => clk_net,
@@ -4139,7 +4139,7 @@ begin
   register_q_net <= coeffs;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x5 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x15 
   port map (
     din => delay1_q_net,
     clk_1 => clk_net,
@@ -4253,15 +4253,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x4 is
+entity pfb_fir_8192ch_core_delay_bram_x22 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x4;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x4 is 
+end pfb_fir_8192ch_core_delay_bram_x22;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x22 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -4281,7 +4281,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -4355,7 +4355,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x4 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x22 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -4415,15 +4415,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x3 is
+entity pfb_fir_8192ch_core_delay_bram_x21 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x3;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x3 is 
+end pfb_fir_8192ch_core_delay_bram_x21;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x21 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -4443,7 +4443,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -4517,7 +4517,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x3 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x21 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -4838,15 +4838,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x2 is
+entity pfb_fir_8192ch_core_delay_bram_x20 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x2;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x2 is 
+end pfb_fir_8192ch_core_delay_bram_x20;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x20 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -4866,7 +4866,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_c03116c7b4 
+  counter : entity xil_defaultlib.sysgen_counter_aac6c8a472 
   port map (
     clr => '0',
     clk => clk_net,
@@ -4943,7 +4943,7 @@ begin
   register_q_net <= coeffs;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x2 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x20 
   port map (
     din => delay1_q_net,
     clk_1 => clk_net,
@@ -5057,15 +5057,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x10 is
+entity pfb_fir_8192ch_core_delay_bram_x19 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x10;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x10 is 
+end pfb_fir_8192ch_core_delay_bram_x19;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x19 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -5085,7 +5085,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -5159,7 +5159,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x10 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x19 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -5219,15 +5219,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x9 is
+entity pfb_fir_8192ch_core_delay_bram_x41 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x9;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x9 is 
+end pfb_fir_8192ch_core_delay_bram_x41;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x41 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -5247,7 +5247,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -5321,7 +5321,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x9 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x41 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -5642,15 +5642,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x8 is
+entity pfb_fir_8192ch_core_delay_bram_x40 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x8;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x8 is 
+end pfb_fir_8192ch_core_delay_bram_x40;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x40 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -5670,7 +5670,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_c03116c7b4 
+  counter : entity xil_defaultlib.sysgen_counter_aac6c8a472 
   port map (
     clr => '0',
     clk => clk_net,
@@ -5747,7 +5747,7 @@ begin
   register_q_net <= coeffs;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x8 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x40 
   port map (
     din => delay1_q_net,
     clk_1 => clk_net,
@@ -5861,15 +5861,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x7 is
+entity pfb_fir_8192ch_core_delay_bram_x39 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x7;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x7 is 
+end pfb_fir_8192ch_core_delay_bram_x39;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x39 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -5889,7 +5889,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -5963,7 +5963,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x7 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x39 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -6023,15 +6023,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x6 is
+entity pfb_fir_8192ch_core_delay_bram_x38 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x6;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x6 is 
+end pfb_fir_8192ch_core_delay_bram_x38;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x38 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -6051,7 +6051,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -6125,7 +6125,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x6 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x38 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -6446,15 +6446,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x1 is
+entity pfb_fir_8192ch_core_delay_bram_x37 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x1;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x1 is 
+end pfb_fir_8192ch_core_delay_bram_x37;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x37 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -6474,7 +6474,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_c03116c7b4 
+  counter : entity xil_defaultlib.sysgen_counter_aac6c8a472 
   port map (
     clr => '0',
     clk => clk_net,
@@ -6551,7 +6551,7 @@ begin
   register_q_net <= coeffs;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x1 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x37 
   port map (
     din => delay1_q_net,
     clk_1 => clk_net,
@@ -6665,15 +6665,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x0 is
+entity pfb_fir_8192ch_core_delay_bram_x42 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x0;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x0 is 
+end pfb_fir_8192ch_core_delay_bram_x42;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x42 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -6693,7 +6693,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -6767,7 +6767,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x0 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x42 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -6827,15 +6827,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram is
+entity pfb_fir_8192ch_core_delay_bram_x46 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram;
-architecture structural of pfb_fir_8192ch_core_delay_bram is 
+end pfb_fir_8192ch_core_delay_bram_x46;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x46 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -6855,7 +6855,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -6929,7 +6929,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x46 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -7018,10 +7018,10 @@ architecture structural of pfb_fir_8192ch_core_pol1_in1_coeffs is
   signal fan_delay1_q_net : std_logic_vector( 10-1 downto 0 );
   signal rom2_data_net : std_logic_vector( 18-1 downto 0 );
   signal fan_delay2_q_net : std_logic_vector( 10-1 downto 0 );
-  signal fan_delay3_q_net : std_logic_vector( 10-1 downto 0 );
   signal rom3_data_net : std_logic_vector( 18-1 downto 0 );
-  signal fan_delay4_q_net : std_logic_vector( 10-1 downto 0 );
+  signal fan_delay3_q_net : std_logic_vector( 10-1 downto 0 );
   signal rom4_data_net : std_logic_vector( 18-1 downto 0 );
+  signal fan_delay4_q_net : std_logic_vector( 10-1 downto 0 );
 begin
   dout <= delay1_q_net;
   sync_out <= delay_q_net;
@@ -7121,6 +7121,42 @@ begin
     ce => ce_net,
     data => rom2_data_net
   );
+  rom3 : entity xil_defaultlib.pfb_fir_8192ch_core_xlsprom 
+  generic map (
+    c_address_width => 10,
+    c_width => 18,
+    latency => 2,
+    mem_init_file => "xpm_fcb056_vivado.mem",
+    mem_size => 18432,
+    mem_type => "block",
+    read_reset_val => "0"
+  )
+  port map (
+    en => "1",
+    rst => "0",
+    addr => fan_delay3_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    data => rom3_data_net
+  );
+  rom4 : entity xil_defaultlib.pfb_fir_8192ch_core_xlsprom 
+  generic map (
+    c_address_width => 10,
+    c_width => 18,
+    latency => 2,
+    mem_init_file => "xpm_f3ecb2_vivado.mem",
+    mem_size => 18432,
+    mem_type => "block",
+    read_reset_val => "0"
+  )
+  port map (
+    en => "1",
+    rst => "0",
+    addr => fan_delay4_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    data => rom4_data_net
+  );
   register_x0 : entity xil_defaultlib.pfb_fir_8192ch_core_xlregister 
   generic map (
     d_width => 72,
@@ -7149,6 +7185,22 @@ begin
     clr => '0',
     input_port => rom2_data_net,
     output_port => reinterpret2_output_port_net
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_9c4faaffba 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => rom3_data_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_9c4faaffba 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => rom4_data_net,
+    output_port => reinterpret4_output_port_net
   );
   fan_delay1 : entity xil_defaultlib.pfb_fir_8192ch_core_xldelay 
   generic map (
@@ -7195,32 +7247,6 @@ begin
     ce => ce_net,
     q => fan_delay3_q_net
   );
-  rom3 : entity xil_defaultlib.pfb_fir_8192ch_core_xlsprom 
-  generic map (
-    c_address_width => 10,
-    c_width => 18,
-    latency => 2,
-    mem_init_file => "xpm_fcb056_vivado.mem",
-    mem_size => 18432,
-    mem_type => "block",
-    read_reset_val => "0"
-  )
-  port map (
-    en => "1",
-    rst => "0",
-    addr => fan_delay3_q_net,
-    clk => clk_net,
-    ce => ce_net,
-    data => rom3_data_net
-  );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_9c4faaffba 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => rom3_data_net,
-    output_port => reinterpret3_output_port_net
-  );
   fan_delay4 : entity xil_defaultlib.pfb_fir_8192ch_core_xldelay 
   generic map (
     latency => 1,
@@ -7236,47 +7262,21 @@ begin
     ce => ce_net,
     q => fan_delay4_q_net
   );
-  rom4 : entity xil_defaultlib.pfb_fir_8192ch_core_xlsprom 
-  generic map (
-    c_address_width => 10,
-    c_width => 18,
-    latency => 2,
-    mem_init_file => "xpm_f3ecb2_vivado.mem",
-    mem_size => 18432,
-    mem_type => "block",
-    read_reset_val => "0"
-  )
-  port map (
-    en => "1",
-    rst => "0",
-    addr => fan_delay4_q_net,
-    clk => clk_net,
-    ce => ce_net,
-    data => rom4_data_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_9c4faaffba 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => rom4_data_net,
-    output_port => reinterpret4_output_port_net
-  );
 end structural;
 -- Generated from Simulink block pfb_fir_8192ch_core/pfb_fir_real/pol1_in1_first_tap/delay_bram
 library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x21 is
+entity pfb_fir_8192ch_core_delay_bram_x45 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x21;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x21 is 
+end pfb_fir_8192ch_core_delay_bram_x45;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x45 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -7296,7 +7296,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_c03116c7b4 
+  counter : entity xil_defaultlib.sysgen_counter_aac6c8a472 
   port map (
     clr => '0',
     clk => clk_net,
@@ -7340,15 +7340,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_sync_delay is
+entity pfb_fir_8192ch_core_sync_delay_x1 is
   port (
     in_x0 : in std_logic_vector( 1-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     out_x0 : out std_logic_vector( 1-1 downto 0 )
   );
-end pfb_fir_8192ch_core_sync_delay;
-architecture structural of pfb_fir_8192ch_core_sync_delay is 
+end pfb_fir_8192ch_core_sync_delay_x1;
+architecture structural of pfb_fir_8192ch_core_sync_delay_x1 is 
   signal mux_y_net : std_logic_vector( 1-1 downto 0 );
   signal delay_q_net : std_logic_vector( 1-1 downto 0 );
   signal clk_net : std_logic;
@@ -7489,14 +7489,14 @@ begin
   register_q_net <= coeffs;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x21 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x45 
   port map (
     din => delay1_q_net,
     clk_1 => clk_net,
     ce_1 => ce_net,
     dout => d1_q_net
   );
-  sync_delay_x44 : entity xil_defaultlib.pfb_fir_8192ch_core_sync_delay 
+  sync_delay_x44 : entity xil_defaultlib.pfb_fir_8192ch_core_sync_delay_x1 
   port map (
     in_x0 => delay_q_net,
     clk_1 => clk_net,
@@ -7631,15 +7631,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x22 is
+entity pfb_fir_8192ch_core_delay_bram_x44 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x22;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x22 is 
+end pfb_fir_8192ch_core_delay_bram_x44;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x44 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -7659,7 +7659,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -7703,15 +7703,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_sync_delay_x1 is
+entity pfb_fir_8192ch_core_sync_delay_x0 is
   port (
     in_x0 : in std_logic_vector( 1-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     out_x0 : out std_logic_vector( 1-1 downto 0 )
   );
-end pfb_fir_8192ch_core_sync_delay_x1;
-architecture structural of pfb_fir_8192ch_core_sync_delay_x1 is 
+end pfb_fir_8192ch_core_sync_delay_x0;
+architecture structural of pfb_fir_8192ch_core_sync_delay_x0 is 
   signal mux_y_net_x0 : std_logic_vector( 1-1 downto 0 );
   signal mux_y_net : std_logic_vector( 1-1 downto 0 );
   signal clk_net : std_logic;
@@ -7852,14 +7852,14 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x22 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x44 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
     ce_1 => ce_net,
     dout => d1_q_net_x0
   );
-  sync_delay_x44 : entity xil_defaultlib.pfb_fir_8192ch_core_sync_delay_x1 
+  sync_delay_x44 : entity xil_defaultlib.pfb_fir_8192ch_core_sync_delay_x0 
   port map (
     in_x0 => mux_y_net,
     clk_1 => clk_net,
@@ -7919,15 +7919,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x28 is
+entity pfb_fir_8192ch_core_delay_bram_x43 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x28;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x28 is 
+end pfb_fir_8192ch_core_delay_bram_x43;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x43 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -7947,7 +7947,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -7991,15 +7991,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_sync_delay_x0 is
+entity pfb_fir_8192ch_core_sync_delay is
   port (
     in_x0 : in std_logic_vector( 1-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     out_x0 : out std_logic_vector( 1-1 downto 0 )
   );
-end pfb_fir_8192ch_core_sync_delay_x0;
-architecture structural of pfb_fir_8192ch_core_sync_delay_x0 is 
+end pfb_fir_8192ch_core_sync_delay;
+architecture structural of pfb_fir_8192ch_core_sync_delay is 
   signal mux_y_net_x0 : std_logic_vector( 1-1 downto 0 );
   signal mux_y_net : std_logic_vector( 1-1 downto 0 );
   signal clk_net : std_logic;
@@ -8140,14 +8140,14 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x28 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x43 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
     ce_1 => ce_net,
     dout => d1_q_net_x0
   );
-  sync_delay_x44 : entity xil_defaultlib.pfb_fir_8192ch_core_sync_delay_x0 
+  sync_delay_x44 : entity xil_defaultlib.pfb_fir_8192ch_core_sync_delay 
   port map (
     in_x0 => mux_y_net,
     clk_1 => clk_net,
@@ -8218,10 +8218,6 @@ entity pfb_fir_8192ch_core_pol1_in2_coeffs is
   );
 end pfb_fir_8192ch_core_pol1_in2_coeffs;
 architecture structural of pfb_fir_8192ch_core_pol1_in2_coeffs is 
-  signal fan_delay3_q_net : std_logic_vector( 10-1 downto 0 );
-  signal rom3_data_net : std_logic_vector( 18-1 downto 0 );
-  signal fan_delay4_q_net : std_logic_vector( 10-1 downto 0 );
-  signal rom4_data_net : std_logic_vector( 18-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 8-1 downto 0 );
   signal register_q_net : std_logic_vector( 72-1 downto 0 );
   signal pol0_in1_net : std_logic_vector( 8-1 downto 0 );
@@ -8238,6 +8234,10 @@ architecture structural of pfb_fir_8192ch_core_pol1_in2_coeffs is
   signal fan_delay1_q_net : std_logic_vector( 10-1 downto 0 );
   signal rom2_data_net : std_logic_vector( 18-1 downto 0 );
   signal fan_delay2_q_net : std_logic_vector( 10-1 downto 0 );
+  signal rom3_data_net : std_logic_vector( 18-1 downto 0 );
+  signal fan_delay3_q_net : std_logic_vector( 10-1 downto 0 );
+  signal rom4_data_net : std_logic_vector( 18-1 downto 0 );
+  signal fan_delay4_q_net : std_logic_vector( 10-1 downto 0 );
 begin
   dout <= delay1_q_net;
   coeff <= register_q_net;
@@ -8321,6 +8321,42 @@ begin
     ce => ce_net,
     data => rom2_data_net
   );
+  rom3 : entity xil_defaultlib.pfb_fir_8192ch_core_xlsprom 
+  generic map (
+    c_address_width => 10,
+    c_width => 18,
+    latency => 2,
+    mem_init_file => "xpm_4b6fda_vivado.mem",
+    mem_size => 18432,
+    mem_type => "block",
+    read_reset_val => "0"
+  )
+  port map (
+    en => "1",
+    rst => "0",
+    addr => fan_delay3_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    data => rom3_data_net
+  );
+  rom4 : entity xil_defaultlib.pfb_fir_8192ch_core_xlsprom 
+  generic map (
+    c_address_width => 10,
+    c_width => 18,
+    latency => 2,
+    mem_init_file => "xpm_1c5cde_vivado.mem",
+    mem_size => 18432,
+    mem_type => "block",
+    read_reset_val => "0"
+  )
+  port map (
+    en => "1",
+    rst => "0",
+    addr => fan_delay4_q_net,
+    clk => clk_net,
+    ce => ce_net,
+    data => rom4_data_net
+  );
   register_x0 : entity xil_defaultlib.pfb_fir_8192ch_core_xlregister 
   generic map (
     d_width => 72,
@@ -8349,6 +8385,22 @@ begin
     clr => '0',
     input_port => rom2_data_net,
     output_port => reinterpret2_output_port_net
+  );
+  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_9c4faaffba 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => rom3_data_net,
+    output_port => reinterpret3_output_port_net
+  );
+  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_9c4faaffba 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    input_port => rom4_data_net,
+    output_port => reinterpret4_output_port_net
   );
   fan_delay1 : entity xil_defaultlib.pfb_fir_8192ch_core_xldelay 
   generic map (
@@ -8395,32 +8447,6 @@ begin
     ce => ce_net,
     q => fan_delay3_q_net
   );
-  rom3 : entity xil_defaultlib.pfb_fir_8192ch_core_xlsprom 
-  generic map (
-    c_address_width => 10,
-    c_width => 18,
-    latency => 2,
-    mem_init_file => "xpm_4b6fda_vivado.mem",
-    mem_size => 18432,
-    mem_type => "block",
-    read_reset_val => "0"
-  )
-  port map (
-    en => "1",
-    rst => "0",
-    addr => fan_delay3_q_net,
-    clk => clk_net,
-    ce => ce_net,
-    data => rom3_data_net
-  );
-  reinterpret3 : entity xil_defaultlib.sysgen_reinterpret_9c4faaffba 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => rom3_data_net,
-    output_port => reinterpret3_output_port_net
-  );
   fan_delay4 : entity xil_defaultlib.pfb_fir_8192ch_core_xldelay 
   generic map (
     latency => 1,
@@ -8436,47 +8462,21 @@ begin
     ce => ce_net,
     q => fan_delay4_q_net
   );
-  rom4 : entity xil_defaultlib.pfb_fir_8192ch_core_xlsprom 
-  generic map (
-    c_address_width => 10,
-    c_width => 18,
-    latency => 2,
-    mem_init_file => "xpm_1c5cde_vivado.mem",
-    mem_size => 18432,
-    mem_type => "block",
-    read_reset_val => "0"
-  )
-  port map (
-    en => "1",
-    rst => "0",
-    addr => fan_delay4_q_net,
-    clk => clk_net,
-    ce => ce_net,
-    data => rom4_data_net
-  );
-  reinterpret4 : entity xil_defaultlib.sysgen_reinterpret_9c4faaffba 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    input_port => rom4_data_net,
-    output_port => reinterpret4_output_port_net
-  );
 end structural;
 -- Generated from Simulink block pfb_fir_8192ch_core/pfb_fir_real/pol1_in2_first_tap/delay_bram
 library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x20 is
+entity pfb_fir_8192ch_core_delay_bram_x32 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x20;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x20 is 
+end pfb_fir_8192ch_core_delay_bram_x32;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x32 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -8496,7 +8496,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_c03116c7b4 
+  counter : entity xil_defaultlib.sysgen_counter_aac6c8a472 
   port map (
     clr => '0',
     clk => clk_net,
@@ -8573,7 +8573,7 @@ begin
   register_q_net <= coeffs;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x20 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x32 
   port map (
     din => delay1_q_net,
     clk_1 => clk_net,
@@ -8687,15 +8687,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x27 is
+entity pfb_fir_8192ch_core_delay_bram_x31 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x27;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x27 is 
+end pfb_fir_8192ch_core_delay_bram_x31;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x31 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -8715,7 +8715,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -8789,7 +8789,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x27 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x31 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -8849,15 +8849,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x23 is
+entity pfb_fir_8192ch_core_delay_bram_x30 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x23;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x23 is 
+end pfb_fir_8192ch_core_delay_bram_x30;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x30 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -8877,7 +8877,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -8951,7 +8951,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x23 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x30 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -9272,15 +9272,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x25 is
+entity pfb_fir_8192ch_core_delay_bram_x28 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x25;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x25 is 
+end pfb_fir_8192ch_core_delay_bram_x28;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x28 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -9300,7 +9300,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_c03116c7b4 
+  counter : entity xil_defaultlib.sysgen_counter_aac6c8a472 
   port map (
     clr => '0',
     clk => clk_net,
@@ -9377,7 +9377,7 @@ begin
   register_q_net <= coeffs;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x25 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x28 
   port map (
     din => delay1_q_net,
     clk_1 => clk_net,
@@ -9491,15 +9491,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x24 is
+entity pfb_fir_8192ch_core_delay_bram_x27 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x24;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x24 is 
+end pfb_fir_8192ch_core_delay_bram_x27;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x27 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -9519,7 +9519,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -9593,7 +9593,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x24 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x27 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -9653,15 +9653,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x15 is
+entity pfb_fir_8192ch_core_delay_bram_x29 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x15;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x15 is 
+end pfb_fir_8192ch_core_delay_bram_x29;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x29 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -9681,7 +9681,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -9755,7 +9755,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x15 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x29 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -10076,15 +10076,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x14 is
+entity pfb_fir_8192ch_core_delay_bram_x36 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x14;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x14 is 
+end pfb_fir_8192ch_core_delay_bram_x36;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x36 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -10104,7 +10104,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_c03116c7b4 
+  counter : entity xil_defaultlib.sysgen_counter_aac6c8a472 
   port map (
     clr => '0',
     clk => clk_net,
@@ -10181,7 +10181,7 @@ begin
   register_q_net <= coeffs;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x14 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x36 
   port map (
     din => delay1_q_net,
     clk_1 => clk_net,
@@ -10295,15 +10295,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x12 is
+entity pfb_fir_8192ch_core_delay_bram_x35 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x12;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x12 is 
+end pfb_fir_8192ch_core_delay_bram_x35;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x35 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -10323,7 +10323,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -10397,7 +10397,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x12 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x35 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -10457,15 +10457,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x11 is
+entity pfb_fir_8192ch_core_delay_bram_x34 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x11;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x11 is 
+end pfb_fir_8192ch_core_delay_bram_x34;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x34 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -10485,7 +10485,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -10559,7 +10559,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x11 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x34 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -10880,15 +10880,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x13 is
+entity pfb_fir_8192ch_core_delay_bram_x33 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x13;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x13 is 
+end pfb_fir_8192ch_core_delay_bram_x33;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x33 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -10908,7 +10908,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_c03116c7b4 
+  counter : entity xil_defaultlib.sysgen_counter_aac6c8a472 
   port map (
     clr => '0',
     clk => clk_net,
@@ -10985,7 +10985,7 @@ begin
   register_q_net <= coeffs;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x13 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x33 
   port map (
     din => delay1_q_net,
     clk_1 => clk_net,
@@ -11099,15 +11099,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x19 is
+entity pfb_fir_8192ch_core_delay_bram_x2 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x19;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x19 is 
+end pfb_fir_8192ch_core_delay_bram_x2;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x2 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -11127,7 +11127,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -11201,7 +11201,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x19 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x2 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -11261,15 +11261,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x18 is
+entity pfb_fir_8192ch_core_delay_bram_x7 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x18;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x18 is 
+end pfb_fir_8192ch_core_delay_bram_x7;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x7 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -11289,7 +11289,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -11363,7 +11363,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x18 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x7 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -11684,15 +11684,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x17 is
+entity pfb_fir_8192ch_core_delay_bram_x6 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x17;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x17 is 
+end pfb_fir_8192ch_core_delay_bram_x6;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x6 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -11712,7 +11712,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_c03116c7b4 
+  counter : entity xil_defaultlib.sysgen_counter_aac6c8a472 
   port map (
     clr => '0',
     clk => clk_net,
@@ -11789,7 +11789,7 @@ begin
   register_q_net <= coeffs;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x17 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x6 
   port map (
     din => delay1_q_net,
     clk_1 => clk_net,
@@ -11903,15 +11903,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x16 is
+entity pfb_fir_8192ch_core_delay_bram_x4 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x16;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x16 is 
+end pfb_fir_8192ch_core_delay_bram_x4;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x4 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -11931,7 +11931,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -12005,7 +12005,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x16 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x4 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -12065,15 +12065,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x40 is
+entity pfb_fir_8192ch_core_delay_bram_x3 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x40;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x40 is 
+end pfb_fir_8192ch_core_delay_bram_x3;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x3 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -12093,12 +12093,20 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
     ce => ce_net,
     op => counter_op_net
+  );
+  d1 : entity xil_defaultlib.sysgen_delay_e1d10b13c0 
+  port map (
+    clr => '0',
+    d => ram_data_out_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => d1_q_net
   );
   ram : entity xil_defaultlib.pfb_fir_8192ch_core_xlspram 
   generic map (
@@ -12122,14 +12130,6 @@ begin
     clk => clk_net,
     ce => ce_net,
     data_out => ram_data_out_net
-  );
-  d1 : entity xil_defaultlib.sysgen_delay_e1d10b13c0 
-  port map (
-    clr => '0',
-    d => ram_data_out_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => d1_q_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_8192ch_core/pfb_fir_real/pol1_in6_tap3
@@ -12167,7 +12167,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x40 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x3 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -12488,15 +12488,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x39 is
+entity pfb_fir_8192ch_core_delay_bram_x5 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x39;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x39 is 
+end pfb_fir_8192ch_core_delay_bram_x5;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x5 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -12516,12 +12516,20 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_c03116c7b4 
+  counter : entity xil_defaultlib.sysgen_counter_aac6c8a472 
   port map (
     clr => '0',
     clk => clk_net,
     ce => ce_net,
     op => counter_op_net
+  );
+  d1 : entity xil_defaultlib.sysgen_delay_e1d10b13c0 
+  port map (
+    clr => '0',
+    d => ram_data_out_net,
+    clk => clk_net,
+    ce => ce_net,
+    q => d1_q_net
   );
   ram : entity xil_defaultlib.pfb_fir_8192ch_core_xlspram 
   generic map (
@@ -12545,14 +12553,6 @@ begin
     clk => clk_net,
     ce => ce_net,
     data_out => ram_data_out_net
-  );
-  d1 : entity xil_defaultlib.sysgen_delay_e1d10b13c0 
-  port map (
-    clr => '0',
-    d => ram_data_out_net,
-    clk => clk_net,
-    ce => ce_net,
-    q => d1_q_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_8192ch_core/pfb_fir_real/pol1_in7_first_tap
@@ -12593,7 +12593,7 @@ begin
   register_q_net <= coeffs;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x39 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x5 
   port map (
     din => delay1_q_net,
     clk_1 => clk_net,
@@ -12707,15 +12707,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x37 is
+entity pfb_fir_8192ch_core_delay_bram_x12 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x37;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x37 is 
+end pfb_fir_8192ch_core_delay_bram_x12;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x12 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -12735,7 +12735,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -12809,7 +12809,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x37 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x12 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -12869,15 +12869,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x38 is
+entity pfb_fir_8192ch_core_delay_bram_x11 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x38;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x38 is 
+end pfb_fir_8192ch_core_delay_bram_x11;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x11 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -12897,7 +12897,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -12971,7 +12971,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x38 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x11 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -13292,15 +13292,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x46 is
+entity pfb_fir_8192ch_core_delay_bram_x9 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x46;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x46 is 
+end pfb_fir_8192ch_core_delay_bram_x9;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x9 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -13320,7 +13320,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_c03116c7b4 
+  counter : entity xil_defaultlib.sysgen_counter_aac6c8a472 
   port map (
     clr => '0',
     clk => clk_net,
@@ -13397,7 +13397,7 @@ begin
   register_q_net <= coeffs;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x46 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x9 
   port map (
     din => delay1_q_net,
     clk_1 => clk_net,
@@ -13511,15 +13511,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x45 is
+entity pfb_fir_8192ch_core_delay_bram_x8 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x45;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x45 is 
+end pfb_fir_8192ch_core_delay_bram_x8;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x8 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -13539,7 +13539,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -13613,7 +13613,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x45 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x8 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -13673,15 +13673,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x44 is
+entity pfb_fir_8192ch_core_delay_bram_x10 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x44;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x44 is 
+end pfb_fir_8192ch_core_delay_bram_x10;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x10 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -13701,7 +13701,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -13775,7 +13775,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x44 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x10 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -14096,15 +14096,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x43 is
+entity pfb_fir_8192ch_core_delay_bram_x1 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x43;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x43 is 
+end pfb_fir_8192ch_core_delay_bram_x1;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x1 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal delay1_q_net : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -14124,7 +14124,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_c03116c7b4 
+  counter : entity xil_defaultlib.sysgen_counter_aac6c8a472 
   port map (
     clr => '0',
     clk => clk_net,
@@ -14201,7 +14201,7 @@ begin
   register_q_net <= coeffs;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x43 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x1 
   port map (
     din => delay1_q_net,
     clk_1 => clk_net,
@@ -14315,15 +14315,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x42 is
+entity pfb_fir_8192ch_core_delay_bram_x0 is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x42;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x42 is 
+end pfb_fir_8192ch_core_delay_bram_x0;
+architecture structural of pfb_fir_8192ch_core_delay_bram_x0 is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -14343,7 +14343,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -14417,7 +14417,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x42 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x0 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -14477,15 +14477,15 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 library xil_defaultlib;
 use xil_defaultlib.conv_pkg.all;
-entity pfb_fir_8192ch_core_delay_bram_x41 is
+entity pfb_fir_8192ch_core_delay_bram is
   port (
     din : in std_logic_vector( 8-1 downto 0 );
     clk_1 : in std_logic;
     ce_1 : in std_logic;
     dout : out std_logic_vector( 8-1 downto 0 )
   );
-end pfb_fir_8192ch_core_delay_bram_x41;
-architecture structural of pfb_fir_8192ch_core_delay_bram_x41 is 
+end pfb_fir_8192ch_core_delay_bram;
+architecture structural of pfb_fir_8192ch_core_delay_bram is 
   signal d1_q_net : std_logic_vector( 8-1 downto 0 );
   signal d1_q_net_x0 : std_logic_vector( 8-1 downto 0 );
   signal clk_net : std_logic;
@@ -14505,7 +14505,7 @@ begin
     clr => '0',
     op => constant_op_net
   );
-  counter : entity xil_defaultlib.sysgen_counter_70a3bbe4e5 
+  counter : entity xil_defaultlib.sysgen_counter_1f89c3d2fa 
   port map (
     clr => '0',
     clk => clk_net,
@@ -14579,7 +14579,7 @@ begin
   slice1_y_net <= coeff;
   clk_net <= clk_1;
   ce_net <= ce_1;
-  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram_x41 
+  delay_bram : entity xil_defaultlib.pfb_fir_8192ch_core_delay_bram 
   port map (
     din => d1_q_net,
     clk_1 => clk_net,
@@ -14931,6 +14931,13 @@ architecture structural of pfb_fir_8192ch_core_pfb_fir_real is
   signal d1_q_net_x23 : std_logic_vector( 8-1 downto 0 );
   signal slice1_y_net_x24 : std_logic_vector( 36-1 downto 0 );
   signal scale_1_1_op_net : std_logic_vector( 26-1 downto 0 );
+  signal scale_1_10_op_net : std_logic_vector( 26-1 downto 0 );
+  signal scale_1_11_op_net : std_logic_vector( 26-1 downto 0 );
+  signal scale_1_12_op_net : std_logic_vector( 26-1 downto 0 );
+  signal scale_1_13_op_net : std_logic_vector( 26-1 downto 0 );
+  signal scale_1_14_op_net : std_logic_vector( 26-1 downto 0 );
+  signal scale_1_15_op_net : std_logic_vector( 26-1 downto 0 );
+  signal scale_1_16_op_net : std_logic_vector( 26-1 downto 0 );
   signal scale_1_2_op_net : std_logic_vector( 26-1 downto 0 );
   signal scale_1_3_op_net : std_logic_vector( 26-1 downto 0 );
   signal scale_1_4_op_net : std_logic_vector( 26-1 downto 0 );
@@ -14939,13 +14946,6 @@ architecture structural of pfb_fir_8192ch_core_pfb_fir_real is
   signal scale_1_7_op_net : std_logic_vector( 26-1 downto 0 );
   signal scale_1_8_op_net : std_logic_vector( 26-1 downto 0 );
   signal scale_1_9_op_net : std_logic_vector( 26-1 downto 0 );
-  signal scale_1_10_op_net : std_logic_vector( 26-1 downto 0 );
-  signal scale_1_11_op_net : std_logic_vector( 26-1 downto 0 );
-  signal scale_1_12_op_net : std_logic_vector( 26-1 downto 0 );
-  signal scale_1_13_op_net : std_logic_vector( 26-1 downto 0 );
-  signal scale_1_14_op_net : std_logic_vector( 26-1 downto 0 );
-  signal scale_1_15_op_net : std_logic_vector( 26-1 downto 0 );
-  signal scale_1_16_op_net : std_logic_vector( 26-1 downto 0 );
 begin
   sync_out <= delay1_q_net_x3;
   pol1_out1 <= convert_1_1_dout_net;
@@ -15942,6 +15942,153 @@ begin
     ce => ce_net,
     dout => convert_1_1_dout_net
   );
+  convert_1_10 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
+  generic map (
+    bool_conversion => 0,
+    din_arith => 2,
+    din_bin_pt => 25,
+    din_width => 26,
+    dout_arith => 2,
+    dout_bin_pt => 11,
+    dout_width => 12,
+    latency => 1,
+    overflow => xlWrap,
+    quantization => xlRoundBanker
+  )
+  port map (
+    clr => '0',
+    en => "1",
+    din => scale_1_10_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    dout => convert_1_10_dout_net
+  );
+  convert_1_11 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
+  generic map (
+    bool_conversion => 0,
+    din_arith => 2,
+    din_bin_pt => 25,
+    din_width => 26,
+    dout_arith => 2,
+    dout_bin_pt => 11,
+    dout_width => 12,
+    latency => 1,
+    overflow => xlWrap,
+    quantization => xlRoundBanker
+  )
+  port map (
+    clr => '0',
+    en => "1",
+    din => scale_1_11_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    dout => convert_1_11_dout_net
+  );
+  convert_1_12 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
+  generic map (
+    bool_conversion => 0,
+    din_arith => 2,
+    din_bin_pt => 25,
+    din_width => 26,
+    dout_arith => 2,
+    dout_bin_pt => 11,
+    dout_width => 12,
+    latency => 1,
+    overflow => xlWrap,
+    quantization => xlRoundBanker
+  )
+  port map (
+    clr => '0',
+    en => "1",
+    din => scale_1_12_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    dout => convert_1_12_dout_net
+  );
+  convert_1_13 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
+  generic map (
+    bool_conversion => 0,
+    din_arith => 2,
+    din_bin_pt => 25,
+    din_width => 26,
+    dout_arith => 2,
+    dout_bin_pt => 11,
+    dout_width => 12,
+    latency => 1,
+    overflow => xlWrap,
+    quantization => xlRoundBanker
+  )
+  port map (
+    clr => '0',
+    en => "1",
+    din => scale_1_13_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    dout => convert_1_13_dout_net
+  );
+  convert_1_14 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
+  generic map (
+    bool_conversion => 0,
+    din_arith => 2,
+    din_bin_pt => 25,
+    din_width => 26,
+    dout_arith => 2,
+    dout_bin_pt => 11,
+    dout_width => 12,
+    latency => 1,
+    overflow => xlWrap,
+    quantization => xlRoundBanker
+  )
+  port map (
+    clr => '0',
+    en => "1",
+    din => scale_1_14_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    dout => convert_1_14_dout_net
+  );
+  convert_1_15 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
+  generic map (
+    bool_conversion => 0,
+    din_arith => 2,
+    din_bin_pt => 25,
+    din_width => 26,
+    dout_arith => 2,
+    dout_bin_pt => 11,
+    dout_width => 12,
+    latency => 1,
+    overflow => xlWrap,
+    quantization => xlRoundBanker
+  )
+  port map (
+    clr => '0',
+    en => "1",
+    din => scale_1_15_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    dout => convert_1_15_dout_net
+  );
+  convert_1_16 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
+  generic map (
+    bool_conversion => 0,
+    din_arith => 2,
+    din_bin_pt => 25,
+    din_width => 26,
+    dout_arith => 2,
+    dout_bin_pt => 11,
+    dout_width => 12,
+    latency => 1,
+    overflow => xlWrap,
+    quantization => xlRoundBanker
+  )
+  port map (
+    clr => '0',
+    en => "1",
+    din => scale_1_16_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    dout => convert_1_16_dout_net
+  );
   convert_1_2 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
   generic map (
     bool_conversion => 0,
@@ -15962,6 +16109,153 @@ begin
     clk => clk_net,
     ce => ce_net,
     dout => convert_1_2_dout_net
+  );
+  convert_1_3 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
+  generic map (
+    bool_conversion => 0,
+    din_arith => 2,
+    din_bin_pt => 25,
+    din_width => 26,
+    dout_arith => 2,
+    dout_bin_pt => 11,
+    dout_width => 12,
+    latency => 1,
+    overflow => xlWrap,
+    quantization => xlRoundBanker
+  )
+  port map (
+    clr => '0',
+    en => "1",
+    din => scale_1_3_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    dout => convert_1_3_dout_net
+  );
+  convert_1_4 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
+  generic map (
+    bool_conversion => 0,
+    din_arith => 2,
+    din_bin_pt => 25,
+    din_width => 26,
+    dout_arith => 2,
+    dout_bin_pt => 11,
+    dout_width => 12,
+    latency => 1,
+    overflow => xlWrap,
+    quantization => xlRoundBanker
+  )
+  port map (
+    clr => '0',
+    en => "1",
+    din => scale_1_4_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    dout => convert_1_4_dout_net
+  );
+  convert_1_5 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
+  generic map (
+    bool_conversion => 0,
+    din_arith => 2,
+    din_bin_pt => 25,
+    din_width => 26,
+    dout_arith => 2,
+    dout_bin_pt => 11,
+    dout_width => 12,
+    latency => 1,
+    overflow => xlWrap,
+    quantization => xlRoundBanker
+  )
+  port map (
+    clr => '0',
+    en => "1",
+    din => scale_1_5_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    dout => convert_1_5_dout_net
+  );
+  convert_1_6 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
+  generic map (
+    bool_conversion => 0,
+    din_arith => 2,
+    din_bin_pt => 25,
+    din_width => 26,
+    dout_arith => 2,
+    dout_bin_pt => 11,
+    dout_width => 12,
+    latency => 1,
+    overflow => xlWrap,
+    quantization => xlRoundBanker
+  )
+  port map (
+    clr => '0',
+    en => "1",
+    din => scale_1_6_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    dout => convert_1_6_dout_net
+  );
+  convert_1_7 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
+  generic map (
+    bool_conversion => 0,
+    din_arith => 2,
+    din_bin_pt => 25,
+    din_width => 26,
+    dout_arith => 2,
+    dout_bin_pt => 11,
+    dout_width => 12,
+    latency => 1,
+    overflow => xlWrap,
+    quantization => xlRoundBanker
+  )
+  port map (
+    clr => '0',
+    en => "1",
+    din => scale_1_7_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    dout => convert_1_7_dout_net
+  );
+  convert_1_8 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
+  generic map (
+    bool_conversion => 0,
+    din_arith => 2,
+    din_bin_pt => 25,
+    din_width => 26,
+    dout_arith => 2,
+    dout_bin_pt => 11,
+    dout_width => 12,
+    latency => 1,
+    overflow => xlWrap,
+    quantization => xlRoundBanker
+  )
+  port map (
+    clr => '0',
+    en => "1",
+    din => scale_1_8_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    dout => convert_1_8_dout_net
+  );
+  convert_1_9 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
+  generic map (
+    bool_conversion => 0,
+    din_arith => 2,
+    din_bin_pt => 25,
+    din_width => 26,
+    dout_arith => 2,
+    dout_bin_pt => 11,
+    dout_width => 12,
+    latency => 1,
+    overflow => xlWrap,
+    quantization => xlRoundBanker
+  )
+  port map (
+    clr => '0',
+    en => "1",
+    din => scale_1_9_op_net,
+    clk => clk_net,
+    ce => ce_net,
+    dout => convert_1_9_dout_net
   );
   delay1 : entity xil_defaultlib.pfb_fir_8192ch_core_xldelay 
   generic map (
@@ -15986,6 +16280,62 @@ begin
     ip => addr3_s_net_x11,
     op => scale_1_1_op_net
   );
+  scale_1_10 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    ip => addr3_s_net_x10,
+    op => scale_1_10_op_net
+  );
+  scale_1_11 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    ip => addr3_s_net_x9,
+    op => scale_1_11_op_net
+  );
+  scale_1_12 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    ip => addr3_s_net_x8,
+    op => scale_1_12_op_net
+  );
+  scale_1_13 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    ip => addr3_s_net_x7,
+    op => scale_1_13_op_net
+  );
+  scale_1_14 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    ip => addr3_s_net,
+    op => scale_1_14_op_net
+  );
+  scale_1_15 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    ip => addr3_s_net_x6,
+    op => scale_1_15_op_net
+  );
+  scale_1_16 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
+  port map (
+    clk => '0',
+    ce => '0',
+    clr => '0',
+    ip => addr3_s_net_x5,
+    op => scale_1_16_op_net
+  );
   scale_1_2 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
   port map (
     clk => '0',
@@ -16002,27 +16352,6 @@ begin
     ip => addr3_s_net_x3,
     op => scale_1_3_op_net
   );
-  convert_1_3 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
-  generic map (
-    bool_conversion => 0,
-    din_arith => 2,
-    din_bin_pt => 25,
-    din_width => 26,
-    dout_arith => 2,
-    dout_bin_pt => 11,
-    dout_width => 12,
-    latency => 1,
-    overflow => xlWrap,
-    quantization => xlRoundBanker
-  )
-  port map (
-    clr => '0',
-    en => "1",
-    din => scale_1_3_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    dout => convert_1_3_dout_net
-  );
   scale_1_4 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
   port map (
     clk => '0',
@@ -16030,27 +16359,6 @@ begin
     clr => '0',
     ip => addr3_s_net_x2,
     op => scale_1_4_op_net
-  );
-  convert_1_4 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
-  generic map (
-    bool_conversion => 0,
-    din_arith => 2,
-    din_bin_pt => 25,
-    din_width => 26,
-    dout_arith => 2,
-    dout_bin_pt => 11,
-    dout_width => 12,
-    latency => 1,
-    overflow => xlWrap,
-    quantization => xlRoundBanker
-  )
-  port map (
-    clr => '0',
-    en => "1",
-    din => scale_1_4_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    dout => convert_1_4_dout_net
   );
   scale_1_5 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
   port map (
@@ -16060,27 +16368,6 @@ begin
     ip => addr3_s_net_x1,
     op => scale_1_5_op_net
   );
-  convert_1_5 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
-  generic map (
-    bool_conversion => 0,
-    din_arith => 2,
-    din_bin_pt => 25,
-    din_width => 26,
-    dout_arith => 2,
-    dout_bin_pt => 11,
-    dout_width => 12,
-    latency => 1,
-    overflow => xlWrap,
-    quantization => xlRoundBanker
-  )
-  port map (
-    clr => '0',
-    en => "1",
-    din => scale_1_5_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    dout => convert_1_5_dout_net
-  );
   scale_1_6 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
   port map (
     clk => '0',
@@ -16088,27 +16375,6 @@ begin
     clr => '0',
     ip => addr3_s_net_x0,
     op => scale_1_6_op_net
-  );
-  convert_1_6 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
-  generic map (
-    bool_conversion => 0,
-    din_arith => 2,
-    din_bin_pt => 25,
-    din_width => 26,
-    dout_arith => 2,
-    dout_bin_pt => 11,
-    dout_width => 12,
-    latency => 1,
-    overflow => xlWrap,
-    quantization => xlRoundBanker
-  )
-  port map (
-    clr => '0',
-    en => "1",
-    din => scale_1_6_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    dout => convert_1_6_dout_net
   );
   scale_1_7 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
   port map (
@@ -16118,27 +16384,6 @@ begin
     ip => addr3_s_net_x14,
     op => scale_1_7_op_net
   );
-  convert_1_7 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
-  generic map (
-    bool_conversion => 0,
-    din_arith => 2,
-    din_bin_pt => 25,
-    din_width => 26,
-    dout_arith => 2,
-    dout_bin_pt => 11,
-    dout_width => 12,
-    latency => 1,
-    overflow => xlWrap,
-    quantization => xlRoundBanker
-  )
-  port map (
-    clr => '0',
-    en => "1",
-    din => scale_1_7_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    dout => convert_1_7_dout_net
-  );
   scale_1_8 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
   port map (
     clk => '0',
@@ -16147,27 +16392,6 @@ begin
     ip => addr3_s_net_x13,
     op => scale_1_8_op_net
   );
-  convert_1_8 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
-  generic map (
-    bool_conversion => 0,
-    din_arith => 2,
-    din_bin_pt => 25,
-    din_width => 26,
-    dout_arith => 2,
-    dout_bin_pt => 11,
-    dout_width => 12,
-    latency => 1,
-    overflow => xlWrap,
-    quantization => xlRoundBanker
-  )
-  port map (
-    clr => '0',
-    en => "1",
-    din => scale_1_8_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    dout => convert_1_8_dout_net
-  );
   scale_1_9 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
   port map (
     clk => '0',
@@ -16175,230 +16399,6 @@ begin
     clr => '0',
     ip => addr3_s_net_x12,
     op => scale_1_9_op_net
-  );
-  convert_1_9 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
-  generic map (
-    bool_conversion => 0,
-    din_arith => 2,
-    din_bin_pt => 25,
-    din_width => 26,
-    dout_arith => 2,
-    dout_bin_pt => 11,
-    dout_width => 12,
-    latency => 1,
-    overflow => xlWrap,
-    quantization => xlRoundBanker
-  )
-  port map (
-    clr => '0',
-    en => "1",
-    din => scale_1_9_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    dout => convert_1_9_dout_net
-  );
-  scale_1_10 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    ip => addr3_s_net_x10,
-    op => scale_1_10_op_net
-  );
-  convert_1_10 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
-  generic map (
-    bool_conversion => 0,
-    din_arith => 2,
-    din_bin_pt => 25,
-    din_width => 26,
-    dout_arith => 2,
-    dout_bin_pt => 11,
-    dout_width => 12,
-    latency => 1,
-    overflow => xlWrap,
-    quantization => xlRoundBanker
-  )
-  port map (
-    clr => '0',
-    en => "1",
-    din => scale_1_10_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    dout => convert_1_10_dout_net
-  );
-  scale_1_11 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    ip => addr3_s_net_x9,
-    op => scale_1_11_op_net
-  );
-  convert_1_11 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
-  generic map (
-    bool_conversion => 0,
-    din_arith => 2,
-    din_bin_pt => 25,
-    din_width => 26,
-    dout_arith => 2,
-    dout_bin_pt => 11,
-    dout_width => 12,
-    latency => 1,
-    overflow => xlWrap,
-    quantization => xlRoundBanker
-  )
-  port map (
-    clr => '0',
-    en => "1",
-    din => scale_1_11_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    dout => convert_1_11_dout_net
-  );
-  scale_1_12 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    ip => addr3_s_net_x8,
-    op => scale_1_12_op_net
-  );
-  convert_1_12 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
-  generic map (
-    bool_conversion => 0,
-    din_arith => 2,
-    din_bin_pt => 25,
-    din_width => 26,
-    dout_arith => 2,
-    dout_bin_pt => 11,
-    dout_width => 12,
-    latency => 1,
-    overflow => xlWrap,
-    quantization => xlRoundBanker
-  )
-  port map (
-    clr => '0',
-    en => "1",
-    din => scale_1_12_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    dout => convert_1_12_dout_net
-  );
-  scale_1_13 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    ip => addr3_s_net_x7,
-    op => scale_1_13_op_net
-  );
-  convert_1_13 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
-  generic map (
-    bool_conversion => 0,
-    din_arith => 2,
-    din_bin_pt => 25,
-    din_width => 26,
-    dout_arith => 2,
-    dout_bin_pt => 11,
-    dout_width => 12,
-    latency => 1,
-    overflow => xlWrap,
-    quantization => xlRoundBanker
-  )
-  port map (
-    clr => '0',
-    en => "1",
-    din => scale_1_13_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    dout => convert_1_13_dout_net
-  );
-  scale_1_14 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    ip => addr3_s_net,
-    op => scale_1_14_op_net
-  );
-  convert_1_14 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
-  generic map (
-    bool_conversion => 0,
-    din_arith => 2,
-    din_bin_pt => 25,
-    din_width => 26,
-    dout_arith => 2,
-    dout_bin_pt => 11,
-    dout_width => 12,
-    latency => 1,
-    overflow => xlWrap,
-    quantization => xlRoundBanker
-  )
-  port map (
-    clr => '0',
-    en => "1",
-    din => scale_1_14_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    dout => convert_1_14_dout_net
-  );
-  scale_1_15 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    ip => addr3_s_net_x6,
-    op => scale_1_15_op_net
-  );
-  convert_1_15 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
-  generic map (
-    bool_conversion => 0,
-    din_arith => 2,
-    din_bin_pt => 25,
-    din_width => 26,
-    dout_arith => 2,
-    dout_bin_pt => 11,
-    dout_width => 12,
-    latency => 1,
-    overflow => xlWrap,
-    quantization => xlRoundBanker
-  )
-  port map (
-    clr => '0',
-    en => "1",
-    din => scale_1_15_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    dout => convert_1_15_dout_net
-  );
-  scale_1_16 : entity xil_defaultlib.sysgen_scale_a7fd99112f 
-  port map (
-    clk => '0',
-    ce => '0',
-    clr => '0',
-    ip => addr3_s_net_x5,
-    op => scale_1_16_op_net
-  );
-  convert_1_16 : entity xil_defaultlib.pfb_fir_8192ch_core_xlconvert_pipeline 
-  generic map (
-    bool_conversion => 0,
-    din_arith => 2,
-    din_bin_pt => 25,
-    din_width => 26,
-    dout_arith => 2,
-    dout_bin_pt => 11,
-    dout_width => 12,
-    latency => 1,
-    overflow => xlWrap,
-    quantization => xlRoundBanker
-  )
-  port map (
-    clr => '0',
-    en => "1",
-    din => scale_1_16_op_net,
-    clk => clk_net,
-    ce => ce_net,
-    dout => convert_1_16_dout_net
   );
 end structural;
 -- Generated from Simulink block pfb_fir_8192ch_core_struct
@@ -16447,8 +16447,8 @@ entity pfb_fir_8192ch_core_struct is
   );
 end pfb_fir_8192ch_core_struct;
 architecture structural of pfb_fir_8192ch_core_struct is 
-  signal pol0_in1_net : std_logic_vector( 8-1 downto 0 );
   signal pol0_in0_net : std_logic_vector( 8-1 downto 0 );
+  signal pol0_in1_net : std_logic_vector( 8-1 downto 0 );
   signal pol0_in10_net : std_logic_vector( 8-1 downto 0 );
   signal pol0_in11_net : std_logic_vector( 8-1 downto 0 );
   signal pol0_in12_net : std_logic_vector( 8-1 downto 0 );

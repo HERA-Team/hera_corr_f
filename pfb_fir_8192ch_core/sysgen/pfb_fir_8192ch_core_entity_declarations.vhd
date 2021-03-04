@@ -903,23 +903,23 @@ use xil_defaultlib.conv_pkg.all;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-entity sysgen_counter_c03116c7b4 is
+entity sysgen_counter_aac6c8a472 is
   port (
     op : out std_logic_vector((10 - 1) downto 0);
     clk : in std_logic;
     ce : in std_logic;
     clr : in std_logic);
-end sysgen_counter_c03116c7b4;
-architecture behavior of sysgen_counter_c03116c7b4
+end sysgen_counter_aac6c8a472;
+architecture behavior of sysgen_counter_aac6c8a472
 is
   signal count_reg_20_23: unsigned((10 - 1) downto 0) := "0000000000";
   signal count_reg_20_23_rst: std_logic;
   signal rel_34_8: boolean;
   signal rst_limit_join_34_5: boolean;
   signal bool_44_4: boolean;
-  signal rst_limit_join_44_1: boolean;
   signal count_reg_join_44_1: unsigned((11 - 1) downto 0);
   signal count_reg_join_44_1_rst: std_logic;
+  signal rst_limit_join_44_1: boolean;
 begin
   proc_count_reg_20_23: process (clk)
   is
@@ -1278,23 +1278,23 @@ use xil_defaultlib.conv_pkg.all;
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-entity sysgen_counter_70a3bbe4e5 is
+entity sysgen_counter_1f89c3d2fa is
   port (
     op : out std_logic_vector((13 - 1) downto 0);
     clk : in std_logic;
     ce : in std_logic;
     clr : in std_logic);
-end sysgen_counter_70a3bbe4e5;
-architecture behavior of sysgen_counter_70a3bbe4e5
+end sysgen_counter_1f89c3d2fa;
+architecture behavior of sysgen_counter_1f89c3d2fa
 is
   signal count_reg_20_23: unsigned((13 - 1) downto 0) := "0000000000000";
   signal count_reg_20_23_rst: std_logic;
   signal rel_34_8: boolean;
   signal rst_limit_join_34_5: boolean;
   signal bool_44_4: boolean;
+  signal rst_limit_join_44_1: boolean;
   signal count_reg_join_44_1: unsigned((14 - 1) downto 0);
   signal count_reg_join_44_1_rst: std_logic;
-  signal rst_limit_join_44_1: boolean;
 begin
   proc_count_reg_20_23: process (clk)
   is
