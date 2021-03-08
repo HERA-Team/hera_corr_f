@@ -47,7 +47,8 @@ fft_shift: 0x1557
 
 # Specify a full path to an F-Engine fpg files
 # or redis:<fpg filename> if the fpg file has been uploaded to redis
-fpgfile: '/home/hera/src/hera_corr_f/snap_fengine/outputs/snap_fengine.fpg'
+#fpgfile: '/home/hera/src/hera_corr_f/snap_fengine/outputs/snap_fengine.fpg'
+fpgfile: '/home/hera/src/hera_corr_f/snap_fengine/outputs/snap_fengine_2021-03-03_1621.fpg'
 
 # Destination port for SNAP data
 dest_port: 8511
@@ -222,18 +223,18 @@ fengines:
         phase_switch_index: [19,20,21,22,23,24]
         ants: [141, 142, 143]
 # JK: MMCM not locking 22-Jan-21
-    heraNode15Snap0:
-        phase_switch_index: [1,2,3,4,5,6]
-        ants: [144, 145, 146]
-    heraNode15Snap1:
-        phase_switch_index: [7,8,9,10,11,12]
-        ants: [147, 148, 149]
-    heraNode15Snap2:
-        phase_switch_index: [13,14,15,16,17,18]
-        ants: [150, 151, 152]
-    heraNode15Snap3:
-        phase_switch_index: [19,20,21,22,23,24]
-        ants: [153, 154, 155]
+#    heraNode15Snap0:
+#        phase_switch_index: [1,2,3,4,5,6]
+#        ants: [144, 145, 146]
+#    heraNode15Snap1:
+#        phase_switch_index: [7,8,9,10,11,12]
+#        ants: [147, 148, 149]
+#    heraNode15Snap2:
+#        phase_switch_index: [13,14,15,16,17,18]
+#        ants: [150, 151, 152]
+#    heraNode15Snap3:
+#        phase_switch_index: [19,20,21,22,23,24]
+#        ants: [153, 154, 155]
 #
 # Data is sent assuming a total of 32 Xengines and
 # a maximum of 48 channels per Xengine. If all the

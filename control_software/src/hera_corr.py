@@ -369,20 +369,22 @@ class HeraCorrelator(object):
         return hookup['host'], hookup['channel']
 
     def lookup_pam_attenuation(self, ant, pol):
-        redval, redtime = self.r.hmget("atten:ant:%s:%s" % (ant, pol),
+        redval, redtime = self.r.hmget("atten:ant:%s:%s" % (str(ant), pol),
                                        "commanded", "command_time")
         if redval is None:
             raise RuntimeError('Failed to find PAM settings for (%s,%s)' %
                                (str(ant), pol))
         return int(redval)
 
-    def store_pam_attenuation(self, ant, pol, attenuation):
+    def store_pam_attenuation(self, ant, pol, attenuation, verify=True):
         self.logger.info("Commanding (%s,%s) PAM atten=%s dB in redis" \
                          % (str(ant), pol, str(attenuation)))
-        self.r.hmset("atten:ant:%s:%s" % (ant, pol),
+        self.r.hmset("atten:ant:%s:%s" % (str(ant), pol),
                      {"commmanded": str(attenuation),
                       "command_time": time.time()}
         )
+        if verify:
+            assert(self.lookup_pam_attenuation(ant, pol) == attenuation)
 
     def get_pam_attenuation(self, ant, pol):
         host, stream = self.lookup_ant_host_stream(ant, pol)
@@ -392,7 +394,7 @@ class HeraCorrelator(object):
 
     def set_pam_attenuation(self, ant, pol, attenuation,
                             verify=True, safe=True, update_redis=False):
-        self.logger.info("Setting PAM for (%s,%s)" % (ant, pol))
+        self.logger.info("Setting PAM for (%s,%s)" % (str(ant), pol))
         host, stream = self.lookup_ant_host_stream(ant, pol)
         pam = self.fengs[host].pams[stream//2]
         east_north = pam.get_attenuation()
@@ -407,7 +409,7 @@ class HeraCorrelator(object):
         atten[pol] = attenuation
         pam.set_attenuation(atten['e'], atten['n'], verify=verify)
         if update_redis:
-            self.store_pam_attenuation(ant, pol, attenuation)
+            self.store_pam_attenuation(ant, pol, attenuation, verify=verify)
 
     def lookup_eq_coeffs(self, ant, pol):
         """
@@ -427,7 +429,7 @@ class HeraCorrelator(object):
         coeffs = np.array(json.loads(redval['values']), dtype=np.float)
         return coeffs
 
-    def store_eq_coeffs(self, ant, pol, coeffs):
+    def store_eq_coeffs(self, ant, pol, coeffs, verify=True):
         """
         Store the EQ coefficients of an antenna and polarization to
         redis.
@@ -437,9 +439,11 @@ class HeraCorrelator(object):
            pol: String polarization -- 'e' or 'n'
            coeffs: EQ vector (numpy.array)
         """
-        self.r.hmset('eq:ant:%s:%s' % (ant, pol),
+        self.r.hmset('eq:ant:%s:%s' % (str(ant), pol),
                      {'values': json.dumps(coeffs.tolist()),
                       'time': time.time()})
+        if verify:
+            np.testing.assert_allclose(coeffs, self.lookup_eq_coeffs(ant,pol))
 
     def get_eq_coeffs(self, ant, pol):
         """
@@ -465,12 +469,12 @@ class HeraCorrelator(object):
            pol: String polarization -- 'e' or 'n'
            coeffs: EQ vector (numpy.array)
         """
-        self.logger.info("Setting EQ for (%s,%s)" % (ant, pol))
+        self.logger.info("Setting EQ for (%s,%s)" % (str(ant), pol))
         host, stream = self.lookup_ant_host_stream(ant, pol)
         coeffs = np.ones(self.fengs[host].eq.ncoeffs) * coeffs # broadcast shape
         self.fengs[host].eq.set_coeffs(stream, coeffs, verify=verify)
         if update_redis:
-            self.store_eq_coeffs(ant, pol, coeffs)
+            self.store_eq_coeffs(ant, pol, coeffs, verify=verify)
 
     def eq_initialize(self, host, verify=True):
         self.logger.info("Initializing EQ on %s" % (host))
@@ -510,13 +514,15 @@ class HeraCorrelator(object):
         antpols = self.snap_to_ant[host]
         failed = []
         for cnt,pam in enumerate(feng.pams):
-            (ant_e, pol_e) = antpols[2*cnt]
-            (ant_n, pol_n) = antpols[2*cnt + 1]
+            # Antpols are hooked up in n/e order in snap_to_ant, but 
+            # pams address them in e/n order
+            (ant_n, pol_n) = antpols[2*cnt]
+            (ant_e, pol_e) = antpols[2*cnt + 1]
             atten_e, atten_n = None, None
-            if ant_e is not None:
-                atten_e = self.lookup_pam_attenuation(ant_e, pol_e)
             if ant_n is not None:
                 atten_n = self.lookup_pam_attenuation(ant_n, pol_n)
+            if ant_e is not None:
+                atten_e = self.lookup_pam_attenuation(ant_e, pol_e)
             if atten_e is None and atten_n is None:
                 continue
             try:

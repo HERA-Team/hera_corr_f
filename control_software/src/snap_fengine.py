@@ -44,10 +44,10 @@ class SnapFengine(object):
         self.delay = Delay(self.fpga, 'delay', nstreams=6)
         self.pfb = Pfb(self.fpga, 'pfb')
         self.eq = Eq(self.fpga, 'eq_core', nstreams=6, ncoeffs=2**10)
-        self.eq_tvg = EqTvg(self.fpga, 'eqtvg', nstreams=6, nchans=2**13)
+        #self.eq_tvg = EqTvg(self.fpga, 'eqtvg', nstreams=6, nchans=2**13)
         self.reorder = ChanReorder(self.fpga, 'chan_reorder', nchans=2**10)
-        self.rotator = Rotator(self.fpga, 'rotator', n_chans=2**13,
-                          n_streams=2**3, max_spec=2**19, block_size=2**10)
+        #self.rotator = Rotator(self.fpga, 'rotator', n_chans=2**13,
+        #                  n_streams=2**3, max_spec=2**19, block_size=2**10)
         # Packetizer n_time_demux: Round robin time packets to two dests
         self.packetizer = Packetizer(self.fpga, 'packetizer',
                                      n_time_demux=2)
@@ -68,7 +68,7 @@ class SnapFengine(object):
             self.delay,
             self.pfb,
             self.eq,
-            self.eq_tvg, # temporarily removed
+            #self.eq_tvg, # temporarily removed
             self.reorder,
             self.packetizer,
             self.eth,
