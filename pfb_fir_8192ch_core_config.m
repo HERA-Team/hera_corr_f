@@ -189,7 +189,7 @@ function pfb_fir_8192ch_core_config(this_block)
   %    this_block.addFile('');
   %    this_block.addFile('');
   %this_block.addFile('pfb_fir_2048ch_core/sysgen/pfb_fir_2048ch_core.vhd');
-  this_block.addFile('pfb_fir_8192ch_core.vhd');
+  this_block.addFile('pfb_fir_8192ch_core_ip_struct.vhd');
 
 return;
 

@@ -7,14 +7,14 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set Compilation {IP Catalog}
 	set CompilationFlow {IP}
 	set CreateInterfaceDocument {off}
-	set DSPDevice {xc7k160t}
+	set DSPDevice {xc7k325t}
 	set DSPFamily {kintex7}
-	set DSPPackage {ffg676}
-	set DSPSpeed {-2}
-	set FPGAClockPeriod 5
+	set DSPPackage {fbg676}
+	set DSPSpeed {-3}
+	set FPGAClockPeriod 10
 	set GenerateTestBench 0
 	set HDLLanguage {vhdl}
-	set IPOOCCacheRootPath {/home/jackh/.Xilinx/Sysgen/SysgenVivado/lnx64.o/ip}
+	set IPOOCCacheRootPath {/home/jkocz/.Xilinx/Sysgen/SysgenVivado/lnx64.o/ip}
 	set IP_Auto_Infer {1}
 	set IP_Categories_Text {System_Generator_for_DSP}
 	set IP_Common_Repos {0}
@@ -24,7 +24,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set IP_LifeCycle_Menu {2}
 	set IP_Logo {sysgen_icon_100.png}
 	set IP_Name {}
-	set IP_Revision {155914141}
+	set IP_Revision {245691986}
 	set IP_Socket_IP {0}
 	set IP_Socket_IP_Proj_Path {}
 	set IP_Vendor_Text {User_Company}
@@ -42,71 +42,72 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 		{{single_reg_w_init.vhd} -lib {xil_defaultlib}}
 		{{xlclockdriver_rd.vhd} -lib {xil_defaultlib}}
 		{{vivado_ip.tcl}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i0_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i1_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i2_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i3_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i4_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i5_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i6_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i7_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i8_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i9_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i10_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i11_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i12_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i13_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i14_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i15_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i16_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i17_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i18_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i19_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i20_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i21_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i22_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i23_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i24_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i25_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i26_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i27_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i28_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i29_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i30_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i31_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i32_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i33_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i34_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i35_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i36_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i37_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i38_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i39_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i40_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i41_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i42_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i43_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i44_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i45_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i46_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i47_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i48_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i49_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i50_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i51_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i52_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i53_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i54_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i55_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i56_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i57_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i58_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i59_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i60_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i61_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i62_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i63_vivado.coe}}
-		{{pfb_fir_8192ch_core_blk_mem_gen_v8_3_i64_vivado.coe}}
+		{{xpm_b591c5_vivado.mem}}
+		{{xpm_085f89_vivado.mem}}
+		{{xpm_2a067a_vivado.mem}}
+		{{xpm_8bdd51_vivado.mem}}
+		{{xpm_f5fed5_vivado.mem}}
+		{{xpm_24d74b_vivado.mem}}
+		{{xpm_28b985_vivado.mem}}
+		{{xpm_00361e_vivado.mem}}
+		{{xpm_fdd2fa_vivado.mem}}
+		{{xpm_26831e_vivado.mem}}
+		{{xpm_97b9fc_vivado.mem}}
+		{{xpm_09d550_vivado.mem}}
+		{{xpm_0ba527_vivado.mem}}
+		{{xpm_27c51a_vivado.mem}}
+		{{xpm_41a3f3_vivado.mem}}
+		{{xpm_27bcea_vivado.mem}}
+		{{xpm_ed7be7_vivado.mem}}
+		{{xpm_594fb6_vivado.mem}}
+		{{xpm_4eb95b_vivado.mem}}
+		{{xpm_a580d1_vivado.mem}}
+		{{xpm_840a2f_vivado.mem}}
+		{{xpm_97f6be_vivado.mem}}
+		{{xpm_7a3863_vivado.mem}}
+		{{xpm_00bad8_vivado.mem}}
+		{{xpm_b19351_vivado.mem}}
+		{{xpm_01b889_vivado.mem}}
+		{{xpm_6edd36_vivado.mem}}
+		{{xpm_fdb2fe_vivado.mem}}
+		{{xpm_99c7cd_vivado.mem}}
+		{{xpm_fc3b92_vivado.mem}}
+		{{xpm_3407be_vivado.mem}}
+		{{xpm_b41c5d_vivado.mem}}
+		{{xpm_fcb056_vivado.mem}}
+		{{xpm_f3ecb2_vivado.mem}}
+		{{xpm_e9ac52_vivado.mem}}
+		{{xpm_8a3683_vivado.mem}}
+		{{xpm_4b6fda_vivado.mem}}
+		{{xpm_1c5cde_vivado.mem}}
+		{{xpm_2be436_vivado.mem}}
+		{{xpm_1f8fc2_vivado.mem}}
+		{{xpm_a7dc62_vivado.mem}}
+		{{xpm_e12e42_vivado.mem}}
+		{{xpm_7a5e25_vivado.mem}}
+		{{xpm_60a890_vivado.mem}}
+		{{xpm_b8ecfc_vivado.mem}}
+		{{xpm_7055a8_vivado.mem}}
+		{{xpm_fc3989_vivado.mem}}
+		{{xpm_143592_vivado.mem}}
+		{{xpm_c0b730_vivado.mem}}
+		{{xpm_eb1976_vivado.mem}}
+		{{xpm_79cec1_vivado.mem}}
+		{{xpm_02948c_vivado.mem}}
+		{{xpm_e15e47_vivado.mem}}
+		{{xpm_5d48a2_vivado.mem}}
+		{{xpm_8b256c_vivado.mem}}
+		{{xpm_35cf89_vivado.mem}}
+		{{xpm_9cb890_vivado.mem}}
+		{{xpm_e3835e_vivado.mem}}
+		{{xpm_5d81c0_vivado.mem}}
+		{{xpm_3f8c05_vivado.mem}}
+		{{xpm_4b5444_vivado.mem}}
+		{{xpm_6a8440_vivado.mem}}
+		{{xpm_54fbf7_vivado.mem}}
+		{{xpm_c72eb8_vivado.mem}}
+		{{xpm_e18f49_vivado.mem}}
+		{{xpm_9f008d_vivado.mem}}
 		{{pfb_fir_8192ch_core_entity_declarations.vhd} -lib {xil_defaultlib}}
 		{{pfb_fir_8192ch_core.vhd} -lib {xil_defaultlib}}
 		{{pfb_fir_8192ch_core_clock.xdc}}
@@ -114,104 +115,29 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	}
 	set SimPeriod 1
 	set SimTime 10
-	set SimulationTime {255.00000000 ns}
+	set SimulationTime {310.00000000 ns}
 	set SynthStrategyName {Vivado Synthesis Defaults}
 	set SynthesisTool {Vivado}
-	set TargetDir {/home/jackh/herafengine/pfb_fir_8192ch_core}
+	set TargetDir {/home/jkocz/casper/models/hera_corr_f/pfb_fir_8192ch_core}
 	set TopLevelModule {pfb_fir_8192ch_core}
-	set TopLevelSimulinkHandle 73096
+	set TopLevelSimulinkHandle 74189
 	set VHDLLib {xil_defaultlib}
 	set TopLevelPortInterface {}
-	dict set TopLevelPortInterface pol0_in15 Name {pol0_in15}
-	dict set TopLevelPortInterface pol0_in15 Type Fix_8_7
-	dict set TopLevelPortInterface pol0_in15 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol0_in15 BinaryPoint 7
-	dict set TopLevelPortInterface pol0_in15 Width 8
-	dict set TopLevelPortInterface pol0_in15 DatFile {pfb_fir_8192ch_core_pol0_in15.dat}
-	dict set TopLevelPortInterface pol0_in15 IconText {pol0_in15}
-	dict set TopLevelPortInterface pol0_in15 Direction in
-	dict set TopLevelPortInterface pol0_in15 Period 1
-	dict set TopLevelPortInterface pol0_in15 Interface 0
-	dict set TopLevelPortInterface pol0_in15 InterfaceName {}
-	dict set TopLevelPortInterface pol0_in15 InterfaceString {DATA}
-	dict set TopLevelPortInterface pol0_in15 ClockDomain {pfb_fir_8192ch_core}
-	dict set TopLevelPortInterface pol0_in15 Locs {}
-	dict set TopLevelPortInterface pol0_in15 IOStandard {}
-	dict set TopLevelPortInterface pol0_in14 Name {pol0_in14}
-	dict set TopLevelPortInterface pol0_in14 Type Fix_8_7
-	dict set TopLevelPortInterface pol0_in14 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol0_in14 BinaryPoint 7
-	dict set TopLevelPortInterface pol0_in14 Width 8
-	dict set TopLevelPortInterface pol0_in14 DatFile {pfb_fir_8192ch_core_pol0_in14.dat}
-	dict set TopLevelPortInterface pol0_in14 IconText {pol0_in14}
-	dict set TopLevelPortInterface pol0_in14 Direction in
-	dict set TopLevelPortInterface pol0_in14 Period 1
-	dict set TopLevelPortInterface pol0_in14 Interface 0
-	dict set TopLevelPortInterface pol0_in14 InterfaceName {}
-	dict set TopLevelPortInterface pol0_in14 InterfaceString {DATA}
-	dict set TopLevelPortInterface pol0_in14 ClockDomain {pfb_fir_8192ch_core}
-	dict set TopLevelPortInterface pol0_in14 Locs {}
-	dict set TopLevelPortInterface pol0_in14 IOStandard {}
-	dict set TopLevelPortInterface pol0_in13 Name {pol0_in13}
-	dict set TopLevelPortInterface pol0_in13 Type Fix_8_7
-	dict set TopLevelPortInterface pol0_in13 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol0_in13 BinaryPoint 7
-	dict set TopLevelPortInterface pol0_in13 Width 8
-	dict set TopLevelPortInterface pol0_in13 DatFile {pfb_fir_8192ch_core_pol0_in13.dat}
-	dict set TopLevelPortInterface pol0_in13 IconText {pol0_in13}
-	dict set TopLevelPortInterface pol0_in13 Direction in
-	dict set TopLevelPortInterface pol0_in13 Period 1
-	dict set TopLevelPortInterface pol0_in13 Interface 0
-	dict set TopLevelPortInterface pol0_in13 InterfaceName {}
-	dict set TopLevelPortInterface pol0_in13 InterfaceString {DATA}
-	dict set TopLevelPortInterface pol0_in13 ClockDomain {pfb_fir_8192ch_core}
-	dict set TopLevelPortInterface pol0_in13 Locs {}
-	dict set TopLevelPortInterface pol0_in13 IOStandard {}
-	dict set TopLevelPortInterface pol0_in12 Name {pol0_in12}
-	dict set TopLevelPortInterface pol0_in12 Type Fix_8_7
-	dict set TopLevelPortInterface pol0_in12 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol0_in12 BinaryPoint 7
-	dict set TopLevelPortInterface pol0_in12 Width 8
-	dict set TopLevelPortInterface pol0_in12 DatFile {pfb_fir_8192ch_core_pol0_in12.dat}
-	dict set TopLevelPortInterface pol0_in12 IconText {pol0_in12}
-	dict set TopLevelPortInterface pol0_in12 Direction in
-	dict set TopLevelPortInterface pol0_in12 Period 1
-	dict set TopLevelPortInterface pol0_in12 Interface 0
-	dict set TopLevelPortInterface pol0_in12 InterfaceName {}
-	dict set TopLevelPortInterface pol0_in12 InterfaceString {DATA}
-	dict set TopLevelPortInterface pol0_in12 ClockDomain {pfb_fir_8192ch_core}
-	dict set TopLevelPortInterface pol0_in12 Locs {}
-	dict set TopLevelPortInterface pol0_in12 IOStandard {}
-	dict set TopLevelPortInterface pol0_in11 Name {pol0_in11}
-	dict set TopLevelPortInterface pol0_in11 Type Fix_8_7
-	dict set TopLevelPortInterface pol0_in11 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol0_in11 BinaryPoint 7
-	dict set TopLevelPortInterface pol0_in11 Width 8
-	dict set TopLevelPortInterface pol0_in11 DatFile {pfb_fir_8192ch_core_pol0_in11.dat}
-	dict set TopLevelPortInterface pol0_in11 IconText {pol0_in11}
-	dict set TopLevelPortInterface pol0_in11 Direction in
-	dict set TopLevelPortInterface pol0_in11 Period 1
-	dict set TopLevelPortInterface pol0_in11 Interface 0
-	dict set TopLevelPortInterface pol0_in11 InterfaceName {}
-	dict set TopLevelPortInterface pol0_in11 InterfaceString {DATA}
-	dict set TopLevelPortInterface pol0_in11 ClockDomain {pfb_fir_8192ch_core}
-	dict set TopLevelPortInterface pol0_in11 Locs {}
-	dict set TopLevelPortInterface pol0_in11 IOStandard {}
-	dict set TopLevelPortInterface pol0_in10 Name {pol0_in10}
-	dict set TopLevelPortInterface pol0_in10 Type Fix_8_7
-	dict set TopLevelPortInterface pol0_in10 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol0_in10 BinaryPoint 7
-	dict set TopLevelPortInterface pol0_in10 Width 8
-	dict set TopLevelPortInterface pol0_in10 DatFile {pfb_fir_8192ch_core_pol0_in10.dat}
-	dict set TopLevelPortInterface pol0_in10 IconText {pol0_in10}
-	dict set TopLevelPortInterface pol0_in10 Direction in
-	dict set TopLevelPortInterface pol0_in10 Period 1
-	dict set TopLevelPortInterface pol0_in10 Interface 0
-	dict set TopLevelPortInterface pol0_in10 InterfaceName {}
-	dict set TopLevelPortInterface pol0_in10 InterfaceString {DATA}
-	dict set TopLevelPortInterface pol0_in10 ClockDomain {pfb_fir_8192ch_core}
-	dict set TopLevelPortInterface pol0_in10 Locs {}
-	dict set TopLevelPortInterface pol0_in10 IOStandard {}
+	dict set TopLevelPortInterface sync Name {sync}
+	dict set TopLevelPortInterface sync Type UFix_32_0
+	dict set TopLevelPortInterface sync ArithmeticType xlUnsigned
+	dict set TopLevelPortInterface sync BinaryPoint 0
+	dict set TopLevelPortInterface sync Width 32
+	dict set TopLevelPortInterface sync DatFile {pfb_fir_8192ch_core_sync.dat}
+	dict set TopLevelPortInterface sync IconText {sync}
+	dict set TopLevelPortInterface sync Direction in
+	dict set TopLevelPortInterface sync Period 1
+	dict set TopLevelPortInterface sync Interface 0
+	dict set TopLevelPortInterface sync InterfaceName {}
+	dict set TopLevelPortInterface sync InterfaceString {DATA}
+	dict set TopLevelPortInterface sync ClockDomain {pfb_fir_8192ch_core}
+	dict set TopLevelPortInterface sync Locs {}
+	dict set TopLevelPortInterface sync IOStandard {}
 	dict set TopLevelPortInterface pol0_in9 Name {pol0_in9}
 	dict set TopLevelPortInterface pol0_in9 Type Fix_8_7
 	dict set TopLevelPortInterface pol0_in9 ArithmeticType xlSigned
@@ -332,6 +258,96 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol0_in2 ClockDomain {pfb_fir_8192ch_core}
 	dict set TopLevelPortInterface pol0_in2 Locs {}
 	dict set TopLevelPortInterface pol0_in2 IOStandard {}
+	dict set TopLevelPortInterface pol0_in15 Name {pol0_in15}
+	dict set TopLevelPortInterface pol0_in15 Type Fix_8_7
+	dict set TopLevelPortInterface pol0_in15 ArithmeticType xlSigned
+	dict set TopLevelPortInterface pol0_in15 BinaryPoint 7
+	dict set TopLevelPortInterface pol0_in15 Width 8
+	dict set TopLevelPortInterface pol0_in15 DatFile {pfb_fir_8192ch_core_pol0_in15.dat}
+	dict set TopLevelPortInterface pol0_in15 IconText {pol0_in15}
+	dict set TopLevelPortInterface pol0_in15 Direction in
+	dict set TopLevelPortInterface pol0_in15 Period 1
+	dict set TopLevelPortInterface pol0_in15 Interface 0
+	dict set TopLevelPortInterface pol0_in15 InterfaceName {}
+	dict set TopLevelPortInterface pol0_in15 InterfaceString {DATA}
+	dict set TopLevelPortInterface pol0_in15 ClockDomain {pfb_fir_8192ch_core}
+	dict set TopLevelPortInterface pol0_in15 Locs {}
+	dict set TopLevelPortInterface pol0_in15 IOStandard {}
+	dict set TopLevelPortInterface pol0_in14 Name {pol0_in14}
+	dict set TopLevelPortInterface pol0_in14 Type Fix_8_7
+	dict set TopLevelPortInterface pol0_in14 ArithmeticType xlSigned
+	dict set TopLevelPortInterface pol0_in14 BinaryPoint 7
+	dict set TopLevelPortInterface pol0_in14 Width 8
+	dict set TopLevelPortInterface pol0_in14 DatFile {pfb_fir_8192ch_core_pol0_in14.dat}
+	dict set TopLevelPortInterface pol0_in14 IconText {pol0_in14}
+	dict set TopLevelPortInterface pol0_in14 Direction in
+	dict set TopLevelPortInterface pol0_in14 Period 1
+	dict set TopLevelPortInterface pol0_in14 Interface 0
+	dict set TopLevelPortInterface pol0_in14 InterfaceName {}
+	dict set TopLevelPortInterface pol0_in14 InterfaceString {DATA}
+	dict set TopLevelPortInterface pol0_in14 ClockDomain {pfb_fir_8192ch_core}
+	dict set TopLevelPortInterface pol0_in14 Locs {}
+	dict set TopLevelPortInterface pol0_in14 IOStandard {}
+	dict set TopLevelPortInterface pol0_in13 Name {pol0_in13}
+	dict set TopLevelPortInterface pol0_in13 Type Fix_8_7
+	dict set TopLevelPortInterface pol0_in13 ArithmeticType xlSigned
+	dict set TopLevelPortInterface pol0_in13 BinaryPoint 7
+	dict set TopLevelPortInterface pol0_in13 Width 8
+	dict set TopLevelPortInterface pol0_in13 DatFile {pfb_fir_8192ch_core_pol0_in13.dat}
+	dict set TopLevelPortInterface pol0_in13 IconText {pol0_in13}
+	dict set TopLevelPortInterface pol0_in13 Direction in
+	dict set TopLevelPortInterface pol0_in13 Period 1
+	dict set TopLevelPortInterface pol0_in13 Interface 0
+	dict set TopLevelPortInterface pol0_in13 InterfaceName {}
+	dict set TopLevelPortInterface pol0_in13 InterfaceString {DATA}
+	dict set TopLevelPortInterface pol0_in13 ClockDomain {pfb_fir_8192ch_core}
+	dict set TopLevelPortInterface pol0_in13 Locs {}
+	dict set TopLevelPortInterface pol0_in13 IOStandard {}
+	dict set TopLevelPortInterface pol0_in12 Name {pol0_in12}
+	dict set TopLevelPortInterface pol0_in12 Type Fix_8_7
+	dict set TopLevelPortInterface pol0_in12 ArithmeticType xlSigned
+	dict set TopLevelPortInterface pol0_in12 BinaryPoint 7
+	dict set TopLevelPortInterface pol0_in12 Width 8
+	dict set TopLevelPortInterface pol0_in12 DatFile {pfb_fir_8192ch_core_pol0_in12.dat}
+	dict set TopLevelPortInterface pol0_in12 IconText {pol0_in12}
+	dict set TopLevelPortInterface pol0_in12 Direction in
+	dict set TopLevelPortInterface pol0_in12 Period 1
+	dict set TopLevelPortInterface pol0_in12 Interface 0
+	dict set TopLevelPortInterface pol0_in12 InterfaceName {}
+	dict set TopLevelPortInterface pol0_in12 InterfaceString {DATA}
+	dict set TopLevelPortInterface pol0_in12 ClockDomain {pfb_fir_8192ch_core}
+	dict set TopLevelPortInterface pol0_in12 Locs {}
+	dict set TopLevelPortInterface pol0_in12 IOStandard {}
+	dict set TopLevelPortInterface pol0_in11 Name {pol0_in11}
+	dict set TopLevelPortInterface pol0_in11 Type Fix_8_7
+	dict set TopLevelPortInterface pol0_in11 ArithmeticType xlSigned
+	dict set TopLevelPortInterface pol0_in11 BinaryPoint 7
+	dict set TopLevelPortInterface pol0_in11 Width 8
+	dict set TopLevelPortInterface pol0_in11 DatFile {pfb_fir_8192ch_core_pol0_in11.dat}
+	dict set TopLevelPortInterface pol0_in11 IconText {pol0_in11}
+	dict set TopLevelPortInterface pol0_in11 Direction in
+	dict set TopLevelPortInterface pol0_in11 Period 1
+	dict set TopLevelPortInterface pol0_in11 Interface 0
+	dict set TopLevelPortInterface pol0_in11 InterfaceName {}
+	dict set TopLevelPortInterface pol0_in11 InterfaceString {DATA}
+	dict set TopLevelPortInterface pol0_in11 ClockDomain {pfb_fir_8192ch_core}
+	dict set TopLevelPortInterface pol0_in11 Locs {}
+	dict set TopLevelPortInterface pol0_in11 IOStandard {}
+	dict set TopLevelPortInterface pol0_in10 Name {pol0_in10}
+	dict set TopLevelPortInterface pol0_in10 Type Fix_8_7
+	dict set TopLevelPortInterface pol0_in10 ArithmeticType xlSigned
+	dict set TopLevelPortInterface pol0_in10 BinaryPoint 7
+	dict set TopLevelPortInterface pol0_in10 Width 8
+	dict set TopLevelPortInterface pol0_in10 DatFile {pfb_fir_8192ch_core_pol0_in10.dat}
+	dict set TopLevelPortInterface pol0_in10 IconText {pol0_in10}
+	dict set TopLevelPortInterface pol0_in10 Direction in
+	dict set TopLevelPortInterface pol0_in10 Period 1
+	dict set TopLevelPortInterface pol0_in10 Interface 0
+	dict set TopLevelPortInterface pol0_in10 InterfaceName {}
+	dict set TopLevelPortInterface pol0_in10 InterfaceString {DATA}
+	dict set TopLevelPortInterface pol0_in10 ClockDomain {pfb_fir_8192ch_core}
+	dict set TopLevelPortInterface pol0_in10 Locs {}
+	dict set TopLevelPortInterface pol0_in10 IOStandard {}
 	dict set TopLevelPortInterface pol0_in1 Name {pol0_in1}
 	dict set TopLevelPortInterface pol0_in1 Type Fix_8_7
 	dict set TopLevelPortInterface pol0_in1 ArithmeticType xlSigned
@@ -347,21 +363,6 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol0_in1 ClockDomain {pfb_fir_8192ch_core}
 	dict set TopLevelPortInterface pol0_in1 Locs {}
 	dict set TopLevelPortInterface pol0_in1 IOStandard {}
-	dict set TopLevelPortInterface sync Name {sync}
-	dict set TopLevelPortInterface sync Type UFix_32_0
-	dict set TopLevelPortInterface sync ArithmeticType xlUnsigned
-	dict set TopLevelPortInterface sync BinaryPoint 0
-	dict set TopLevelPortInterface sync Width 32
-	dict set TopLevelPortInterface sync DatFile {pfb_fir_8192ch_core_sync.dat}
-	dict set TopLevelPortInterface sync IconText {sync}
-	dict set TopLevelPortInterface sync Direction in
-	dict set TopLevelPortInterface sync Period 1
-	dict set TopLevelPortInterface sync Interface 0
-	dict set TopLevelPortInterface sync InterfaceName {}
-	dict set TopLevelPortInterface sync InterfaceString {DATA}
-	dict set TopLevelPortInterface sync ClockDomain {pfb_fir_8192ch_core}
-	dict set TopLevelPortInterface sync Locs {}
-	dict set TopLevelPortInterface sync IOStandard {}
 	dict set TopLevelPortInterface pol0_in0 Name {pol0_in0}
 	dict set TopLevelPortInterface pol0_in0 Type Fix_8_7
 	dict set TopLevelPortInterface pol0_in0 ArithmeticType xlSigned
@@ -392,21 +393,6 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol0_out0 ClockDomain {pfb_fir_8192ch_core}
 	dict set TopLevelPortInterface pol0_out0 Locs {}
 	dict set TopLevelPortInterface pol0_out0 IOStandard {}
-	dict set TopLevelPortInterface sync_out Name {sync_out}
-	dict set TopLevelPortInterface sync_out Type Bool
-	dict set TopLevelPortInterface sync_out ArithmeticType xlUnsigned
-	dict set TopLevelPortInterface sync_out BinaryPoint 0
-	dict set TopLevelPortInterface sync_out Width 1
-	dict set TopLevelPortInterface sync_out DatFile {pfb_fir_8192ch_core_sync_out.dat}
-	dict set TopLevelPortInterface sync_out IconText {sync_out}
-	dict set TopLevelPortInterface sync_out Direction out
-	dict set TopLevelPortInterface sync_out Period 1
-	dict set TopLevelPortInterface sync_out Interface 0
-	dict set TopLevelPortInterface sync_out InterfaceName {}
-	dict set TopLevelPortInterface sync_out InterfaceString {DATA}
-	dict set TopLevelPortInterface sync_out ClockDomain {pfb_fir_8192ch_core}
-	dict set TopLevelPortInterface sync_out Locs {}
-	dict set TopLevelPortInterface sync_out IOStandard {}
 	dict set TopLevelPortInterface pol0_out1 Name {pol0_out1}
 	dict set TopLevelPortInterface pol0_out1 Type Fix_12_11
 	dict set TopLevelPortInterface pol0_out1 ArithmeticType xlSigned
@@ -422,6 +408,96 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol0_out1 ClockDomain {pfb_fir_8192ch_core}
 	dict set TopLevelPortInterface pol0_out1 Locs {}
 	dict set TopLevelPortInterface pol0_out1 IOStandard {}
+	dict set TopLevelPortInterface pol0_out10 Name {pol0_out10}
+	dict set TopLevelPortInterface pol0_out10 Type Fix_12_11
+	dict set TopLevelPortInterface pol0_out10 ArithmeticType xlSigned
+	dict set TopLevelPortInterface pol0_out10 BinaryPoint 11
+	dict set TopLevelPortInterface pol0_out10 Width 12
+	dict set TopLevelPortInterface pol0_out10 DatFile {pfb_fir_8192ch_core_pol0_out10.dat}
+	dict set TopLevelPortInterface pol0_out10 IconText {pol0_out10}
+	dict set TopLevelPortInterface pol0_out10 Direction out
+	dict set TopLevelPortInterface pol0_out10 Period 1
+	dict set TopLevelPortInterface pol0_out10 Interface 0
+	dict set TopLevelPortInterface pol0_out10 InterfaceName {}
+	dict set TopLevelPortInterface pol0_out10 InterfaceString {DATA}
+	dict set TopLevelPortInterface pol0_out10 ClockDomain {pfb_fir_8192ch_core}
+	dict set TopLevelPortInterface pol0_out10 Locs {}
+	dict set TopLevelPortInterface pol0_out10 IOStandard {}
+	dict set TopLevelPortInterface pol0_out11 Name {pol0_out11}
+	dict set TopLevelPortInterface pol0_out11 Type Fix_12_11
+	dict set TopLevelPortInterface pol0_out11 ArithmeticType xlSigned
+	dict set TopLevelPortInterface pol0_out11 BinaryPoint 11
+	dict set TopLevelPortInterface pol0_out11 Width 12
+	dict set TopLevelPortInterface pol0_out11 DatFile {pfb_fir_8192ch_core_pol0_out11.dat}
+	dict set TopLevelPortInterface pol0_out11 IconText {pol0_out11}
+	dict set TopLevelPortInterface pol0_out11 Direction out
+	dict set TopLevelPortInterface pol0_out11 Period 1
+	dict set TopLevelPortInterface pol0_out11 Interface 0
+	dict set TopLevelPortInterface pol0_out11 InterfaceName {}
+	dict set TopLevelPortInterface pol0_out11 InterfaceString {DATA}
+	dict set TopLevelPortInterface pol0_out11 ClockDomain {pfb_fir_8192ch_core}
+	dict set TopLevelPortInterface pol0_out11 Locs {}
+	dict set TopLevelPortInterface pol0_out11 IOStandard {}
+	dict set TopLevelPortInterface pol0_out12 Name {pol0_out12}
+	dict set TopLevelPortInterface pol0_out12 Type Fix_12_11
+	dict set TopLevelPortInterface pol0_out12 ArithmeticType xlSigned
+	dict set TopLevelPortInterface pol0_out12 BinaryPoint 11
+	dict set TopLevelPortInterface pol0_out12 Width 12
+	dict set TopLevelPortInterface pol0_out12 DatFile {pfb_fir_8192ch_core_pol0_out12.dat}
+	dict set TopLevelPortInterface pol0_out12 IconText {pol0_out12}
+	dict set TopLevelPortInterface pol0_out12 Direction out
+	dict set TopLevelPortInterface pol0_out12 Period 1
+	dict set TopLevelPortInterface pol0_out12 Interface 0
+	dict set TopLevelPortInterface pol0_out12 InterfaceName {}
+	dict set TopLevelPortInterface pol0_out12 InterfaceString {DATA}
+	dict set TopLevelPortInterface pol0_out12 ClockDomain {pfb_fir_8192ch_core}
+	dict set TopLevelPortInterface pol0_out12 Locs {}
+	dict set TopLevelPortInterface pol0_out12 IOStandard {}
+	dict set TopLevelPortInterface pol0_out13 Name {pol0_out13}
+	dict set TopLevelPortInterface pol0_out13 Type Fix_12_11
+	dict set TopLevelPortInterface pol0_out13 ArithmeticType xlSigned
+	dict set TopLevelPortInterface pol0_out13 BinaryPoint 11
+	dict set TopLevelPortInterface pol0_out13 Width 12
+	dict set TopLevelPortInterface pol0_out13 DatFile {pfb_fir_8192ch_core_pol0_out13.dat}
+	dict set TopLevelPortInterface pol0_out13 IconText {pol0_out13}
+	dict set TopLevelPortInterface pol0_out13 Direction out
+	dict set TopLevelPortInterface pol0_out13 Period 1
+	dict set TopLevelPortInterface pol0_out13 Interface 0
+	dict set TopLevelPortInterface pol0_out13 InterfaceName {}
+	dict set TopLevelPortInterface pol0_out13 InterfaceString {DATA}
+	dict set TopLevelPortInterface pol0_out13 ClockDomain {pfb_fir_8192ch_core}
+	dict set TopLevelPortInterface pol0_out13 Locs {}
+	dict set TopLevelPortInterface pol0_out13 IOStandard {}
+	dict set TopLevelPortInterface pol0_out14 Name {pol0_out14}
+	dict set TopLevelPortInterface pol0_out14 Type Fix_12_11
+	dict set TopLevelPortInterface pol0_out14 ArithmeticType xlSigned
+	dict set TopLevelPortInterface pol0_out14 BinaryPoint 11
+	dict set TopLevelPortInterface pol0_out14 Width 12
+	dict set TopLevelPortInterface pol0_out14 DatFile {pfb_fir_8192ch_core_pol0_out14.dat}
+	dict set TopLevelPortInterface pol0_out14 IconText {pol0_out14}
+	dict set TopLevelPortInterface pol0_out14 Direction out
+	dict set TopLevelPortInterface pol0_out14 Period 1
+	dict set TopLevelPortInterface pol0_out14 Interface 0
+	dict set TopLevelPortInterface pol0_out14 InterfaceName {}
+	dict set TopLevelPortInterface pol0_out14 InterfaceString {DATA}
+	dict set TopLevelPortInterface pol0_out14 ClockDomain {pfb_fir_8192ch_core}
+	dict set TopLevelPortInterface pol0_out14 Locs {}
+	dict set TopLevelPortInterface pol0_out14 IOStandard {}
+	dict set TopLevelPortInterface pol0_out15 Name {pol0_out15}
+	dict set TopLevelPortInterface pol0_out15 Type Fix_12_11
+	dict set TopLevelPortInterface pol0_out15 ArithmeticType xlSigned
+	dict set TopLevelPortInterface pol0_out15 BinaryPoint 11
+	dict set TopLevelPortInterface pol0_out15 Width 12
+	dict set TopLevelPortInterface pol0_out15 DatFile {pfb_fir_8192ch_core_pol0_out15.dat}
+	dict set TopLevelPortInterface pol0_out15 IconText {pol0_out15}
+	dict set TopLevelPortInterface pol0_out15 Direction out
+	dict set TopLevelPortInterface pol0_out15 Period 1
+	dict set TopLevelPortInterface pol0_out15 Interface 0
+	dict set TopLevelPortInterface pol0_out15 InterfaceName {}
+	dict set TopLevelPortInterface pol0_out15 InterfaceString {DATA}
+	dict set TopLevelPortInterface pol0_out15 ClockDomain {pfb_fir_8192ch_core}
+	dict set TopLevelPortInterface pol0_out15 Locs {}
+	dict set TopLevelPortInterface pol0_out15 IOStandard {}
 	dict set TopLevelPortInterface pol0_out2 Name {pol0_out2}
 	dict set TopLevelPortInterface pol0_out2 Type Fix_12_11
 	dict set TopLevelPortInterface pol0_out2 ArithmeticType xlSigned
@@ -542,96 +618,21 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	dict set TopLevelPortInterface pol0_out9 ClockDomain {pfb_fir_8192ch_core}
 	dict set TopLevelPortInterface pol0_out9 Locs {}
 	dict set TopLevelPortInterface pol0_out9 IOStandard {}
-	dict set TopLevelPortInterface pol0_out10 Name {pol0_out10}
-	dict set TopLevelPortInterface pol0_out10 Type Fix_12_11
-	dict set TopLevelPortInterface pol0_out10 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol0_out10 BinaryPoint 11
-	dict set TopLevelPortInterface pol0_out10 Width 12
-	dict set TopLevelPortInterface pol0_out10 DatFile {pfb_fir_8192ch_core_pol0_out10.dat}
-	dict set TopLevelPortInterface pol0_out10 IconText {pol0_out10}
-	dict set TopLevelPortInterface pol0_out10 Direction out
-	dict set TopLevelPortInterface pol0_out10 Period 1
-	dict set TopLevelPortInterface pol0_out10 Interface 0
-	dict set TopLevelPortInterface pol0_out10 InterfaceName {}
-	dict set TopLevelPortInterface pol0_out10 InterfaceString {DATA}
-	dict set TopLevelPortInterface pol0_out10 ClockDomain {pfb_fir_8192ch_core}
-	dict set TopLevelPortInterface pol0_out10 Locs {}
-	dict set TopLevelPortInterface pol0_out10 IOStandard {}
-	dict set TopLevelPortInterface pol0_out11 Name {pol0_out11}
-	dict set TopLevelPortInterface pol0_out11 Type Fix_12_11
-	dict set TopLevelPortInterface pol0_out11 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol0_out11 BinaryPoint 11
-	dict set TopLevelPortInterface pol0_out11 Width 12
-	dict set TopLevelPortInterface pol0_out11 DatFile {pfb_fir_8192ch_core_pol0_out11.dat}
-	dict set TopLevelPortInterface pol0_out11 IconText {pol0_out11}
-	dict set TopLevelPortInterface pol0_out11 Direction out
-	dict set TopLevelPortInterface pol0_out11 Period 1
-	dict set TopLevelPortInterface pol0_out11 Interface 0
-	dict set TopLevelPortInterface pol0_out11 InterfaceName {}
-	dict set TopLevelPortInterface pol0_out11 InterfaceString {DATA}
-	dict set TopLevelPortInterface pol0_out11 ClockDomain {pfb_fir_8192ch_core}
-	dict set TopLevelPortInterface pol0_out11 Locs {}
-	dict set TopLevelPortInterface pol0_out11 IOStandard {}
-	dict set TopLevelPortInterface pol0_out12 Name {pol0_out12}
-	dict set TopLevelPortInterface pol0_out12 Type Fix_12_11
-	dict set TopLevelPortInterface pol0_out12 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol0_out12 BinaryPoint 11
-	dict set TopLevelPortInterface pol0_out12 Width 12
-	dict set TopLevelPortInterface pol0_out12 DatFile {pfb_fir_8192ch_core_pol0_out12.dat}
-	dict set TopLevelPortInterface pol0_out12 IconText {pol0_out12}
-	dict set TopLevelPortInterface pol0_out12 Direction out
-	dict set TopLevelPortInterface pol0_out12 Period 1
-	dict set TopLevelPortInterface pol0_out12 Interface 0
-	dict set TopLevelPortInterface pol0_out12 InterfaceName {}
-	dict set TopLevelPortInterface pol0_out12 InterfaceString {DATA}
-	dict set TopLevelPortInterface pol0_out12 ClockDomain {pfb_fir_8192ch_core}
-	dict set TopLevelPortInterface pol0_out12 Locs {}
-	dict set TopLevelPortInterface pol0_out12 IOStandard {}
-	dict set TopLevelPortInterface pol0_out13 Name {pol0_out13}
-	dict set TopLevelPortInterface pol0_out13 Type Fix_12_11
-	dict set TopLevelPortInterface pol0_out13 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol0_out13 BinaryPoint 11
-	dict set TopLevelPortInterface pol0_out13 Width 12
-	dict set TopLevelPortInterface pol0_out13 DatFile {pfb_fir_8192ch_core_pol0_out13.dat}
-	dict set TopLevelPortInterface pol0_out13 IconText {pol0_out13}
-	dict set TopLevelPortInterface pol0_out13 Direction out
-	dict set TopLevelPortInterface pol0_out13 Period 1
-	dict set TopLevelPortInterface pol0_out13 Interface 0
-	dict set TopLevelPortInterface pol0_out13 InterfaceName {}
-	dict set TopLevelPortInterface pol0_out13 InterfaceString {DATA}
-	dict set TopLevelPortInterface pol0_out13 ClockDomain {pfb_fir_8192ch_core}
-	dict set TopLevelPortInterface pol0_out13 Locs {}
-	dict set TopLevelPortInterface pol0_out13 IOStandard {}
-	dict set TopLevelPortInterface pol0_out14 Name {pol0_out14}
-	dict set TopLevelPortInterface pol0_out14 Type Fix_12_11
-	dict set TopLevelPortInterface pol0_out14 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol0_out14 BinaryPoint 11
-	dict set TopLevelPortInterface pol0_out14 Width 12
-	dict set TopLevelPortInterface pol0_out14 DatFile {pfb_fir_8192ch_core_pol0_out14.dat}
-	dict set TopLevelPortInterface pol0_out14 IconText {pol0_out14}
-	dict set TopLevelPortInterface pol0_out14 Direction out
-	dict set TopLevelPortInterface pol0_out14 Period 1
-	dict set TopLevelPortInterface pol0_out14 Interface 0
-	dict set TopLevelPortInterface pol0_out14 InterfaceName {}
-	dict set TopLevelPortInterface pol0_out14 InterfaceString {DATA}
-	dict set TopLevelPortInterface pol0_out14 ClockDomain {pfb_fir_8192ch_core}
-	dict set TopLevelPortInterface pol0_out14 Locs {}
-	dict set TopLevelPortInterface pol0_out14 IOStandard {}
-	dict set TopLevelPortInterface pol0_out15 Name {pol0_out15}
-	dict set TopLevelPortInterface pol0_out15 Type Fix_12_11
-	dict set TopLevelPortInterface pol0_out15 ArithmeticType xlSigned
-	dict set TopLevelPortInterface pol0_out15 BinaryPoint 11
-	dict set TopLevelPortInterface pol0_out15 Width 12
-	dict set TopLevelPortInterface pol0_out15 DatFile {pfb_fir_8192ch_core_pol0_out15.dat}
-	dict set TopLevelPortInterface pol0_out15 IconText {pol0_out15}
-	dict set TopLevelPortInterface pol0_out15 Direction out
-	dict set TopLevelPortInterface pol0_out15 Period 1
-	dict set TopLevelPortInterface pol0_out15 Interface 0
-	dict set TopLevelPortInterface pol0_out15 InterfaceName {}
-	dict set TopLevelPortInterface pol0_out15 InterfaceString {DATA}
-	dict set TopLevelPortInterface pol0_out15 ClockDomain {pfb_fir_8192ch_core}
-	dict set TopLevelPortInterface pol0_out15 Locs {}
-	dict set TopLevelPortInterface pol0_out15 IOStandard {}
+	dict set TopLevelPortInterface sync_out Name {sync_out}
+	dict set TopLevelPortInterface sync_out Type Bool
+	dict set TopLevelPortInterface sync_out ArithmeticType xlUnsigned
+	dict set TopLevelPortInterface sync_out BinaryPoint 0
+	dict set TopLevelPortInterface sync_out Width 1
+	dict set TopLevelPortInterface sync_out DatFile {pfb_fir_8192ch_core_sync_out.dat}
+	dict set TopLevelPortInterface sync_out IconText {sync_out}
+	dict set TopLevelPortInterface sync_out Direction out
+	dict set TopLevelPortInterface sync_out Period 1
+	dict set TopLevelPortInterface sync_out Interface 0
+	dict set TopLevelPortInterface sync_out InterfaceName {}
+	dict set TopLevelPortInterface sync_out InterfaceString {DATA}
+	dict set TopLevelPortInterface sync_out ClockDomain {pfb_fir_8192ch_core}
+	dict set TopLevelPortInterface sync_out Locs {}
+	dict set TopLevelPortInterface sync_out IOStandard {}
 	dict set TopLevelPortInterface clk Name {clk}
 	dict set TopLevelPortInterface clk Type -
 	dict set TopLevelPortInterface clk ArithmeticType xlUnsigned
