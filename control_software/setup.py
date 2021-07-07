@@ -2,7 +2,7 @@ from distutils.core import setup
 import glob
 import os
 
-ver = '0.0.1'
+ver = '0.0.2'
 try:
     import subprocess
     ver = ver + '-' + subprocess.check_output(['git', 'describe', '--abbrev=8', '--always', '--dirty', '--tags']).strip()
@@ -27,9 +27,9 @@ setup(name='hera_corr_f',
       )
 
 if ver.endswith("dirty"):
-    print "********************************************"
-    print "* You are installing from a dirty git repo *"
-    print "*      One day you will regret this.       *"
-    print "*                                          *"
-    print "*  Consider cleaning up and reinstalling.  *"
-    print "********************************************"
+    print ("********************************************") 
+    print ("* You are installing from a dirty git repo *")
+    print ("*      One day you will regret this.       *")
+    print ("*                                          *")
+    print ("*  Consider cleaning up and reinstalling.  *")
+    print ("********************************************")

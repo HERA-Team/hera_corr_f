@@ -39,7 +39,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN0.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN0.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type i
+mmediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -61,7 +62,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN1.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN1.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type i
+mmediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -83,7 +85,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN10.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN10.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type i
+mmediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -105,7 +108,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN11.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN11.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type i
+mmediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -127,7 +131,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN12.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN12.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type i
+mmediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -149,7 +154,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN13.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN13.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type i
+mmediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -171,7 +177,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN14.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN14.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type i
+mmediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -193,7 +200,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN15.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN15.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type i
+mmediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -215,7 +223,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN2.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN2.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type i
+mmediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -237,7 +246,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN3.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN3.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type i
+mmediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -259,7 +269,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN4.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN4.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type i
+mmediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -281,7 +292,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN5.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN5.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type i
+mmediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -303,7 +315,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN6.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN6.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type i
+mmediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -325,7 +338,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN7.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN7.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type i
+mmediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -347,7 +361,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN8.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN8.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type i
+mmediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -369,7 +384,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN9.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.POL0_IN9.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 12} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 11} signed {attribs {resolve_type i
+mmediate dependency {} format bool minimum {} maximum {}} value true}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -391,7 +407,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.SHIFT.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 16} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.SHIFT.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 16} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type im
+mediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -413,7 +430,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.SYNC.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 32} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.SYNC.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 32} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type im
+mediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -435,7 +453,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.OUT0.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.OUT0.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type im
+mediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -457,7 +476,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.OUT1.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.OUT1.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type im
+mediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -479,7 +499,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.OUT2.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.OUT2.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type im
+mediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -501,7 +522,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.OUT3.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.OUT3.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type im
+mediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -523,7 +545,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.OUT4.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.OUT4.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type im
+mediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -545,7 +568,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.OUT5.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.OUT5.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type im
+mediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -567,7 +591,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.OUT6.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.OUT6.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type im
+mediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -589,7 +614,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.OUT7.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.OUT7.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 36} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type im
+mediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -611,7 +637,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.OVERFLOW.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 4} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.OVERFLOW.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 4} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type imm
+ediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -633,7 +660,8 @@
       <spirit:parameters>
         <spirit:parameter>
           <spirit:name>LAYERED_METADATA</spirit:name>
-          <spirit:value spirit:id="BUSIFPARAM_VALUE.SYNC_OUT.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 1} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type immediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
+          <spirit:value spirit:id="BUSIFPARAM_VALUE.SYNC_OUT.LAYERED_METADATA">xilinx.com:interface:datatypes:1.0 {DATA {datatype {name {attribs {resolve_type immediate dependency {} format string minimum {} maximum {}} value {}} bitwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 1} bitoffset {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} real {fixed {fractwidth {attribs {resolve_type immediate dependency {} format long minimum {} maximum {}} value 0} signed {attribs {resolve_type imm
+ediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spirit:value>
         </spirit:parameter>
       </spirit:parameters>
     </spirit:busInterface>
@@ -1173,42 +1201,6 @@
     <spirit:fileSet>
       <spirit:name>xilinx_vhdlsynthesis_view_fileset</spirit:name>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i0/fft_8192_1a_core_blk_mem_gen_v8_3_i0.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i1/fft_8192_1a_core_blk_mem_gen_v8_3_i1.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i2/fft_8192_1a_core_blk_mem_gen_v8_3_i2.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i3/fft_8192_1a_core_blk_mem_gen_v8_3_i3.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i4/fft_8192_1a_core_blk_mem_gen_v8_3_i4.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i5/fft_8192_1a_core_blk_mem_gen_v8_3_i5.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i6/fft_8192_1a_core_blk_mem_gen_v8_3_i6.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i7/fft_8192_1a_core_blk_mem_gen_v8_3_i7.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i8/fft_8192_1a_core_blk_mem_gen_v8_3_i8.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
         <spirit:name>fft_8192_1a_core_c_addsub_v12_0_i0/fft_8192_1a_core_c_addsub_v12_0_i0.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
@@ -1277,6 +1269,46 @@
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i10/fft_8192_1a_core_c_counter_binary_v12_0_i10.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i11/fft_8192_1a_core_c_counter_binary_v12_0_i11.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i12/fft_8192_1a_core_c_counter_binary_v12_0_i12.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i13/fft_8192_1a_core_c_counter_binary_v12_0_i13.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i14/fft_8192_1a_core_c_counter_binary_v12_0_i14.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i15/fft_8192_1a_core_c_counter_binary_v12_0_i15.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i16/fft_8192_1a_core_c_counter_binary_v12_0_i16.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i17/fft_8192_1a_core_c_counter_binary_v12_0_i17.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i18/fft_8192_1a_core_c_counter_binary_v12_0_i18.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i19/fft_8192_1a_core_c_counter_binary_v12_0_i19.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
         <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i2/fft_8192_1a_core_c_counter_binary_v12_0_i2.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
@@ -1309,83 +1341,83 @@
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i0/fft_8192_1a_core_dist_mem_gen_v8_0_i0.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i0/fft_8192_1a_core_dist_mem_gen_i0.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i1/fft_8192_1a_core_dist_mem_gen_v8_0_i1.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i1/fft_8192_1a_core_dist_mem_gen_i1.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i10/fft_8192_1a_core_dist_mem_gen_v8_0_i10.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i10/fft_8192_1a_core_dist_mem_gen_i10.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i11/fft_8192_1a_core_dist_mem_gen_v8_0_i11.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i11/fft_8192_1a_core_dist_mem_gen_i11.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i12/fft_8192_1a_core_dist_mem_gen_v8_0_i12.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i12/fft_8192_1a_core_dist_mem_gen_i12.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i13/fft_8192_1a_core_dist_mem_gen_v8_0_i13.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i13/fft_8192_1a_core_dist_mem_gen_i13.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i14/fft_8192_1a_core_dist_mem_gen_v8_0_i14.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i14/fft_8192_1a_core_dist_mem_gen_i14.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i15/fft_8192_1a_core_dist_mem_gen_v8_0_i15.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i15/fft_8192_1a_core_dist_mem_gen_i15.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i16/fft_8192_1a_core_dist_mem_gen_v8_0_i16.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i16/fft_8192_1a_core_dist_mem_gen_i16.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i17/fft_8192_1a_core_dist_mem_gen_v8_0_i17.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i17/fft_8192_1a_core_dist_mem_gen_i17.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i18/fft_8192_1a_core_dist_mem_gen_v8_0_i18.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i18/fft_8192_1a_core_dist_mem_gen_i18.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i19/fft_8192_1a_core_dist_mem_gen_v8_0_i19.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i19/fft_8192_1a_core_dist_mem_gen_i19.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i2/fft_8192_1a_core_dist_mem_gen_v8_0_i2.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i2/fft_8192_1a_core_dist_mem_gen_i2.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i3/fft_8192_1a_core_dist_mem_gen_v8_0_i3.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i3/fft_8192_1a_core_dist_mem_gen_i3.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i4/fft_8192_1a_core_dist_mem_gen_v8_0_i4.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i4/fft_8192_1a_core_dist_mem_gen_i4.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i5/fft_8192_1a_core_dist_mem_gen_v8_0_i5.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i5/fft_8192_1a_core_dist_mem_gen_i5.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i6/fft_8192_1a_core_dist_mem_gen_v8_0_i6.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i6/fft_8192_1a_core_dist_mem_gen_i6.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i7/fft_8192_1a_core_dist_mem_gen_v8_0_i7.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i7/fft_8192_1a_core_dist_mem_gen_i7.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i8/fft_8192_1a_core_dist_mem_gen_v8_0_i8.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i8/fft_8192_1a_core_dist_mem_gen_i8.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i9/fft_8192_1a_core_dist_mem_gen_v8_0_i9.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i9/fft_8192_1a_core_dist_mem_gen_i9.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
@@ -1393,120 +1425,128 @@
         <spirit:userFileType>xdc</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i0_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i0_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i1_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i1_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i2_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i2_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i3_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i3_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i4_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i4_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i5_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i5_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i0_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i6_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i1_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i7_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i2_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i8_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i3_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i9_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i6_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i10_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i7_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i11_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i8_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i12_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i4_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i13_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i5_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i14_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i6_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i15_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i7_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i16_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i8_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i17_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i9_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i18_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i10_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i19_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i11_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_f6cc85_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i12_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_862abf_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i13_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_aac239_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i14_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_fa7f51_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i15_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_31439a_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i16_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_98f453_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i17_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_cb2434_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i18_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_45185a_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i19_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_258bd0_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>xpm_f5fed5_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>xpm_ecb464_dpram.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>hdl/conv_pkg.vhd</spirit:name>
@@ -1556,48 +1596,12 @@
       <spirit:file>
         <spirit:name>hdl/fft_8192_1a_core.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_6f17f7c6</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_864649d8</spirit:userFileType>
         <spirit:logicalName>xil_defaultlib</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
       <spirit:name>xilinx_vhdlbehavioralsimulation_view_fileset</spirit:name>
-      <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i0/fft_8192_1a_core_blk_mem_gen_v8_3_i0.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i1/fft_8192_1a_core_blk_mem_gen_v8_3_i1.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i2/fft_8192_1a_core_blk_mem_gen_v8_3_i2.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i3/fft_8192_1a_core_blk_mem_gen_v8_3_i3.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i4/fft_8192_1a_core_blk_mem_gen_v8_3_i4.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i5/fft_8192_1a_core_blk_mem_gen_v8_3_i5.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i6/fft_8192_1a_core_blk_mem_gen_v8_3_i6.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i7/fft_8192_1a_core_blk_mem_gen_v8_3_i7.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i8/fft_8192_1a_core_blk_mem_gen_v8_3_i8.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
       <spirit:file>
         <spirit:name>fft_8192_1a_core_c_addsub_v12_0_i0/fft_8192_1a_core_c_addsub_v12_0_i0.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
@@ -1667,6 +1671,46 @@
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i10/fft_8192_1a_core_c_counter_binary_v12_0_i10.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i11/fft_8192_1a_core_c_counter_binary_v12_0_i11.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i12/fft_8192_1a_core_c_counter_binary_v12_0_i12.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i13/fft_8192_1a_core_c_counter_binary_v12_0_i13.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i14/fft_8192_1a_core_c_counter_binary_v12_0_i14.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i15/fft_8192_1a_core_c_counter_binary_v12_0_i15.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i16/fft_8192_1a_core_c_counter_binary_v12_0_i16.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i17/fft_8192_1a_core_c_counter_binary_v12_0_i17.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i18/fft_8192_1a_core_c_counter_binary_v12_0_i18.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i19/fft_8192_1a_core_c_counter_binary_v12_0_i19.xci</spirit:name>
+        <spirit:userFileType>xci</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
         <spirit:name>fft_8192_1a_core_c_counter_binary_v12_0_i2/fft_8192_1a_core_c_counter_binary_v12_0_i2.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
@@ -1699,200 +1743,208 @@
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i0/fft_8192_1a_core_dist_mem_gen_v8_0_i0.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i0/fft_8192_1a_core_dist_mem_gen_i0.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i1/fft_8192_1a_core_dist_mem_gen_v8_0_i1.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i1/fft_8192_1a_core_dist_mem_gen_i1.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i10/fft_8192_1a_core_dist_mem_gen_v8_0_i10.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i10/fft_8192_1a_core_dist_mem_gen_i10.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i11/fft_8192_1a_core_dist_mem_gen_v8_0_i11.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i11/fft_8192_1a_core_dist_mem_gen_i11.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i12/fft_8192_1a_core_dist_mem_gen_v8_0_i12.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i12/fft_8192_1a_core_dist_mem_gen_i12.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i13/fft_8192_1a_core_dist_mem_gen_v8_0_i13.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i13/fft_8192_1a_core_dist_mem_gen_i13.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i14/fft_8192_1a_core_dist_mem_gen_v8_0_i14.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i14/fft_8192_1a_core_dist_mem_gen_i14.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i15/fft_8192_1a_core_dist_mem_gen_v8_0_i15.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i15/fft_8192_1a_core_dist_mem_gen_i15.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i16/fft_8192_1a_core_dist_mem_gen_v8_0_i16.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i16/fft_8192_1a_core_dist_mem_gen_i16.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i17/fft_8192_1a_core_dist_mem_gen_v8_0_i17.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i17/fft_8192_1a_core_dist_mem_gen_i17.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i18/fft_8192_1a_core_dist_mem_gen_v8_0_i18.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i18/fft_8192_1a_core_dist_mem_gen_i18.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i19/fft_8192_1a_core_dist_mem_gen_v8_0_i19.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i19/fft_8192_1a_core_dist_mem_gen_i19.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i2/fft_8192_1a_core_dist_mem_gen_v8_0_i2.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i2/fft_8192_1a_core_dist_mem_gen_i2.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i3/fft_8192_1a_core_dist_mem_gen_v8_0_i3.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i3/fft_8192_1a_core_dist_mem_gen_i3.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i4/fft_8192_1a_core_dist_mem_gen_v8_0_i4.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i4/fft_8192_1a_core_dist_mem_gen_i4.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i5/fft_8192_1a_core_dist_mem_gen_v8_0_i5.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i5/fft_8192_1a_core_dist_mem_gen_i5.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i6/fft_8192_1a_core_dist_mem_gen_v8_0_i6.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i6/fft_8192_1a_core_dist_mem_gen_i6.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i7/fft_8192_1a_core_dist_mem_gen_v8_0_i7.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i7/fft_8192_1a_core_dist_mem_gen_i7.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i8/fft_8192_1a_core_dist_mem_gen_v8_0_i8.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i8/fft_8192_1a_core_dist_mem_gen_i8.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i9/fft_8192_1a_core_dist_mem_gen_v8_0_i9.xci</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i9/fft_8192_1a_core_dist_mem_gen_i9.xci</spirit:name>
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i0_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i0_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i1_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i1_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i2_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i2_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i3_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i3_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i4_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i4_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i5_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i5_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i0_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i6_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i1_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i7_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i2_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i8_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i3_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i9_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i6_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i10_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i7_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i11_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_blk_mem_gen_v8_3_i8_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i12_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i4_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i13_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i5_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i14_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i6_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i15_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i7_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i16_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i8_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i17_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i9_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i18_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i10_vivado.coe</spirit:name>
+        <spirit:name>fft_8192_1a_core_dist_mem_gen_i19_vivado.coe</spirit:name>
         <spirit:userFileType>coe</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i11_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_f6cc85_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i12_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_862abf_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i13_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_aac239_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i14_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_fa7f51_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i15_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_31439a_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i16_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_98f453_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i17_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_cb2434_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i18_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_45185a_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>fft_8192_1a_core_dist_mem_gen_v8_0_i19_vivado.coe</spirit:name>
-        <spirit:userFileType>coe</spirit:userFileType>
+        <spirit:name>xpm_258bd0_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>xpm_f5fed5_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>xpm_ecb464_dpram.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
         <spirit:name>hdl/conv_pkg.vhd</spirit:name>
@@ -1990,11 +2042,16 @@
       </xilinx:taxonomies>
       <xilinx:displayName>fft_8192_1a_core</xilinx:displayName>
       <xilinx:definitionSource>sysgen</xilinx:definitionSource>
-      <xilinx:coreRevision>150469605</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2018-02-25T21:09:34Z</xilinx:coreCreationDateTime>
+      <xilinx:xpmLibraries>
+        <xilinx:xpmLibrary>XPM_MEMORY</xilinx:xpmLibrary>
+        <xilinx:xpmLibrary>XPM_FIFO</xilinx:xpmLibrary>
+        <xilinx:xpmLibrary>XPM_CDC</xilinx:xpmLibrary>
+      </xilinx:xpmLibraries>
+      <xilinx:coreRevision>237138321</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2020-11-24T23:48:17Z</xilinx:coreCreationDateTime>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
-      <xilinx:xilinxVersion>2016.4</xilinx:xilinxVersion>
+      <xilinx:xilinxVersion>2019.1.1</xilinx:xilinxVersion>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>

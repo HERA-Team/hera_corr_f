@@ -11,3 +11,6 @@ vivado*.str
 slprj/
 SysgenFeatureReport.htm
 startsg.local
+*.2016b
+*.mem
+
