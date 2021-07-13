@@ -2080,8 +2080,8 @@ class Fem(Block):
     RMS2DC_INTERCEPT = -55.15991678
 
     IMU_ORIENT = [[0,0,1],[0,1,0],[1,0,0]]
-    SWMODE = {'load':0b001,'antenna':0b111,'noise':0b000}
-    SWMODE_REV = {0b001:'load', 0b111:'antenna', 0b000:'noise',}
+    SWMODE = {'load':0b000,'antenna':0b110,'noise':0b001}
+    SWMODE_REV = {0b000:'load', 0b110:'antenna', 0b001:'noise',}
 
     def __init__(self, host, name, logger=None):
         """ Front End Module (FEM) digital control class
