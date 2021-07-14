@@ -2268,9 +2268,9 @@ class Fem(Block):
             mode = cur_mode
         new_val = 0b00000000
         if east:
-            new_val |= 0b00010000
-        if north:
             new_val |= 0b00001000
+        if north:
+            new_val |= 0b00010000
         new_val |= self.SWMODE.get(mode, val & 0b00000111)
         self._sw.write(new_val)
         if verify:
