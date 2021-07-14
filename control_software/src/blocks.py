@@ -2255,8 +2255,8 @@ class Fem(Block):
             val = self._sw.read()
         except:
             raise RuntimeError("I2C RF switch read failure")
-        cur_e = bool(val & 0b00010000)
-        cur_n = bool(val & 0b00001000)
+        cur_e = bool(val & 0b00001000)
+        cur_n = bool(val & 0b00010000)
         cur_mode = self.SWMODE_REV.get(val & 0b00000111, 'Unknown')
         if mode is None and east is None and north is None:
             return cur_mode, cur_e, cur_n
