@@ -2,8 +2,8 @@ from hera_corr_f import SnapFengine
 import time
 
 IP = '10.10.10.236' # SNAP in digital lab
-#NTEST = 10
-NTEST = 2
+NTEST = 300
+#NTEST = 2
 NRAMPS = 1000
 #NRAMPS = 500
 

@@ -415,15 +415,14 @@ class Adc(casperfpga.snapadc.SNAPADC):
         for cnt in range(maxtries):
             try:
                 for chip in self.adcList:
-                    for L in self.laneList:
-                        assert(self.working_taps[chip][L].size > 0)
+                    assert(self.working_taps[chip].size > 0)
                 return
             except(KeyError, AssertionError):
                 self.logger.info('Not enough working taps. Reinitializing.')
                 if len(self.working_taps) > 0:
                     self.init()
                 self.working_taps = {}
-                h = np.zeros((nchips, nlanes, ntaps), dtype=int)
+                h = np.zeros((nchips, ntaps), dtype=int)
                 self.setDemux(numChannel=1)
                 self.selectADC() # select all chips
                 self.adc.test('pat_deskew')
@@ -433,18 +432,15 @@ class Adc(casperfpga.snapadc.SNAPADC):
                             self.delay(t, chip, L)
                     self.snapshot()
                     for chip,d in self.readRAM(signed=False).items():
-                        h[chip,:,t] = (np.sum(d == d[:1], axis=0) == d.shape[0])
+                        h[chip,t] = (np.sum(d == d[:1], axis=(0,1)) == d.shape[0] * d.shape[1])
                 self.selectADC() # select all chips
                 self.adc.test('off')
                 self.setDemux(numChannel=self.num_chans)
                 ker = np.ones(ker_size)
                 for chip in self.adcList:
-                    self.working_taps[chip] = {}
                     # identify taps that work for all lanes of chip
-                    d = (np.sum(h[chip], axis=0) == len(self.laneList))
-                    taps = np.where(np.convolve(d, ker, 'same') == ker_size)[0]
-                    for L in self.laneList:
-                        self.working_taps[chip][L] = taps
+                    taps = np.where(np.convolve(h[chip], ker, 'same') == ker_size)[0]
+                    self.working_taps[chip] = taps
         raise RuntimeError('Failed to find working taps.')
 
     def alignLineClock(self, chips_lanes=None, ker_size=5):
@@ -462,17 +458,13 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.setDemux(numChannel=1)
         for chip, lanes in chips_lanes.items():
             self.selectADC(chip)
-            tap = None
-            for L in lanes:
-                taps = self.working_taps[chip][L]
-                if tap is None:
-                    tap = random.choice(taps)
-                #tap = random.choice(taps)
+            taps = self.working_taps[chip]
+            tap = random.choice(taps)
+            for L in self.laneList: # redo all lanes to be the same
                 self.delay(tap, chip, L)
-                # Remove from future consideration if tap doesn't work out
-                #self.working_taps[chip][L] = taps[taps != tap]
-                self.working_taps[chip][L] = taps[np.abs(taps - tap) >= ker_size//2]
-                self.logger.info('Setting ADC=%d lane=%d tap=%s' % (chip, L, tap))
+            # Remove from future consideration if tap doesn't work out
+            self.working_taps[chip] = taps[np.abs(taps - tap) >= ker_size//2]
+            self.logger.info('Setting ADC=%d tap=%s' % (chip, tap))
         self.setDemux(numChannel=self.num_chans)
         return {} # success
 
