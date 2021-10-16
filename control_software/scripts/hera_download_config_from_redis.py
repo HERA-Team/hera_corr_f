@@ -4,7 +4,7 @@ import redis
 
 r = redis.Redis('redishost')
 
-cfgdat = r.hget('init_configuration','config').decode().splitlines()
+cfgdat = r.hget('snap_configuration','config').decode().splitlines()
 
 for line in cfgdat:
     print(line)
