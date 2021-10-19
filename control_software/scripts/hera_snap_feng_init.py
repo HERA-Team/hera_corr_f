@@ -50,7 +50,7 @@ def main():
                         help='Program FPGAs with the fpgfile specified in the config file'
                              'irrespective of whether they are programmed already')
     parser.add_argument('--multithread', action='store_true', default=False,
-                        help='Multithread initialization (not recommended for a high number of SNAPs)')
+                        help='Multithread ADC initialization (not recommended for a high number of SNAPs)')
     parser.add_argument('--allsnaps', action='store_true', default=False,
                         help='Require communication with all snaps (exit if any are put in dead_fengs")')
     parser.add_argument('--ipython', action='store_true', default=False,
@@ -110,7 +110,7 @@ def main():
         if args.initialize or args.forceinitialize:
             # XXX forceinitialize not treated properly
             kwargs = {
-                'multithread': True,
+                'multithread': args.multithread,
                 'verify': True,
                 'timeout': 300.,
             }

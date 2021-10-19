@@ -1499,7 +1499,8 @@ class Eth(Block):
 
     def get_arp_table(self):
         MAX_MACS = 256 # XXX is 256 the maximum number of macs?
-        macs_str = self.read('sw', MAX_MACS, offset=self.BASE_ARP_OFFSET)
+        macs_str = self.read('sw', MAX_MACS * struct.calcsize('Q'), 
+                             offset=self.BASE_ARP_OFFSET)
         macs = struct.unpack('>%dQ' % (MAX_MACS), macs_str)
         return macs
 
