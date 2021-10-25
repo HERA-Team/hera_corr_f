@@ -1,5 +1,3 @@
-#!/usr/env python
-
 """
 Upload hosts/ethers files to redis.
 """
