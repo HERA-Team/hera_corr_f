@@ -23,7 +23,7 @@ setup(name='hera_corr_f',
       provides=['hera_corr_f'],
       packages=['hera_corr_f'],
       package_dir={'hera_corr_f': 'src'},
-      scripts=glob.glob('scripts/*.py'),
+      scripts=glob.glob('scripts/*.py')+glob.glob('scripts/*.sh'),
       )
 
 if ver.endswith("dirty"):
