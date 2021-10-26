@@ -173,7 +173,7 @@ def main():
         # Sync logic. Do global sync first, and then noise generators
         # wait for a PPS to pass then arm all the boards
         if args.sync:
-            corr.disable_eths()
+            #corr.disable_eths() # ARP: no need to disable, and keeping them enabled reduces risk of them going incommunicado 
             #corr.do_for_all_f("change_period", block="sync", args=[0])
             corr.sync()
             #corr.sync_noise(manual=args.mansync)
