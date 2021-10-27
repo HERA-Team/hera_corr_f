@@ -2095,8 +2095,8 @@ class Fem(Block):
     RMS2DC_INTERCEPT = -55.15991678
 
     IMU_ORIENT = [[0,0,1],[0,1,0],[1,0,0]]
-    SWMODE = {'load':0b001,'antenna':0b111,'noise':0b000}
-    SWMODE_REV = {0b001:'load', 0b111:'antenna', 0b000:'noise',}
+    SWMODE = {'load':0b000,'antenna':0b110,'noise':0b001}
+    SWMODE_REV = {0b000:'load', 0b110:'antenna', 0b001:'noise',}
 
     def __init__(self, host, name, logger=None):
         """ Front End Module (FEM) digital control class
@@ -2270,8 +2270,8 @@ class Fem(Block):
             val = self._sw.read()
         except:
             raise RuntimeError("I2C RF switch read failure")
-        cur_e = bool(val & 0b00010000)
-        cur_n = bool(val & 0b00001000)
+        cur_e = bool(val & 0b00001000)
+        cur_n = bool(val & 0b00010000)
         cur_mode = self.SWMODE_REV.get(val & 0b00000111, 'Unknown')
         if mode is None and east is None and north is None:
             return cur_mode, cur_e, cur_n
@@ -2283,9 +2283,9 @@ class Fem(Block):
             mode = cur_mode
         new_val = 0b00000000
         if east:
-            new_val |= 0b00010000
-        if north:
             new_val |= 0b00001000
+        if north:
+            new_val |= 0b00010000
         new_val |= self.SWMODE.get(mode, val & 0b00000111)
         self._sw.write(new_val)
         if verify:
