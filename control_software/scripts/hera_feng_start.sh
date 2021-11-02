@@ -3,6 +3,9 @@
 LOGFILE=~/snap_start.log
 ERRFILE=~/snap_start.err
 
+source ~/.bashrc
+set -e
+
 echo hera_start_feng.sh: Initializing F-Engines > $LOGFILE
 hera_snap_feng_init.py -p -i -d >> $LOGFILE 2> $ERRFILE
 
