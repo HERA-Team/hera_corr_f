@@ -1040,11 +1040,12 @@ class HeraCorrelator(object):
         self.logger.info('Synchronizing F-Engines')
         if hosts is None:
             hosts = self.fengs.keys()
-        unconfigured = [host for host in hosts
-                            if not self.fengs[host].adc_is_configured()]
-        if len(unconfigured) > 0:
-            raise RuntimeError('ADCs not initialized on: %s'
-                               % (','.join(unconfigured)))
+        # Allow sync of unconfigured hosts (just not eth tx) ARP 11/3/21
+        #unconfigured = [host for host in hosts
+        #                    if not self.fengs[host].adc_is_configured()]
+        #if len(unconfigured) > 0:
+        #    raise RuntimeError('ADCs not initialized on: %s'
+        #                       % (','.join(unconfigured)))
         for host in hosts:
             self.fengs[host].sync.set_delay(0)
         if not manual:
@@ -1117,9 +1118,15 @@ class HeraCorrelator(object):
         self.logger.info('Enabling ethernet output')
         if hosts is None:
             hosts = self.fengs.keys()
+        unconfigured = [host for host in hosts
+                            if not self.fengs[host].adc_is_configured()]
+        if len(unconfigured) > 0:
+            self.logger.warning('Declining to enable eths on unconfigured hosts: %s'
+                               % (','.join(unconfigured)))
         failed = []
         for host in hosts:
             try:
+                assert host not in unconfigured
                 self.fengs[host].eth.enable_tx(verify=verify)
             except(AssertionError):
                 self.logger.warning('Failed to enable %s.eth' % (host)) 
