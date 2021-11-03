@@ -8,9 +8,17 @@ import time
 import yaml
 import logging
 import json
+import sys
 
 TIMEOUT = 10
 NTRIES = 3
+
+def warn_failed(logger, failed, who, all_snaps=False):
+    if len(failed) == 0:
+        return
+    logger.warning('Stage %s failed on: %s' % (who, ','.join(failed)))
+    if all_snaps:
+        sys.exit(1)
 
 def main():
     parser = argparse.ArgumentParser(description='Interact with a programmed SNAP board for'
@@ -102,10 +110,10 @@ def main():
                 'timeout': 300.,
             }
             failed = corr.program_fengs(force=args.forceprogram)
-            assert(len(failed) == 0)
+            warn_failed(logger, failed, 'program_fengs', all_snaps=args.allsnaps)
 
-        failed = corr.check_version_fengs()
-        assert(len(failed) == 0) # end session if bitfile is incompatible with this software
+        #failed = corr.check_version_fengs()
+        #assert(len(failed) == 0) # end session if bitfile is incompatible with this software
 
         if args.initialize or args.forceinitialize:
             # XXX forceinitialize not treated properly
@@ -123,15 +131,15 @@ def main():
                     break
                 logger.warn('Reinitializing because ADC alignment failed: %s' % (','.join(failed)))
                 failed = corr.align_adcs(hosts=failed, reinit=True, **kwargs)
-            assert(len(failed) == 0)
+            warn_failed(logger, failed, 'align_adcs', all_snaps=args.allsnaps)
             failed = corr.initialize_dsps(**kwargs)
-            assert(len(failed) == 0)
+            warn_failed(logger, failed, 'initialize_dsps', all_snaps=args.allsnaps)
             failed = corr.fft_shift_pfbs(**kwargs)
-            assert(len(failed) == 0)
+            warn_failed(logger, failed, 'fft_shift_pfbs', all_snaps=args.allsnaps)
             failed = corr.initialize_eqs(**kwargs)
-            assert(len(failed) == 0)
+            warn_failed(logger, failed, 'initialize_eqs', all_snaps=args.allsnaps)
             failed = corr.disable_phase_switches(**kwargs)
-            assert(len(failed) == 0)
+            warn_failed(logger, failed, 'disable_phase_switches', all_snaps=args.allsnaps)
             
             # Initialize FEM and PAM but accept failure
             fem_failed = corr.switch_fems('antenna', **kwargs)
@@ -156,7 +164,7 @@ def main():
             # Channels not assigned to Xengs in the config file are
             # ignored. Following are the assumed globals:
             failed = corr.config_dest_eths(**kwargs)
-            assert(len(failed) == 0)
+            warn_failed(logger, failed, 'config_dest_eths', all_snaps=args.allsnaps)
 
         #if args.tvg:
         #    logger.info('Enabling EQ TVGs...')
@@ -179,9 +187,11 @@ def main():
             #corr.sync_noise(manual=args.mansync)
 
         if args.eth:
-            corr.enable_eths()
+            failed = corr.enable_eths()
+            warn_failed(logger, failed, 'enable_eths', all_snaps=args.allsnaps)
         else:
-            corr.disable_eths()
+            failed = corr.disable_eths()
+            warn_failed(logger, failed, 'disable_eths', all_snaps=args.allsnaps)
 
         # Re-enable the monitoring process
         corr.enable_monitoring()
