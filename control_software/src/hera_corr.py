@@ -1121,7 +1121,7 @@ class HeraCorrelator(object):
         unconfigured = [host for host in hosts
                             if not self.fengs[host].adc_is_configured()]
         if len(unconfigured) > 0:
-            self.logger.warning('Declining to enable eths on unconfigured hosts: %s'
+            self.logger.warning('Not enabling eths on unconfiged hosts: %s'
                                % (','.join(unconfigured)))
         failed = []
         for host in hosts:
