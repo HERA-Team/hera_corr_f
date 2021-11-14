@@ -263,7 +263,7 @@ class SnapFengine(object):
         status = {}
         # High-level configuration status
         status['is_programmed'] = str(int(self.is_programmed()))
-        status['version'] = '%d-%d' % self.version()
+        status['version'] = '%d.%d' % self.version()
         status['adc_is_configured'] = str(int(self.adc_is_configured()))
         status['is_initialized'] = str(int(self.is_initialized()))
         status['dest_is_configured'] = str(int(self.dest_is_configured()))

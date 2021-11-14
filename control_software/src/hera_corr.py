@@ -118,9 +118,23 @@ class HeraCorrelator(object):
             self.fengs[host] = feng # single dict call is threadsafe
             self.r.hset('status:snap:%s' % host, 'connected', '1')
         else:
-            self.r.hset('status:snap:%s' % host, 'connected', '0') 
+            self.feng_declare_disconnected(host)
             if verify:
                 raise RuntimeError('Failed to connect: %s' % (host))
+
+    def feng_declare_disconnected(self, host):
+        '''
+        If an F-Engine is not responding, mark it in redis and remove it
+        from host list.
+
+        Inputs:
+            host (str): F-Engine host to connect to.
+        '''
+        self.r.hset('status:snap:%s' % host, 'connected', '0')
+        try:
+            del self.fengs[host]
+        except(KeyError):
+            pass
 
     def _call_on_hosts(self, target, args, kwargs,
                        hosts, multithread, timeout):
@@ -143,7 +157,7 @@ class HeraCorrelator(object):
                 # Automatically puts host as first argument
                 val = target(host, *args, **kwargs)
                 q.put((host,val))
-            except(RuntimeError,AssertionError) as e:
+            except(RuntimeError, AssertionError) as e:
                 self.logger.warning('%s: %s' % (host, e.message))
         threads = {host: Thread(
                             target=wrap_target,
@@ -299,7 +313,7 @@ class HeraCorrelator(object):
         failed = self._call_on_hosts(
                             target=self.feng_set_redis_status,
                             args=(),
-                            kwargs={}
+                            kwargs={},
                             hosts=hosts,
                             multithread=multithread,
                             timeout=timeout,
@@ -803,7 +817,7 @@ class HeraCorrelator(object):
         for host in hosts:
             try:
                 self.fengs[host].pfb.set_fft_shift(fft_shift, verify=verify)
-            except(AssertionError):
+            except(AssertionError,RuntimeError):
                 self.logger.warning('Failed to set fft_shift on %s.pfb'
                                     % (host)) 
                 failed.append(host)
@@ -826,7 +840,7 @@ class HeraCorrelator(object):
         feng.align_adc(force=force, verify=verify)
         
     def align_adcs(self, hosts=None, reinit=False, verify=True,
-                   force=False, multithread=False, timeout=300.):
+                   force=False, multithread=True, timeout=300.):
         """
         Align ADC bit lanes.
 
@@ -1119,7 +1133,8 @@ class HeraCorrelator(object):
         if hosts is None:
             hosts = self.fengs.keys()
         unconfigured = [host for host in hosts
-                            if not self.fengs[host].adc_is_configured()]
+                            if not self.fengs[host].adc_is_configured()
+                            or not self.fengs[host].dest_is_configured()]
         if len(unconfigured) > 0:
             self.logger.warning('Not enabling eths on unconfiged hosts: %s'
                                % (','.join(unconfigured)))
@@ -1128,7 +1143,7 @@ class HeraCorrelator(object):
             try:
                 assert host not in unconfigured
                 self.fengs[host].eth.enable_tx(verify=verify)
-            except(AssertionError):
+            except(AssertionError, RuntimeError):
                 self.logger.warning('Failed to enable %s.eth' % (host)) 
                 failed.append(host)
         return failed
