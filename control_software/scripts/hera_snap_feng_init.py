@@ -57,8 +57,8 @@ def main():
     group_prog.add_argument('-P', '--forceprogram', action='store_true', default=False,
                         help='Program FPGAs with the fpgfile specified in the config file'
                              'irrespective of whether they are programmed already')
-    parser.add_argument('--multithread', action='store_true', default=False,
-                        help='Multithread ADC initialization (not recommended for a high number of SNAPs)')
+    parser.add_argument('--nomultithread', action='store_true', default=False,
+                        help='Disable multithread ADC initialization.')
     parser.add_argument('--allsnaps', action='store_true', default=False,
                         help='Require communication with all snaps (exit if any are put in dead_fengs")')
     parser.add_argument('--ipython', action='store_true', default=False,
@@ -68,7 +68,7 @@ def main():
     logger = handlers.add_default_log_handlers(logging.getLogger(__file__))
     handlers.log_notify(logger)  # send a NOTIFY level message that this script has started
 
-    corr = HeraCorrelator(hosts=args.hosts, redishost=args.redishost, config=args.config_file, use_redis=False)
+    corr = HeraCorrelator(hosts=args.hosts, redishost=args.redishost, config=args.config_file)
 
     try:
         if args.allsnaps:
@@ -118,7 +118,7 @@ def main():
         if args.initialize or args.forceinitialize:
             # XXX forceinitialize not treated properly
             kwargs = {
-                'multithread': args.multithread,
+                'multithread': not args.nomultithread,
                 'verify': True,
                 'timeout': 300.,
             }
@@ -131,13 +131,19 @@ def main():
                     break
                 logger.warn('Reinitializing because ADC alignment failed: %s' % (','.join(failed)))
                 failed = corr.align_adcs(hosts=failed, reinit=True, **kwargs)
+            corr.set_redis_status_fengs()
             warn_failed(logger, failed, 'align_adcs', all_snaps=args.allsnaps)
+
             failed = corr.initialize_dsps(**kwargs)
+            corr.set_redis_status_fengs()
             warn_failed(logger, failed, 'initialize_dsps', all_snaps=args.allsnaps)
+
             failed = corr.fft_shift_pfbs(**kwargs)
             warn_failed(logger, failed, 'fft_shift_pfbs', all_snaps=args.allsnaps)
+
             failed = corr.initialize_eqs(**kwargs)
             warn_failed(logger, failed, 'initialize_eqs', all_snaps=args.allsnaps)
+
             failed = corr.disable_phase_switches(**kwargs)
             warn_failed(logger, failed, 'disable_phase_switches', all_snaps=args.allsnaps)
             
@@ -164,6 +170,7 @@ def main():
             # Channels not assigned to Xengs in the config file are
             # ignored. Following are the assumed globals:
             failed = corr.config_dest_eths(**kwargs)
+            corr.set_redis_status_fengs()
             warn_failed(logger, failed, 'config_dest_eths', all_snaps=args.allsnaps)
 
         #if args.tvg:

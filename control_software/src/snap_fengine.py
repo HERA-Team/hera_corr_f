@@ -1,6 +1,7 @@
 import logging
 from hera_corr_cm.handlers import add_default_log_handlers
 import numpy as np
+import time
 import datetime
 import casperfpga
 from blocks import *
@@ -196,7 +197,7 @@ class SnapFengine(object):
         """
         return self.input.get_reg_bits('source_sel', INITIALIZED_BIT, 1)
 
-    def get_fpga_stats(self):
+    def get_fpga_stats(self): # XXX deprecate? [ARP 11/3/21]
         """
         Get FPGA stats.
         returns: Dictionary of stats
@@ -256,6 +257,23 @@ class SnapFengine(object):
         """
         """
         return self.input.get_reg_bits('source_sel', DEST_CONFIG_BIT, 1)
+
+    def get_status(self):
+        '''Return dict of config status.'''
+        status = {}
+        # High-level configuration status
+        status['is_programmed'] = str(int(self.is_programmed()))
+        status['version'] = '%d.%d' % self.version()
+        status['adc_is_configured'] = str(int(self.adc_is_configured()))
+        status['is_initialized'] = str(int(self.is_initialized()))
+        status['dest_is_configured'] = str(int(self.dest_is_configured()))
+        # Lower level stuff, deprecates get_fpga_stats
+        status['temp'] = self.fpga.transport.get_temp()
+        status['timestamp'] = datetime.datetime.now().isoformat()
+        status['uptime'] = self.sync.uptime()
+        status['pps_count'] = self.sync.count()
+        status['serial'] = self.serial
+        return status
 
 #    def get_pam_atten_by_target(self, chan, target_pow=None,
 #                                target_rms=None):
