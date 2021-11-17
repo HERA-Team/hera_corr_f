@@ -195,6 +195,7 @@ class HeraCorrelator(object):
         # Instantiate CasperFpga connections to all the F-Engine.
         
         if hosts is None:
+            # in this one cose, get list direct from config
             hosts = [host for host in self.config['fengines']
                         if not host in self.fengs]
         failed = self._call_on_hosts(
@@ -270,8 +271,7 @@ class HeraCorrelator(object):
             multithread (bool): Multithread across hosts. Default: True
             timeout (float): Timeout in seconds. Default: 300.
         """
-        if hosts is None:
-            hosts = self.fengs.keys()
+        hosts = self.get_feng_hostnames(hosts=hosts, programmed=False)
         failed = self._call_on_hosts(
                             target=self.feng_program,
                             args=(),
@@ -285,6 +285,31 @@ class HeraCorrelator(object):
                             timeout=timeout,
         )
         return failed
+
+    def get_feng_hostnames(self, hosts=None, programmed=True,
+                           adc_aligned=False, initialized=False,
+                           dest_configed=False):
+        """
+        Generate list of hosts with various filters applied.
+
+        Inputs:
+            hosts (list): Lists of hosts to filter. Default: all
+            programmed (bool): Only return hosts with programmed fpgas
+            adc_aligned (bool): Only return hosts with aligned adcs
+            initialized (bool): Only return hosts that are initialized
+            dest_configed (bool): Only return hosts with eth dest configed
+        """
+        if hosts is None:
+            hosts = self.fengs.keys()
+        if programmed:
+            hosts = [h for h in hosts if self.fengs[h].is_programmed()]
+        if adc_aligned:
+            hosts = [h for h in hosts if self.fengs[h].adc_is_configured()]
+        if initialized:
+            hosts = [h for h in hosts if self.fengs[h].is_initialized()]
+        if dest_configed:
+            hosts = [h for h in hosts if self.fengs[h].dest_is_configured()]
+        return hosts
 
     def feng_set_redis_status(self, host):
         """
@@ -308,8 +333,7 @@ class HeraCorrelator(object):
             multithread (bool): Multithread across hosts. Default: True
             timeout (float): Timeout in seconds.  Default: 300.
         """
-        if hosts is None:
-            hosts = self.fengs.keys()
+        hosts = self.get_feng_hostnames(hosts=hosts)
         failed = self._call_on_hosts(
                             target=self.feng_set_redis_status,
                             args=(),
@@ -341,8 +365,7 @@ class HeraCorrelator(object):
         Inputs:
             hosts (list): List of hosts to target. Default: all
         """
-        if hosts is None:
-            hosts = self.fengs.keys()
+        hosts = self.get_feng_hostnames(hosts=hosts)
         stats = [self.feng_get_redis_status(h) for h in hosts]
         return dict(zip(hosts, stats))
 
@@ -425,9 +448,11 @@ class HeraCorrelator(object):
                              Default: 300.
         """
         if hosts is None:
-            hosts = self.fengs.keys()
+            # if controlling phase switch for all fengs, record to
+            # master redis flag
             self.r.hmset('corr:status:phase_switch',
                          {'state':'off', 'time':time.time()})
+        hosts = self.get_feng_hostnames(hosts=hosts)
         failed = self._call_on_hosts(
                             target=self.phase_switch_disable,
                             args=(),
@@ -473,10 +498,12 @@ class HeraCorrelator(object):
                              Default: 300.
         """
         if hosts is None:
-            hosts = self.fengs.keys()
+            # if controlling phase switch for all fengs, record to
+            # master redis flag
             self.r.hmset('corr:status:phase_switch',
                          {'state':'on', 'time':time.time()}
             )
+        hosts = self.get_feng_hostnames(hosts=hosts)
         failed = self._call_on_hosts(
                             target=self.phase_switch_enable,
                             args=(),
@@ -504,11 +531,11 @@ class HeraCorrelator(object):
         """
         assert(mode in ('load', 'noise', 'antenna'))
         if hosts is None:
-            hosts = self.fengs.keys()
             # Assumes we succeed in setting entire array to fem state
             t = time.time()
             self.r.hmset('corr:fem_switch_state',
                          {'state': mode, 'time': t})
+        hosts = self.get_feng_hostnames(hosts=hosts)
         failed = []
         for host in hosts:
             for cnt,fem in enumerate(self.fengs[host].fems):
@@ -726,8 +753,7 @@ class HeraCorrelator(object):
             timeout (float): Timeout in seconds for multithreading.
                              Default: 300.
         """
-        if hosts is None:
-            hosts = self.fengs.keys()
+        hosts = self.get_feng_hostnames(hosts=hosts, adc_aligned=True)
         failed = self._call_on_hosts(
                             target=self.eq_initialize,
                             args=(),
@@ -783,8 +809,7 @@ class HeraCorrelator(object):
             timeout (float): Timeout in seconds for multithreading.
                              Default: 300.
         """
-        if hosts is None:
-            hosts = self.fengs.keys()
+        hosts = self.get_feng_hostnames(hosts=hosts)
         failed = self._call_on_hosts(
                             target=self.pam_initialize,
                             args=(),
@@ -811,8 +836,11 @@ class HeraCorrelator(object):
         if fft_shift is None:
             fft_shift = self.config['fft_shift']
         self.logger.info('Setting fft_shift to %s' % (bin(fft_shift)))
-        if hosts is None:
-            hosts = self.fengs.keys()
+        hosts = self.get_feng_hostnames(hosts=hosts, adc_aligned=True)
+        unconfigured = [h for h in self.fengs.keys() if h not in hosts]
+        if len(unconfigured) > 0:
+            self.logger.warning('Not configuring unconfiged hosts: %s'
+                               % (','.join(unconfigured)))
         failed = []
         for host in hosts:
             try:
@@ -852,8 +880,7 @@ class HeraCorrelator(object):
             multithread (bool): Multithread across hosts. Default: True
             timeout (float): Timeout in seconds for multithreading.
         """
-        if hosts is None:
-            hosts = self.fengs.keys()
+        hosts = self.get_feng_hostnames(hosts=hosts)
         failed = self._call_on_hosts(
                             target=self.adc_align,
                             args=(),
@@ -896,8 +923,11 @@ class HeraCorrelator(object):
             timeout (float): Timeout in seconds for multithreading.
                              Default: 300.
         """
-        if hosts is None:
-            hosts = self.fengs.keys()
+        hosts = self.get_feng_hostnames(hosts=hosts, adc_aligned=True)
+        unconfigured = [h for h in self.fengs.keys() if h not in hosts]
+        if len(unconfigured) > 0:
+            self.logger.warning('Not initializing unconfiged hosts: %s'
+                               % (','.join(unconfigured)))
         failed = self._call_on_hosts(
                             target=self.dsp_initialize,
                             args=(),
@@ -998,8 +1028,11 @@ class HeraCorrelator(object):
             timeout (float): Timeout in seconds for multithreading.
                              Default: 300.
         """
-        if hosts is None:
-            hosts = self.fengs.keys()
+        hosts = self.get_feng_hostnames(hosts=hosts, adc_aligned=True)
+        unconfigured = [h for h in self.fengs.keys() if h not in hosts]
+        if len(unconfigured) > 0:
+            self.logger.warning('Not configuring eth on unconfiged hosts: %s'
+                               % (','.join(unconfigured)))
         dest_port = self.config['dest_port']
         # Map fengs to ports
         source_ports = {
@@ -1052,8 +1085,11 @@ class HeraCorrelator(object):
             maxtime (float): Max seconds to wait for a sync. Default: 0.8
         """
         self.logger.info('Synchronizing F-Engines')
-        if hosts is None:
-            hosts = self.fengs.keys()
+        hosts = self.get_feng_hostnames(hosts=hosts, adc_aligned=True)
+        unconfigured = [h for h in self.fengs.keys() if h not in hosts]
+        if len(unconfigured) > 0:
+            self.logger.warning('Not syncing unconfiged hosts: %s'
+                               % (','.join(unconfigured)))
         # Allow sync of unconfigured hosts (just not eth tx) ARP 11/3/21
         #unconfigured = [host for host in hosts
         #                    if not self.fengs[host].adc_is_configured()]
@@ -1071,8 +1107,8 @@ class HeraCorrelator(object):
         start = time.time()
         self.logger.info('Sync passed (t=%.2f)' % (start))
         # Consider multithreading if gets too slow
-        for host,feng in self.fengs.items():
-            feng.sync.arm_sync()
+        for host in hosts:
+            self.fengs[host].sync.arm_sync()
         sync_time = time.time() - start
         if not manual:
             # XXX use sync.count to verify no sync has passed
@@ -1083,8 +1119,8 @@ class HeraCorrelator(object):
         else:
             self.logger.warning('Using manual sync trigger')
             for i in range(3):  # takes 3 syncs to trigger
-                for host,feng in self.fengs.items():
-                    feng.sync.sw_sync()
+                for host in hosts:
+                    self.fengs[host].sync.sw_sync()
             sync_time = int(time.time())  # roughly  # noqa
         # Store sync time in ms
         self.r['corr:feng_sync_time'] = 1000 * sync_time # ms
@@ -1130,11 +1166,9 @@ class HeraCorrelator(object):
             verify (bool): Check success.  Default: False
         """
         self.logger.info('Enabling ethernet output')
-        if hosts is None:
-            hosts = self.fengs.keys()
-        unconfigured = [host for host in hosts
-                            if not self.fengs[host].adc_is_configured()
-                            or not self.fengs[host].dest_is_configured()]
+        hosts = self.get_feng_hostnames(hosts=hosts, adc_aligned=True,
+                                        dest_configed=True)
+        unconfigured = [h for h in self.fengs.keys() if h not in hosts]
         if len(unconfigured) > 0:
             self.logger.warning('Not enabling eths on unconfiged hosts: %s'
                                % (','.join(unconfigured)))
@@ -1157,8 +1191,7 @@ class HeraCorrelator(object):
             verify (bool): Check success.  Default: False
         """
         self.logger.info('Disabling ethernet output')
-        if hosts is None:
-            hosts = self.fengs.keys()
+        hosts = self.get_feng_hostnames(hosts=hosts)
         failed = []
         for host in hosts:
             try:
