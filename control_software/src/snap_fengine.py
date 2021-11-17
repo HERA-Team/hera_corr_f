@@ -40,7 +40,7 @@ class SnapFengine(object):
         self.synth = Synth(self.fpga, 'lmx_ctrl')
         self.adc = Adc(self.fpga) # not a subclass of Block
         self.sync = Sync(self.fpga, 'sync')
-        #self.noise = NoiseGen(self.fpga, 'noise', nstreams=3)
+        self.noise = NoiseGen(self.fpga, 'noise', nstreams=3)
         self.input = Input(self.fpga, 'input', nstreams=12)
         self.delay = Delay(self.fpga, 'delay', nstreams=6)
         self.pfb = Pfb(self.fpga, 'pfb')
@@ -64,7 +64,7 @@ class SnapFengine(object):
             self.synth,
             self.adc,
             self.sync,
-            #self.noise, # temporarily removed
+            self.noise,
             self.input,
             self.delay,
             self.pfb,
