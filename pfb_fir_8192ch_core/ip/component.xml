@@ -1453,10 +1453,6 @@ ediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spiri
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>pfb_fir_8192ch_core_c_counter_binary_v12_0_i2/pfb_fir_8192ch_core_c_counter_binary_v12_0_i2.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
         <spirit:name>constrs/pfb_fir_8192ch_core.xdc</spirit:name>
         <spirit:userFileType>xdc</spirit:userFileType>
       </spirit:file>
@@ -1474,10 +1470,6 @@ ediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spiri
       </spirit:file>
       <spirit:file>
         <spirit:name>xpm_8bdd51_vivado.mem</spirit:name>
-        <spirit:userFileType>mem</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>xpm_f5fed5_vivado.mem</spirit:name>
         <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
@@ -1613,10 +1605,6 @@ ediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spiri
         <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>xpm_2be436_vivado.mem</spirit:name>
-        <spirit:userFileType>mem</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
         <spirit:name>xpm_1f8fc2_vivado.mem</spirit:name>
         <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
@@ -1626,6 +1614,10 @@ ediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spiri
       </spirit:file>
       <spirit:file>
         <spirit:name>xpm_e12e42_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>xpm_2be436_vivado.mem</spirit:name>
         <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
@@ -1772,7 +1764,7 @@ ediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spiri
       <spirit:file>
         <spirit:name>hdl/pfb_fir_8192ch_core.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:userFileType>CHECKSUM_8d2450b3</spirit:userFileType>
+        <spirit:userFileType>CHECKSUM_00c154a1</spirit:userFileType>
         <spirit:logicalName>xil_defaultlib</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
@@ -1791,10 +1783,6 @@ ediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spiri
         <spirit:userFileType>xci</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>pfb_fir_8192ch_core_c_counter_binary_v12_0_i2/pfb_fir_8192ch_core_c_counter_binary_v12_0_i2.xci</spirit:name>
-        <spirit:userFileType>xci</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
         <spirit:name>xpm_b591c5_vivado.mem</spirit:name>
         <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
@@ -1808,10 +1796,6 @@ ediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spiri
       </spirit:file>
       <spirit:file>
         <spirit:name>xpm_8bdd51_vivado.mem</spirit:name>
-        <spirit:userFileType>mem</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
-        <spirit:name>xpm_f5fed5_vivado.mem</spirit:name>
         <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
@@ -1947,10 +1931,6 @@ ediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spiri
         <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
-        <spirit:name>xpm_2be436_vivado.mem</spirit:name>
-        <spirit:userFileType>mem</spirit:userFileType>
-      </spirit:file>
-      <spirit:file>
         <spirit:name>xpm_1f8fc2_vivado.mem</spirit:name>
         <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
@@ -1960,6 +1940,10 @@ ediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spiri
       </spirit:file>
       <spirit:file>
         <spirit:name>xpm_e12e42_vivado.mem</spirit:name>
+        <spirit:userFileType>mem</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>xpm_2be436_vivado.mem</spirit:name>
         <spirit:userFileType>mem</spirit:userFileType>
       </spirit:file>
       <spirit:file>
@@ -2159,11 +2143,11 @@ ediate dependency {} format bool minimum {} maximum {}} value false}}}}}}</spiri
         <xilinx:xpmLibrary>XPM_FIFO</xilinx:xpmLibrary>
         <xilinx:xpmLibrary>XPM_CDC</xilinx:xpmLibrary>
       </xilinx:xpmLibraries>
-      <xilinx:coreRevision>245691986</xilinx:coreRevision>
-      <xilinx:coreCreationDateTime>2021-03-03T23:46:42Z</xilinx:coreCreationDateTime>
+      <xilinx:coreRevision>264546063</xilinx:coreRevision>
+      <xilinx:coreCreationDateTime>2021-10-08T04:01:27Z</xilinx:coreCreationDateTime>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
-      <xilinx:xilinxVersion>2019.1</xilinx:xilinxVersion>
+      <xilinx:xilinxVersion>2019.1.1</xilinx:xilinxVersion>
     </xilinx:packagingInfo>
   </spirit:vendorExtensions>
 </spirit:component>
