@@ -6,7 +6,7 @@
       "device": "xc7k325tfbg676-3",
       "name": "pfb_fir_8192ch_core_bd",
       "synth_flow_mode": "Hierarchical",
-      "tool_version": "2019.1",
+      "tool_version": "2019.1.1",
       "validated": "true"
     },
     "design_tree": {
