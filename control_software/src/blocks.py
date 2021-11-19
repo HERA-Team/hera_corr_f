@@ -167,7 +167,6 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.num_chans       = num_chans
         self.interleave_mode = 4 >> num_chans
         self.clock_divide    = 1
-        self.sample_rate     = sample_rate
         self.resolution      = resolution
         self.host = host # the SNAPADC class doesn't directly expose this
         self.working_taps = {}
