@@ -308,15 +308,21 @@ class HeraCorrelator(object):
         """
         if hosts is None:
             hosts = self.fengs.keys()
-        if programmed:
-            hosts = [h for h in hosts if self.fengs[h].is_programmed()]
-        if adc_aligned:
-            hosts = [h for h in hosts if self.fengs[h].adc_is_configured()]
-        if initialized:
-            hosts = [h for h in hosts if self.fengs[h].is_initialized()]
-        if dest_configed:
-            hosts = [h for h in hosts if self.fengs[h].dest_is_configured()]
-        return hosts
+        filtered_hosts = []
+        for h in hosts:
+            try:
+                if programmed and not self.fengs[h].is_programmed():
+                    continue
+                if adc_aligned and not self.fengs[h].adc_is_configured():
+                    continue
+                if initialized and not self.fengs[h].is_initialized():
+                    continue
+                if dest_configed and not self.fengs[h].dest_is_configured():
+                    continue
+                filtered_hosts.append(h)
+            except Exception as e:
+                self.logger.warn("Comms failed on %s: %s" % (h, e.message))
+        return filtered_hosts
 
     def feng_set_redis_status(self, host):
         """
