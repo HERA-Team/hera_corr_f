@@ -127,10 +127,10 @@ class SnapFengine(object):
                 time.sleep(0.1)
             assert(self.fpga.is_running())
 
-    def initialize_adc(self, verify=False):
+    def initialize_adc(self, sample_rate=500., verify=False):
         """Initialize Synth and Adc blocks, then reprogram FPGA."""        
         self.synth.initialize(verify=verify)
-        self.adc.init(verify=verify)
+        self.adc.init(sample_rate=sample_rate, verify=verify)
         # Mark ADC as uncalibrated
         self._set_adc_status(0)
 
@@ -267,6 +267,7 @@ class SnapFengine(object):
         status = {}
         # High-level configuration status
         status['is_programmed'] = str(int(self.is_programmed()))
+        status['sample_rate'] = str(self.adc.lmx.getFreq())
         status['version'] = '%d.%d' % self.version()
         status['adc_is_configured'] = str(int(self.adc_is_configured()))
         status['is_initialized'] = str(int(self.is_initialized()))

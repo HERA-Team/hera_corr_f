@@ -119,9 +119,9 @@ class Block(object):
 
 
 class Synth(casperfpga.synth.LMX2581):
-    def __init__(self, host, name, logger=None):
+    def __init__(self, host, name, fosc=10, logger=None):
         self.logger = logger or add_default_log_handlers(logging.getLogger(__name__ + "%s" % (host.host)))
-        super(Synth, self).__init__(host, name)
+        super(Synth, self).__init__(host, name, fosc=fosc)
         self.host = host
 
     def initialize(self, verify=False):
@@ -134,25 +134,45 @@ class Synth(casperfpga.synth.LMX2581):
         #self.powerOn()
         pass
 
+    def getFreq(self):
+        """
+        Infer the output sample clock from the configuration of
+        the LMX registers.
+        """
+        VCO_DIV = self.getWord('VCO_DIV')
+        VCO_DIV = 2 * (VCO_DIV + 1)
+        PLL_NUM_H = self.getWord('PLL_NUM_H')
+        PLL_NUM_L = self.getWord('PLL_NUM_L')
+        PLL_N = self.getWord('PLL_N')
+        PLL_DEN = self.getWord('PLL_DEN')
+        PLL_NUM = (PLL_NUM_H & 0b1111111111) << 12
+        PLL_NUM += PLL_NUM_L & 0b111111111111
+        return self.FOSC * (PLL_N + PLL_NUM / PLL_DEN) / VCO_DIV
+
 class Adc(casperfpga.snapadc.SNAPADC):
-    def __init__(self, host, sample_rate=500, num_chans=2, resolution=8, ref=10, logger=None, **kwargs):
+    def __init__(self, host, num_chans=2, resolution=8, ref=10,
+                 logger=None, **kwargs):
         """
         Instantiate an ADC block.
 
         Inputs:
            host (casperfpga.Casperfpga): Host FPGA
-           sample_rate (float): Sample rate in MS/s
            num_chans (int): Number of channels per ADC chip. Valid values are 1, 2, or 4.
            resolution (int): Bit resolution of the ADC. Valid values are 8, 12.
            ref (float): Reference frequency (in MHz) from which ADC clock is derived. If None, an external sampling clock must be used.
         """
-        self.logger = logger or add_default_log_handlers(logging.getLogger(__name__ + ":%s" % (host.host)))
-        casperfpga.snapadc.SNAPADC.__init__(self, host, ref=ref, logger=self.logger)
+        self.logger = logger or add_default_log_handlers(
+                      logging.getLogger(__name__ + ":%s" % (host.host)))
+        # Purposely setting ref=None below to prevent LMX object
+        # from being attached so we can do it ourselves
+        casperfpga.snapadc.SNAPADC.__init__(self, host, ref=None,
+                                            logger=self.logger)
+        # Attach our own wrapping of LMX
+        self.lmx = Synth(host, 'lmx_ctrl', fosc=ref)
         self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
         self.interleave_mode = 4 >> num_chans
         self.clock_divide    = 1
-        self.sample_rate     = sample_rate
         self.resolution      = resolution
         self.host = host # the SNAPADC class doesn't directly expose this
         self.working_taps = {}
@@ -189,8 +209,9 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.adc.write((gain_map[gain]<<4) + gain_map[gain], 0x2b)
 
     # OVERWRITING casperfpga.snapadc.SNAPADC.init
-    def init(self, verify=False):
-        """ Get SNAP ADCs into working condition
+    def init(self, sample_rate=500., verify=False):
+        """
+        Get SNAP ADCs into working condition
 
         Supported frequency range: 60MHz ~ 1000MHz. Set resolution to
         None to let init() automatically decide the best resolution.
@@ -198,10 +219,13 @@ class Adc(casperfpga.snapadc.SNAPADC):
         1. configuring frequency synthesizer LMX2581
         2. configuring clock source switch HMC922
         3. configuring ADCs HMCAD1511 (support HMCAD1520 in future)
-        4. configuring IDELAYE2 and ISERDESE2 inside of FPGA """
+        4. configuring IDELAYE2 and ISERDESE2 inside of FPGA
+
+        Inputs:
+           sample_rate (float): Sample rate in MS/s. Default: 500.
+        """
 
         # XXX verify currently not implemented
-        samplingRate = self.sample_rate
         numChannel = self.num_chans
         if self.lmx is not None:
             self.logger.debug("Reseting frequency synthesizer")
@@ -209,7 +233,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
             self.logger.debug("Disabling Synth output A")
             self.lmx.setWord(1, "OUTA_PD")
             self.logger.debug("Configuring frequency synthesizer")
-            assert(self.lmx.setFreq(samplingRate)) # Error if failed
+            assert(self.lmx.setFreq(sample_rate)) # Error if failed
 
         self.logger.debug("Configuring clock source switch")
         if self.lmx is not None:
@@ -246,14 +270,14 @@ class Adc(casperfpga.snapadc.SNAPADC):
         # Select all ADCs and continue initialization
         self.selectADC()
 
-        if numChannel==1 and samplingRate<240:
+        if numChannel==1 and sample_rate<240:
             lowClkFreq = True
-        elif numChannel==2 and samplingRate<120:
+        elif numChannel==2 and sample_rate<120:
             lowClkFreq = True
-        elif numChannel==4 and samplingRate<60:
+        elif numChannel==4 and sample_rate<60:
             lowClkFreq = True
         # XXX this case already covered above
-        #elif numChannel==4 and self.RESOLUTION==14 and samplingRate<30:
+        #elif numChannel==4 and self.RESOLUTION==14 and sample_rate<30:
         #    lowClkFreq = True
         else:
             lowClkFreq = False
