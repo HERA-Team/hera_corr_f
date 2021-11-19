@@ -161,8 +161,14 @@ class Adc(casperfpga.snapadc.SNAPADC):
            resolution (int): Bit resolution of the ADC. Valid values are 8, 12.
            ref (float): Reference frequency (in MHz) from which ADC clock is derived. If None, an external sampling clock must be used.
         """
-        self.logger = logger or add_default_log_handlers(logging.getLogger(__name__ + ":%s" % (host.host)))
-        casperfpga.snapadc.SNAPADC.__init__(self, host, ref=ref, logger=self.logger)
+        self.logger = logger or add_default_log_handlers(
+                      logging.getLogger(__name__ + ":%s" % (host.host)))
+        # Purposely setting ref=None below to prevent LMX object
+        # from being attached so we can do it ourselves
+        casperfpga.snapadc.SNAPADC.__init__(self, host, ref=None,
+                                            logger=self.logger)
+        # Attach our own wrapping of LMX
+        self.lmx = Synth(host, 'lmx_ctrl', fosc=ref)
         self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
         self.interleave_mode = 4 >> num_chans
