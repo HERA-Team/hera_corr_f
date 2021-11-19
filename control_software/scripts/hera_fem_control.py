@@ -26,7 +26,7 @@ def main():
     logger = handlers.add_default_log_handlers(logging.getLogger(__file__))
     handlers.log_notify(logger)  # send a NOTIFY level message that this script has started
 
-    corr = HeraCorrelator(hosts=args.hosts, redishost=args.redishost, use_redis=False)
+    corr = HeraCorrelator(hosts=args.hosts, redishost=args.redishost)
     try:
         if len(corr.fengs) == 0:
             logger.error("No F-Engines are connected. Is the power off?")
