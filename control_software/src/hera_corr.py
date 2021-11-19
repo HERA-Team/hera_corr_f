@@ -18,7 +18,7 @@ from casperfpga import utils
 
 LOGGER = add_default_log_handlers(logging.getLogger(__name__))
 TEMP_BITSTREAM_STORE = "/tmp/" # location to store bitfiles from redis
-MAJOR_VERSION =None 
+MAJOR_VERSION = [6, 7]
 
 class HeraCorrelator(object):
     """HERA Correlator control class."""
@@ -369,21 +369,18 @@ class HeraCorrelator(object):
         stats = [self.feng_get_redis_status(h) for h in hosts]
         return dict(zip(hosts, stats))
 
-    def feng_check_version(self, host, major=MAJOR_VERSION, minor=None):
+    def feng_check_version(self, host, major=MAJOR_VERSION):
         """
         Ensure host is programmed with compatible bitfile version.
 
         Inputs:
             host (str): Host to target.
             major (int): Major version to match. Default MAJOR_VERSION
-            minor (int): Minor version to match. Default None
         """
         feng = self.fengs[host]
         _maj,_min = feng.version()
         if major is not None:
-            assert(_maj == major)
-        if minor is not None:
-            assert(_min == minor)
+            assert(_maj in major)
 
     def disable_monitoring(self, expiry=60, verify=True, timeout=60):
         """
