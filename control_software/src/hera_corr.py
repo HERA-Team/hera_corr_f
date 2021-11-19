@@ -253,8 +253,9 @@ class HeraCorrelator(object):
         if verify:
             # if not forced, may leave feng programmed w/ wrong bitstream
             self.feng_check_version(host)
+        sample_rate = self.config['target_sample_rate']
         # configure synth/clk and reprogram FPGA one more time
-        feng.initialize_adc(verify=verify)
+        feng.initialize_adc(sample_rate=sample_rate, verify=verify)
 
     def program_fengs(self, hosts=None, progfile=None, force=False,
                       verify=True, multithread=True, timeout=300.):
@@ -284,6 +285,12 @@ class HeraCorrelator(object):
                             multithread=multithread,
                             timeout=timeout,
         )
+        # record actual sample frequency to redis
+        h = hosts[0]
+        clk_MHz = self.fengs[h].adc.lmx.getFreq()
+        self.r['feng:sample_freq'] = clk_MHz * 1e6 # in Hz
+        self.r['feng:samples_per_mcnt'] = self.config['samples_per_mcnt']
+        self.r['feng:sync_time'] = -1 # not sync'd yet
         return failed
 
     def feng_set_redis_status(self, host):
@@ -1073,12 +1080,12 @@ class HeraCorrelator(object):
         # Consider multithreading if gets too slow
         for host,feng in self.fengs.items():
             feng.sync.arm_sync()
-        sync_time = time.time() - start
+        elapsed_time = time.time() - start
         if not manual:
             # XXX use sync.count to verify no sync has passed
-            if sync_time > maxtime:
+            if elapsed_time > maxtime:
                 raise RuntimeError("Sync time (%.2f) exceeded max (%.2f)"\
-                                   % (sync_time, maxtime))
+                                   % (elapsed_time, maxtime))
             sync_time = int(start) + 1 + 3  # Takes 3 PPS pulses to arm
         else:
             self.logger.warning('Using manual sync trigger')
@@ -1089,6 +1096,7 @@ class HeraCorrelator(object):
         # Store sync time in ms
         self.r['corr:feng_sync_time'] = 1000 * sync_time # ms
         self.r['corr:feng_sync_time_str'] = time.ctime(sync_time)
+        self.r['feng:sync_time'] = sync_time # in UTC seconds
 
     def sync_noise(self, manual=False, maxtime=0.8):
         """
