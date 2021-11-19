@@ -119,9 +119,9 @@ class Block(object):
 
 
 class Synth(casperfpga.synth.LMX2581):
-    def __init__(self, host, name, logger=None):
+    def __init__(self, host, name, fosc=10, logger=None):
         self.logger = logger or add_default_log_handlers(logging.getLogger(__name__ + "%s" % (host.host)))
-        super(Synth, self).__init__(host, name)
+        super(Synth, self).__init__(host, name, fosc=fosc)
         self.host = host
 
     #def initialize(self, verify=False):
