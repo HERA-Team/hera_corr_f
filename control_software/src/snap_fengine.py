@@ -40,7 +40,6 @@ class SnapFengine(object):
         self.synth = Synth(self.fpga, 'lmx_ctrl')
         self.adc = Adc(self.fpga) # not a subclass of Block
         self.sync = Sync(self.fpga, 'sync')
-        #self.noise = NoiseGen(self.fpga, 'noise', nstreams=3)
         self.input = Input(self.fpga, 'input', nstreams=12)
         self.delay = Delay(self.fpga, 'delay', nstreams=6)
         self.pfb = Pfb(self.fpga, 'pfb')
@@ -64,7 +63,7 @@ class SnapFengine(object):
             self.synth,
             self.adc,
             self.sync,
-            #self.noise, # temporarily removed
+            #self.noise, # added below
             self.input,
             self.delay,
             self.pfb,
@@ -76,6 +75,11 @@ class SnapFengine(object):
             self.corr,
             self.phase_switch,
         ]
+        if self.version()[0] >= 7:
+            self.noise = NoiseGen(self.fpga, 'noise', nstreams=3)
+            self.blocks.insert(3, self.noise)
+        else:
+            pass # Version 6 had no noise generator
 
         self.i2c_initialized = False
         # The I2C devices mess with FPGA registers
