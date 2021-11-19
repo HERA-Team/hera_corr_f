@@ -251,12 +251,13 @@ class HeraCorrelator(object):
         # XXX may lie and say it programmed when it didn't
         # XXX might also try multiple times and/or revert to golden image
         feng.program(progfile, force=force, verify=verify, timeout=timeout)
-        if verify:
-            # if not forced, may leave feng programmed w/ wrong bitstream
-            self.feng_check_version(host)
         sample_rate = self.config['target_sample_rate']
         # configure synth/clk and reprogram FPGA one more time
         feng.initialize_adc(sample_rate=sample_rate, verify=verify)
+        # cannot read version until after initialization happens
+        if verify:
+            # if not forced, may leave feng programmed w/ wrong bitstream
+            self.feng_check_version(host)
 
     def program_fengs(self, hosts=None, progfile=None, force=False,
                       verify=True, multithread=True, timeout=300.):
