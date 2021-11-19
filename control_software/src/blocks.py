@@ -124,15 +124,15 @@ class Synth(casperfpga.synth.LMX2581):
         super(Synth, self).__init__(host, name, fosc=fosc)
         self.host = host
 
-    #def initialize(self, verify=False):
-    #    """
-    #    Seem to have to do this if reference
-    #    was not present when board was powered up(?)
-    #    """
-    #    #Ed. This seems to break things?
-    #    #self.powerOff()
-    #    #self.powerOn()
-    #    pass
+    def initialize(self, verify=False):
+        """
+        Seem to have to do this if reference
+        was not present when board was powered up(?)
+        """
+        #Ed. This seems to break things?
+        #self.powerOff()
+        #self.powerOn()
+        pass
 
     def getFreq(self):
         """
