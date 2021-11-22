@@ -299,7 +299,8 @@ class SnapFengine(object):
             if code == self.input.USE_ADC:
                 inputs.append('adc')
             elif code == self.input.USE_NOISE:
-                seed = self.noise.get_seed(stream)
+                # inputs share noisegen blocks
+                seed = self.noise.get_seed(stream // 2)
                 inputs.append('noise-%d' % (seed))
             else:
                 raise ValueError('Unrecognized input: %d' % (code))
