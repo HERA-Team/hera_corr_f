@@ -672,9 +672,9 @@ class NoiseGen(Block):
         for stream in streams:
             assert stream <= self.nstreams
             assert seed < 256
-            stream = 2 * stream # latest block counts in antennas
-            regname = 'seed_%d' % (stream // 4)
-            self.set_reg_bits(regname, seed, 8 * (stream % 4), 8)
+            _stream = 2 * stream # latest block counts in antennas
+            regname = 'seed_%d' % (_stream // 4)
+            self.set_reg_bits(regname, seed, 8 * (_stream % 4), 8)
             if verify:
                 assert seed == self.get_seed(stream)
 
