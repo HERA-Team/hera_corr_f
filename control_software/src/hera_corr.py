@@ -525,6 +525,49 @@ class HeraCorrelator(object):
         )
         return failed
 
+    def feng_set_input(self, host, source, seed=0, stream=None, verify=True):
+        """
+        Set F-Engine Input to ADC or digital noise.
+
+        Inputs:
+            host (str): Host to target.
+            source (str): Either 'adc' or 'noise'.
+            seed (int): Initialization seed if source is 'noise'.
+            stream (int): Which stream to switch. If None, switch all.
+            verify (bool): Verify configuration. Default True.
+        """
+        feng = self.fengs[host]
+        feng.set_input(source, seed=seed, stream=stream, verify=verify)
+
+    def set_input_fengs(self, hosts=None, source='adc', seed='same', verify=True):
+        if hosts is None:
+            # if controlling phase switch for all fengs, record to
+            # master redis flag
+            self.r.hmset('corr:status:input',
+                         {'source':source, 'seed':seed, 'time':time.time()}
+            )
+        hosts = self.get_feng_hostnames(hosts=hosts)
+        failed = []
+        seed_cnt = 0
+        for host in hosts:
+            feng = self.fengs[host]
+            for cnt in range(feng.input.ninput_mux_streams):
+                self.logger.info('Switching %s.input[%d] to %s' %
+                                 (host, cnt, source)) 
+                try:
+                    # will error if verification fails
+                    feng.set_input(source, seed=seed_cnt, stream=cnt,
+                                   verify=verify)
+                    if seed != 'same':
+                        seed_cnt = (seed_cnt + 1) % 256
+                except(RuntimeError,AssertionError,IOError):
+                    self.logger.warning('Failed to switch %s.input[%d]' %
+                                        (host, cnt)) 
+                    # only logging failures at resolution of host
+                    failed.append(host)
+        return set(failed) # only return unique hosts
+    
+
     def switch_fems(self, mode, east=True, north=True, verify=True,
                     hosts=None, multithread=False, timeout=300.):
         """
