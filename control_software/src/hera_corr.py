@@ -556,9 +556,9 @@ class HeraCorrelator(object):
                                  (host, cnt, source)) 
                 try:
                     # will error if verification fails
-                    feng.set_input(source, seed=seed_cnt, stream=cnt,
+                    feng.set_input(source, seed=seed_cnt, stream=cnt//2,
                                    verify=verify)
-                    if seed != 'same':
+                    if seed != 'same' and cnt % 2 == 1:
                         seed_cnt = (seed_cnt + 1) % 256
                 except(RuntimeError,AssertionError,IOError):
                     self.logger.warning('Failed to switch %s.input[%d]' %
