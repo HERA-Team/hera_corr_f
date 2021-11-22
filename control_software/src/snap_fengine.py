@@ -277,7 +277,7 @@ class SnapFengine(object):
             self.input.use_adc(stream=stream, verify=verify)
         elif source == 'noise':
             self.input.use_noise(stream=stream, verify=verify)
-            self.noise.set_seed(stream=stream, seed=seed, verify=verify)
+            self.noise.set_seed(stream=stream//2, seed=seed, verify=verify)
         else:
             raise ValueError('Unsupported source: %s' % (source))
 

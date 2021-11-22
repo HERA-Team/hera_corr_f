@@ -556,7 +556,7 @@ class HeraCorrelator(object):
                                  (host, cnt, source)) 
                 try:
                     # will error if verification fails
-                    feng.set_input(source, seed=seed_cnt, stream=cnt//2,
+                    feng.set_input(source, seed=seed_cnt, stream=cnt,
                                    verify=verify)
                     if seed != 'same' and cnt % 2 == 1:
                         seed_cnt = (seed_cnt + 1) % 256
