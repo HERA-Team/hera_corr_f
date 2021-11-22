@@ -263,13 +263,13 @@ class SnapFengine(object):
         """
         return self.input.get_reg_bits('source_sel', DEST_CONFIG_BIT, 1)
 
-    def set_input(self, source, seed=None, stream=None, verify=True):
+    def set_input(self, source, seed=0, stream=None, verify=True):
         """
         Choose the input to the F-Engine.
 
         Inputs:
             source (str): Either 'adc' or 'noise'.
-            seed (int): Seed for digital noise source.
+            seed (int): Initialization seed if source is 'noise'.
             stream (int): Which stream to switch. If None, switch all.
             verify (bool): Verify configuration. Default True.
         """
@@ -277,6 +277,7 @@ class SnapFengine(object):
             self.input.use_adc(stream=stream, verify=verify)
         elif source == 'noise':
             self.input.use_noise(stream=stream, verify=verify)
+            self.noise.set_seed(stream=stream, seed=seed, verify=verify)
         else:
             raise ValueError('Unsupported source: %s' % (source))
 
@@ -298,7 +299,8 @@ class SnapFengine(object):
             if code == self.input.USE_ADC:
                 inputs.append('adc')
             elif code == self.input.USE_NOISE:
-                inputs.append('noise')
+                seed = self.noise.get_seed(stream)
+                inputs.append('noise-%d' % (seed))
             else:
                 raise ValueError('Unrecognized input: %d' % (code))
         if len(streams) == 1:
