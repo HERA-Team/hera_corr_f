@@ -670,7 +670,7 @@ class NoiseGen(Block):
         """
         if stream is None:
             for stm in range(self.nstreams):
-                self.set_seed(steam=stm, seed=seed, verify=verify)
+                self.set_seed(stream=stm, seed=seed, verify=verify)
         else:
             assert stream <= self.nstreams
             assert seed < 256
