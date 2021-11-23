@@ -659,26 +659,27 @@ class NoiseGen(Block):
 
     def set_seed(self, stream=None, seed=0, verify=True):
         """
-        Set the seed of the noise generator for a given stream.
+        Set the seed of the noise generator for a given stream. Six 8-b 
+        seeds are stored in two 32-b registers from LSB to MSB. Of these,
+        only seeds 0, 2, and 4 are used, going to the 3 LFSRs that serve 
+        inputs 0-1, 2-3, and 4-5 respectively.
 
         Inputs:
             stream (int): Which stream to switch. If None, switch all.
             seed (int): int 0-255 for seeding digital noise generator.
         """
         if stream is None:
-            streams = list(range(self.nstreams))
+            for stm in range(self.nstreams):
+                self.set_seed(steam=stm, seed=seed, verify=verify)
         else:
-            streams = [stream]
-        for stream in streams:
             assert stream <= self.nstreams
             assert seed < 256
-            _stream = 2 * stream # latest block counts in antennas
-            regname = 'seed_%d' % (_stream // 4)
-            self.set_reg_bits(regname, seed, 8 * (_stream % 4), 8)
+            regname = 'seed_%d' % (stream // 4)
+            self.set_reg_bits(regname, seed, 8 * (stream % 4), 8)
             if verify:
                 assert seed == self.get_seed(stream)
 
-    def get_seed(self, stream):
+    def get_seed(self, stream=None):
         """
         Get the seed of the noise generator for a given stream.
 
@@ -686,14 +687,10 @@ class NoiseGen(Block):
             stream (int): Which stream to switch. If None, switch all.
         """
         if stream is None:
-            streams = list(range(self.nstreams))
-        else:
-            streams = [stream]
-        for stream in streams:
-            assert stream <= self.nstreams
-            stream = 2 * stream # latest block counts in antennas
-            regname = 'seed_%d' % (stream // 4)
-            return (self.read_uint(regname) >> (8 * stream % 4)) & 0xff
+            return [self.get_seed(stm) for stm in range(self.nstreams)]
+        assert stream <= self.nstreams
+        regname = 'seed_%d' % (stream // 4)
+        return (self.read_uint(regname) >> (8 * (stream % 4))) & 0xff
 
     def initialize(self, verify=False):
         self.set_seed(verify=verify)
