@@ -540,6 +540,16 @@ class HeraCorrelator(object):
         feng.set_input(source, seed=seed, stream=stream, verify=verify)
 
     def set_input_fengs(self, hosts=None, source='adc', seed='same', verify=True):
+        """
+        Set F-Engine Inputs to ADC or digital noise.
+
+        Inputs:
+            host (str): Host to target.
+            source (str): Either 'adc' or 'noise'.
+            seed (str): If 'same', use same seed for all, otherwise different.
+            stream (int): Which stream to switch. If None, switch all.
+            verify (bool): Verify configuration. Default True.
+        """
         if hosts is None:
             # if controlling phase switch for all fengs, record to
             # master redis flag
@@ -556,9 +566,11 @@ class HeraCorrelator(object):
                                  (host, cnt, source)) 
                 try:
                     # will error if verification fails
+                    # overwrites previous seed for streams that share noise,
+                    # but that is okay.
                     feng.set_input(source, seed=seed_cnt, stream=cnt,
                                    verify=verify)
-                    if seed != 'same' and cnt % 2 == 1:
+                    if seed != 'same':
                         seed_cnt = (seed_cnt + 1) % 256
                 except(RuntimeError,AssertionError,IOError):
                     self.logger.warning('Failed to switch %s.input[%d]' %

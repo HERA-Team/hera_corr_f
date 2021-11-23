@@ -276,8 +276,9 @@ class SnapFengine(object):
         if source == 'adc':
             self.input.use_adc(stream=stream, verify=verify)
         elif source == 'noise':
+            # inputs share noisegens, so relevant seed may be below
+            self.noise.set_seed(stream=2*(stream//2), seed=seed, verify=verify)
             self.input.use_noise(stream=stream, verify=verify)
-            self.noise.set_seed(stream=stream//2, seed=seed, verify=verify)
         else:
             raise ValueError('Unsupported source: %s' % (source))
 
@@ -299,8 +300,8 @@ class SnapFengine(object):
             if code == self.input.USE_ADC:
                 inputs.append('adc')
             elif code == self.input.USE_NOISE:
-                # inputs share noisegen blocks
-                seed = self.noise.get_seed(stream // 2)
+                # inputs share noisegens, so relevant seed may be below
+                seed = self.noise.get_seed(2*(stream//2))
                 inputs.append('noise-%d' % (seed))
             else:
                 raise ValueError('Unrecognized input: %d' % (code))
