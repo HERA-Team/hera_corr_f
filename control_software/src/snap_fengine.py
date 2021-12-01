@@ -40,7 +40,7 @@ class SnapFengine(object):
         self.synth = Synth(self.fpga, 'lmx_ctrl')
         self.adc = Adc(self.fpga) # not a subclass of Block
         self.sync = Sync(self.fpga, 'sync')
-        self.noise = NoiseGen(self.fpga, 'noise', nstreams=3)
+        self.noise = NoiseGen(self.fpga, 'noise', nstreams=6)
         self.input = Input(self.fpga, 'input', nstreams=12)
         self.delay = Delay(self.fpga, 'delay', nstreams=6)
         self.pfb = Pfb(self.fpga, 'pfb')
@@ -277,7 +277,7 @@ class SnapFengine(object):
             self.input.use_adc(stream=stream, verify=verify)
         elif source == 'noise':
             # inputs share noisegens, so relevant seed may be below
-            self.noise.set_seed(stream=2*(stream//2), seed=seed, verify=verify)
+            self.noise.set_seed(stream=stream, seed=seed, verify=verify)
             self.input.use_noise(stream=stream, verify=verify)
         else:
             raise ValueError('Unsupported source: %s' % (source))

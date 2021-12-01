@@ -672,7 +672,7 @@ class NoiseGen(Block):
             for stm in range(self.nstreams):
                 self.set_seed(stream=stm, seed=seed, verify=verify)
         else:
-            assert stream <= self.nstreams
+            assert stream < self.nstreams
             assert seed < 256
             regname = 'seed_%d' % (stream // 4)
             self.set_reg_bits(regname, seed, 8 * (stream % 4), 8)
