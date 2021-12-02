@@ -40,7 +40,7 @@ class SnapFengine(object):
         self.synth = Synth(self.fpga, 'lmx_ctrl')
         self.adc = Adc(self.fpga) # not a subclass of Block
         self.sync = Sync(self.fpga, 'sync')
-        self.noise = NoiseGen(self.fpga, 'noise', nstreams=3)
+        self.noise = NoiseGen(self.fpga, 'noise', nstreams=6)
         self.input = Input(self.fpga, 'input', nstreams=12)
         self.delay = Delay(self.fpga, 'delay', nstreams=6)
         self.pfb = Pfb(self.fpga, 'pfb')
@@ -202,7 +202,7 @@ class SnapFengine(object):
         """
         return self.input.get_reg_bits('source_sel', INITIALIZED_BIT, 1)
 
-    def get_fpga_stats(self): # XXX deprecate? [ARP 11/3/21]
+    def get_fpga_stats(self):
         """
         Get FPGA stats.
         returns: Dictionary of stats
@@ -263,6 +263,53 @@ class SnapFengine(object):
         """
         return self.input.get_reg_bits('source_sel', DEST_CONFIG_BIT, 1)
 
+    def set_input(self, source, seed=0, stream=None, verify=True):
+        """
+        Choose the input to the F-Engine.
+
+        Inputs:
+            source (str): Either 'adc' or 'noise'.
+            seed (int): Initialization seed if source is 'noise'.
+            stream (int): Which stream to switch. If None, switch all.
+            verify (bool): Verify configuration. Default True.
+        """
+        if source == 'adc':
+            self.input.use_adc(stream=stream, verify=verify)
+        elif source == 'noise':
+            # inputs share noisegens, so relevant seed may be below
+            self.noise.set_seed(stream=stream, seed=seed, verify=verify)
+            self.input.use_noise(stream=stream, verify=verify)
+        else:
+            raise ValueError('Unsupported source: %s' % (source))
+
+    def get_input(self, stream=None):
+        """
+        Read input mode for F-Engine.
+
+        Inputs:
+            stream (int): Which stream to read input mode. If None, all.
+        """
+        if stream is None:
+            streams = list(range(self.input.ninput_mux_streams))
+        else:
+            streams = [stream]
+        inputs = []
+        for stream in streams:
+            code = self.input.get_reg_bits('source_sel',
+                            2*(self.input.ninput_mux_streams-1-stream), 2)
+            if code == self.input.USE_ADC:
+                inputs.append('adc')
+            elif code == self.input.USE_NOISE:
+                # inputs share noisegens, so relevant seed may be below
+                seed = self.noise.get_seed(2*(stream//2))
+                inputs.append('noise-%d' % (seed))
+            else:
+                raise ValueError('Unrecognized input: %d' % (code))
+        if len(streams) == 1:
+            return inputs[0]
+        else:
+            return inputs
+
     def get_status(self):
         '''Return dict of config status.'''
         status = {}
@@ -273,6 +320,7 @@ class SnapFengine(object):
         status['adc_is_configured'] = str(int(self.adc_is_configured()))
         status['is_initialized'] = str(int(self.is_initialized()))
         status['dest_is_configured'] = str(int(self.dest_is_configured()))
+        status['input'] = ','.join(self.get_input())
         # Lower level stuff, deprecates get_fpga_stats
         status['temp'] = self.fpga.transport.get_temp()
         status['timestamp'] = datetime.datetime.now().isoformat()

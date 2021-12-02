@@ -657,37 +657,43 @@ class NoiseGen(Block):
         super(NoiseGen, self).__init__(host, name, logger)
         self.nstreams = nstreams
 
-    def set_seed(self, stream, seed):
+    def set_seed(self, stream=None, seed=0, verify=True):
         """
-        Set the seed of the noise generator for a given stream.
-        """
-        if stream > self.nstreams:
-            self._error('Tried to set noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
-            return
-        if seed > 255:
-            self._error('Seed value is an 8-bit integer. It cannot be %d' % seed)
-            return
-        stream = 2*stream # latest block counts in antennas
-        regname = 'seed_%d' % (stream // 4)
-        self.set_reg_bits(regname, seed, 8 * (stream % 4), 8)
+        Set the seed of the noise generator for a given stream. Six 8-b 
+        seeds are stored in two 32-b registers from LSB to MSB. Of these,
+        only seeds 0, 2, and 4 are used, going to the 3 LFSRs that serve 
+        inputs 0-1, 2-3, and 4-5 respectively.
 
-    def get_seed(self, stream):
+        Inputs:
+            stream (int): Which stream to switch. If None, switch all.
+            seed (int): int 0-255 for seeding digital noise generator.
+        """
+        if stream is None:
+            for stm in range(self.nstreams):
+                self.set_seed(stream=stm, seed=seed, verify=verify)
+        else:
+            assert stream < self.nstreams
+            assert seed < 256
+            regname = 'seed_%d' % (stream // 4)
+            self.set_reg_bits(regname, seed, 8 * (stream % 4), 8)
+            if verify:
+                assert seed == self.get_seed(stream)
+
+    def get_seed(self, stream=None):
         """
         Get the seed of the noise generator for a given stream.
-        """
-        if stream > self.nstreams:
-            self._error('Tried to get noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
-            return
-        stream = 2*stream # latest block counts in antennas
-        regname = 'seed_%d' % (stream // 4)
-        return (self.read_uint(regname) >> (8 * stream % 4)) & 0xff
 
+        Inputs:
+            stream (int): Which stream to switch. If None, switch all.
+        """
+        if stream is None:
+            return [self.get_seed(stm) for stm in range(self.nstreams)]
+        assert stream <= self.nstreams
+        regname = 'seed_%d' % (stream // 4)
+        return (self.read_uint(regname) >> (8 * (stream % 4))) & 0xff
 
     def initialize(self, verify=False):
-        for stream in range(self.nstreams):
-            self.set_seed(stream, 0)
-            if verify:
-                assert(self.get_seed(stream) == 0)
+        self.set_seed(verify=verify)
 
 
 class Input(Block):
