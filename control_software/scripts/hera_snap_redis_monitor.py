@@ -1,12 +1,12 @@
 #! /usr/bin/env python
 from __future__ import print_function
-import os
 import time
 import socket
 import logging
 import argparse
-import datetime
-import numpy as np
+from os import path as op
+from datetime import datetime
+from numpy import arange
 
 from hera_corr_f import HeraCorrelator, __version__, __package__
 from hera_corr_f import hcf_util as hcfu
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     script_redis_key = "status:script:{:s}:{:s}".format(hostname, __file__)
     locked_out = False
     logger.info('Starting SNAP redis monitor')
-    bins = np.arange(-128, 128)
+    bins = arange(-128, 128)
     while(True):
         tick = time.time()
         corr.r.set(script_redis_key, "alive", ex=max(60, args.delay * 2))
@@ -95,8 +95,8 @@ if __name__ == "__main__":
 
         # load this module's version into redis
         corr.r.hmset(
-            "version:{:s}:{:s}".format(__package__, os.path.basename(__file__)),
-            {"version": __version__, "timestamp": datetime.datetime.now().isoformat()}
+            "version:{:s}:{:s}".format(__package__, op.basename(__file__)),
+            {"version": __version__, "timestamp": datetime.now().isoformat()}
         )
 
         for host in corr.fengs:
@@ -146,7 +146,7 @@ if __name__ == "__main__":
                 #             "Full error output:".format(host, stream // 2),
                 #             exc_info=True,
                 #         )
-                timestamp = datetime.datetime.now().isoformat()
+                timestamp = datetime.now().isoformat()
 
                 snaprf_status_redis_key = "status:snaprf:{:s}:{:d}".format(host, stream)
                 snap_rf_stats = {}
