@@ -3,7 +3,6 @@
 import logging
 import os
 import time
-import socket
 import redis
 import yaml
 import json
@@ -49,19 +48,18 @@ class HeraCorrelator(object):
         # also keep a non-decoded redis connection for reading
         # values with byte-strings like the .fpg files
         self.r_bytes = redis.Redis(redishost, decode_responses=False)
-        self.redis_transport = redis_transport # XXX why have this (ARP 11/3/21)?
+        self.redis_transport = redis_transport  # XXX why have this (ARP 11/3/21)?
         self.passive = passive
 
         self.fengs = {}
-        self.get_config(config) # sets self.config
-        self.set_default_progfile() # sets self._progfile
+        self.get_config(config)  # sets self.config
+        self.set_default_progfile()  # sets self._progfile
 
         if not passive:
-            if block_monitoring: # XXX still necessary (ARP 11/3/21)?
+            if block_monitoring:  # XXX still necessary (ARP 11/3/21)?
                 self.disable_monitoring(60, verify=True)
             self._hookup_from_redis()
             self._unconnected = self.connect_fengs(hosts=hosts)
-
 
     def get_config(self, config=None, verify=True):
         """
@@ -116,7 +114,7 @@ class HeraCorrelator(object):
         feng = SnapFengine(host, ant_indices=ant_indices,
                            redishost=redishost)
         if feng.fpga.is_connected():
-            self.fengs[host] = feng # single dict call is threadsafe
+            self.fengs[host] = feng  # single dict call is threadsafe
             self.r.hset('status:snap:%s' % host, 'connected', '1')
         else:
             self.feng_declare_disconnected(host)
@@ -669,6 +667,18 @@ class HeraCorrelator(object):
         if verify:
             assert(self.lookup_pam_attenuation(ant, pol) == attenuation)
 
+    def get_fem_switch(self, ant, pol):
+        """
+        Read FEM switch for specified ant/pol via SNAP.
+
+        Inputs:
+           ant: Antenna string or integer. Eg. '0' or 0.
+           pol: String polarization -- 'e' or 'n'
+        """
+        host, stream = self.lookup_ant_host_stream(ant, pol)
+        switch, east, north = self.fengs[host].fems[stream//2].switch()
+        return switch
+
     def get_pam_attenuation(self, ant, pol):
         """
         Read PAM attenuation for specified ant/pol from SNAP.
@@ -702,7 +712,7 @@ class HeraCorrelator(object):
         east_north = pam.get_attenuation()
         if safe:
             # make sure we read the same value as commanded
-            commanded = pam._cached_atten # commanded values stored here
+            commanded = pam._cached_atten  # commanded values stored here
             if commanded is None:
                 commanded = (self.lookup_pam_attenuation(ant, 'e'),
                              self.lookup_pam_attenuation(ant, 'n'))
@@ -711,7 +721,7 @@ class HeraCorrelator(object):
         atten[pol] = attenuation
         pam.set_attenuation(atten['e'], atten['n'], verify=verify)
         if update_redis:
-            self.store_pam_attenuation(ant,pol,attenuation, verify=verify)
+            self.store_pam_attenuation(ant, pol, attenuation, verify=verify)
 
     def lookup_eq_coeffs(self, ant, pol):
         """

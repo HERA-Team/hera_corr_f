@@ -4,8 +4,6 @@ import json
 from numpy import histogram, mean, sqrt, arange
 
 
-FQ0, FQ1 = 46.9, 234.3  # MHz - limits of auto spectra
-NCHAN = 6144
 POL_NAME_FROM_CHAR = {"e": "east", "n": "north"}
 BINS = arange(-128, 128)
 
