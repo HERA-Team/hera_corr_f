@@ -12,7 +12,7 @@ Parameters = Namespace(fq0=46.9,  # low cut-off in MHz
 DY2SC = 24 * 60 * 60
 
 
-class Attenuators:
+class Attenuator:
     def __init__(self):
         self.hc = HeraCorrelator()
         self.antpols = {}
@@ -43,7 +43,10 @@ class Attenuators:
             for cval in chkap:
                 antpol_redis[cval] = self.hc.r.hget(rkey, cval)
             rkey = 'auto:{}{}'.format(ant, pol)
-            self.antpols[ant, pol]['auto'] = np.frombuffer(self.hc.r_bytes.get(rkey), np.float32)
+            try:
+                self.antpols[ant, pol]['auto'] = np.frombuffer(self.hc.r_bytes.get(rkey), np.float32)  # noqa
+            except AttributeError:
+                self.antpols[ant, pol]['auto'] = None
 
             # Stuff from HeraCorrelator
             for cval, func in chkap.items():
@@ -86,13 +89,18 @@ class Attenuators:
             print('State loaded {:.2f} s ago'.format((ctjd - self.state_time.jd) * DY2SC))
 
         for (ant, pol), state in self.antpols.items():
-            pwr = np.median(state['auto'][ch0:ch1])
-            gain_dB = np.around(10*np.log10(target_pwr / pwr)).astype(int)
+
             if state['pam_atten'] is None:
                 print("No current attenuation value for {}{}".format(ant, pol))
                 print("Set to default value {}".format(default))
                 set_val = default
+            elif state['auto'] is None:
+                print("No auto values for {}{}".format(ant, pol))
+                print("Set to default value {}".format(default))
+                set_val = default
             else:
+                pwr = np.median(state['auto'][ch0:ch1])
+                gain_dB = np.around(10*np.log10(target_pwr / pwr)).astype(int)
                 set_val = np.array(state['pam_atten'] - gain_dB).clip(0, 15)
             self.antpols[ant, pol]['calc_pam_atten'] = set_val
             if verbose:
