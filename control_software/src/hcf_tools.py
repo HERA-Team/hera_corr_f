@@ -53,7 +53,10 @@ class Attenuator:
             antpol_redis = {}
             rkey = 'status:ant:{}:{}'.format(ant, pol)
             for cval in chkap:
-                antpol_redis[cval] = self.hc.r.hget(rkey, cval)
+                this_val = self.hc.r.hget(rkey, cval)
+                if not this_val:
+                    this_val = None
+                antpol_redis[cval] = this_val
             rkey = 'auto:{}{}'.format(ant, pol)
             try:
                 self.antpols[ant, pol]['auto'] = np.frombuffer(self.hc.r_bytes.get(rkey), np.float32)  # noqa
@@ -171,4 +174,7 @@ class Attenuator:
             return
         for (ant, pol), state in self.antpols.items():
             rkey = "atten:set:{}{}".format(ant, pol)
-            self.hc.r.hset(rkey, state['fem_switch'], state['pam_atten'])
+            switch_state = state['fem_switch']
+            if switch_state is None:
+                switch_state = 'Unknown'
+            self.hc.r.hset(rkey, switch_state, state['pam_atten'])
