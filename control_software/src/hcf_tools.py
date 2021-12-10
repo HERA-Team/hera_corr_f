@@ -12,8 +12,12 @@ Parameters = Namespace(fq0=46.9,  # low cut-off in MHz
 DY2SC = 24 * 60 * 60
 
 
-def fake_get_fem_switch(a, b):
+def self__hc__get_fem_switch(a, b):
     return 'Fake'
+
+
+def self__hc__set_pam_attenuation(a, b, c):
+    return
 
 
 class Attenuator:
@@ -39,7 +43,7 @@ class Attenuator:
         """
         self.state_time = Time.now()
         self.timestamp_jd = np.frombuffer(self.hc.r_bytes.get('auto:timestamp'), np.float64)[0]
-        chkap = {'pam_atten': self.hc.get_pam_attenuation, 'fem_switch': fake_get_fem_switch}
+        chkap = {'pam_atten': self.hc.get_pam_attenuation, 'fem_switch': self__hc__get_fem_switch}
         not_fully_successful = set()
         did_not_agree = set()
         for ant, pol in self.antpols:
@@ -72,7 +76,7 @@ class Attenuator:
                     else:
                         print('\tset to None.')
                         self.antpols[ant, pol][cval] = None
-                if self.antpols[ant, pol][cval] != antpol_redis[cval]:
+                if self.antpols[ant, pol][cval] not in ['Fake', antpol_redis[cval]]:
                     did_not_agree.add(nfskey)
                     print("{} states don't agree:".format(cval))
                     print("\tredis:  {}".format(antpol_redis[cval]))
@@ -138,7 +142,7 @@ class Attenuator:
             else:
                 for i in range(retries):
                     try:
-                        self.hc.set_pam_attenuation(ant, pol, state[set_to])
+                        self__hc__set_pam_attenuation(ant, pol, state[set_to])
                     except (RuntimeError, IOError, AssertionError):
                         print('Failure {} / {}, trying again'.format((i+1), retries))
                         continue
