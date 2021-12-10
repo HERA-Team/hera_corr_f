@@ -55,7 +55,6 @@ class Attenuator:
             for cval in chkap:
                 this_val = self.hc.r.hget(rkey, cval)
                 if not this_val or this_val == 'null':
-                    print('L58:  ',cval,this_val)
                     this_val = None
                 antpol_redis[cval] = this_val
             rkey = 'auto:{}{}'.format(ant, pol)
@@ -74,12 +73,12 @@ class Attenuator:
                 except:  # noqa
                     not_fully_successful.add(nfskey)
                     self.antpols[ant, pol][comm_stat_key] = False
-                    print("{} not found for {} {}".format(cval, ant, pol))
+                    print("{} not found for {} {}".format(cval, ant, pol), end='  ')
                     if update_from_redis:
-                        print('\tset to redis value:  {}'.format(antpol_redis[cval]))
+                        print('set to redis value:  {}'.format(antpol_redis[cval]))
                         self.antpols[ant, pol][cval] = antpol_redis[cval]
                     else:
-                        print('\tset to None.')
+                        print('set to None.')
                         self.antpols[ant, pol][cval] = None
                 if not self.antpols[ant, pol][cval] and not antpol_redis[cval]:
                     agree = True
@@ -94,9 +93,9 @@ class Attenuator:
                     agree = False
                 if not agree:
                     did_not_agree.add(nfskey)
-                    print("{} states don't agree:".format(cval))
-                    print("\tredis:  {}".format(antpol_redis[cval]))
-                    print("\tcorr:  {}".format(self.antpols[ant, pol][cval]))
+                    print("{}{} {} states don't agree:".format(ant, pol, cval), end='  ')
+                    print("<redis = {}>".format(antpol_redis[cval]), end='  ')
+                    print("<corr = {}".format(self.antpols[ant, pol][cval]))
         print("{} out of {} were not fully successful."
               .format(len(not_fully_successful), len(self.antpols)))
         print("{} out of {} did not fully agree."
