@@ -7,7 +7,8 @@ from argparse import Namespace
 
 Parameters = Namespace(fq0=46.9,  # low cut-off in MHz
                        fq1=234.3,  # high cut-off in MHz
-                       nchan=6144  # number of channels
+                       nchan=6144,  # number of channels
+                       switch_states=['antenna', 'load', 'noise']
                        )
 DY2SC = 24 * 60 * 60
 
@@ -30,7 +31,7 @@ class Attenuator:
                     self.antpols[int(ant), str(pol)] = {'host': hookup['host'],
                                                         'channel': hookup['channel']}
         self.state_time = None
-        self.eq_calc_done = False
+        self.atten_set_options = []
 
     def get_current_state(self, update_from_redis=False):
         """
@@ -42,7 +43,7 @@ class Attenuator:
             If error getting from correlator, use redis value.  Otherwise use None.
         """
         self.state_time = Time.now()
-        self.timestamp_jd = np.frombuffer(self.hc.r_bytes.get('auto:timestamp'), np.float64)[0]
+        self.auto_timestamp_jd = np.frombuffer(self.hc.r_bytes.get('auto:timestamp'), np.float64)[0]
         chkap = {'pam_atten': self.hc.get_pam_attenuation, 'fem_switch': self__hc__get_fem_switch}
         not_fully_successful = set()
         did_not_agree = set()
@@ -93,28 +94,29 @@ class Attenuator:
         if self.state_time is None:
             print('Skipping - must get_current_state first')
             return
-        self.eq_calc_done = True
+        self.atten_set_options.append('calc_pam_atten')
         self.calc_time = Time.now()
         ctjd = self.calc_time.jd
         dchan = (Parameters.fq1 - Parameters.fq0) / Parameters.nchan
         ch0 = np.around((cf-bw/2) / dchan).astype(int)
         ch1 = np.around((cf+bw/2) / dchan).astype(int)
-        if verbose:
-            print('Calculating equalization using {:.1f} - {:.1f} MHz  ({} - {})'.
-                  format((cf-bw/2.0), (cf+bw/2.0), ch0, ch1))
-            print('Target power {}'.format(target_pwr))
-            print('Auto timestamp {:.2f} s ago'.format((ctjd - self.timestamp_jd) * DY2SC))
-            print('State loaded {:.2f} s ago'.format((ctjd - self.state_time.jd) * DY2SC))
+        print('Calculating equalization using {:.1f} - {:.1f} MHz  ({} - {})'.
+              format((cf-bw/2.0), (cf+bw/2.0), ch0, ch1))
+        print('Target power {}'.format(target_pwr))
+        print('Auto timestamp {:.2f} s ago'.format((ctjd - self.auto_timestamp_jd) * DY2SC))
+        print('State loaded {:.2f} s ago'.format((ctjd - self.state_time.jd) * DY2SC))
 
         success = []
         for (ant, pol), state in self.antpols.items():
             if state['pam_atten'] is None:
-                print("No current attenuation value for {}{}".format(ant, pol))
-                print("Set to default value {}".format(default))
+                if verbose:
+                    print("No current attenuation value for {}{}".format(ant, pol))
+                    print("Set to default value {}".format(default))
                 set_val = default
             elif state['auto'] is None:
-                print("No auto values for {}{}".format(ant, pol))
-                print("Set to default value {}".format(default))
+                if verbose:
+                    print("No auto values for {}{}".format(ant, pol))
+                    print("Set to default value {}".format(default))
                 set_val = default
             else:
                 success.append("{}{}".format(ant, pol))
@@ -129,8 +131,10 @@ class Attenuator:
 
     def set_pam_attenuation(self, retries=3, set_to='calc_pam_atten'):
         """
-        Actually tries to set the pam attenuation based on 'set_to' value.
+        Tries to set the pam attenuation based on 'set_to' value.
         """
+        if set_to not in self.atten_set_options:
+            print("{} attenuation values not available.".format(set_to))
         self.failed = []
         self.skipped = []
         self.same = []
@@ -149,31 +153,22 @@ class Attenuator:
                     break
                 else:
                     self.failed.append((ant, pol))
-#
-#     no_comms = [antpol for antpol, (cur, new) in pam_settings.items() if cur == -1]
-#     big = [antpol for antpol, (cur, new) in pam_settings.items() if np.abs(cur - new) >= 3]
-#     if verbose:
-#         print('No Communication')
-#         for ant, pol in no_comms:
-#             hookup = hc.ant_to_snap[ant][pol]
-#             print('   ', ant, pol, hookup['host'], hookup['channel'])
-#         print('Trouble Setting Attenuation?')
-#         for ant, pol in big:
-#             hookup = hc.ant_to_snap[ant][pol]
-#             print('   ', ant, pol, hookup['host'], hookup['channel'])
-#         print('Finished loading at', cur_jd)
-#
-#     def log_pam_atten(self):
-#         with open(outfile, 'w') as fp:
-#             csv_out = csv.writer(fp, delimiter=',')
-#             csv_out.writerow(['ANT', 'POL', 'SNAP', 'CH', 'OLD_ATTEN', 'NEW_ATTEN'])
-#             for (ant, pol), (snap, ch) in antpols.items():
-#                 # pam_num = ch // 2
-#                 try:
-#                     cur_atten = hc.get_pam_attenuation(ant, pol)
-#                 except IOError:
-#                     cur_atten = -1
-#                     new_atten = -1
-#
-#                 pam_settings[ant, pol] = (cur_atten, new_atten)
-#                 csv_out.writerow([str(val) for val in (ant, pol, snap, ch, cur_atten, new_atten)])
+
+    def get_state_atten_values(self, switch='antenna'):
+        print("Put nominal values in redis, and pull them in here as 'set_to' options")
+        if switch not in Parameters.switch_states:
+            print("{} not available.".format(switch))
+            return
+        set_name = "{}_pam_atten".format(switch)
+        self.atten_set_options.append(set_name)
+        for (ant, pol), state in self.antpols.items():
+            rkey = "atten:set:{}{}".format(ant, pol)
+            self.antpols[ant, pol][set_name] = self.hc.r.hget(rkey, switch)
+
+    def log_state_atten_values(self):
+        if self.state_time is None:
+            print('Skipping - must get_current_state first')
+            return
+        for (ant, pol), state in self.antpols.items():
+            rkey = "atten:set:{}{}".format(ant, pol)
+            self.hc.r.hset(rkey, state['fem_switch'], state['pam_atten'])
