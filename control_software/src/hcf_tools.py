@@ -54,9 +54,8 @@ class Attenuator:
             rkey = 'status:ant:{}:{}'.format(ant, pol)
             for cval in chkap:
                 this_val = self.hc.r.hget(rkey, cval)
-                print('L57:  ',this_val)
                 if not this_val:
-                    print('L58:  ',this_val)
+                    print('L58:  ',cval,this_val)
                     this_val = None
                 antpol_redis[cval] = this_val
             rkey = 'auto:{}{}'.format(ant, pol)
@@ -82,7 +81,16 @@ class Attenuator:
                     else:
                         print('\tset to None.')
                         self.antpols[ant, pol][cval] = None
-                if self.antpols[ant, pol][cval] not in ['Fake', antpol_redis[cval]]:
+                if not self.antpols[ant, pol][cval] and not antpol_redis[cval]:
+                    agree = True
+                elif cval == 'fem_switch':
+                    agree = self.antpols[ant, pol][cval] in ['Fake', antpol_redis[cval]]
+                elif cval == 'pam_atten':
+                    agree = int(self.antpols[ant, pol][cval]) == int(antpol_redis[cval])
+                else:
+                    print("{} not allowed.".format(cval))
+                    agree = False
+                if not agree:
                     did_not_agree.add(nfskey)
                     print("{} states don't agree:".format(cval))
                     print("\tredis:  {}".format(antpol_redis[cval]))
@@ -177,7 +185,6 @@ class Attenuator:
         for (ant, pol), state in self.antpols.items():
             rkey = "atten:set:{}{}".format(ant, pol)
             switch_state = state['fem_switch']
-            print(ant,pol,rkey,switch_state,state['pam_atten'])
             if not switch_state:
                 switch_state = 'Unknown'
             if state['pam_atten']:
