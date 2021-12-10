@@ -12,6 +12,10 @@ Parameters = Namespace(fq0=46.9,  # low cut-off in MHz
 DY2SC = 24 * 60 * 60
 
 
+def fake_get_fem_switch(a, b):
+    return 'Fake'
+
+
 class Attenuator:
     def __init__(self):
         self.hc = HeraCorrelator()
@@ -19,8 +23,8 @@ class Attenuator:
         for ant, val in self.hc.ant_to_snap.items():
             for pol, hookup in val.items():
                 if hookup['host'] in self.hc.fengs:
-                    self.antpols[ant, pol] = {'host': hookup['host'],
-                                              'channel': hookup['channel']}
+                    self.antpols[int(ant), str(pol)] = {'host': hookup['host'],
+                                                        'channel': hookup['channel']}
         self.state_time = None
         self.eq_calc_done = False
 
@@ -35,8 +39,11 @@ class Attenuator:
         """
         self.state_time = Time.now()
         self.timestamp_jd = np.frombuffer(self.hc.r_bytes.get('auto:timestamp'), np.float64)[0]
-        chkap = {'pam_atten': self.hc.get_pam_attenuation, 'fem_switch': self.hc.get_fem_switch}
+        chkap = {'pam_atten': self.hc.get_pam_attenuation, 'fem_switch': fake_get_fem_switch}
+        not_fully_successful = set()
+        did_not_agree = set()
         for ant, pol in self.antpols:
+            nfskey = '{}{}'.format(ant, pol)
             # Stuff from redis (use to check)
             antpol_redis = {}
             rkey = 'status:ant:{}:{}'.format(ant, pol)
@@ -47,6 +54,7 @@ class Attenuator:
                 self.antpols[ant, pol]['auto'] = np.frombuffer(self.hc.r_bytes.get(rkey), np.float32)  # noqa
             except AttributeError:
                 self.antpols[ant, pol]['auto'] = None
+                not_fully_successful.add(nfskey)
 
             # Stuff from HeraCorrelator
             for cval, func in chkap.items():
@@ -55,6 +63,7 @@ class Attenuator:
                     self.antpols[ant, pol][cval] = func(ant, pol)
                     self.antpols[ant, pol][comm_stat_key] = True
                 except:  # noqa
+                    not_fully_successful.add(nfskey)
                     self.antpols[ant, pol][comm_stat_key] = False
                     print("{} not found for {} {}".format(cval, ant, pol))
                     if update_from_redis:
@@ -64,9 +73,14 @@ class Attenuator:
                         print('\tset to None.')
                         self.antpols[ant, pol][cval] = None
                 if self.antpols[ant, pol][cval] != antpol_redis[cval]:
+                    did_not_agree.add(nfskey)
                     print("{} states don't agree:".format(cval))
                     print("\tredis:  {}".format(antpol_redis[cval]))
                     print("\tcorr:  {}".format(self.antpols[ant, pol][cval]))
+        print("{} out of {} were not fully successful."
+              .format(len(not_fully_successful), len(self.antpols)))
+        print("{} out of {} did not fully agree."
+              .format(len(did_not_agree), len(self.antpols)))
 
     def calc_equalization(self, cf=168.0, bw=8.0, target_pwr=75.0, default=5.0, verbose=True):
         """
@@ -88,8 +102,8 @@ class Attenuator:
             print('Auto timestamp {:.2f} s ago'.format((ctjd - self.timestamp_jd) * DY2SC))
             print('State loaded {:.2f} s ago'.format((ctjd - self.state_time.jd) * DY2SC))
 
+        success = []
         for (ant, pol), state in self.antpols.items():
-
             if state['pam_atten'] is None:
                 print("No current attenuation value for {}{}".format(ant, pol))
                 print("Set to default value {}".format(default))
@@ -99,6 +113,7 @@ class Attenuator:
                 print("Set to default value {}".format(default))
                 set_val = default
             else:
+                success.append("{}{}".format(ant, pol))
                 pwr = np.median(state['auto'][ch0:ch1])
                 gain_dB = np.around(10*np.log10(target_pwr / pwr)).astype(int)
                 set_val = np.array(state['pam_atten'] - gain_dB).clip(0, 15)
@@ -106,6 +121,7 @@ class Attenuator:
             if verbose:
                 print("{}{}:  {}  {} -> {}"
                       .format(ant, pol, state['fem_switch'], state['pam_atten'], set_val))
+        print("{} out of {} were successful".format(len(success), len(self.antpols)))
 
     def set_pam_attenuation(self, retries=3, set_to='calc_pam_atten'):
         """
