@@ -6,7 +6,6 @@ import logging
 import argparse
 from os import path as op
 from datetime import datetime
-from numpy import arange
 
 from hera_corr_f import HeraCorrelator, __version__, __package__
 from hera_corr_f import hcf_util as hcfu
@@ -68,7 +67,7 @@ if __name__ == "__main__":
     script_redis_key = "status:script:{:s}:{:s}".format(hostname, __file__)
     locked_out = False
     logger.info('Starting SNAP redis monitor')
-    bins = arange(-128, 128)
+
     while(True):
         tick = time.time()
         corr.r.set(script_redis_key, "alive", ex=max(60, args.delay * 2))
@@ -117,7 +116,7 @@ if __name__ == "__main__":
                     # we could do this for every stream but the function
                     # returns both polarization and we don't need to overload
                     # the network
-                    adc_stats = hcfu.get_adc_stats(corr, host, stream, bins, logger)
+                    adc_stats = hcfu.get_adc_stats(corr, host, stream, logger)
                     this_pol = 'x'
                 else:
                     this_pol = 'y'
@@ -125,7 +124,7 @@ if __name__ == "__main__":
                 eq_coeffs = hcfu.get_eq_coeff(corr, host, stream, logger)
                 fft_of = hcfu.get_fft_of(corr, host, stream, logger)
 
-                # LEAVING IN BECAUSE I DON'T UNDERSTAND THE FINALLY!!!
+                # IS THE FINALLY WHAT WE WANT?  (NOW IMPLEMENTED VIA hcf_util.py)
                 # try:
                 #     fft_of = corr.fengs[host].pfb.is_overflowing()
                 # except:  # noqa

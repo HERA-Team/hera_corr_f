@@ -1,16 +1,18 @@
 from __future__ import print_function
+from hera_corr_f import HeraCorrelator
+import csv
+import numpy as np
 import sys
 import json
-from numpy import histogram, mean, sqrt, arange
 
 
 FQ0, FQ1 = 46.9, 234.3  # MHz - limits of auto spectra
 NCHAN = 6144
 POL_NAME_FROM_CHAR = {"e": "east", "n": "north"}
-BINS = arange(-128, 128)
+BINS = np.arange(-128, 128)
 
 
-class Lager:
+class LittleLogger:
     """
     This spoofs the logger if None is supplied.
     """
@@ -41,7 +43,7 @@ def get_fft_of(corr, host, stream, logger=None):
     Dictionary of fft_of.
     """
     if logger is None:
-        logger = Lager()
+        logger = LittleLogger()
     try:
         fft_of = corr.fengs[host].pfb.is_overflowing()
     except:  # noqa
@@ -52,23 +54,17 @@ def get_fft_of(corr, host, stream, logger=None):
             exc_info=True,
         )
         fft_of = None
-    finally:
-        reset_fft_overflow(corr, host, logger)
+    finally:  # I DON'T UNDERSTAND THIS -- THE EXCEPT ABOVE CATCHES EVERYTHING!
+        try:
+            # this call resets the fft overflow boolean.
+            corr.fengs[host].pfb.rst_stats()
+        except:  # noqa
+            logger.info(
+                "Error resetting fft overflow on snap {} ant {}. "
+                "Full error output:".format(host, stream // 2),
+                exc_info=True,
+            )
     return fft_of
-
-
-def reset_fft_overflow(corr, host, logger=None):
-    if logger is None:
-        logger = Lager()
-    try:
-        # this call resets the fft overflow boolean.
-        corr.fengs[host].pfb.rst_stats()
-    except:  # noqa
-        logger.info(
-            "Error resetting fft overflow on snap {}. "
-            "Full error output:".format(host),
-            exc_info=True,
-        )
 
 
 def get_eq_coeff(corr, host, stream, logger=None):
@@ -91,7 +87,7 @@ def get_eq_coeff(corr, host, stream, logger=None):
     Dictionary of eq_coeff.
     """
     if logger is None:
-        logger = Lager()
+        logger = LittleLogger()
     try:
         eq_coeffs = corr.fengs[host].eq.get_coeffs(stream)
         eq_coeffs = json.dumps(eq_coeffs.tolist())
@@ -126,7 +122,7 @@ def get_autocorrelation(corr, host, stream, logger=None):
     Dictionary of autocorrelation.
     """
     if logger is None:
-        logger = Lager()
+        logger = LittleLogger()
     try:
         autocorrelation = corr.fengs[host].corr.get_new_corr(stream, stream)
         autocorrelation = json.dumps(autocorrelation.real.tolist())
@@ -162,7 +158,7 @@ def get_adc_stats(corr, host, stream, logger=None):
     """
     rv = {'x': {}, 'y': {}}
     if logger is None:
-        logger = Lager()
+        logger = LittleLogger()
     bin_centers = (BINS[1:] + BINS[:1]) / 2
 
     try:
@@ -179,11 +175,11 @@ def get_adc_stats(corr, host, stream, logger=None):
 
     for pol in ['x', 'y']:
         if rv[pol]['adc'] is not None:
-            hist, _ = histogram(rv[pol]['adc'], bins=BINS)
+            hist, _ = np.histogram(rv[pol]['adc'], bins=BINS)
             rv[pol]['histogram'] = [bin_centers.tolist(), hist.tolist()]
             rv[pol]['mean'] = rv[pol]['adc'].mean()
-            rv[pol]['power'] = mean(rv[pol]['adc'] ** 2)
-            rv[pol]['rms'] = sqrt(rv[pol]['power'])
+            rv[pol]['power'] = np.mean(rv[pol]['adc'] ** 2)
+            rv[pol]['rms'] = np.sqrt(rv[pol]['power'])
         else:
             rv[pol]['histogram'] = [[None], [None]]
             rv[pol]['mean'] = None
@@ -217,7 +213,7 @@ def get_pam_stats(corr, host, stream, pol, logger=None):
     feng = corr.fengs[host]
     pam = feng.pams[stream // 2]
     if logger is None:
-        logger = Lager()
+        logger = LittleLogger()
 
     try:
         rv["pam_atten"] = pam.get_attenuation()[stream % 2]
@@ -299,7 +295,7 @@ def get_fem_stats(corr, host, stream, logger=None):
     feng = corr.fengs[host]
     fem = feng.fems[stream // 2]
     if logger is None:
-        logger = Lager()
+        logger = LittleLogger()
 
     try:
         switch, east, north = fem.switch()
@@ -399,3 +395,72 @@ def validate_redis_dict(in_dict, recursion_depth=1):
             validate_redis_dict(in_dict[redis_key], recursion_depth=recursion_depth + 1)
 
     return in_dict
+
+
+def equalize_pams(cf=168.0, bw=8.0, retries=2, set_atten=True, target_pwr=75.0,
+                  verbose=False):
+    from astropy.time import Time
+    dchan = (FQ1 - FQ0) / NCHAN
+    outfile = 'pam_settings_v004.csv'
+
+    hc = HeraCorrelator()
+    antpols = {}
+    for ant, val in hc.ant_to_snap.items():
+        for pol, hookup in val.items():
+            if hookup['host'] in hc.fengs:
+                antpols[ant, pol] = (hookup['host'], hookup['channel'])
+
+    ch0 = np.around((cf-bw/2) / dchan).astype(int)
+    ch1 = np.around((cf+bw/2) / dchan).astype(int)
+
+    if verbose:
+        print('Selecting CHs:', ch0, ch1)
+
+    loaded_jd = np.frombuffer(hc.r_bytes.get('auto:timestamp'), np.float64)[0]
+    cur_jd = Time.now().jd
+    if verbose:
+        print('Using autos loaded {} s ago'.format((cur_jd - loaded_jd) * 24 * 60 * 60))
+
+    pam_settings = {}
+    with open(outfile, 'w') as fp:
+        csv_out = csv.writer(fp, delimiter=',')
+        csv_out.writerow(['ANT', 'POL', 'SNAP', 'CH', 'OLD_ATTEN', 'NEW_ATTEN'])
+        for (ant, pol), (snap, ch) in antpols.items():
+            # pam_num = ch // 2
+            try:
+                cur_atten = hc.get_pam_attenuation(ant, pol)
+            except IOError:
+                cur_atten = -1
+                new_atten = -1
+            key = 'auto:%s%s' % (ant.encode('utf8'), pol.encode('utf8'))
+            auto = hc.r_bytes.get(key)
+            auto = np.frombuffer(auto, np.float32)
+            pwr = np.median(auto[ch0:ch1])
+            gain_dB = np.around(10*np.log10(target_pwr / pwr)).astype(int)
+            if cur_atten != -1:
+                new_atten = np.array(cur_atten - gain_dB).clip(0, 15)
+            pam_settings[ant, pol] = (cur_atten, new_atten)
+            csv_out.writerow([str(val) for val in (ant, pol, snap, ch, cur_atten, new_atten)])
+            if verbose:
+                print(ant, pol, cur_atten, new_atten, pwr)
+            if set_atten and new_atten != cur_atten:
+                for i in range(retries):
+                    try:
+                        hc.set_pam_attenuation(ant, pol, new_atten)
+                    except (RuntimeError, IOError, AssertionError):
+                        print('Failed, trying again', i, retries)
+                        continue
+                    break
+
+    no_comms = [antpol for antpol, (cur, new) in pam_settings.items() if cur == -1]
+    big = [antpol for antpol, (cur, new) in pam_settings.items() if np.abs(cur - new) >= 3]
+    if verbose:
+        print('No Communication')
+        for ant, pol in no_comms:
+            hookup = hc.ant_to_snap[ant][pol]
+            print('   ', ant, pol, hookup['host'], hookup['channel'])
+        print('Trouble Setting Attenuation?')
+        for ant, pol in big:
+            hookup = hc.ant_to_snap[ant][pol]
+            print('   ', ant, pol, hookup['host'], hookup['channel'])
+        print('Finished loading at', cur_jd)
