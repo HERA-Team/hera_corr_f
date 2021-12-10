@@ -83,6 +83,8 @@ class Attenuator:
                         self.antpols[ant, pol][cval] = None
                 if not self.antpols[ant, pol][cval] and not antpol_redis[cval]:
                     agree = True
+                elif self.antpols[ant, pol][cval] is None or antpol_redis[cval] is None:
+                    agree = False
                 elif cval == 'fem_switch':
                     agree = self.antpols[ant, pol][cval] in ['Fake', antpol_redis[cval]]
                 elif cval == 'pam_atten':
