@@ -54,7 +54,9 @@ class Attenuator:
             rkey = 'status:ant:{}:{}'.format(ant, pol)
             for cval in chkap:
                 this_val = self.hc.r.hget(rkey, cval)
+                print('L57:  ',this_val)
                 if not this_val:
+                    print('L58:  ',this_val)
                     this_val = None
                 antpol_redis[cval] = this_val
             rkey = 'auto:{}{}'.format(ant, pol)
@@ -175,6 +177,6 @@ class Attenuator:
         for (ant, pol), state in self.antpols.items():
             rkey = "atten:set:{}{}".format(ant, pol)
             switch_state = state['fem_switch']
-            if switch_state is None:
+            if not switch_state:
                 switch_state = 'Unknown'
             self.hc.r.hset(rkey, switch_state, state['pam_atten'])
