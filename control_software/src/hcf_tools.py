@@ -54,7 +54,7 @@ class Attenuator:
             rkey = 'status:ant:{}:{}'.format(ant, pol)
             for cval in chkap:
                 this_val = self.hc.r.hget(rkey, cval)
-                if not this_val:
+                if not this_val or this_val == 'null':
                     print('L58:  ',cval,this_val)
                     this_val = None
                 antpol_redis[cval] = this_val
