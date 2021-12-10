@@ -177,6 +177,8 @@ class Attenuator:
         for (ant, pol), state in self.antpols.items():
             rkey = "atten:set:{}{}".format(ant, pol)
             switch_state = state['fem_switch']
+            print(ant,pol,rkey,switch_state,state['pam_atten'])
             if not switch_state:
                 switch_state = 'Unknown'
-            self.hc.r.hset(rkey, switch_state, state['pam_atten'])
+            if state['pam_atten']:
+                self.hc.r.hset(rkey, switch_state, state['pam_atten'])
