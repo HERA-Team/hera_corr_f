@@ -93,9 +93,9 @@ class Attenuator:
                     agree = False
                 if not agree:
                     did_not_agree.add(nfskey)
-                    print("{}{} {} states don't agree:".format(ant, pol, cval), end='  ')
+                    print("{:>3s}{} {} states disagree:".format(str(ant), pol, cval), end='  ')
                     print("<redis = {}>".format(antpol_redis[cval]), end='  ')
-                    print("<corr = {}".format(self.antpols[ant, pol][cval]))
+                    print("<corr = {}>".format(self.antpols[ant, pol][cval]))
         print("{} out of {} were not fully successful."
               .format(len(not_fully_successful), len(self.antpols)))
         print("{} out of {} did not fully agree."
