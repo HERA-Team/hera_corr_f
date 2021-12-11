@@ -73,7 +73,7 @@ class Attenuator:
                 except:  # noqa
                     not_fully_successful.add(nfskey)
                     self.antpols[ant, pol][comm_stat_key] = False
-                    print("{} not found for {} {}".format(cval, ant, pol), end='  ')
+                    print("{:>3s}{} {} not found:".format(str(ant), pol, cval), end='  ')
                     if update_from_redis:
                         print('set to redis value:  {}'.format(antpol_redis[cval]))
                         self.antpols[ant, pol][cval] = antpol_redis[cval]
