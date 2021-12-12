@@ -13,7 +13,7 @@ ap.add_argument('--target-pwr', dest='target_pwr', default=75.0,
 ap.add_argument('--default-atten', dest='default_atten', default=5.0,
                 help='Default attenuation to use for unsuccessful equalization calculation.')
 ap.add_argument('--retries', help="Number of retries", default=2)
-ap.add_argument('--verbose', help="Flag for verbose mode.", action='store_true')
+ap.add_argument('-v', '--verbose', help="Flag for verbose mode.", action='store_true')
 ap.add_argument('--set-atten', dest='set_atten', help="Flag to actually set attentuation.",
                 action='store_true')
 ap.add_argument('--log-values', dest='log_values', action='store_true',

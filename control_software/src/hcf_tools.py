@@ -32,6 +32,7 @@ class Attenuator:
                                                         'channel': hookup['channel']}
         self.state_time = None
         self.atten_set_options = []
+        self.total_antpols = len(self.antpols)
 
     def get_current_state(self, update_from_redis=False):
         """
@@ -97,9 +98,9 @@ class Attenuator:
                     print("<redis = {}>".format(antpol_redis[cval]), end='  ')
                     print("<corr = {}>".format(self.antpols[ant, pol][cval]))
         print("{} out of {} were not fully successful."
-              .format(len(not_fully_successful), len(self.antpols)))
+              .format(len(not_fully_successful), self.total_antpols))
         print("{} out of {} did not fully agree."
-              .format(len(did_not_agree), len(self.antpols)))
+              .format(len(did_not_agree), self.total_antpols))
 
     def calc_equalization(self, cf=168.0, bw=8.0, target_pwr=75.0, default_atten=5.0, verbose=True):
         """
@@ -120,7 +121,7 @@ class Attenuator:
         print('Auto timestamp {:.2f} s ago'.format((ctjd - self.auto_timestamp_jd) * DY2SC))
         print('State loaded {:.2f} s ago'.format((ctjd - self.state_time.jd) * DY2SC))
 
-        success = []
+        self.calc_success = []
         for (ant, pol), state in self.antpols.items():
             if state['pam_atten'] is None:
                 if verbose:
@@ -133,7 +134,7 @@ class Attenuator:
                     print("Set to default value {}".format(default_atten))
                 set_val = default_atten
             else:
-                success.append("{}{}".format(ant, pol))
+                self.calc_success.append("{}{}".format(ant, pol))
                 pwr = np.median(state['auto'][ch0:ch1])
                 gain_dB = np.around(10*np.log10(target_pwr / pwr)).astype(int)
                 set_val = np.array(state['pam_atten'] - gain_dB).clip(0, 15)
@@ -141,7 +142,7 @@ class Attenuator:
             if verbose:
                 print("{}{}:  {}  {} -> {}"
                       .format(ant, pol, state['fem_switch'], state['pam_atten'], set_val))
-        print("{} out of {} were successful".format(len(success), len(self.antpols)))
+        print("{} out of {} were successful".format(len(self.calc_success), self.total_antpols))
 
     def set_pam_attenuation(self, retries=3, set_to='calc'):
         """
@@ -149,14 +150,14 @@ class Attenuator:
         """
         if set_to not in self.atten_set_options:
             print("{} attenuation values not available.".format(set_to))
-        self.failed = []
-        self.skipped = []
-        self.same = []
+        self.set_failed = []
+        self.set_skipped = []
+        self.set_same = []
         for (ant, pol), state in self.antpols.items():
             if state[set_to] is None:
-                self.skipped.append((ant, pol))
+                self.set_skipped.append((ant, pol))
             elif state[set_to] == state['pam_atten']:
-                self.same.append((ant, pol))
+                self.set_same.append((ant, pol))
             else:
                 for i in range(retries):
                     try:
@@ -166,7 +167,10 @@ class Attenuator:
                         continue
                     break
                 else:
-                    self.failed.append((ant, pol))
+                    self.set_failed.append((ant, pol))
+        print("{} out of {} failed.".format(len(self.set_failed), self.total_antpols))
+        print("{} out of {} were the same.".format(len(self.set_same), self.total_antpols))
+        print("{} out of {} were skipped.".format(len(self.set_skipped), self.total_antpols))
 
     def get_state_atten_values(self, switch='antenna'):
         """Pull eq values from redis, and pull them in here as 'set_to' options"""
