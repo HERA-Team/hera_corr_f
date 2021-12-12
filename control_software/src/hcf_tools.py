@@ -108,7 +108,7 @@ class Attenuator:
         if self.state_time is None:
             print('Skipping - must get_current_state first')
             return
-        self.atten_set_options.append('calc_pam_atten')
+        self.atten_set_options.append('calc')
         self.calc_time = Time.now()
         ctjd = self.calc_time.jd
         dchan = (Parameters.fq1 - Parameters.fq0) / Parameters.nchan
@@ -137,13 +137,13 @@ class Attenuator:
                 pwr = np.median(state['auto'][ch0:ch1])
                 gain_dB = np.around(10*np.log10(target_pwr / pwr)).astype(int)
                 set_val = np.array(state['pam_atten'] - gain_dB).clip(0, 15)
-            self.antpols[ant, pol]['calc_pam_atten'] = set_val
+            self.antpols[ant, pol]['calc'] = set_val
             if verbose:
                 print("{}{}:  {}  {} -> {}"
                       .format(ant, pol, state['fem_switch'], state['pam_atten'], set_val))
         print("{} out of {} were successful".format(len(success), len(self.antpols)))
 
-    def set_pam_attenuation(self, retries=3, set_to='calc_pam_atten'):
+    def set_pam_attenuation(self, retries=3, set_to='calc'):
         """
         Tries to set the pam attenuation based on 'set_to' value.
         """
@@ -169,15 +169,14 @@ class Attenuator:
                     self.failed.append((ant, pol))
 
     def get_state_atten_values(self, switch='antenna'):
-        print("Pull eq values in redis, and pull them in here as 'set_to' options")
+        """Pull eq values from redis, and pull them in here as 'set_to' options"""
         if switch not in Parameters.switch_states:
             print("{} not available.".format(switch))
             return
-        set_name = "{}_pam_atten".format(switch)
-        self.atten_set_options.append(set_name)
+        self.atten_set_options.append(switch)
         for (ant, pol), state in self.antpols.items():
             rkey = "atten:set:{}{}".format(ant, pol)
-            self.antpols[ant, pol][set_name] = self.hc.r.hget(rkey, switch)
+            self.antpols[ant, pol][switch] = self.hc.r.hget(rkey, switch)
 
     def log_state_atten_values(self):
         if self.state_time is None:
