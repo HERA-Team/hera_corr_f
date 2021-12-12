@@ -101,7 +101,7 @@ class Attenuator:
         print("{} out of {} did not fully agree."
               .format(len(did_not_agree), len(self.antpols)))
 
-    def calc_equalization(self, cf=168.0, bw=8.0, target_pwr=75.0, default=5.0, verbose=True):
+    def calc_equalization(self, cf=168.0, bw=8.0, target_pwr=75.0, default_atten=5.0, verbose=True):
         """
         Calculates all of the equalization attenuations.
         """
@@ -125,13 +125,13 @@ class Attenuator:
             if state['pam_atten'] is None:
                 if verbose:
                     print("No current attenuation value for {}{}".format(ant, pol))
-                    print("Set to default value {}".format(default))
-                set_val = default
+                    print("Set to default value {}".format(default_atten))
+                set_val = default_atten
             elif state['auto'] is None:
                 if verbose:
                     print("No auto values for {}{}".format(ant, pol))
-                    print("Set to default value {}".format(default))
-                set_val = default
+                    print("Set to default value {}".format(default_atten))
+                set_val = default_atten
             else:
                 success.append("{}{}".format(ant, pol))
                 pwr = np.median(state['auto'][ch0:ch1])
@@ -169,7 +169,7 @@ class Attenuator:
                     self.failed.append((ant, pol))
 
     def get_state_atten_values(self, switch='antenna'):
-        print("Put nominal values in redis, and pull them in here as 'set_to' options")
+        print("Pull eq values in redis, and pull them in here as 'set_to' options")
         if switch not in Parameters.switch_states:
             print("{} not available.".format(switch))
             return
