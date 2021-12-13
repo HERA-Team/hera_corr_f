@@ -10,7 +10,6 @@ Parameters = Namespace(fq0=46.9,  # low cut-off in MHz
                        nchan=6144,  # number of channels
                        switch_states=['antenna', 'load', 'noise']
                        )
-DY2SC = 24 * 60 * 60
 
 
 def self__hc__get_fem_switch(a, b):
@@ -135,8 +134,8 @@ class Attenuator:
         print('Calculating equalization using {:.1f} - {:.1f} MHz  ({} - {})'.
               format((cf-bw/2.0), (cf+bw/2.0), ch0, ch1))
         print('Target power {}'.format(target_pwr))
-        print('Auto timestamp {:.2f} s ago'.format((ctjd - self.auto_timestamp_jd) * DY2SC))
-        print('State loaded {:.2f} s ago'.format((ctjd - self.state_time.jd) * DY2SC))
+        print('Auto timestamp {:.2f} s ago'.format((ctjd - self.auto_timestamp_jd) * 24 * 3600))
+        print('State loaded {:.2f} s ago'.format((ctjd - self.state_time.jd) * 24 * 3600))
 
         self.outcome.calc_eq = Namespace()
         self.outcome.calc_eq.success = []
@@ -235,14 +234,14 @@ class Attenuator:
         self.outcome.log.updated = []
         self.outcome.log.unknown = []
         for (ant, pol), state in self.antpols.items():
-            rkey = "atten:set:{}{}".format(ant, pol)
             this_switch_state = state['fem_switch']
             if not this_switch_state:
                 this_switch_state = 'Unknown'
                 self.outcome.log.unknown.append('{}{}'.format(ant, pol))
             if state['pam_atten'] and (switch == 'all' or switch == this_switch_state):
+                rkey = "atten:set:{}{}".format(ant, pol)
                 self.hc.r.hset(rkey, this_switch_state, state['pam_atten'])
                 self.outcome.log.updated.append("{}{}".format(ant, pol))
         print("Updated {} of {} values for {}.  {} were unknown."
               .format(len(self.outcome.log.updated), self.N_antpols,
-                      switch, self.outcome.log.unknown))
+                      switch, len(self.outcome.log.unknown)))
