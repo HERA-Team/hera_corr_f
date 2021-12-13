@@ -16,7 +16,8 @@ ap.add_argument('--retries', help="Number of retries", default=2)
 ap.add_argument('-v', '--verbose', help="Flag for verbose mode.", action='store_true')
 ap.add_argument('--set-atten', dest='set_atten', help="Flag to actually set attentuation.",
                 action='store_true')
-ap.add_argument('--log-values', dest='log_values', action='store_true',
+ap.add_argument('--log-values', dest='log_values', default=None,
+                choices=[None, 'antenna', 'load', 'noise', 'all', 'None'],
                 help="Flag to log current switch/values to redis.")
 ap.add_argument('--update-from-redis', dest='update_from_redis', action='store_true',
                 help='Flag to update info from corr with redis values.')
@@ -32,8 +33,8 @@ if args.set == 'calc':
 else:
     atten.get_state_atten_values(switch=args.set)
 
-if args.log_values:
-    atten.log_state_atten_values()
+if args.log_values is not None and args.log_values != 'None':
+    atten.log_state_atten_values(switch=args.log_values)
 
 if args.set_atten:
     atten.set_pam_attenuation(retries=args.retries, set_to=args.set)
