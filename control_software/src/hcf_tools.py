@@ -145,7 +145,7 @@ class Attenuator:
                 if verbose:
                     vstr = "No current attenuation value" if state['pam_atten'] is None \
                            else "No auto values"
-                    print("{:>3s}{}:  {}:".format(ant, pol, vstr), end='  ')
+                    print("{:>3s}{}:  {}:".format(str(ant), pol, vstr), end='  ')
                     print("set to default value {}".format(default_atten))
                 set_val = default_atten
             else:
