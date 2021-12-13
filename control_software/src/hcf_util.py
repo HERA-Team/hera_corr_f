@@ -104,7 +104,7 @@ def get_eq_coeff(corr, host, stream, logger=None):
     return eq_coeffs
 
 
-def get_autocorrelation(corr, host, stream, logger=None):
+def get_auto(corr, host, stream, logger=None):
     """
     Get autocorrelation for the given hostname and stream.
 

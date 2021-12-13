@@ -3,6 +3,7 @@ from hera_corr_f import HeraCorrelator
 import numpy as np
 from astropy.time import Time
 from argparse import Namespace
+import json
 
 
 Parameters = Namespace(fq0=46.9,  # low cut-off in MHz
@@ -32,11 +33,25 @@ class Attenuator:
         self.state_time = None
         self.atten_set_options = []
         self.N_antpols = len(self.antpols)
+        self.atten_metadata = json.loads(self.hc.r.hget('atten:set', 'metadata'))
+        self.valid_sets = list(self.atten_metadata['sets'].keys())
         self.outcome = Namespace()
+
+    def show_metadata(self):
+        print(json.dumps(self.atten_metadata, indent=4))
 
     def get_current_state(self, update_from_redis=False):
         """
         Get the PAM attenuators and FEM switch state from redis and correlator.
+
+        This reads the information from both the SNAPs and redis and provides information
+        on how well they agree in the dict self.outcome.get_state, which has other warning info.
+
+        It puts the information in self.antpols[ant, pol][*].   * = ['pam_atten', 'fem_switch']
+        gives the attenuation and the FEM setting and is used as the current valid data.  If there
+        is no valid data from the SNAP and if update_from_redis is True, then the pam_atten and
+        fem_switch states from redis are used.  If no valid SNAP info and update_from_redis is
+        False, then those states are marked as None.
 
         Parameter
         ---------
@@ -47,9 +62,10 @@ class Attenuator:
         self.auto_timestamp_jd = np.frombuffer(self.hc.r_bytes.get('auto:timestamp'), np.float64)[0]
         chkap = {'pam_atten': self.hc.get_pam_attenuation,
                  'fem_switch': self__hc__get_fem_switch}
-        self.outcome.get_state = Namespace()
-        self.outcome.get_state.not_fully_successful = set()
-        self.outcome.get_state.did_not_agree = set()
+        self.outcome.get_state = {'redis_auto_err': set(),
+                                  'snap_pam_atten_err': set(),
+                                  'snap_fem_switch_err': set(),
+                                  'disagree': set()}
         for ant, pol in self.antpols:
             outkey = '{}{}'.format(ant, pol)
 
@@ -64,18 +80,19 @@ class Attenuator:
             rkey = 'auto:{}{}'.format(ant, pol)
             try:
                 self.antpols[ant, pol]['auto'] = np.frombuffer(self.hc.r_bytes.get(rkey), np.float32)  # noqa
-            except AttributeError:
+            except:  # noqa
                 self.antpols[ant, pol]['auto'] = None
-                self.outcome.get_state.not_fully_successful.add(outkey)
+                self.outcome.get_state['redis_auto_err'].add(outkey)
 
             # Stuff from HeraCorrelator
             for cval, func in chkap.items():
                 comm_stat_key = "{}_comm_stat".format(cval)
+                err_type = 'snap_{}_err'.format(cval)
                 try:
                     self.antpols[ant, pol][cval] = func(ant, pol)
                     self.antpols[ant, pol][comm_stat_key] = True
                 except:  # noqa
-                    self.outcome.get_state.not_fully_successful.add(outkey)
+                    self.outcome.get_state[err_type].add(outkey)
                     self.antpols[ant, pol][comm_stat_key] = False
                     print("{:>3s}{} {} not found:".format(str(ant), pol, cval), end='  ')
                     if update_from_redis:
@@ -96,18 +113,19 @@ class Attenuator:
                     print("{} not allowed.".format(cval))
                     agree = False
                 if not agree:
-                    self.outcome.get_state.did_not_agree.add(outkey)
+                    self.outcome.get_state['disagree'].add(outkey)
                     print("{:>3s}{} {} states disagree:".format(str(ant), pol, cval), end='  ')
                     print("<redis = {}>".format(antpol_redis[cval]), end='  ')
                     print("<corr = {}>".format(self.antpols[ant, pol][cval]))
-        print("{} out of {} were not fully successful."
-              .format(len(self.outcome.get_state.not_fully_successful), self.N_antpols))
-        print("{} out of {} did not fully agree."
-              .format(len(self.outcome.get_state.did_not_agree), self.N_antpols))
+        print("Out of {} antpols:".format(self.N_antpols))
+        for key, val in self.outcome.get_state.items():
+            print("\t{}:  {}".format(key, len(val)))
 
     def calc_equalization(self, cf=168.0, bw=8.0, target_pwr=75.0, default_atten=5.0, verbose=True):
         """
         Calculates all of the equalization attenuations.
+
+        Warnings are stored in dict self.outcome.cal_eq.
 
         Parameters
         ----------
@@ -133,22 +151,20 @@ class Attenuator:
         ch1 = np.around((cf+bw/2) / dchan).astype(int)
         print('Calculating equalization using {:.1f} - {:.1f} MHz  ({} - {})'.
               format((cf-bw/2.0), (cf+bw/2.0), ch0, ch1))
-        print('Target power {}'.format(target_pwr))
-        print('Auto timestamp {:.2f} s ago'.format((ctjd - self.auto_timestamp_jd) * 24 * 3600))
-        print('State loaded {:.2f} s ago'.format((ctjd - self.state_time.jd) * 24 * 3600))
+        print('\tTarget power {}'.format(target_pwr))
+        print('\tAuto timestamp {:.2f} s ago'.format((ctjd - self.auto_timestamp_jd) * 24 * 3600))
+        print('\tState loaded {:.2f} s ago'.format((ctjd - self.state_time.jd) * 24 * 3600))
 
-        self.outcome.calc_eq = Namespace()
-        self.outcome.calc_eq.success = []
+        self.outcome.calc_eq = {'no_atten': set(), 'no_auto': set()}
         for (ant, pol), state in self.antpols.items():
             if state['pam_atten'] is None or state['auto'] is None:
+                err_type = "no_atten" if state['pam_atten'] is None else "no_auto"
+                self.outcome.calc_eq[err_type].add("{}{}".format(ant, pol))
                 if verbose:
-                    vstr = "No current attenuation value" if state['pam_atten'] is None \
-                           else "No auto values"
-                    print("{:>3s}{}:  {}:".format(str(ant), pol, vstr), end='  ')
+                    print("{:>3s}{}:  {} value:".format(str(ant), pol, err_type), end='  ')
                     print("set to default value {}".format(default_atten))
                 set_val = default_atten
             else:
-                self.outcome.calc_eq.success.append("{}{}".format(ant, pol))
                 pwr = np.median(state['auto'][ch0:ch1])
                 gain_dB = np.around(10*np.log10(target_pwr / pwr)).astype(int)
                 set_val = np.array(state['pam_atten'] - gain_dB).clip(0, 15)
@@ -156,24 +172,33 @@ class Attenuator:
             if verbose:
                 print("{:>3s}{}:  {}  {} -> {}"
                       .format(str(ant), pol, state['fem_switch'], state['pam_atten'], set_val))
-        print("{} out of {} successful".format(len(self.outcome.calc_eq.success), self.N_antpols))
+        print("Out of {} antpols:".format(self.N_antpols))
+        for key, val in self.outcome.calc_eq.items():
+            print("\t{}:  {}".format(key, len(val)))
 
-    def set_pam_attenuation(self, retries=3, set_to='calc'):
+    def set_pam_attenuation(self, set_to='calc', retries=3):
         """
-        Tries to set the pam attenuation based on 'set_to' value.
+        Tries to set the pam attenuation to self.antpols[ant, pol][set_to].
+
+        Results are in dict self.outcome.set_pam.
+
+        Parameters
+        ----------
+        set_to : str
+            Values to use.
+        retries : int
+            Number of times to try before moving on to next antpol.
         """
-        if set_to not in self.atten_set_options:
+        if set_to not in self.valid_sets:
             print("Skipping - {} attenuation values not available.".format(set_to))
+            print("Should be one of {}".format(', '.join(self.valid_sets)))
             return
-        self.outcome.set_pam = Namespace()
-        self.outcome.set_pam.failed = []
-        self.outcome.set_pam.skipped = []
-        self.outcome.set_pam.same = []
+        self.outcome.set_pam = {'failed': set(), 'skipped': set(), 'same': set()}
         for (ant, pol), state in self.antpols.items():
             if state[set_to] is None:
-                self.outcome.set_pam.skipped.append((ant, pol))
+                self.outcome.set_pam['skipped'].add("{}{}".format(ant, pol))
             elif state[set_to] == state['pam_atten']:
-                self.outcome.set_pam.same.append("{}{}".format(ant, pol))
+                self.outcome.set_pam['same'].add("{}{}".format(ant, pol))
             else:
                 for i in range(retries):
                     try:
@@ -183,44 +208,59 @@ class Attenuator:
                         continue
                     break
                 else:
-                    self.outcome.set_pam.failed.append((ant, pol))
-        print("Total antpols to set: {}  ({} were same)."
-              .format(self.N_antpols, len(self.outcome.set_pam.same)))
-        print("\t{} failed.".format(len(self.outcome.set_pam.failed)))
-        print("\t{} skipped.".format(len(self.outcome.set_pam.skipped)))
+                    self.outcome.set_pam['failed'].add("{}{}".format(ant, pol))
+        print("Out of {} antpols:".format(self.N_antpols))
+        for key, val in self.outcome.set_pam.items():
+            print("\t{}:  {}".format(key, len(val)))
 
-    def get_state_atten_values(self, switch='antenna'):
+    def get_state_atten_values(self, set_to='antenna'):
         """
-        Pull eq values from redis, and pull them here as 'set_to' options.
+        Pull attenuation values from redis as set.antpols[ant, pol][set_to] options.
 
         Parameter
         ---------
-        switch : str
-            One of the allowed Parameters.switch_states
+        set_to : str
+            One of the valis sets in redis to use.
         """
-        if switch not in Parameters.switch_states:
-            print("Skipping - {} not available.".format(switch))
+        if set_to not in self.valid_sets:
+            print("Skipping - {} attenuation values not available.".format(set_to))
+            print("Should be one of {}".format(', '.join(self.valid_sets)))
             return
-        self.outcome.get_redis = Namespace()
-        self.outcome.get_redis.found = []
-        self.atten_set_options.append(switch)
-        for (ant, pol), state in self.antpols.items():
+        self.outcome.get_redis = {'found': set()}
+        for (ant, pol) in self.antpols:
             rkey = "atten:set:{}{}".format(ant, pol)
             try:
-                self.antpols[ant, pol][switch] = float(self.hc.r.hget(rkey, switch))
-                self.outcome.get_redis.found.append("{}{}".format(ant, pol))
+                self.antpols[ant, pol][set_to] = float(self.hc.r.hget(rkey, set_to))
+                self.outcome.get_redis['found'].add("{}{}".format(ant, pol))
             except ValueError:
                 continue
-        print("Found {} of {} for switch {}"
-              .format(len(self.outcome.get_redis.found), self.N_antpols, switch))
+        print("Found {} of {} for set {}"
+              .format(len(self.outcome.get_redis['found']), self.N_antpols, set_to))
 
-    def log_state_atten_values(self, switch='all'):
+    def test_recent_settings(self):
         """
-        Put atten values into redis.
+        allow for a loop back test to check success rate.
+        """
 
-        This will put attenuation values into redis for various switch values:
-            'all':  all known values
-            'antenna', 'load', 'noise':  only that switch state
+    def log_atten_values_to_redis(self, set_class, set_name=None, purge=False,
+                                  description=None):
+        """
+        Put atten values into redis - purge old values of same key if purge==True.
+
+        This will put attenuation values into redis with various options based on
+        set_class/set_name:
+            If set_class == 'current':  use values from 'self.get_current_state'
+                If set_name is None:  load to current fem_switch state per antpol.
+                If set_name in ['antenna', 'load', 'noise']:  load only that fem_switch state
+                 -> for 2 options above, redis key will be one of antenna, load, noise
+                Else: load values to set_name (include description)
+                 -> for option above, redis key will be set_name
+                 ->                   metadata will contain the switch settings
+            If set_class == 'calc':  use values as calculated in 'self.calc_equalization'
+                Must have a set name.  Include a description.  Note to override antenna,
+                load, noise, use one of those as the set_name.
+            If set_class == 'file':  use values from csv file.
+                 set_name: name of file and used as redis key.  First line is description (in "")
 
         Parameter
         ---------

@@ -120,69 +120,36 @@ if __name__ == "__main__":
                     this_pol = 'x'
                 else:
                     this_pol = 'y'
-                autocorrelation = hcfu.get_autocorrelation(corr, host, stream, logger)
-                eq_coeffs = hcfu.get_eq_coeff(corr, host, stream, logger)
-                fft_of = hcfu.get_fft_of(corr, host, stream, logger)
 
-                # IS THE FINALLY WHAT WE WANT?  (NOW IMPLEMENTED VIA hcf_util.py)
-                # try:
-                #     fft_of = corr.fengs[host].pfb.is_overflowing()
-                # except:  # noqa
-                #     logger.info(
-                #         "Error getting fft overflow on snap {} ant {}; "
-                #         "Setting to None."
-                #         "Full error output:".format(host, stream // 2),
-                #         exc_info=True,
-                #     )
-                #     fft_of = None
-                # finally:
-                #     try:
-                #         # this call resets the fft overflow boolean.
-                #         corr.fengs[host].pfb.rst_stats()
-                #     except:  # noqa
-                #         logger.info(
-                #             "Error resetting fft overflow on snap {} ant {}. "
-                #             "Full error output:".format(host, stream // 2),
-                #             exc_info=True,
-                #         )
-                timestamp = datetime.now().isoformat()
-
-                snaprf_status_redis_key = "status:snaprf:{:s}:{:d}".format(host, stream)
+                # Build snap_rf_stats and add to redis
                 snap_rf_stats = {}
-
+                snap_rf_stats["timestamp"] = datetime.now().isoformat()
+                snap_rf_stats["autocorrelation"] = hcfu.get_auto(corr, host, stream, logger)
+                snap_rf_stats["eq_coeffs"] = hcfu.get_eq_coeff(corr, host, stream, logger)
+                snap_rf_stats["fft_of"] = hcfu.get_fft_of(corr, host, stream, logger)
                 snap_rf_stats["histogram"] = adc_stats[this_pol]['histogram']
-                snap_rf_stats["autocorrelation"] = autocorrelation
-                snap_rf_stats["eq_coeffs"] = eq_coeffs
-                snap_rf_stats["fft_of"] = fft_of
-                snap_rf_stats["timestamp"] = timestamp
-
                 snap_rf_stats = hcfu.validate_redis_dict(snap_rf_stats)
+
+                snaprf_status_redis_key = "status:snaprf:{}:{}".format(host, stream)
                 corr.r.hmset(snaprf_status_redis_key, snap_rf_stats)
 
-                # lookup if this is known to cm
+                # lookup if this is known to cm, if not no antenna is listed so skip
                 ant, pol = antpols[stream]
                 if ant is None or pol is None:
-                    # this snap has no listed antenna on this stream.
-                    # do not try to make an antenna status and move to the
-                    # next stream.
                     continue
-                ant_status_redis_key = "status:ant:{:d}:{:s}".format(ant, pol)
 
+                # Build ant_status and add to redis.
                 ant_status = {}
-                ant_status["adc_mean"] = adc_stats[this_pol]['mean']
-                ant_status["adc_power"] = adc_stats[this_pol]['power']
-                ant_status["adc_rms"] = adc_stats[this_pol]['rms']
                 ant_status['f_host'] = host
                 ant_status['host_ant_id'] = stream
-                ant_status['histogram'] = adc_stats[this_pol]['histogram']
-                ant_status["autocorrelation"] = autocorrelation
-                ant_status["eq_coeffs"] = eq_coeffs
+                for val in ['timestamp', 'autocorrelation', 'eq_coeffs', 'fft_of', 'histogram']:
+                    ant_status[val] = snap_rf_stats[val]
+                for val in ['adc_mean', 'adc_power', 'adc_rms', 'histogram']:
+                    ant_status[val] = adc_stats[this_pol][val.split('_')[-1]]
                 ant_status.update(hcfu.get_pam_stats(corr, host, stream, pol, logger))
                 ant_status.update(hcfu.get_fem_stats(corr, host, stream, logger))
-                ant_status["fft_of"] = fft_of
-                ant_status['timestamp'] = timestamp
-
                 ant_status = hcfu.validate_redis_dict(ant_status)
+                ant_status_redis_key = "status:ant:{:d}:{:s}".format(ant, pol)
                 corr.r.hmset(ant_status_redis_key, ant_status)
 
             # all the data throughput from the adc call can cause network issues
