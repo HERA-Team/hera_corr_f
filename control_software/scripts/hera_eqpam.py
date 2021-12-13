@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 import argparse
-from hera_corr_f import hcf_tools as hcft
+from hera_corr_f import hcf_atten
 
 
 ap = argparse.ArgumentParser()
@@ -23,7 +23,7 @@ ap.add_argument('--update-from-redis', dest='update_from_redis', action='store_t
                 help='Flag to update info from corr with redis values.')
 args = ap.parse_args()
 
-atten = hcft.Attenuator()
+atten = hcf_atten.Attenuator()
 
 atten.get_current_state(update_from_redis=args.update_from_redis)
 
