@@ -21,6 +21,16 @@ def self__hc__set_pam_attenuation(a, b, c):
     return
 
 
+def descriptor(**kwargs):
+    slist = []
+    for key, val in kwargs.items():
+        if val is not None and len(val):
+            slist.append(val if key == 'description' else "{}: {}".format(key, val))
+    if len(slist):
+        return " | ".join(slist)
+    return ""
+
+
 class Attenuator:
     def __init__(self):
         self.hc = HeraCorrelator()
@@ -300,20 +310,21 @@ class Attenuator:
         ----------
 
         """
-        ctype = {'current':
-                 {'apkey': 'pam_atten', 'time': self.state_time, 'method': 'get_current_state'},
-                 'calc':
-                 {'apkey': 'calc', 'time': self.calc_time, 'method': 'calc_equalization'},
-                 'file':
-                 {'apkey': set_name, 'time': None, 'method': 'read_setfile'}
-                 }
+        class_param = {'current':
+                       {'key': 'pam_atten', 'time': self.state_time, 'method': 'get_current_state'},
+                       'calc':
+                       {'key': 'calc', 'time': self.calc_time, 'method': 'calc_equalization'},
+                       'file':
+                       {'key': set_name, 'time': None, 'method': 'read_setfile'}
+                       }
         self.outcome.handle = {'updated': set(), 'value_err': set(), 'unknown_switch': set()}
         handle_time = Time.now()
+        filedesc = None
 
-        # Get set info ([set_name], use_switch_state, the_data)
-        if set_class in ['current', 'class']:
-            if ctype[set_class]['time'] is None:
-                print('Skipping - must {} first'.format(ctype[set_class]['method']))
+        # Get set info ([set_name], use_switch_state, the_data, filedesc)
+        if set_class in ['current', 'calc']:
+            if class_param[set_class]['time'] is None:
+                print('Skipping - must {} first'.format(class_param[set_class]['method']))
                 return
             if set_name is None:
                 set_name = ["{}:{}".format(set_class, x) for x in Parameters.switch_state]
@@ -326,22 +337,20 @@ class Attenuator:
                 use_switch_state = False
             the_data = self.antpols
         elif set_class == 'file':
-            fdesc, the_data = self.read_setfile(set_name)
+            filedesc, the_data = self.read_setfile(set_name)
             if the_data is None:
                 print("Skipping - {} not found".format(set_name))
                 return
-            description = fdesc if description is None else "{}: {}".format(fdesc, description)
             set_name = [set_name]
             use_switch_state = False
         else:
             print("Skipping - {} is invalid set_class.".format(set_class))
             return
 
-        # Purge old redis entries if desired
-        if purge:
-            dostuff=1
+        if purge:  # Purge if desired
+            self.purge_redis_set(set_name)
 
-        # Copy to self.antpols and redis
+        # Copy to self.antpols and redis.
         for this_set_name in set_name:
             self.loaded_sets.append(this_set_name)
             this_switch_set = this_set_name.split(':')[-1] if use_switch_state else 'useit'
@@ -349,14 +358,14 @@ class Attenuator:
                 if use_switch_state:
                     update = "{}{}-{}".format(ant, pol, this_switch_set)
                     this_switch_state = state['fem_switch']
-                    if not this_switch_state:
+                    if not this_switch_state or this_switch_state == 'null':
                         self.outcome.log['unknown'].add(update)
                         continue
                 else:
                     update = "{}{}".format(ant, pol)
                     this_switch_state = 'useit'
                 try:
-                    this_value = float(state[ctype[set_class]['apkey']])
+                    this_value = float(state[class_param[set_class]['key']])
                 except ValueError:
                     self.outcome.handle['value_err'].add(update)
                     continue
@@ -367,7 +376,9 @@ class Attenuator:
                     self.outcome.handle['updated'].add(update)
 
         # Write metadata
-        description = "{} - {}".format(description, handle_time.isot)
+        description = descriptor(description=description, file_description=filedesc,
+                                 set_class=set_class, set_name=', '.join(set_name),
+                                 purge=str(purge), time=handle_time.isot)
         for this_set in set_name:
             self.atten_metadata['sets'][this_set] = description
         self.hc.r.hset('atten:set', 'metadata', json.dumps(self.atten_metadata))
