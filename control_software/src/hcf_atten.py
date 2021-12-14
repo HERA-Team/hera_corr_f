@@ -257,8 +257,7 @@ class Attenuator:
             for this_key in keys:
                 self.hc.r.hdel(rkey, this_key)
 
-    def handle_atten_values(self, set_class, set_name=None, purge=False,
-                            description=None):
+    def handle_atten_values(self, set_class, set_name=None, purge=False, description=None):
         """
         Put atten values into redis and self.antpols[ant, pol][<key>]
         Will purge old values of <key> in redis if purge==True.
