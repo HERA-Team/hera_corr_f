@@ -257,6 +257,20 @@ class Attenuator:
             for this_key in keys:
                 self.hc.r.hdel(rkey, this_key)
 
+    def read_setfile(self, fname):
+        """Read csv file for atten set."""
+        fdata = {fname: {}}
+        try:
+            with open(fname, 'r') as fp:
+                fdesc = fp.readline().strip('"')
+                for line in fp:
+                    ldata = line.split(',')
+                    if len(ldata) == 3:
+                        fdata[int(ldata[0]), ldata[1]][fname] = float(ldata[2])
+        except IOError:
+            return None, None
+        return fdesc, fdata
+
     def handle_atten_values(self, set_class, set_name=None, purge=False, description=None):
         """
         Put atten values into redis and self.antpols[ant, pol][<key>]
@@ -289,67 +303,75 @@ class Attenuator:
         ctype = {'current':
                  {'apkey': 'pam_atten', 'time': self.state_time, 'method': 'get_current_state'},
                  'calc':
-                 {'apkey': 'calc', 'time': self.calc_time, 'method': 'calc_equalization'}
+                 {'apkey': 'calc', 'time': self.calc_time, 'method': 'calc_equalization'},
+                 'file':
+                 {'apkey': set_name, 'time': None, 'method': 'read_setfile'}
                  }
-        self.outcome.handle = {'updated': set(), 'unknown': set()}
-        switch_state = False
+        self.outcome.handle = {'updated': set(), 'value_err': set(), 'unknown_switch': set()}
         handle_time = Time.now()
+
+        # Get set info ([set_name], use_switch_state, the_data)
         if set_class in ['current', 'class']:
             if ctype[set_class]['time'] is None:
                 print('Skipping - must {} first'.format(ctype[set_class]['method']))
                 return
             if set_name is None:
                 set_name = ["{}:{}".format(set_class, x) for x in Parameters.switch_state]
-                switch_state = True
+                use_switch_state = True
             elif set_name in Parameters.switch_state:
                 set_name = ["{}:{}".format(set_class, set_name)]
-                switch_state = True
+                use_switch_state = True
             else:
-                self.loaded_sets.append(set_name)
-                for (ant, pol), state in self.antpols.items():
-                    if purge:
-                        self.hc.r.hdel()
-                    self.antpols[ant, pol][set_name] = float(state[ctype['apkey']])
-                    self.outcome.handle['updated'].add("{}{}".format(ant, pol))
                 set_name = [set_name]
+                use_switch_state = False
+            the_data = self.antpols
         elif set_class == 'file':
-            try:
-                with open(set_name, 'r') as fp:
-                    fdesc = fp.readline().strip('"')
-                    description = fdesc if description is None else "{}: {}".format(description, fdesc)  # noqa
-                    self.loaded_sets.append(set_name)
-                    for line in fp:
-                        data = line.split(',')
-                        if len(data) == 3:
-                            self.antpols.setdefault([int(data[0]), data[1]], {})
-                            self.antpols[int(data[0]), data[1]][set_name] = float(data[2])
-                            self.outcome.handle['updated'].add("{}{}".format(ant, pol))
-            except IOError:
-                print("Skipping - {} not found.".format(set_name))
+            fdesc, the_data = self.read_setfile(set_name)
+            if the_data is None:
+                print("Skipping - {} not found".format(set_name))
                 return
+            description = fdesc if description is None else "{}: {}".format(fdesc, description)
             set_name = [set_name]
+            use_switch_state = False
         else:
-            print("Skipping - {} is an invalid set_class".format(set_class))
+            print("Skipping - {} is invalid set_class.".format(set_class))
+            return
 
-        if switch_state:
-            for this_set in set_name:
-                self.loaded_sets.append(this_set)
-                switch = this_set.split(':')[-1]
-                for (ant, pol), state in self.antpols.items():
+        # Purge old redis entries if desired
+        if purge:
+            dostuff=1
+
+        # Copy to self.antpols and redis
+        for this_set_name in set_name:
+            self.loaded_sets.append(this_set_name)
+            this_switch_set = this_set_name.split(':')[-1] if use_switch_state else 'useit'
+            for (ant, pol), state in the_data:
+                if use_switch_state:
+                    update = "{}{}-{}".format(ant, pol, this_switch_set)
                     this_switch_state = state['fem_switch']
                     if not this_switch_state:
-                        self.outcome.log.unknown.add('{}{}-{}'.format(ant, pol, switch))
-                    elif state[ctype[set_class]] and switch == this_switch_state:
-                        rkey = "atten:set:{}{}".format(ant, pol)
-                        self.hc.r.hset(rkey, this_set, state[ctype[set_class]])
-                        self.outcome.log.updated.add("{}{}-{}".format(ant, pol, switch))
+                        self.outcome.log['unknown'].add(update)
+                        continue
+                else:
+                    update = "{}{}".format(ant, pol)
+                    this_switch_state = 'useit'
+                try:
+                    this_value = float(state[ctype[set_class]['apkey']])
+                except ValueError:
+                    self.outcome.handle['value_err'].add(update)
+                    continue
+                if this_switch_set == this_switch_state:
+                    self.antpols[ant, pol][this_set_name] = this_value
+                    rkey = "atten:set:{}{}".format(ant, pol)
+                    self.hc.r.hset(rkey, this_set_name, this_value)
+                    self.outcome.handle['updated'].add(update)
 
+        # Write metadata
         description = "{} - {}".format(description, handle_time.isot)
         for this_set in set_name:
             self.atten_metadata['sets'][this_set] = description
         self.hc.r.hset('atten:set', 'metadata', json.dumps(self.atten_metadata))
         self.sets_in_redis = list(self.atten_metadata['sets'].keys())
         print("Out of {} antpols:".format(self.N_antpols))
-
         for key, val in self.outcome.handle.items():
             print("\t{}:  {}".format(key, len(val)))
