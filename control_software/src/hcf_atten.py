@@ -227,7 +227,7 @@ class Attenuator:
         for key, val in self.outcome.set_pam.items():
             print("\t{}:  {}".format(key, len(val)))
 
-    def load_atten_values_from_redis(self, set_to='calc:antenna'):
+    def load_atten_from_redis(self, set_to='calc:antenna'):
         """
         Pull attenuation values from redis as set.antpols[ant, pol][set_to] options.
 
@@ -281,7 +281,7 @@ class Attenuator:
             return None, None
         return fdesc, fdata
 
-    def handle_atten_values(self, set_class, set_name=None, purge=False, description=None):
+    def handle_atten_sets(self, set_class, set_name=None, purge=False, description=None):
         """
         Put atten values into redis and self.antpols[ant, pol][<key>]
         Will purge old values of <key> in redis if purge==True.
@@ -359,7 +359,7 @@ class Attenuator:
                     update = "{}{}-{}".format(ant, pol, this_switch_set)
                     this_switch_state = state['fem_switch']
                     if not this_switch_state or this_switch_state == 'null':
-                        self.outcome.log['unknown'].add(update)
+                        self.outcome.log['unknown_switch'].add(update)
                         continue
                 else:
                     update = "{}{}".format(ant, pol)
