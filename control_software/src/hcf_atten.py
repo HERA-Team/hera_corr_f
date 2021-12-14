@@ -292,7 +292,6 @@ class Attenuator:
                  'calc':
                  {'apkey': 'calc', 'time': self.calc_time, 'method': 'calc_equalization'}
                  }
-        print("NEED TO ADD METADATA LATER - include now()")
         self.outcome.handle = {'updated': set(), 'unknown': set()}
         switch_state = False
         handle_time = Time.now()
@@ -309,6 +308,8 @@ class Attenuator:
             else:
                 self.loaded_sets.append(set_name)
                 for (ant, pol), state in self.antpols.items():
+                    if purge:
+                        self.hc.r.hdel()
                     self.antpols[ant, pol][set_name] = float(state[ctype['apkey']])
                     self.outcome.handle['updated'].add("{}{}".format(ant, pol))
                 set_name = [set_name]
