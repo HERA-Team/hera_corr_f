@@ -111,11 +111,7 @@ if __name__ == "__main__":
                 if corr.r.exists("disable_monitoring"):
                     continue
                 if stream % 2 == 0:
-                    # every other antplot we need to get a new ADC snapshot
-                    # because we will be on a new antenna
-                    # we could do this for every stream but the function
-                    # returns both polarization and we don't need to overload
-                    # the network
+                    # adc_stats returns both polarizations, so only read every other
                     adc_stats = hcfu.get_adc_stats(corr, host, stream, logger)
                     this_pol = 'x'
                 else:

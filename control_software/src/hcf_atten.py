@@ -31,10 +31,12 @@ class Attenuator:
                     self.antpols[int(ant), str(pol)] = {'host': hookup['host'],
                                                         'channel': hookup['channel']}
         self.state_time = None
+        self.calc_time = None
         self.atten_set_options = []
         self.N_antpols = len(self.antpols)
         self.atten_metadata = json.loads(self.hc.r.hget('atten:set', 'metadata'))
-        self.valid_sets = list(self.atten_metadata['sets'].keys())
+        self.sets_in_redis = list(self.atten_metadata['sets'].keys())
+        self.loaded_sets = []
         self.outcome = Namespace()
 
     def show_metadata(self):
@@ -117,6 +119,7 @@ class Attenuator:
                     print("{:>3s}{} {} states disagree:".format(str(ant), pol, cval), end='  ')
                     print("<redis = {}>".format(antpol_redis[cval]), end='  ')
                     print("<corr = {}>".format(self.antpols[ant, pol][cval]))
+        self.loaded_sets.append('pam_atten')
         print("Out of {} antpols:".format(self.N_antpols))
         for key, val in self.outcome.get_state.items():
             print("\t{}:  {}".format(key, len(val)))
@@ -172,6 +175,7 @@ class Attenuator:
             if verbose:
                 print("{:>3s}{}:  {}  {} -> {}"
                       .format(str(ant), pol, state['fem_switch'], state['pam_atten'], set_val))
+        self.loaded_sets.append('calc')
         print("Out of {} antpols:".format(self.N_antpols))
         for key, val in self.outcome.calc_eq.items():
             print("\t{}:  {}".format(key, len(val)))
@@ -189,13 +193,13 @@ class Attenuator:
         retries : int
             Number of times to try before moving on to next antpol.
         """
-        if set_to not in self.valid_sets:
-            print("Skipping - {} attenuation values not available.".format(set_to))
-            print("Should be one of {}".format(', '.join(self.valid_sets)))
+        if set_to not in self.loaded_sets:
+            print("Skipping - {} attenuation set not available.".format(set_to))
+            print("Should be one of {}".format(', '.join(self.loaded_sets)))
             return
         self.outcome.set_pam = {'failed': set(), 'skipped': set(), 'same': set()}
         for (ant, pol), state in self.antpols.items():
-            if state[set_to] is None:
+            if set_to not in state or state[set_to] is None:
                 self.outcome.set_pam['skipped'].add("{}{}".format(ant, pol))
             elif state[set_to] == state['pam_atten']:
                 self.outcome.set_pam['same'].add("{}{}".format(ant, pol))
@@ -213,7 +217,7 @@ class Attenuator:
         for key, val in self.outcome.set_pam.items():
             print("\t{}:  {}".format(key, len(val)))
 
-    def get_state_atten_values(self, set_to='antenna'):
+    def load_atten_values_from_redis(self, set_to='calc:antenna'):
         """
         Pull attenuation values from redis as set.antpols[ant, pol][set_to] options.
 
@@ -222,10 +226,11 @@ class Attenuator:
         set_to : str
             One of the valis sets in redis to use.
         """
-        if set_to not in self.valid_sets:
-            print("Skipping - {} attenuation values not available.".format(set_to))
-            print("Should be one of {}".format(', '.join(self.valid_sets)))
+        if set_to not in self.sets_in_redis:
+            print("Skipping - {} attenuation set not available.".format(set_to))
+            print("Should be one of {}".format(', '.join(self.sets_in_redis)))
             return
+        print("Loading from redis:  {} - {}".format(set_to, self.atten_metadata['sets'][set_to]))
         self.outcome.get_redis = {'found': set()}
         for (ant, pol) in self.antpols:
             rkey = "atten:set:{}{}".format(ant, pol)
@@ -233,7 +238,8 @@ class Attenuator:
                 self.antpols[ant, pol][set_to] = float(self.hc.r.hget(rkey, set_to))
                 self.outcome.get_redis['found'].add("{}{}".format(ant, pol))
             except ValueError:
-                continue
+                self.antpols[ant, pol][set_to] = None
+        self.loaded_sets.append(set_to)
         print("Found {} of {} for set {}"
               .format(len(self.outcome.get_redis['found']), self.N_antpols, set_to))
 
@@ -242,46 +248,108 @@ class Attenuator:
         allow for a loop back test to check success rate.
         """
 
-    def log_atten_values_to_redis(self, set_class, set_name=None, purge=False,
-                                  description=None):
+    def purge_redis_set(self, keys):
         """
-        Put atten values into redis - purge old values of same key if purge==True.
+        Purge all of an atten set in redis.
+        """
+        for (ant, pol) in self.antpols:
+            rkey = "atten:set:{}{}".format(ant, pol)
+            for this_key in keys:
+                self.hc.r.hdel(rkey, this_key)
 
-        This will put attenuation values into redis with various options based on
-        set_class/set_name:
+    def handle_atten_values(self, set_class, set_name=None, purge=False,
+                            description=None):
+        """
+        Put atten values into redis and self.antpols[ant, pol][<key>]
+        Will purge old values of <key> in redis if purge==True.
+
+        This will put attenuation values into redis AND self.antpols (so you don't also
+        have to self.load_atten_values_from_redis) with various options based on set_class/set_name:
             If set_class == 'current':  use values from 'self.get_current_state'
-                If set_name is None:  load to current fem_switch state per antpol.
-                If set_name in ['antenna', 'load', 'noise']:  load only that fem_switch state
-                 -> for 2 options above, redis key will be one of antenna, load, noise
+                If set_name is None:  load to current fem_switch per antpol with "current:" prefix
+                If set_name in ['antenna', 'load', 'noise']:  load that fem_switch with "current:"
+                 -> for both options above, <key> will be one of "current:"[antenna, load, noise]
                 Else: load values to set_name (include description)
-                 -> for option above, redis key will be set_name
-                 ->                   metadata will contain the switch settings
+                 -> for option above, <key> will be set_name
+                 ->                   metadata will contain description and switch settings
             If set_class == 'calc':  use values as calculated in 'self.calc_equalization'
-                Must have a set name.  Include a description.  Note to override antenna,
-                load, noise, use one of those as the set_name.
+                If set_name is None:  load to current fem_switch per antpol with "calc:" prefix
+                If set_name in [...]: load that fem_switch with "calc:" prefix
+                 -> for both options above, <key> will be one of calc:[...]
+                Else: load values to set_name (include description)
+                 -> for option above, <key> will be set_name
+                 ->                   metadata will contain description and switch settings
+                 -> Note to override antenna, load, noise, use one of those as the set_name.
             If set_class == 'file':  use values from csv file.
-                 set_name: name of file and used as redis key.  First line is description (in "")
+                 set_name: name of file and used as <key>.  First line is description.
 
-        Parameter
-        ---------
-        switch : str
-            One of the allowed Parameters.switch_states or 'all'
+        Parameters
+        ----------
+
         """
-        if self.state_time is None:
-            print('Skipping - must get_current_state first')
-            return
-        self.outcome.log = Namespace()
-        self.outcome.log.updated = []
-        self.outcome.log.unknown = []
-        for (ant, pol), state in self.antpols.items():
-            this_switch_state = state['fem_switch']
-            if not this_switch_state:
-                this_switch_state = 'Unknown'
-                self.outcome.log.unknown.append('{}{}'.format(ant, pol))
-            if state['pam_atten'] and (switch == 'all' or switch == this_switch_state):
-                rkey = "atten:set:{}{}".format(ant, pol)
-                self.hc.r.hset(rkey, this_switch_state, state['pam_atten'])
-                self.outcome.log.updated.append("{}{}".format(ant, pol))
-        print("Updated {} of {} values for {}.  {} were unknown."
-              .format(len(self.outcome.log.updated), self.N_antpols,
-                      switch, len(self.outcome.log.unknown)))
+        ctype = {'current':
+                 {'apkey': 'pam_atten', 'time': self.state_time, 'method': 'get_current_state'},
+                 'calc':
+                 {'apkey': 'calc', 'time': self.calc_time, 'method': 'calc_equalization'}
+                 }
+        print("NEED TO ADD METADATA LATER - include now()")
+        self.outcome.handle = {'updated': set(), 'unknown': set()}
+        switch_state = False
+        handle_time = Time.now()
+        if set_class in ['current', 'class']:
+            if ctype[set_class]['time'] is None:
+                print('Skipping - must {} first'.format(ctype[set_class]['method']))
+                return
+            if set_name is None:
+                set_name = ["{}:{}".format(set_class, x) for x in Parameters.switch_state]
+                switch_state = True
+            elif set_name in Parameters.switch_state:
+                set_name = ["{}:{}".format(set_class, set_name)]
+                switch_state = True
+            else:
+                self.loaded_sets.append(set_name)
+                for (ant, pol), state in self.antpols.items():
+                    self.antpols[ant, pol][set_name] = float(state[ctype['apkey']])
+                    self.outcome.handle['updated'].add("{}{}".format(ant, pol))
+                set_name = [set_name]
+        elif set_class == 'file':
+            try:
+                with open(set_name, 'r') as fp:
+                    fdesc = fp.readline().strip('"')
+                    description = fdesc if description is None else "{}: {}".format(description, fdesc)  # noqa
+                    self.loaded_sets.append(set_name)
+                    for line in fp:
+                        data = line.split(',')
+                        if len(data) == 3:
+                            self.antpols.setdefault([int(data[0]), data[1]], {})
+                            self.antpols[int(data[0]), data[1]][set_name] = float(data[2])
+                            self.outcome.handle['updated'].add("{}{}".format(ant, pol))
+            except IOError:
+                print("Skipping - {} not found.".format(set_name))
+                return
+            set_name = [set_name]
+        else:
+            print("Skipping - {} is an invalid set_class".format(set_class))
+
+        if switch_state:
+            for this_set in set_name:
+                self.loaded_sets.append(this_set)
+                switch = this_set.split(':')[-1]
+                for (ant, pol), state in self.antpols.items():
+                    this_switch_state = state['fem_switch']
+                    if not this_switch_state:
+                        self.outcome.log.unknown.add('{}{}-{}'.format(ant, pol, switch))
+                    elif state[ctype[set_class]] and switch == this_switch_state:
+                        rkey = "atten:set:{}{}".format(ant, pol)
+                        self.hc.r.hset(rkey, this_set, state[ctype[set_class]])
+                        self.outcome.log.updated.add("{}{}-{}".format(ant, pol, switch))
+
+        description = "{} - {}".format(description, handle_time.isot)
+        for this_set in set_name:
+            self.atten_metadata['sets'][this_set] = description
+        self.hc.r.hset('atten:set', 'metadata', json.dumps(self.atten_metadata))
+        self.sets_in_redis = list(self.atten_metadata['sets'].keys())
+        print("Out of {} antpols:".format(self.N_antpols))
+
+        for key, val in self.outcome.handle.items():
+            print("\t{}:  {}".format(key, len(val)))
