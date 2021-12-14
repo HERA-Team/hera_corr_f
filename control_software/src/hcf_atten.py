@@ -317,7 +317,7 @@ class Attenuator:
                        'file':
                        {'key': set_name, 'time': None, 'method': 'read_setfile'}
                        }
-        self.outcome.handle = {'updated': set(), 'value_err': set(), 'unknown_switch': set()}
+        self.outcome.handle = {'updated': set(), 'float_err': set(), 'unknown_switch': set()}
         handle_time = Time.now()
         filedesc = None
 
@@ -327,9 +327,9 @@ class Attenuator:
                 print('Skipping - must {} first'.format(class_param[set_class]['method']))
                 return
             if set_name is None:
-                set_name = ["{}:{}".format(set_class, x) for x in Parameters.switch_state]
+                set_name = ["{}:{}".format(set_class, x) for x in Parameters.switch_states]
                 use_switch_state = True
-            elif set_name in Parameters.switch_state:
+            elif set_name in Parameters.switch_states:
                 set_name = ["{}:{}".format(set_class, set_name)]
                 use_switch_state = True
             else:
@@ -354,7 +354,7 @@ class Attenuator:
         for this_set_name in set_name:
             self.loaded_sets.append(this_set_name)
             this_switch_set = this_set_name.split(':')[-1] if use_switch_state else 'useit'
-            for (ant, pol), state in the_data:
+            for (ant, pol), state in the_data.items():
                 if use_switch_state:
                     update = "{}{}-{}".format(ant, pol, this_switch_set)
                     this_switch_state = state['fem_switch']
@@ -366,8 +366,8 @@ class Attenuator:
                     this_switch_state = 'useit'
                 try:
                     this_value = float(state[class_param[set_class]['key']])
-                except ValueError:
-                    self.outcome.handle['value_err'].add(update)
+                except (ValueError, TypeError):
+                    self.outcome.handle['float_err'].add(update)
                     continue
                 if this_switch_set == this_switch_state:
                     self.antpols[ant, pol][this_set_name] = this_value
