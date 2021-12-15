@@ -3,7 +3,6 @@
 import logging
 import os
 import time
-import socket
 import redis
 import yaml
 import json
@@ -17,14 +16,15 @@ import numpy as np
 from casperfpga import utils
 
 LOGGER = add_default_log_handlers(logging.getLogger(__name__))
-TEMP_BITSTREAM_STORE = "/tmp/" # location to store bitfiles from redis
+TEMP_BITSTREAM_STORE = "/tmp/"  # location to store bitfiles from redis
 MAJOR_VERSION = [6, 7]
+
 
 class HeraCorrelator(object):
     """HERA Correlator control class."""
 
     def __init__(self, hosts=None, redishost='redishost', config=None,
-                 logger=LOGGER, passive=False, redis_transport=False, 
+                 logger=LOGGER, passive=False, redis_transport=False,
                  block_monitoring=True):
         """
         Instantiate a HeraCorrelator instance.
@@ -33,13 +33,13 @@ class HeraCorrelator(object):
             hosts (list): List of F-Engine hosts to connect to.
             redishost (str): Hostname (or IP address) of redis database.
                 Default: 'redishost'
-            config (str): Path to configuration file. If None, will be 
+            config (str): Path to configuration file. If None, will be
                 grabbed from redis. Default: None
             logger (logging.Logger): Logging object for this class.
             passive (Boolean): Disable SNAP connections. Default False.
-            redis_transport (Boolean): Use redis proxy for talking to SNAP 
+            redis_transport (Boolean): Use redis proxy for talking to SNAP
                 boards, rather than direct TFTP. Default: False
-            block_monitoring (Boolean): Disable monitoring before 
+            block_monitoring (Boolean): Disable monitoring before
                 connecting to boards.  Default: True
         """
         self.logger = logger
@@ -48,26 +48,25 @@ class HeraCorrelator(object):
         # also keep a non-decoded redis connection for reading
         # values with byte-strings like the .fpg files
         self.r_bytes = redis.Redis(redishost, decode_responses=False)
-        self.redis_transport = redis_transport # XXX why have this (ARP 11/3/21)?
+        self.redis_transport = redis_transport  # XXX why have this (ARP 11/3/21)?
         self.passive = passive
 
         self.fengs = {}
-        self.get_config(config) # sets self.config
-        self.set_default_progfile() # sets self._progfile
+        self.get_config(config)  # sets self.config
+        self.set_default_progfile()  # sets self._progfile
 
         if not passive:
-            if block_monitoring: # XXX still necessary (ARP 11/3/21)?
+            if block_monitoring:  # XXX still necessary (ARP 11/3/21)?
                 self.disable_monitoring(60, verify=True)
             self._hookup_from_redis()
             self._unconnected = self.connect_fengs(hosts=hosts)
-
 
     def get_config(self, config=None, verify=True):
         """
         Parse configuration file and set self.config accordingly.
 
         Inputs:
-            config (str): Path to configuration file. If None, 
+            config (str): Path to configuration file. If None,
                 configuration pulled from redis. Default: None
             verify (bool): Do basic sanity checking on configuration.
                            Default: True
@@ -81,7 +80,7 @@ class HeraCorrelator(object):
                                                  'upload_time'))
             self.config_time_str = self.r.hget('snap_configuration',
                                                'upload_time_str')
-            self.logger.info('Using redis config (uploaded %s)' % 
+            self.logger.info('Using redis config (uploaded %s)' %
                              self.config_time_str)  # noqa
         else:
             # Read configuration from file
@@ -106,7 +105,7 @@ class HeraCorrelator(object):
         '''
         # Not supporting auto assignment of antenna indices
         ant_indices = self.config['fengines'][host]['ants']
-        self.logger.info("Connecting %s with antenna indices %s" % 
+        self.logger.info("Connecting %s with antenna indices %s" %
                          (host, ant_indices))
         if self.redis_transport:
             redishost = self.redishost
@@ -115,7 +114,7 @@ class HeraCorrelator(object):
         feng = SnapFengine(host, ant_indices=ant_indices,
                            redishost=redishost)
         if feng.fpga.is_connected():
-            self.fengs[host] = feng # single dict call is threadsafe
+            self.fengs[host] = feng  # single dict call is threadsafe
             self.r.hset('status:snap:%s' % host, 'connected', '1')
         else:
             self.feng_declare_disconnected(host)
@@ -193,7 +192,7 @@ class HeraCorrelator(object):
                              Default: 300.
         """
         # Instantiate CasperFpga connections to all the F-Engine.
-        
+
         if hosts is None:
             # in this one cose, get list direct from config
             hosts = [host for host in self.config['fengines']
@@ -207,7 +206,7 @@ class HeraCorrelator(object):
                             timeout=timeout,
         )
         return failed
-            
+
     def set_default_progfile(self, progfile=None):
         """
         Set the FPGA progamming file to use.
@@ -225,7 +224,7 @@ class HeraCorrelator(object):
             with open(progfile, "wb") as fh:
                 fh.write(bitstream)
         self._progfile = progfile
-        
+
     def feng_program(self, host, progfile=None, force=False,
                         verify=True, timeout=10):
         """
@@ -246,7 +245,7 @@ class HeraCorrelator(object):
             return
         if progfile is None:
             progfile = self._progfile
-        self.logger.info("Programming FPGA on %s with %s" % 
+        self.logger.info("Programming FPGA on %s with %s" %
                          (host, progfile))
         # XXX may lie and say it programmed when it didn't
         # XXX might also try multiple times and/or revert to golden image
@@ -366,7 +365,7 @@ class HeraCorrelator(object):
             host (str): Host to target.
         """
         #keys = ['is_programmed', 'version', 'adc_is_configured',
-        #        'is_initialized', 'dest_is_configured', 'temp', 
+        #        'is_initialized', 'dest_is_configured', 'temp',
         #        'timestamp', 'uptime', 'pps_count', 'serial']
         stats = self.r.hgetall('status:snap:%s' % host)
         return stats
@@ -445,7 +444,7 @@ class HeraCorrelator(object):
         feng.phase_switch.disable_mod(verify=verify)
         feng.phase_switch.disable_demod(verify=verify)
         self.r.hset('status:snap:%s' % host, 'phase_switch', '0')
-        
+
     def disable_phase_switches(self, hosts=None, verify=True,
                                multithread=False, timeout=300.):
         """
@@ -453,7 +452,7 @@ class HeraCorrelator(object):
 
         Inputs:
             hosts (list): List of hosts to target. Default: all
-            verify (bool): Check success.  Default: True 
+            verify (bool): Check success.  Default: True
             multithread (bool): Multithread across hosts. Default: True
             timeout (float): Timeout in seconds for multithreading.
                              Default: 300.
@@ -503,7 +502,7 @@ class HeraCorrelator(object):
 
         Inputs:
             hosts (list): List of hosts to target. Default: all
-            verify (bool): Check success.  Default: True 
+            verify (bool): Check success.  Default: True
             multithread (bool): Multithread across hosts. Default: False
             timeout (float): Timeout in seconds for multithreading.
                              Default: 300.
@@ -563,7 +562,7 @@ class HeraCorrelator(object):
             feng = self.fengs[host]
             for cnt in range(feng.input.ninput_mux_streams):
                 self.logger.info('Switching %s.input[%d] to %s' %
-                                 (host, cnt, source)) 
+                                 (host, cnt, source))
                 try:
                     # will error if verification fails
                     # overwrites previous seed for streams that share noise,
@@ -574,11 +573,11 @@ class HeraCorrelator(object):
                         seed_cnt = (seed_cnt + 1) % 256
                 except(RuntimeError,AssertionError,IOError):
                     self.logger.warning('Failed to switch %s.input[%d]' %
-                                        (host, cnt)) 
+                                        (host, cnt))
                     # only logging failures at resolution of host
                     failed.append(host)
         return set(failed) # only return unique hosts
-    
+
 
     def switch_fems(self, mode, east=True, north=True, verify=True,
                     hosts=None, multithread=False, timeout=300.):
@@ -606,7 +605,7 @@ class HeraCorrelator(object):
         for host in hosts:
             for cnt,fem in enumerate(self.fengs[host].fems):
                 self.logger.info('Switching %s.fem[%d] to %s' %
-                                 (host, cnt, mode)) 
+                                 (host, cnt, mode))
                 try:
                     # will error if verification fails
                     fem.switch(mode,east=east,north=north,verify=verify)
@@ -614,7 +613,7 @@ class HeraCorrelator(object):
                                 'fem[%d]' % cnt, mode)
                 except(RuntimeError,AssertionError,IOError):
                     self.logger.warning('Failed to switch %s.fem[%d]' %
-                                        (host, cnt)) 
+                                        (host, cnt))
                     self.r.hset('status:snap:%s' % host,
                                 'fem[%d]' % cnt, 'failed')
                     # only logging failures at resolution of host
@@ -668,6 +667,18 @@ class HeraCorrelator(object):
         if verify:
             assert(self.lookup_pam_attenuation(ant, pol) == attenuation)
 
+    def get_fem_switch(self, ant, pol):
+        """
+        Read FEM switch for specified ant/pol via SNAP.
+
+        Inputs:
+           ant: Antenna string or integer. Eg. '0' or 0.
+           pol: String polarization -- 'e' or 'n'
+        """
+        host, stream = self.lookup_ant_host_stream(ant, pol)
+        switch, east, north = self.fengs[host].fems[stream//2].switch()
+        return switch
+
     def get_pam_attenuation(self, ant, pol):
         """
         Read PAM attenuation for specified ant/pol from SNAP.
@@ -701,7 +712,7 @@ class HeraCorrelator(object):
         east_north = pam.get_attenuation()
         if safe:
             # make sure we read the same value as commanded
-            commanded = pam._cached_atten # commanded values stored here
+            commanded = pam._cached_atten  # commanded values stored here
             if commanded is None:
                 commanded = (self.lookup_pam_attenuation(ant, 'e'),
                              self.lookup_pam_attenuation(ant, 'n'))
@@ -710,7 +721,7 @@ class HeraCorrelator(object):
         atten[pol] = attenuation
         pam.set_attenuation(atten['e'], atten['n'], verify=verify)
         if update_redis:
-            self.store_pam_attenuation(ant,pol,attenuation, verify=verify)
+            self.store_pam_attenuation(ant, pol, attenuation, verify=verify)
 
     def lookup_eq_coeffs(self, ant, pol):
         """
@@ -843,7 +854,7 @@ class HeraCorrelator(object):
         antpols = self.snap_to_ant[host]
         failed = []
         for cnt,pam in enumerate(feng.pams):
-            # Antpols are hooked up in n/e order in snap_to_ant, but 
+            # Antpols are hooked up in n/e order in snap_to_ant, but
             # pams address them in e/n order
             (ant_n, pol_n) = antpols[2*cnt]
             (ant_e, pol_e) = antpols[2*cnt + 1]
@@ -913,7 +924,7 @@ class HeraCorrelator(object):
                 self.fengs[host].pfb.set_fft_shift(fft_shift, verify=verify)
             except(AssertionError,RuntimeError):
                 self.logger.warning('Failed to set fft_shift on %s.pfb'
-                                    % (host)) 
+                                    % (host))
                 failed.append(host)
         return failed
 
@@ -932,7 +943,7 @@ class HeraCorrelator(object):
         if reinit:
             feng.initialize_adc()
         feng.align_adc(force=force, verify=verify)
-        
+
     def align_adcs(self, hosts=None, reinit=False, verify=True,
                    force=False, multithread=True, timeout=300.):
         """
@@ -1215,7 +1226,7 @@ class HeraCorrelator(object):
                 for feng in self.fengs:
                     feng.sync.sw_sync()
             sync_time = int(time.time())  # roughly  # noqa
-        self.logger.info('Synchronized in %.2f seconds' % 
+        self.logger.info('Synchronized in %.2f seconds' %
                          (after_sync - before_sync))
 
     def enable_eths(self, hosts=None, verify=True):
@@ -1240,7 +1251,7 @@ class HeraCorrelator(object):
                 assert host not in unconfigured
                 self.fengs[host].eth.enable_tx(verify=verify)
             except(AssertionError, RuntimeError):
-                self.logger.warning('Failed to enable %s.eth' % (host)) 
+                self.logger.warning('Failed to enable %s.eth' % (host))
                 failed.append(host)
         return failed
 
@@ -1259,6 +1270,6 @@ class HeraCorrelator(object):
             try:
                 self.fengs[host].eth.disable_tx(verify=verify)
             except(AssertionError):
-                self.logger.warning('Failed to enable %s.eth' % (host)) 
+                self.logger.warning('Failed to enable %s.eth' % (host))
                 failed.append(host)
         return failed

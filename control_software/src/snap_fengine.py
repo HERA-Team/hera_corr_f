@@ -14,6 +14,7 @@ INITIALIZED_BIT = 15
 PAM_MAX = 15
 PAM_MIN = 0
 
+
 class SnapFengine(object):
     def __init__(self, host, ant_indices=None, logger=None,
                  redishost='redishost'):
@@ -38,7 +39,7 @@ class SnapFengine(object):
 
         # blocks
         self.synth = Synth(self.fpga, 'lmx_ctrl')
-        self.adc = Adc(self.fpga) # not a subclass of Block
+        self.adc = Adc(self.fpga)  # not a subclass of Block
         self.sync = Sync(self.fpga, 'sync')
         self.noise = NoiseGen(self.fpga, 'noise', nstreams=6)
         self.input = Input(self.fpga, 'input', nstreams=12)
@@ -69,7 +70,7 @@ class SnapFengine(object):
             self.delay,
             self.pfb,
             self.eq,
-            #self.eq_tvg, # temporarily removed
+            # self.eq_tvg, # temporarily removed
             self.reorder,
             self.packetizer,
             self.eth,
@@ -124,7 +125,7 @@ class SnapFengine(object):
             assert(self.fpga.is_running())
 
     def initialize_adc(self, sample_rate=500., verify=False):
-        """Initialize Synth and Adc blocks, then reprogram FPGA."""        
+        """Initialize Synth and Adc blocks, then reprogram FPGA."""
         self.synth.initialize(verify=verify)
         self.adc.init(sample_rate=sample_rate, verify=verify)
         # Mark ADC as uncalibrated
@@ -146,12 +147,12 @@ class SnapFengine(object):
         if len(fails) > 0:
             self.logger.warning("rampTest failed on: " + str(fails))
         else:
-            self._set_adc_status(1) # record status
+            self._set_adc_status(1)  # record status
         if verify:
-            assert(self.adc_is_configured()) # errors if anything failed
+            assert(self.adc_is_configured())  # errors if anything failed
         # Otherwise, finish up here.
         self.adc.selectADC()
-        self.adc.adc.selectInput([1,1,3,3])
+        self.adc.adc.selectInput([1, 1, 3, 3])
         self.adc.set_gain(4)
 
     def _set_adc_status(self, val):
@@ -159,8 +160,8 @@ class SnapFengine(object):
 
     def adc_is_configured(self):
         """
-        Read the source_sel register 
-        within the Input block is see if the ADC is configured. 
+        Read the source_sel register
+        within the Input block is see if the ADC is configured.
         """
         return self.input.get_reg_bits('source_sel', ADC_ALIGNED_BIT, 1)
 
@@ -174,20 +175,20 @@ class SnapFengine(object):
             self._add_i2c()
         if self.is_initialized():
             return
-        
+
         if self.version()[0] < 7:
             # Version 6 had no noise generator
             self.blocks = [blk for blk in self.blocks
                            if blk not in [self.noise]]
 
-        # Init all blocks other than Synth and ADC 
+        # Init all blocks other than Synth and ADC
         blocks_to_init = [blk for blk in self.blocks
                           if blk not in [self.synth, self.adc]]
 
         for block in blocks_to_init:
             self.logger.info("Initializing block: %s" % block.name)
             block.initialize(verify=verify)
-        
+
         self._set_initialized(1)
 
     def _set_initialized(self, value):
@@ -196,8 +197,8 @@ class SnapFengine(object):
 
     def is_initialized(self):
         """
-        16th bit from LSB (0x8000) of the source_sel register 
-        within the Input block is set when the Fengine is 
+        16th bit from LSB (0x8000) of the source_sel register
+        within the Input block is set when the Fengine is
         initialized. Look for this bit and return.
         """
         return self.input.get_reg_bits('source_sel', INITIALIZED_BIT, 1)
