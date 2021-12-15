@@ -92,14 +92,11 @@ class Attenuator:
 
             # Stuff from HeraCorrelator
             for cval, func in chkap.items():
-                comm_stat_key = "{}_comm_stat".format(cval)
                 err_type = 'snap_{}_err'.format(cval)
                 try:
                     self.antpols[ant, pol][cval] = func(ant, pol)
-                    self.antpols[ant, pol][comm_stat_key] = True
                 except:  # noqa
                     self.outcome.get_state[err_type].add(outkey)
-                    self.antpols[ant, pol][comm_stat_key] = False
                     print("{:>3s}{} {} not found:".format(str(ant), pol, cval), end='  ')
                     if update_from_redis:
                         print('set to redis value:  {}'.format(antpol_redis[cval]))
