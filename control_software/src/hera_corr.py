@@ -1226,8 +1226,9 @@ class HeraCorrelator(object):
                 for feng in self.fengs:
                     feng.sync.sw_sync()
             sync_time = int(time.time())  # roughly  # noqa
+        after_sync = time.time()
         self.logger.info('Synchronized in %.2f seconds' %
-                         (after_sync - before_sync))
+                         (after_sync - start))
 
     def enable_eths(self, hosts=None, verify=True):
         """
