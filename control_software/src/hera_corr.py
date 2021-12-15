@@ -815,7 +815,7 @@ class HeraCorrelator(object):
                     failed.append((stream, (ant, pol)))
         if len(failed) > 0:
             raise RuntimeError('Failed to initialize EQ on %s: %s' %
-                               (host, ','.join(['%d=(%d%s)' % (ant,pol)
+                               (host, ','.join(['(%d%s)' % (ant,pol)
                                       for stream,(ant,pol) in failed])))
 
     def initialize_eqs(self, hosts=None, verify=True,
