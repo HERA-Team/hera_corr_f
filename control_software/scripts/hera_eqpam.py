@@ -4,8 +4,7 @@ from hera_corr_f import hcf_atten
 
 
 ap = argparse.ArgumentParser()
-ap.add_argument('--set', help="Set to use.", choices=['calc', 'antenna', 'load', 'noise'],
-                default='calc')
+ap.add_argument('--set', help="Set to use.", default='calc')
 ap.add_argument('--cf', help='Center frequency in MHz for equalization calculation.', default=168.0)
 ap.add_argument('--bw', help='Bandwidth in MHz for equalization calculation.', default=8.0)
 ap.add_argument('--target-pwr', dest='target_pwr', default=75.0,
@@ -31,10 +30,10 @@ if args.set == 'calc':
     atten.calc_equalization(cf=args.cf, bw=args.bw, target_pwr=args.target_pwr,
                             default_atten=args.default_atten, verbose=args.verbose)
 else:
-    atten.get_state_atten_values(switch=args.set)
+    atten.load_atten_sets(switch=args.set)
 
 if args.log_values is not None and args.log_values != 'None':
-    atten.log_state_atten_values(switch=args.log_values)
+    atten.handle_atten_sets(switch=args.log_values)
 
 if args.set_atten:
     atten.set_pam_attenuation(retries=args.retries, set_to=args.set)

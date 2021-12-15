@@ -13,15 +13,10 @@ Parameters = Namespace(fq0=46.9,  # low cut-off in MHz
                        )
 
 
-def self__hc__get_fem_switch(a, b):
-    return 'Fake'
-
-
-def self__hc__set_pam_attenuation(a, b, c):
-    return
-
-
 def descriptor(**kwargs):
+    """
+    Generate an attenuation set description string.
+    """
     slist = []
     for key, val in kwargs.items():
         if val is not None and len(val):
@@ -73,7 +68,7 @@ class Attenuator:
         self.state_time = Time.now()
         self.auto_timestamp_jd = np.frombuffer(self.hc.r_bytes.get('auto:timestamp'), np.float64)[0]
         chkap = {'pam_atten': self.hc.get_pam_attenuation,
-                 'fem_switch': self__hc__get_fem_switch}
+                 'fem_switch': self.hc.get_fem_switch}
         self.outcome.get_state = {'redis_auto_err': set(),
                                   'snap_pam_atten_err': set(),
                                   'snap_fem_switch_err': set(),
@@ -118,7 +113,7 @@ class Attenuator:
                 elif self.antpols[ant, pol][cval] is None or antpol_redis[cval] is None:
                     agree = False
                 elif cval == 'fem_switch':
-                    agree = self.antpols[ant, pol][cval] in ['Fake', antpol_redis[cval]]
+                    agree = self.antpols[ant, pol][cval] == antpol_redis[cval]
                 elif cval == 'pam_atten':
                     agree = int(self.antpols[ant, pol][cval]) == int(antpol_redis[cval])
                 else:
@@ -216,7 +211,7 @@ class Attenuator:
             else:
                 for i in range(retries):
                     try:
-                        self__hc__set_pam_attenuation(ant, pol, state[set_to])
+                        self.hc.set_pam_attenuation(ant, pol, state[set_to])
                     except (RuntimeError, IOError, AssertionError):
                         print('Failure {} / {}, trying again'.format((i+1), retries))
                         continue
@@ -227,9 +222,11 @@ class Attenuator:
         for key, val in self.outcome.set_pam.items():
             print("\t{}:  {}".format(key, len(val)))
 
-    def load_atten_from_redis(self, set_to='calc:antenna'):
+    def load_atten_sets(self, set_to='calc:antenna'):
         """
         Pull attenuation values from redis as set.antpols[ant, pol][set_to] options.
+
+        These sets are generally put into redis via the handle_atten_sets method.
 
         Parameter
         ---------
@@ -284,7 +281,6 @@ class Attenuator:
     def handle_atten_sets(self, set_class, set_name=None, purge=False, description=None):
         """
         Put atten values into redis and self.antpols[ant, pol][<key>]
-        Will purge old values of <key> in redis if purge==True.
 
         This will put attenuation values into redis AND self.antpols (so you don't also
         have to self.load_atten_values_from_redis) with various options based on set_class/set_name:
@@ -305,6 +301,10 @@ class Attenuator:
                  -> Note to override antenna, load, noise, use one of those as the set_name.
             If set_class == 'file':  use values from csv file.
                  set_name: name of file and used as <key>.  First line is description.
+
+        Will purge old values of <key> in redis if purge==True.
+
+        These sets may be read from redis via the load_atten_sets method.
 
         Parameters
         ----------
