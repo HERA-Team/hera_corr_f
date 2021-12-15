@@ -37,7 +37,6 @@ class Attenuator:
                                                         'channel': hookup['channel']}
         self.state_time = None
         self.calc_time = None
-        self.atten_set_options = []
         self.N_antpols = len(self.antpols)
         self.atten_metadata = json.loads(self.hc.r.hget('atten:set', 'metadata'))
         self.sets_in_redis = list(self.atten_metadata['sets'].keys())
@@ -151,7 +150,7 @@ class Attenuator:
         if self.state_time is None:
             print('Skipping - must get_current_state first')
             return
-        self.atten_set_options.append('calc')
+        self.loaded_sets.append('calc')
         self.calc_time = Time.now()
         ctjd = self.calc_time.jd
         dchan = (Parameters.fq1 - Parameters.fq0) / Parameters.nchan
