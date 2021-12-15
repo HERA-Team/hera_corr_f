@@ -64,17 +64,12 @@ class Block(object):
     def _exception(self, msg, *args, **kwargs):
         self.logger.exception(self._prefix_log(msg), *args, **kwargs)
 
-    def listdev(self):
-        """
-        return a list of all register names within
-        the block.
-        """
-
     def initialize(self, verify=False):
         """
         Individual blocks should override this
         method to configure themselves appropriately
         """
+        print("THIS DOESN'T DO ANYTHING")
 
     def listdev(self):
         """
@@ -247,7 +242,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.logger.debug("Initialising ADCs")
         self.adc.init() # resets: don't set ADC registers before here
 
-        # SNAP only uses one of the 3 ADC chips to provide clocks, 
+        # SNAP only uses one of the 3 ADC chips to provide clocks,
         # set others to lowest drive strength possible and terminate them
         self.selectADC([1,2]) # Talk to the 2nd and 3rd ADCs
         # Please refer to HMCAD1511 datasheet for more details
@@ -295,7 +290,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.selectADC()
         self.logger.debug('Reprogrammed')
 
-        # Select the clock source switch again. The reprogramming 
+        # Select the clock source switch again. The reprogramming
         # seems to lose this information
         self.logger.debug('Configuring clock source switch')
         if self.lmx is not None:
@@ -337,7 +332,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
                 val = self._set(val, ls, self.M_WB_W_ISERDES_BITSLIP_LANE_SEL)
 
                 # The registers related to reset, request, bitslip, and other
-                # commands after being set will not be automatically cleared.  
+                # commands after being set will not be automatically cleared.
                 # Therefore we have to clear them by ourselves.
                 self.adc._write(0x0, self.A_WB_W_CTRL)
                 if verify:
@@ -352,10 +347,10 @@ class Adc(casperfpga.snapadc.SNAPADC):
                     assert(self.adc._read(self.A_WB_W_CTRL) & self.M_WB_W_DELAY_TAP == 0x00)
 
 
-    # The ADC16 controller word (the offset in write_int method) 2 and 3 are for delaying 
+    # The ADC16 controller word (the offset in write_int method) 2 and 3 are for delaying
     # taps of A and B lanes, respectively.
     #
-    # Refer to the memory map word 2 and word 3 for clarification.  The memory map was made 
+    # Refer to the memory map word 2 and word 3 for clarification.  The memory map was made
     # for a ROACH design so it has chips A-H.  SNAP 1 design has three chips.
     def delay(self, tap, chipSel=None, laneSel=None, verify=False):
         if chipSel==None:
@@ -402,7 +397,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
 
         valt = self._set(0x0, tap, self.M_WB_W_DELAY_TAP)
 
-        # Don't be misled by the naming - "DELAY_STROBE" in casper repo.  It doesn't 
+        # Don't be misled by the naming - "DELAY_STROBE" in casper repo.  It doesn't
         # generate strobe at all.  You have to manually clear the bits that you set.
         self.adc._write(0x00, self.A_WB_W_CTRL)
         self.adc._write(0x00, self.A_WB_W_DELAY_STROBE_L)
@@ -432,7 +427,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
 
     def _find_working_taps(self, ker_size=5, maxtries=5):
         '''Generate a dictionary of working tap values per chip/lane.
-        ker: size of convolutional kernel used as a stand-off from 
+        ker: size of convolutional kernel used as a stand-off from
              marginal tap values. Default 7.'''
         nchips, nlanes, ntaps = len(self.adcList), len(self.laneList), 32
         # Make sure we have enough taps to work with, otherwise reinit ADC
@@ -659,9 +654,9 @@ class NoiseGen(Block):
 
     def set_seed(self, stream=None, seed=0, verify=True):
         """
-        Set the seed of the noise generator for a given stream. Six 8-b 
+        Set the seed of the noise generator for a given stream. Six 8-b
         seeds are stored in two 32-b registers from LSB to MSB. Of these,
-        only seeds 0, 2, and 4 are used, going to the 3 LFSRs that serve 
+        only seeds 0, 2, and 4 are used, going to the 3 LFSRs that serve
         inputs 0-1, 2-3, and 4-5 respectively.
 
         Inputs:
@@ -1185,7 +1180,7 @@ class Eq(Block):
         self.write('coeffs', data, offset=(self.streamsize * stream))
         if verify:
             assert(data == self._raw_read(stream))
-        
+
     def _raw_read(self, stream):
         data = self.read('coeffs', self.streamsize,
                          offset=(self.streamsize * stream))
@@ -1216,7 +1211,7 @@ class Eq(Block):
         Currently, this is 100.0
         """
         for stream in range(self.nstreams):
-            self.set_coeffs(stream, 
+            self.set_coeffs(stream,
                coeffs * np.ones(self.ncoeffs, dtype='>%s' % self.format),
                verify=verify)
 
@@ -1324,7 +1319,7 @@ class ChanReorder(Block):
     def reindex_channel(self, actual_index, output_index, verify=False):
         self.write_int('reorder3_map1', actual_index, word_offset=output_index)
         if verify:
-            assert(actual_index == self.read_int('reorder3_map1', 
+            assert(actual_index == self.read_int('reorder3_map1',
                                                  word_offset=output_index))
 
     def initialize(self, verify=False):
@@ -1529,7 +1524,7 @@ class Eth(Block):
 
     def get_arp_table(self):
         MAX_MACS = 256 # XXX is 256 the maximum number of macs?
-        macs_str = self.read('sw', MAX_MACS * struct.calcsize('Q'), 
+        macs_str = self.read('sw', MAX_MACS * struct.calcsize('Q'),
                              offset=self.BASE_ARP_OFFSET)
         macs = struct.unpack('>%dQ' % (MAX_MACS), macs_str)
         return macs
@@ -1744,7 +1739,7 @@ class Corr(Block):
         Set the number of spectra to accumulate to `acc_len`
         """
         self.acc_len = acc_len
-        # Convert to clks from spectra. FFT output length = 8192 
+        # Convert to clks from spectra. FFT output length = 8192
         # with 8 samples in parallel = 8192/8 clocks per spectrum
         self.write_int('acc_len', 1024 * self.acc_len)
         if verify:
