@@ -121,6 +121,9 @@ class Attenuator:
                     print("<redis = {}>".format(antpol_redis[cval]), end='  ')
                     print("<corr = {}>".format(self.antpols[ant, pol][cval]))
         self.loaded_sets.append('pam_atten')
+        age = float(self.state_time.jd - self.auto_timestamp_jd)
+        print("Age of autos are {:.1f} sec  =  {:.2f} hours  =  {:.2f} days."
+              .format(age * 3600.0 * 24.0, age * 24.0, age))
         print("Out of {} antpols:".format(self.N_antpols))
         for key, val in self.outcome.get_state.items():
             print("\t{}:  {}".format(key, len(val)))
@@ -156,8 +159,8 @@ class Attenuator:
         print('Calculating equalization using {:.1f} - {:.1f} MHz  ({} - {})'.
               format((cf-bw/2.0), (cf+bw/2.0), ch0, ch1))
         print('\tTarget power {}'.format(target_pwr))
-        print('\tAuto timestamp {:.2f} s ago'.format((ctjd - self.auto_timestamp_jd) * 24 * 3600))
-        print('\tState loaded {:.2f} s ago'.format((ctjd - self.state_time.jd) * 24 * 3600))
+        print('\tAuto timestamp {:.2f} s ago'.format((ctjd - self.auto_timestamp_jd) * 24.0 * 3600))
+        print('\tState loaded {:.2f} s ago'.format((ctjd - self.state_time.jd) * 24.0 * 3600))
 
         self.outcome.calc_eq = {'no_atten': set(), 'no_auto': set()}
         for (ant, pol), state in self.antpols.items():
