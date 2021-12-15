@@ -798,7 +798,7 @@ class Input(Block):
         """
         self._select_input(self.USE_ADC, stream=stream, verify=verify)
 
-    def use_zero(self, stream=None):
+    def use_zero(self, stream=None, verify=False):
         """
         Switch input to zeros.
         Inputs:
