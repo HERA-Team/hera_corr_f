@@ -96,7 +96,7 @@ if __name__ == "__main__":
                     continue
                 if stream % 2 == 0:
                     # adc_stats returns both polarizations, so only read every other
-                    adc_stats = corr.get_adc_stats(corr, host, stream, logger)
+                    adc_stats = corr.get_adc_stats(host, stream)
                     this_pol = 'x'
                 else:
                     this_pol = 'y'
@@ -104,9 +104,9 @@ if __name__ == "__main__":
                 # Build snap_rf_stats and add to redis
                 snap_rf_stats = {}
                 snap_rf_stats["timestamp"] = datetime.now().isoformat()
-                snap_rf_stats["autocorrelation"] = corr.get_auto(corr, host, stream, logger)
-                snap_rf_stats["eq_coeffs"] = corr.get_eq_coeff(corr, host, stream, logger)
-                snap_rf_stats["fft_of"] = corr.get_fft_of(corr, host, stream, logger)
+                snap_rf_stats["autocorrelation"] = corr.get_auto(host, stream)
+                snap_rf_stats["eq_coeffs"] = corr.get_eq_coeff(host, stream)
+                snap_rf_stats["fft_of"] = corr.get_fft_of(host, stream)
                 snap_rf_stats["histogram"] = adc_stats[this_pol]['histogram']
                 snap_rf_stats = corr.validate_redis_dict(snap_rf_stats)
 
@@ -126,8 +126,8 @@ if __name__ == "__main__":
                     ant_status[val] = snap_rf_stats[val]
                 for val in ['adc_mean', 'adc_power', 'adc_rms', 'histogram']:
                     ant_status[val] = adc_stats[this_pol][val.split('_')[-1]]
-                ant_status.update(corr.get_pam_stats(corr, host, stream, pol, logger))
-                ant_status.update(corr.get_fem_stats(corr, host, stream, logger))
+                ant_status.update(corr.get_pam_stats(host, stream, pol))
+                ant_status.update(corr.get_fem_stats(host, stream))
                 ant_status = corr.validate_redis_dict(ant_status)
                 ant_status_redis_key = "status:ant:{:d}:{:s}".format(ant, pol)
                 corr.r.hmset(ant_status_redis_key, ant_status)
