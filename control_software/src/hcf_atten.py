@@ -26,19 +26,19 @@ def descriptor(**kwargs):
     return ""
 
 
-class Attenuator:
+class Attenuator(HeraCorrelator):
     def __init__(self):
-        self.hc = HeraCorrelator()
+        super(Attenuator, self).__init__()
         self.antpols = {}
-        for ant, val in self.hc.ant_to_snap.items():
+        for ant, val in self.ant_to_snap.items():
             for pol, hookup in val.items():
-                if hookup['host'] in self.hc.fengs:
+                if hookup['host'] in self.fengs:
                     self.antpols[int(ant), str(pol)] = {'host': hookup['host'],
                                                         'channel': hookup['channel']}
         self.state_time = None
         self.calc_time = None
         self.N_antpols = len(self.antpols)
-        self.atten_metadata = json.loads(self.hc.r.hget('atten:set', 'metadata'))
+        self.atten_metadata = json.loads(self.r.hget('atten:set', 'metadata'))
         self.sets_in_redis = list(self.atten_metadata['sets'].keys())
         self.loaded_sets = []
         self.outcome = Namespace()
@@ -65,9 +65,9 @@ class Attenuator:
             If error getting from correlator, use redis value.  Otherwise use None.
         """
         self.state_time = Time.now()
-        self.auto_timestamp_jd = np.frombuffer(self.hc.r_bytes.get('auto:timestamp'), np.float64)[0]
-        chkap = {'pam_atten': self.hc.get_pam_attenuation,
-                 'fem_switch': self.hc.get_fem_switch}
+        self.auto_timestamp_jd = np.frombuffer(self.r_bytes.get('auto:timestamp'), np.float64)[0]
+        chkap = {'pam_atten': self.get_pam_attenuation,
+                 'fem_switch': self.get_fem_switch}
         self.outcome.get_state = {'redis_auto_err': set(),
                                   'snap_pam_atten_err': set(),
                                   'snap_fem_switch_err': set(),
@@ -79,13 +79,13 @@ class Attenuator:
             antpol_redis = {}
             rkey = 'status:ant:{}:{}'.format(ant, pol)
             for cval in chkap:
-                this_val = self.hc.r.hget(rkey, cval)
+                this_val = self.r.hget(rkey, cval)
                 if not this_val or this_val == 'null':
                     this_val = None
                 antpol_redis[cval] = this_val
             rkey = 'auto:{}{}'.format(ant, pol)
             try:
-                self.antpols[ant, pol]['auto'] = np.frombuffer(self.hc.r_bytes.get(rkey), np.float32)  # noqa
+                self.antpols[ant, pol]['auto'] = np.frombuffer(self.r_bytes.get(rkey), np.float32)  # noqa
             except:  # noqa
                 self.antpols[ant, pol]['auto'] = None
                 self.outcome.get_state['redis_auto_err'].add(outkey)
@@ -210,7 +210,7 @@ class Attenuator:
             else:
                 for i in range(retries):
                     try:
-                        self.hc.set_pam_attenuation(ant, pol, state[set_to])
+                        self.set_pam_attenuation(ant, pol, state[set_to])
                     except (RuntimeError, IOError, AssertionError):
                         print('Failure {} / {}, trying again'.format((i+1), retries))
                         continue
@@ -241,7 +241,7 @@ class Attenuator:
         for (ant, pol) in self.antpols:
             rkey = "atten:set:{}{}".format(ant, pol)
             try:
-                self.antpols[ant, pol][set_to] = float(self.hc.r.hget(rkey, set_to))
+                self.antpols[ant, pol][set_to] = float(self.r.hget(rkey, set_to))
                 self.outcome.get_redis['found'].add("{}{}".format(ant, pol))
             except ValueError:
                 self.antpols[ant, pol][set_to] = None
@@ -261,7 +261,7 @@ class Attenuator:
         for (ant, pol) in self.antpols:
             rkey = "atten:set:{}{}".format(ant, pol)
             for this_key in keys:
-                self.hc.r.hdel(rkey, this_key)
+                self.r.hdel(rkey, this_key)
 
     def read_setfile(self, fname):
         """Read csv file for atten set."""
@@ -371,7 +371,7 @@ class Attenuator:
                 if this_switch_set == this_switch_state:
                     self.antpols[ant, pol][this_set_name] = this_value
                     rkey = "atten:set:{}{}".format(ant, pol)
-                    self.hc.r.hset(rkey, this_set_name, this_value)
+                    self.r.hset(rkey, this_set_name, this_value)
                     self.outcome.handle['updated'].add(update)
 
         # Write metadata
@@ -380,7 +380,7 @@ class Attenuator:
                                  purge=str(purge), time=handle_time.isot)
         for this_set in set_name:
             self.atten_metadata['sets'][this_set] = description
-        self.hc.r.hset('atten:set', 'metadata', json.dumps(self.atten_metadata))
+        self.r.hset('atten:set', 'metadata', json.dumps(self.atten_metadata))
         self.sets_in_redis = list(self.atten_metadata['sets'].keys())
         print("Out of {} antpols:".format(self.N_antpols))
         for key, val in self.outcome.handle.items():
