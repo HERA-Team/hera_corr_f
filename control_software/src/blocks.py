@@ -69,7 +69,7 @@ class Block(object):
         Individual blocks should override this
         method to configure themselves appropriately
         """
-        print("THIS DOESN'T DO ANYTHING")
+        pass
 
     def listdev(self):
         """
