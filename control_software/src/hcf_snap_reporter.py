@@ -160,7 +160,7 @@ class SnapReporter(HeraCorrelator):
         Dictionary of autocorrelation.
         """
         try:
-            autocorrelation = self.fengs[host].self.get_new_corr(stream, stream)
+            autocorrelation = self.fengs[host].get_new_corr(stream, stream)
             autocorrelation = json.dumps(autocorrelation.real.tolist())
         except:  # noqa
             self.logger.info(
