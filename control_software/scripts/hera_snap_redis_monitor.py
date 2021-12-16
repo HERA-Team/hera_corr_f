@@ -15,26 +15,6 @@ logger = add_default_log_handlers(logging.getLogger(__file__))
 hostname = socket.gethostname()
 
 
-def print_ant_log_messages(corr):
-    for ant, antval in corr.ant_to_snap.iteritems():
-        for pol, polval in antval.iteritems():
-            # Skip if the antenna is associated with a board we can't reach
-            if polval['host'] is not None:
-                host = polval['host']
-                chan = polval['channel']
-                try:
-                    _ = corr.fengs[host]
-                    logger.debug("Expecting data from Ant {}, Pol {} from host {} input {}"
-                                 .format(ant, pol, host, chan))
-                except KeyError:
-                    # If the entry is set to a bogus hostname I suppose.
-                    logger.warning("Failed to find F-Engine {} associated with ant/pol {}/{}"
-                                   .format(polval['host'], ant, pol))
-            else:
-                logger.warning("Failed to find F-Engine {} associated with ant/pol {}/{}"
-                               .format(polval['host'], ant, pol))
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Polling SNAPs for FPGA/PAM/FEM monitoring data',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -63,7 +43,7 @@ if __name__ == "__main__":
                                           block_monitoring=False,
                                           logger=logger)
     upload_time = corr.r.hget('snap_configuration', 'upload_time')
-    print_ant_log_messages(corr)
+    corr.print_ant_log_messages()
 
     retry_tick = time.time()
     script_redis_key = "status:script:{:s}:{:s}".format(hostname, __file__)
@@ -91,7 +71,7 @@ if __name__ == "__main__":
                                                   redis_transport=(not args.noredistapcp),
                                                   block_monitoring=False,
                                                   logger=logger)
-            print_ant_log_messages(corr)
+            corr.print_ant_log_messages()
 
         # Recompute the hookup every time. It's fast
         corr._hookup_from_redis()

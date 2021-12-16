@@ -45,13 +45,36 @@ def validate_redis_dict(in_dict, recursion_depth=1):
 
 
 class SnapReporter(HeraCorrelator):
-    def __init__(self, redishost, redis_transport, block_monitoring=False, logger=None):
-        super(SnapReporter, self).__init__(redishost=redishost, redis_transport=redis_transport,
+    def __init__(self, redishost='redishost',
+                 redis_transport=True,
+                 block_monitoring=False,
+                 logger=None):
+        super(SnapReporter, self).__init__(redishost=redishost,
+                                           redis_transport=redis_transport,
                                            block_monitoring=block_monitoring)
         if logger is None:
             self.logger = Lager()
         else:
             self.logger = logger
+
+    def print_ant_log_messages(self):
+        for ant, antval in self.ant_to_snap.iteritems():
+            for pol, polval in antval.iteritems():
+                # Skip if the antenna is associated with a board we can't reach
+                if polval['host'] is not None:
+                    host = polval['host']
+                    chan = polval['channel']
+                    try:
+                        _ = self.fengs[host]
+                        self.logger.debug("Expecting data from Ant {}, Pol {} from host {} input {}"
+                                          .format(ant, pol, host, chan))
+                    except KeyError:
+                        # If the entry is set to a bogus hostname I suppose.
+                        self.logger.warning("Failed to find F-Eng {} associated with ant/pol {}/{}"
+                                            .format(polval['host'], ant, pol))
+                else:
+                    self.logger.warning("Failed to find F-Eng {} associated with ant/pol {}/{}"
+                                        .format(polval['host'], ant, pol))
 
     def get_fft_of(self, host, stream):
         """
