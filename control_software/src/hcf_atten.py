@@ -46,7 +46,7 @@ class Attenuator(HeraCorrelator):
     def show_metadata(self):
         print(json.dumps(self.atten_metadata, indent=4))
 
-    def get_current_state(self, update_from_redis=False):
+    def get_current_state(self, update_bad_from_redis=False):
         """
         Get the PAM attenuators and FEM switch state from redis and correlator.
 
@@ -55,13 +55,13 @@ class Attenuator(HeraCorrelator):
 
         It puts the information in self.antpols[ant, pol][*].   * = ['pam_atten', 'fem_switch']
         gives the attenuation and the FEM setting and is used as the current valid data.  If there
-        is no valid data from the SNAP and if update_from_redis is True, then the pam_atten and
-        fem_switch states from redis are used.  If no valid SNAP info and update_from_redis is
+        is no valid data from the SNAP and if update_bad_from_redis is True, then the pam_atten and
+        fem_switch states from redis are used.  If no valid SNAP info and update_bad_from_redis is
         False, then those states are marked as None.
 
         Parameter
         ---------
-        update_from_redis : bool
+        update_bad_from_redis : bool
             If error getting from correlator, use redis value.  Otherwise use None.
         """
         self.state_time = Time.now()
@@ -98,7 +98,7 @@ class Attenuator(HeraCorrelator):
                 except:  # noqa
                     self.outcome.get_state[err_type].add(outkey)
                     print("{:>3s}{} {} not found:".format(str(ant), pol, cval), end='  ')
-                    if update_from_redis:
+                    if update_bad_from_redis:
                         print('set to redis value:  {}'.format(antpol_redis[cval]))
                         self.antpols[ant, pol][cval] = antpol_redis[cval]
                     else:
