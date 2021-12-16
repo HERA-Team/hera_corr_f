@@ -46,7 +46,7 @@ class Attenuator(HeraCorrelator):
     def show_metadata(self):
         print(json.dumps(self.atten_metadata, indent=4))
 
-    def get_current_state(self, update_bad_from_redis=False):
+    def get_current_state(self, update_bad_from_redis=False, verbose=False):
         """
         Get the PAM attenuators and FEM switch state from redis and correlator.
 
@@ -97,12 +97,15 @@ class Attenuator(HeraCorrelator):
                     self.antpols[ant, pol][cval] = func(ant, pol)
                 except:  # noqa
                     self.outcome.get_state[err_type].add(outkey)
-                    print("{:>3s}{} {} not found:".format(str(ant), pol, cval), end='  ')
+                    if verbose:
+                        print("{:>3s}{} {} not found:".format(str(ant), pol, cval), end='  ')
                     if update_bad_from_redis:
-                        print('set to redis value:  {}'.format(antpol_redis[cval]))
+                        if verbose:
+                            print('set to redis value:  {}'.format(antpol_redis[cval]))
                         self.antpols[ant, pol][cval] = antpol_redis[cval]
                     else:
-                        print('set to None.')
+                        if verbose:
+                            print('set to None.')
                         self.antpols[ant, pol][cval] = None
                 if not self.antpols[ant, pol][cval] and not antpol_redis[cval]:
                     agree = True
@@ -112,14 +115,12 @@ class Attenuator(HeraCorrelator):
                     agree = self.antpols[ant, pol][cval] == antpol_redis[cval]
                 elif cval == 'pam_atten':
                     agree = int(self.antpols[ant, pol][cval]) == int(antpol_redis[cval])
-                else:
-                    print("{} not allowed.".format(cval))
-                    agree = False
                 if not agree:
                     self.outcome.get_state['disagree'].add(outkey)
-                    print("{:>3s}{} {} states disagree:".format(str(ant), pol, cval), end='  ')
-                    print("<redis = {}>".format(antpol_redis[cval]), end='  ')
-                    print("<corr = {}>".format(self.antpols[ant, pol][cval]))
+                    if verbose:
+                        print("{:>3s}{} {} states disagree:".format(str(ant), pol, cval), end='  ')
+                        print("<redis = {}>".format(antpol_redis[cval]), end='  ')
+                        print("<corr = {}>".format(self.antpols[ant, pol][cval]))
         self.loaded_sets.append('pam_atten')
         age = float(self.state_time.jd - self.auto_timestamp_jd)
         print("Age of autos are {:.1f} sec  =  {:.2f} hours  =  {:.2f} days."
