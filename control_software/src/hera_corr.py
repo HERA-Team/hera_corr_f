@@ -661,7 +661,7 @@ class HeraCorrelator(object):
         self.logger.info("Commanding (%s,%s) PAM atten=%s dB in redis" \
                          % (str(ant), pol, str(attenuation)))
         self.r.hmset("atten:ant:%s:%s" % (str(ant), pol),
-                     {"commmanded": str(attenuation),
+                     {"commanded": str(attenuation),
                       "command_time": time.time()}
         )
         if verify:
@@ -841,12 +841,13 @@ class HeraCorrelator(object):
         )
         return failed
 
-    def pam_initialize(self, host, verify=True):
+    def pam_initialize(self, host, default=8, verify=True):
         """
         Initialize PAM coefficients on specified host.
 
         Inputs:
             host (str): Host to target.
+            default (int): Default PAM attenuation value. Default: 8
             verify (bool): Check success.  Default: True
         """
         self.logger.info("Initializing PAMs on %s" % (host))
@@ -860,9 +861,19 @@ class HeraCorrelator(object):
             (ant_e, pol_e) = antpols[2*cnt + 1]
             atten_e, atten_n = None, None
             if ant_n is not None:
-                atten_n = self.lookup_pam_attenuation(ant_n, pol_n)
+                try:
+                    atten_n = self.lookup_pam_attenuation(ant_n, pol_n)
+                except(RuntimeError):
+                    self.logger.warn("(%d,%s) PAM Attenuation not in redis. Setting to default." % (ant_n, pol_n))
+                    self.store_pam_attenuation(ant_n, pol_n, default)
+                    atten_n = default
             if ant_e is not None:
-                atten_e = self.lookup_pam_attenuation(ant_e, pol_e)
+                try:
+                    atten_e = self.lookup_pam_attenuation(ant_e, pol_e)
+                except(RuntimeError):
+                    self.logger.warn("(%d,%s) PAM Attenuation not in redis. Setting to default." % (ant_e, pol_e))
+                    self.store_pam_attenuation(ant_e, pol_e, default)
+                    atten_e = default
             if atten_e is None and atten_n is None:
                 continue
             try:
@@ -874,13 +885,14 @@ class HeraCorrelator(object):
             raise RuntimeError('Failed to initialize PAMs on %s: %s' % (
                 host, ','.join(['%d=(%s%s/%s%s)' % f for f in failed])))
 
-    def initialize_pams(self, hosts=None, verify=True,
+    def initialize_pams(self, hosts=None, default=8, verify=True,
                         multithread=False, timeout=300.):
         """
         Initialize PAM coefficients.
 
         Inputs:
             hosts (list): List of hosts to target. Default: all
+            default (int): Default PAM attenuation value. Default: 8
             verify (bool): Check success.  Default: True
             multithread (bool): Multithread across hosts. Default: True
             timeout (float): Timeout in seconds for multithreading.
@@ -890,7 +902,7 @@ class HeraCorrelator(object):
         failed = self._call_on_hosts(
                             target=self.pam_initialize,
                             args=(),
-                            kwargs={'verify': verify},
+                            kwargs={'verify': verify, 'default':default},
                             hosts=hosts,
                             multithread=multithread,
                             timeout=timeout
