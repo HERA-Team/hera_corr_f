@@ -180,8 +180,7 @@ class HeraCorrelator(object):
                                 % (target.__name__, ','.join(failed)))
         return failed
 
-    def connect_fengs(self, hosts=None,
-                          multithread=False, timeout=300.):
+    def connect_fengs(self, hosts=None, multithread=False, timeout=300.):
         """
         Connect to SNAP boards listed in the current configuration.
 
@@ -196,7 +195,7 @@ class HeraCorrelator(object):
         if hosts is None:
             # in this one cose, get list direct from config
             hosts = [host for host in self.config['fengines']
-                        if not host in self.fengs]
+                     if host not in self.fengs]
         failed = self._call_on_hosts(
                             target=self.feng_connect,
                             args=(),
@@ -226,7 +225,7 @@ class HeraCorrelator(object):
         self._progfile = progfile
 
     def feng_program(self, host, progfile=None, force=False,
-                        verify=True, timeout=10):
+                     verify=True, timeout=10):
         """
         Program F-Engine on specified host.
 
@@ -369,7 +368,6 @@ class HeraCorrelator(object):
         #        'timestamp', 'uptime', 'pps_count', 'serial']
         stats = self.r.hgetall('status:snap:%s' % host)
         return stats
-
 
     def get_redis_status_fengs(self, hosts=None):
         """
