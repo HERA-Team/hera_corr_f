@@ -108,7 +108,7 @@ if __name__ == "__main__":
                 snap_rf_stats["eq_coeffs"] = corr.get_eq_coeff(host, stream)
                 snap_rf_stats["fft_of"] = corr.get_fft_of(host, stream)
                 snap_rf_stats["histogram"] = adc_stats[this_pol]['histogram']
-                snap_rf_stats = corr.validate_redis_dict(snap_rf_stats)
+                snap_rf_stats = hcf_snap_reporter.validate_redis_dict(snap_rf_stats)
 
                 snaprf_status_redis_key = "status:snaprf:{}:{}".format(host, stream)
                 corr.r.hmset(snaprf_status_redis_key, snap_rf_stats)
@@ -128,7 +128,7 @@ if __name__ == "__main__":
                     ant_status[val] = adc_stats[this_pol][val.split('_')[-1]]
                 ant_status.update(corr.get_pam_stats(host, stream, pol))
                 ant_status.update(corr.get_fem_stats(host, stream))
-                ant_status = corr.validate_redis_dict(ant_status)
+                ant_status = hcf_snap_reporter.validate_redis_dict(ant_status)
                 ant_status_redis_key = "status:ant:{:d}:{:s}".format(ant, pol)
                 corr.r.hmset(ant_status_redis_key, ant_status)
 
