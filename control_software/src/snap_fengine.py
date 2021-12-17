@@ -338,7 +338,7 @@ class SnapFengine(object):
             for key, val in fem.get_status().items():
                 status["fem%d_" % (i) + key] = val
         # fft overflow status
-        rf_stats['fft_overflow'] = self.pfb.is_overflowing()
+        status['fft_overflow'] = self.pfb.is_overflowing()
         self.pfb.rst_stats() # clear pfb overflow flag for next time
         # add adc snapshot statistics
         status.update(self.input.get_status())
