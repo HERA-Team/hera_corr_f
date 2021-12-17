@@ -26,8 +26,6 @@ if __name__ == "__main__":
                         help='Seconds between reconnection attempts to dead boards')
     parser.add_argument('-l', dest='loglevel', type=str, default="INFO",
                         help='Log level. DEBUG / INFO / WARNING / ERROR')
-    parser.add_argument('--noredistapcp', action='store_true',
-                        help='Don\'t use the redis-based SNAP comms protocol')
     args = parser.parse_args()
 
     if args.loglevel not in ["DEBUG", "INFO", "WARNING", "ERROR"]:
@@ -37,7 +35,6 @@ if __name__ == "__main__":
             handler.setLevel(getattr(logging, args.loglevel))
 
     corr = hcf_snap_reporter.SnapReporter(redishost=args.redishost,
-                                          redis_transport=(not args.noredistapcp),
                                           block_monitoring=False,
                                           logger=logger)
     upload_time = corr.r.hget('snap_configuration', 'upload_time')
