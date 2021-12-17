@@ -329,6 +329,22 @@ class SnapFengine(object):
         status['uptime'] = self.sync.uptime()
         status['pps_count'] = self.sync.count()
         status['serial'] = self.serial
+        # populate pam status
+        for i,pam in enumerate(self.pams):
+            for key, val in pam.get_status().items():
+                status["pam%d_" (i) + key] = val
+        # populate fem status
+        for i,fem in enumerate(self.fems):
+            for key, val in fem.get_status().items():
+                status["fem%d_" (i) + key] = val
+        # fft overflow status
+        rf_stats['fft_overflow'] = self.pfb.is_overflowing()
+        self.pfb.rst_stats() # clear pfb overflow flag for next time
+        # add adc snapshot statistics
+        status.update(self.input.get_status())
+        # add autocorrelation from on-board correlator
+        for stream in range(self.input.ninputs):
+            status['stream%d_autocorr' % stream] = self.corr.get_new_corr(stream, stream)
         return status
 
 #    def get_pam_atten_by_target(self, chan, target_pow=None,
