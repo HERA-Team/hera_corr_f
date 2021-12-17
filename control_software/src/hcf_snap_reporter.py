@@ -9,6 +9,7 @@ POL_NAME_FROM_CHAR = {"e": "east", "n": "north"}
 BINS = arange(-128, 128)
 
 
+# XXX why?
 class Lager:
     """
     This spoofs the logger if None is supplied.
@@ -20,6 +21,7 @@ class Lager:
         print(msg.strip().strip(self.strip))
 
 
+# XXX is this used?
 def validate_redis_dict(in_dict, recursion_depth=1):
     if recursion_depth == sys.getrecursionlimit():
         raise RuntimeError("Max Recursion reached during dictionary validation.")
@@ -45,6 +47,7 @@ def validate_redis_dict(in_dict, recursion_depth=1):
 
 
 class SnapReporter(HeraCorrelator):
+    # XXX not handling HeraCorrelator input list
     def __init__(self, redishost='redishost',
                  redis_transport=True,
                  block_monitoring=False,
@@ -78,7 +81,7 @@ class SnapReporter(HeraCorrelator):
 
     def get_fft_of(self, host, stream):
         """
-        Get fft_off given hostname and stream.
+        Get fft_of given hostname and stream.
 
         Parameters
         ----------
@@ -116,6 +119,7 @@ class SnapReporter(HeraCorrelator):
                 exc_info=True,
             )
 
+    # XXX can these reporters be built in at lower level?
     def get_eq_coeff(self, host, stream):
         """
         Get eq_coeff for the given hostname and stream.
@@ -144,6 +148,7 @@ class SnapReporter(HeraCorrelator):
             eq_coeffs = None
         return eq_coeffs
 
+    # XXX can these reporters be built in at lower level?
     def get_auto(self, host, stream):
         """
         Get autocorrelation for the given hostname and stream.
@@ -172,6 +177,7 @@ class SnapReporter(HeraCorrelator):
             autocorrelation = None
         return autocorrelation
 
+    # XXX can these reporters be built in at lower level?
     def get_adc_stats(self, host, stream):
         """
         Get PAM stats for the given hostname and stream.
@@ -216,6 +222,7 @@ class SnapReporter(HeraCorrelator):
                 rv[pol]['rms'] = None
         return rv
 
+    # XXX can these reporters be built in at lower level?
     def get_pam_stats(self, host, stream, pol):
         """
         Get PAM stats for the given hostname and stream.
@@ -293,6 +300,7 @@ class SnapReporter(HeraCorrelator):
             rv["pam_id"] = None
         return rv
 
+    # XXX can these reporters be built in at lower level?
     def get_fem_stats(self, host, stream):
         """
         Get FEM stats for the given hostname and stream.
