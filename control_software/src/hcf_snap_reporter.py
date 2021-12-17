@@ -49,11 +49,9 @@ def validate_redis_dict(in_dict, recursion_depth=1):
 class SnapReporter(HeraCorrelator):
     # XXX not handling HeraCorrelator input list
     def __init__(self, redishost='redishost',
-                 redis_transport=True,
                  block_monitoring=False,
                  logger=None):
         super(SnapReporter, self).__init__(redishost=redishost,
-                                           redis_transport=redis_transport,
                                            block_monitoring=block_monitoring)
         if logger is None:
             self.logger = Lager()
@@ -165,7 +163,7 @@ class SnapReporter(HeraCorrelator):
         Dictionary of autocorrelation.
         """
         try:
-            autocorrelation = self.fengs[host].get_new_corr(stream, stream)
+            autocorrelation = self.fengs[host].corr.get_new_corr(stream, stream)
             autocorrelation = json.dumps(autocorrelation.real.tolist())
         except:  # noqa
             self.logger.info(
