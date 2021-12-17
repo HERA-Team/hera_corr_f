@@ -18,13 +18,13 @@ ap.add_argument('--set-atten', dest='set_atten', help="Flag to actually set atte
 ap.add_argument('--log-values', dest='log_values', default=None,
                 choices=[None, 'antenna', 'load', 'noise', 'all', 'None'],
                 help="Flag to log current switch/values to redis.")
-ap.add_argument('--update-from-redis', dest='update_from_redis', action='store_true',
+ap.add_argument('--update-bad-from-redis', dest='update_bad_from_redis', action='store_true',
                 help='Flag to update info from corr with redis values.')
 args = ap.parse_args()
 
 atten = hcf_atten.Attenuator()
 
-atten.get_current_state(update_from_redis=args.update_from_redis)
+atten.get_current_state(update_bad_from_redis=args.update_bad_from_redis)
 
 if args.set == 'calc':
     atten.calc_equalization(cf=args.cf, bw=args.bw, target_pwr=args.target_pwr,

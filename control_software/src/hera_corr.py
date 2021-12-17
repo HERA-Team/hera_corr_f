@@ -13,7 +13,6 @@ from Queue import Queue
 from threading import Thread
 from hera_corr_f import SnapFengine
 import numpy as np
-from casperfpga import utils
 
 LOGGER = add_default_log_handlers(logging.getLogger(__name__))
 TEMP_BITSTREAM_STORE = "/tmp/"  # location to store bitfiles from redis
@@ -150,12 +149,13 @@ class HeraCorrelator(object):
             timeout (float): Timeout in seconds for thread call.
         '''
         q = Queue()
+
         def wrap_target(host, args, kwargs):
             '''Wrapper to capture target output and exceptions.'''
             try:
                 # Automatically puts host as first argument
                 val = target(host, *args, **kwargs)
-                q.put((host,val))
+                q.put((host, val))
             except(RuntimeError, AssertionError) as e:
                 self.logger.warning('%s: %s' % (host, e.message))
         threads = {host: Thread(
@@ -170,18 +170,17 @@ class HeraCorrelator(object):
             if not multithread:
                 thread.join(timeout)
         if multithread:
-            for host,thread in threads.items():
+            for host, thread in threads.items():
                 thread.join(timeout)
             # XXX think about killing live threads
         successes = set([q.get()[0] for i in range(q.qsize())])
-        failed = [host for host in hosts if not host in successes]
+        failed = [host for host in hosts if host not in successes]
         if len(failed) > 0:
             self.logger.warning('Call %s failed on: %s'
                                 % (target.__name__, ','.join(failed)))
         return failed
 
-    def connect_fengs(self, hosts=None,
-                          multithread=False, timeout=300.):
+    def connect_fengs(self, hosts=None, multithread=False, timeout=300.):
         """
         Connect to SNAP boards listed in the current configuration.
 
@@ -194,9 +193,9 @@ class HeraCorrelator(object):
         # Instantiate CasperFpga connections to all the F-Engine.
 
         if hosts is None:
-            # in this one cose, get list direct from config
+            # in this one case, get list direct from config
             hosts = [host for host in self.config['fengines']
-                        if not host in self.fengs]
+                     if host not in self.fengs]
         failed = self._call_on_hosts(
                             target=self.feng_connect,
                             args=(),
@@ -226,7 +225,7 @@ class HeraCorrelator(object):
         self._progfile = progfile
 
     def feng_program(self, host, progfile=None, force=False,
-                        verify=True, timeout=10):
+                     verify=True, timeout=10):
         """
         Program F-Engine on specified host.
 
@@ -364,12 +363,8 @@ class HeraCorrelator(object):
         Inputs:
             host (str): Host to target.
         """
-        #keys = ['is_programmed', 'version', 'adc_is_configured',
-        #        'is_initialized', 'dest_is_configured', 'temp',
-        #        'timestamp', 'uptime', 'pps_count', 'serial']
         stats = self.r.hgetall('status:snap:%s' % host)
         return stats
-
 
     def get_redis_status_fengs(self, hosts=None):
         """
