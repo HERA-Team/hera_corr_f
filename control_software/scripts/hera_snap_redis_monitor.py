@@ -7,32 +7,12 @@ import argparse
 from os import path as op
 from datetime import datetime
 
-from hera_corr_f import HeraCorrelator, __version__, __package__
-from hera_corr_f import hcf_util as hcfu
+from hera_corr_f import __version__, __package__
+from hera_corr_f import hcf_snap_reporter
 from hera_corr_cm.handlers import add_default_log_handlers
 
 logger = add_default_log_handlers(logging.getLogger(__file__))
 hostname = socket.gethostname()
-
-
-def print_ant_log_messages(corr):
-    for ant, antval in corr.ant_to_snap.iteritems():
-        for pol, polval in antval.iteritems():
-            # Skip if the antenna is associated with a board we can't reach
-            if polval['host'] is not None:
-                host = polval['host']
-                chan = polval['channel']
-                try:
-                    _ = corr.fengs[host]
-                    logger.debug("Expecting data from Ant {}, Pol {} from host {} input {}"
-                                 .format(ant, pol, host, chan))
-                except KeyError:
-                    # If the entry is set to a bogus hostname I suppose.
-                    logger.warning("Failed to find F-Engine {} associated with ant/pol {}/{}"
-                                   .format(polval['host'], ant, pol))
-            else:
-                logger.warning("Failed to find F-Engine {} associated with ant/pol {}/{}"
-                               .format(polval['host'], ant, pol))
 
 
 if __name__ == "__main__":
@@ -42,8 +22,6 @@ if __name__ == "__main__":
                         help='Host servicing redis requests')
     parser.add_argument('-d', dest='delay', type=float, default=10.0,
                         help='Seconds between polling loops')
-    parser.add_argument('-c', dest='poco', action='store_true', default=False,
-                        help='Upload pocket correlator output to redis')
     parser.add_argument('-D', dest='retrytime', type=float, default=300.0,
                         help='Seconds between reconnection attempts to dead boards')
     parser.add_argument('-l', dest='loglevel', type=str, default="INFO",
@@ -58,10 +36,12 @@ if __name__ == "__main__":
         for handler in logger.handlers:
             handler.setLevel(getattr(logging, args.loglevel))
 
-    corr = HeraCorrelator(redishost=args.redishost, redis_transport=(not args.noredistapcp),
-                          block_monitoring=False)
+    corr = hcf_snap_reporter.SnapReporter(redishost=args.redishost,
+                                          redis_transport=(not args.noredistapcp),
+                                          block_monitoring=False,
+                                          logger=logger)
     upload_time = corr.r.hget('snap_configuration', 'upload_time')
-    print_ant_log_messages(corr)
+    corr.print_ant_log_messages()
 
     retry_tick = time.time()
     script_redis_key = "status:script:{:s}:{:s}".format(hostname, __file__)
@@ -85,9 +65,11 @@ if __name__ == "__main__":
         if corr.r.hget('snap_configuration', 'upload_time') != upload_time:
             upload_time = corr.r.hget('snap_configuration', 'upload_time')
             logger.info('New configuration detected. Reinitializing fengine list')
-            corr = HeraCorrelator(redishost=args.redishost, use_redis=(not args.noredistapcp),
-                                  block_monitoring=False)
-            print_ant_log_messages(corr)
+            corr = hcf_snap_reporter.SnapReporter(redishost=args.redishost,
+                                                  redis_transport=(not args.noredistapcp),
+                                                  block_monitoring=False,
+                                                  logger=logger)
+            corr.print_ant_log_messages()
 
         # Recompute the hookup every time. It's fast
         corr._hookup_from_redis()
@@ -112,7 +94,7 @@ if __name__ == "__main__":
                     continue
                 if stream % 2 == 0:
                     # adc_stats returns both polarizations, so only read every other
-                    adc_stats = hcfu.get_adc_stats(corr, host, stream, logger)
+                    adc_stats = corr.get_adc_stats(host, stream)
                     this_pol = 'x'
                 else:
                     this_pol = 'y'
@@ -120,11 +102,11 @@ if __name__ == "__main__":
                 # Build snap_rf_stats and add to redis
                 snap_rf_stats = {}
                 snap_rf_stats["timestamp"] = datetime.now().isoformat()
-                snap_rf_stats["autocorrelation"] = hcfu.get_auto(corr, host, stream, logger)
-                snap_rf_stats["eq_coeffs"] = hcfu.get_eq_coeff(corr, host, stream, logger)
-                snap_rf_stats["fft_of"] = hcfu.get_fft_of(corr, host, stream, logger)
+                snap_rf_stats["autocorrelation"] = corr.get_auto(host, stream)
+                snap_rf_stats["eq_coeffs"] = corr.get_eq_coeff(host, stream)
+                snap_rf_stats["fft_of"] = corr.get_fft_of(host, stream)
                 snap_rf_stats["histogram"] = adc_stats[this_pol]['histogram']
-                snap_rf_stats = hcfu.validate_redis_dict(snap_rf_stats)
+                snap_rf_stats = hcf_snap_reporter.validate_redis_dict(snap_rf_stats)
 
                 snaprf_status_redis_key = "status:snaprf:{}:{}".format(host, stream)
                 corr.r.hmset(snaprf_status_redis_key, snap_rf_stats)
@@ -142,9 +124,9 @@ if __name__ == "__main__":
                     ant_status[val] = snap_rf_stats[val]
                 for val in ['adc_mean', 'adc_power', 'adc_rms', 'histogram']:
                     ant_status[val] = adc_stats[this_pol][val.split('_')[-1]]
-                ant_status.update(hcfu.get_pam_stats(corr, host, stream, pol, logger))
-                ant_status.update(hcfu.get_fem_stats(corr, host, stream, logger))
-                ant_status = hcfu.validate_redis_dict(ant_status)
+                ant_status.update(corr.get_pam_stats(host, stream, pol))
+                ant_status.update(corr.get_fem_stats(host, stream))
+                ant_status = hcf_snap_reporter.validate_redis_dict(ant_status)
                 ant_status_redis_key = "status:ant:{:d}:{:s}".format(ant, pol)
                 corr.r.hmset(ant_status_redis_key, ant_status)
 
