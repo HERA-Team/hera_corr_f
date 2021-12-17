@@ -717,7 +717,7 @@ class Input(Block):
         for stream in range(self.ninput_mux_streams):
             snapshots[2*stream], snapshots[2*stream+1] = self.get_adc_snapshot(stream)
         for stream,snapshot in snapshots.items():
-            rv['stream%d_hist' % stream] = np.histogram(snapshot, bins=HIST_BINS)
+            rv['stream%d_hist' % stream] = np.histogram(snapshot, bins=HIST_BINS)[0]
             rv['stream%d_mean' % stream] = np.mean(snapshot)
             pwr = np.mean(np.abs(snapshot)**2)
             rv['stream%d_power' % stream] = pwr
