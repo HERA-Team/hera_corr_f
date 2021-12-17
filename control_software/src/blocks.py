@@ -714,7 +714,7 @@ class Input(Block):
         '''Return dict of current status.'''
         rv = {}
         snapshots = {}
-        for stream in range(self.ninput_mux_streams):
+        for stream in range(self.ninput_mux_streams//2): # bram holds stream and stream+1
             snapshots[2*stream], snapshots[2*stream+1] = self.get_adc_snapshot(stream)
         for stream,snapshot in snapshots.items():
             rv['stream%d_hist' % stream] = np.histogram(snapshot, bins=HIST_BINS)[0]
