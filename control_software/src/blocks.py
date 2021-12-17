@@ -2184,9 +2184,9 @@ class Fem(Block):
         rv["e_lna_power"] = east
         rv["n_lna_power"] = north
         rv["temp"] = self.temperature()
-        rv["voltage"] = fem.shunt("u")
-        rv["current"] = fem.shunt("i")
-        rv["id"] = fem.id()
+        rv["voltage"] = self.shunt("u")
+        rv["current"] = self.shunt("i")
+        rv["id"] = self.id()
         theta, phi = self.imu()
         rv["imu_theta"] = theta
         rv["imu_phi"] = phi
