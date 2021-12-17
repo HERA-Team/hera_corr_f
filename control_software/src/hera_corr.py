@@ -536,15 +536,17 @@ class HeraCorrelator(object):
         feng = self.fengs[host]
         feng.set_input(source, seed=seed, stream=stream, verify=verify)
 
-    def set_input_fengs(self, hosts=None, source='adc', seed='same', verify=True):
+    def set_input_fengs(self, hosts=None, source='adc', seed='same',
+                        manual_sync=False, verify=True):
         """
-        Set F-Engine Inputs to ADC or digital noise.
+        Set F-Engine Inputs to ADC or digital noise and then sync the noises.
 
         Inputs:
             host (str): Host to target.
             source (str): Either 'adc' or 'noise'.
             seed (str): If 'same', use same seed for all, otherwise different.
             stream (int): Which stream to switch. If None, switch all.
+            manual_sync (bool): Sync noises manually. Default False.
             verify (bool): Verify configuration. Default True.
         """
         if hosts is None:
@@ -574,6 +576,7 @@ class HeraCorrelator(object):
                                         (host, cnt))
                     # only logging failures at resolution of host
                     failed.append(host)
+        self.sync_noise(manual=manual_sync) # necessary to make seeds "take"
         return set(failed) # only return unique hosts
 
 
@@ -1208,34 +1211,37 @@ class HeraCorrelator(object):
         self.r['corr:feng_sync_time_str'] = time.ctime(sync_time)
         self.r['feng:sync_time'] = sync_time # in UTC seconds
 
-    def sync_noise(self, manual=False, maxtime=0.8):
+    def sync_noise(self, manual=False, hosts=None, maxtime=0.8):
         """
         Synchronize internal noise generators to PPS.
 
         Inputs:
             manual (bool): synchronize to software trigger instead of
                 external PPS. Default: False
+            hosts (list): List of hosts to target. Default: all
             maxtime (float): Max seconds to wait for a sync. Default: 0.8
         """
         self.logger.info('Synchronizing noise generators')
+        hosts = self.get_feng_hostnames(hosts=hosts)
         if not manual:
             self.logger.info('Waiting for PPS (t=%.2f)' % time.time())
             self.fengs.values()[0].sync.wait_for_sync()
         start = time.time()
         self.logger.info('Sync passed (t=%.2f)' % (start))
-        for feng in self.fengs:
-            feng.sync.arm_noise()
-        sync_time = time.time() - start
+        for host in hosts:
+            self.fengs[host].sync.arm_noise()
+        elapsed_time = time.time() - start
         if not manual:
-            if sync_time > maxtime:
+            if elapsed_time > maxtime:
                 raise RuntimeError("Sync time (%.2f) > maximum (%.2f)" %
-                                   (sync_time, maxtime))
+                                   (elapsed_time, maxtime))
         else:
             self.logger.warning('Using manual sync trigger')
             for i in range(3):  # takes 3 syncs to trigger
-                for feng in self.fengs:
-                    feng.sync.sw_sync()
+                for host in hosts:
+                    self.fengs[host].sync.sw_sync()
             sync_time = int(time.time())  # roughly  # noqa
+
         after_sync = time.time()
         self.logger.info('Synchronized in %.2f seconds' %
                          (after_sync - start))
