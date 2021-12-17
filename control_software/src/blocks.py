@@ -719,8 +719,9 @@ class Input(Block):
         for stream,snapshot in snapshots.items():
             rv['stream%d_hist' % stream] = np.histogram(snapshot, bins=HIST_BINS)
             rv['stream%d_mean' % stream] = np.mean(snapshot)
-            rv['stream%d_power' % stream] = np.mean(np.abs(snapshot)**2)
-            rv['stream%d_rms' % stream] = np.sqrt(rv['power'])
+            pwr = np.mean(np.abs(snapshot)**2)
+            rv['stream%d_power' % stream] = pwr
+            rv['stream%d_rms' % stream] = np.sqrt(pwr)
         return rv
 
     def get_adc_snapshot(self, antenna):
