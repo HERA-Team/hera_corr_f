@@ -27,6 +27,12 @@ def descriptor(**kwargs):
 
 
 class Attenuator(HeraCorrelator):
+    """
+    This adds methods on top of HeraCorrelator to get and set pam attenuators.
+
+    Defines pam attenuation sets or "patsets" as pam attenuation settings per antpol
+    and stored in redis.
+    """
     def __init__(self):
         super(Attenuator, self).__init__()
         self.antpols = {}
@@ -38,13 +44,13 @@ class Attenuator(HeraCorrelator):
         self.state_time = None
         self.calc_time = None
         self.N_antpols = len(self.antpols)
-        self.atten_metadata = json.loads(self.r.hget('atten:set', 'metadata'))
-        self.sets_in_redis = list(self.atten_metadata['sets'].keys())
-        self.loaded_sets = []
+        self.patset_metadata = json.loads(self.r.hget('atten:set', 'metadata'))
+        self.patsets_in_redis = list(self.patset_metadata['sets'].keys())
+        self.loaded_patsets = []
         self.outcome = Namespace()
 
-    def show_metadata(self):
-        print(json.dumps(self.atten_metadata, indent=4))
+    def show_set_metadata(self):
+        print(json.dumps(self.patset_metadata, indent=4))
 
     def get_current_state(self, update_bad_from_redis=False, verbose=False):
         """
@@ -75,7 +81,7 @@ class Attenuator(HeraCorrelator):
         for ant, pol in self.antpols:
             outkey = '{}{}'.format(ant, pol)
 
-            # Stuff from redis (use to check)
+            # Status from redis (use to check)
             antpol_redis = {}
             rkey = 'status:ant:{}:{}'.format(ant, pol)
             for cval in chkap:
@@ -85,7 +91,7 @@ class Attenuator(HeraCorrelator):
                 antpol_redis[cval] = this_val
             rkey = 'auto:{}{}'.format(ant, pol)
             try:
-                self.antpols[ant, pol]['auto'] = np.frombuffer(self.r_bytes.get(rkey), np.float32)  # noqa
+                self.antpols[ant, pol]['auto'] = np.frombuffer(self.r_bytes.get(rkey), np.float32)
             except:  # noqa
                 self.antpols[ant, pol]['auto'] = None
                 self.outcome.get_state['redis_auto_err'].add(outkey)
@@ -121,7 +127,7 @@ class Attenuator(HeraCorrelator):
                         print("{:>3s}{} {} states disagree:".format(str(ant), pol, cval), end='  ')
                         print("<redis = {}>".format(antpol_redis[cval]), end='  ')
                         print("<corr = {}>".format(self.antpols[ant, pol][cval]))
-        self.loaded_sets.append('pam_atten')
+        self.loaded_patsets.append('pam_atten')
         age = float(self.state_time.jd - self.auto_timestamp_jd)
         print("Age of autos are {:.1f} sec  =  {:.2f} hours  =  {:.2f} days."
               .format(age * 3600.0 * 24.0, age * 24.0, age))
@@ -129,7 +135,8 @@ class Attenuator(HeraCorrelator):
         for key, val in self.outcome.get_state.items():
             print("\t{}:  {}".format(key, len(val)))
 
-    def calc_equalization(self, cf=168.0, bw=8.0, target_pwr=75.0, default_atten=5.0, verbose=True):
+    def calc_equalization(self, cf=168.0, bw=8.0,
+                          target_power=75.0, default_atten=8.0, verbose=False):
         """
         Calculates all of the equalization attenuations.
 
@@ -151,7 +158,6 @@ class Attenuator(HeraCorrelator):
         if self.state_time is None:
             print('Skipping - must get_current_state first')
             return
-        self.loaded_sets.append('calc')
         self.calc_time = Time.now()
         ctjd = self.calc_time.jd
         dchan = (Parameters.fq1 - Parameters.fq0) / Parameters.nchan
@@ -159,7 +165,7 @@ class Attenuator(HeraCorrelator):
         ch1 = np.around((cf+bw/2) / dchan).astype(int)
         print('Calculating equalization using {:.1f} - {:.1f} MHz  ({} - {})'.
               format((cf-bw/2.0), (cf+bw/2.0), ch0, ch1))
-        print('\tTarget power {}'.format(target_pwr))
+        print('\tTarget power {}'.format(target_power))
         print('\tAuto timestamp {:.2f} s ago'.format((ctjd - self.auto_timestamp_jd) * 24.0 * 3600))
         print('\tState loaded {:.2f} s ago'.format((ctjd - self.state_time.jd) * 24.0 * 3600))
 
@@ -174,44 +180,44 @@ class Attenuator(HeraCorrelator):
                 set_val = default_atten
             else:
                 pwr = np.median(state['auto'][ch0:ch1])
-                gain_dB = np.around(10*np.log10(target_pwr / pwr)).astype(int)
+                gain_dB = np.around(10*np.log10(target_power / pwr)).astype(int)
                 set_val = np.array(state['pam_atten'] - gain_dB).clip(0, 15)
             self.antpols[ant, pol]['calc'] = set_val
             if verbose:
                 print("{:>3s}{}:  {}  {} -> {}"
                       .format(str(ant), pol, state['fem_switch'], state['pam_atten'], set_val))
-        self.loaded_sets.append('calc')
+        self.loaded_patsets.append('calc')
         print("Out of {} antpols:".format(self.N_antpols))
         for key, val in self.outcome.calc_eq.items():
             print("\t{}:  {}".format(key, len(val)))
 
-    def set_pam_attenuation(self, set_to='calc', retries=3):
+    def set_pam_attenuation(self, patset_to='calc', retries=3):
         """
-        Tries to set the pam attenuation to self.antpols[ant, pol][set_to].
+        Tries to set the pam attenuation to self.antpols[ant, pol][patset_to].
 
         Results are in dict self.outcome.set_pam.
 
         Parameters
         ----------
-        set_to : str
+        patset_to : str
             Values to use.
         retries : int
             Number of times to try before moving on to next antpol.
         """
-        if set_to not in self.loaded_sets:
-            print("Skipping - {} attenuation set not available.".format(set_to))
-            print("Should be one of {}".format(', '.join(self.loaded_sets)))
+        if patset_to not in self.loaded_patsets:
+            print("Skipping - {} attenuation set not available.".format(patset_to))
+            print("Should be one of {}".format(', '.join(self.loaded_patsets)))
             return
         self.outcome.set_pam = {'failed': set(), 'skipped': set(), 'same': set()}
         for (ant, pol), state in self.antpols.items():
-            if set_to not in state or state[set_to] is None:
+            if patset_to not in state or state[patset_to] is None:
                 self.outcome.set_pam['skipped'].add("{}{}".format(ant, pol))
-            elif state[set_to] == state['pam_atten']:
+            elif state[patset_to] == state['pam_atten']:
                 self.outcome.set_pam['same'].add("{}{}".format(ant, pol))
             else:
                 for i in range(retries):
                     try:
-                        self.set_pam_attenuation(ant, pol, state[set_to])
+                        self.set_pam_attenuation(ant, pol, state[patset_to])
                     except (RuntimeError, IOError, AssertionError):
                         print('Failure {} / {}, trying again'.format((i+1), retries))
                         continue
@@ -222,49 +228,51 @@ class Attenuator(HeraCorrelator):
         for key, val in self.outcome.set_pam.items():
             print("\t{}:  {}".format(key, len(val)))
 
-    def load_atten_sets(self, set_to='calc:antenna'):
+    def load_patset(self, patset_to='calc:antenna'):
         """
-        Pull attenuation values from redis as set.antpols[ant, pol][set_to] options.
+        Pull attenuation values from redis as set.antpols[ant, pol][patset_to] options.
 
-        These sets are generally put into redis via the handle_atten_sets method.
+        These sets are generally put into redis via the handle_patsets method.
 
         Parameter
         ---------
-        set_to : str
+        patset_to : str
             One of the valis sets in redis to use.
         """
-        if set_to not in self.sets_in_redis:
-            print("Skipping - {} attenuation set not available.".format(set_to))
-            print("Should be one of {}".format(', '.join(self.sets_in_redis)))
+        if patset_to not in self.patsets_in_redis:
+            print("Skipping - {} attenuation set not available.".format(patset_to))
+            print("Should be one of {}".format(', '.join(self.patsets_in_redis)))
             return
-        print("Loading from redis:  {} - {}".format(set_to, self.atten_metadata['sets'][set_to]))
+        print("Loading from redis:  {} - {}"
+              .format(patset_to, self.patset_metadata['sets'][patset_to]))
         self.outcome.get_redis = {'found': set()}
         for (ant, pol) in self.antpols:
             rkey = "atten:set:{}{}".format(ant, pol)
             try:
-                self.antpols[ant, pol][set_to] = float(self.r.hget(rkey, set_to))
+                self.antpols[ant, pol][patset_to] = float(self.r.hget(rkey, patset_to))
                 self.outcome.get_redis['found'].add("{}{}".format(ant, pol))
             except ValueError:
-                self.antpols[ant, pol][set_to] = None
-        self.loaded_sets.append(set_to)
+                self.antpols[ant, pol][patset_to] = None
+        self.loaded_patsets.append(patset_to)
         print("Found {} of {} for set {}"
-              .format(len(self.outcome.get_redis['found']), self.N_antpols, set_to))
+              .format(len(self.outcome.get_redis['found']), self.N_antpols, patset_to))
 
     def test_recent_settings(self):
         """
         allow for a loop back test to check success rate.
         """
+        pass
 
-    def purge_redis_set(self, keys):
+    def purge_patset_in_redis(self, keys):
         """
         Purge all of an atten set in redis.
         """
         for (ant, pol) in self.antpols:
             rkey = "atten:set:{}{}".format(ant, pol)
-            for this_key in keys:
-                self.r.hdel(rkey, this_key)
+            for patset in keys:
+                self.r.hdel(rkey, patset)
 
-    def read_setfile(self, fname):
+    def read_patset_file(self, fname):
         """Read csv file for atten set."""
         fdata = {fname: {}}
         try:
@@ -278,82 +286,83 @@ class Attenuator(HeraCorrelator):
             return None, None
         return fdesc, fdata
 
-    def handle_atten_sets(self, set_class, set_name=None, purge=False, description=None):
+    def handle_patsets(self, patset_type, patset_name=None, purge=False, description=None):
         """
         Put atten values into redis and self.antpols[ant, pol][<key>]
 
         This will put attenuation values into redis AND self.antpols (so you don't also
-        have to self.load_atten_values_from_redis) with various options based on set_class/set_name:
-            If set_class == 'current':  use values from 'self.get_current_state'
-                If set_name is None:  load to current fem_switch per antpol with "current:" prefix
-                If set_name in ['antenna', 'load', 'noise']:  load that fem_switch with "current:"
+        have to self.load_atten_values_from_redis) with various options based on
+        patset_type/patset_name:
+            If patset_type == 'current':  use values from 'self.get_current_state'
+                If patset_name is None: load to current fem_switch per antpol with "current:" prefix
+                If patset_name in ['antenna', 'load', 'noise']: load that fem_switch with "current:"
                  -> for both options above, <key> will be one of "current:"[antenna, load, noise]
-                Else: load values to set_name (include description)
-                 -> for option above, <key> will be set_name
+                Else: load values to patset_name (include description)
+                 -> for option above, <key> will be patset_name
                  ->                   metadata will contain description and switch settings
-            If set_class == 'calc':  use values as calculated in 'self.calc_equalization'
-                If set_name is None:  load to current fem_switch per antpol with "calc:" prefix
-                If set_name in [...]: load that fem_switch with "calc:" prefix
+            If patset_type == 'calc':  use values as calculated in 'self.calc_equalization'
+                If patset_name is None:  load to current fem_switch per antpol with "calc:" prefix
+                If patset_name in [...]: load that fem_switch with "calc:" prefix
                  -> for both options above, <key> will be one of calc:[...]
-                Else: load values to set_name (include description)
-                 -> for option above, <key> will be set_name
+                Else: load values to patset_name (include description)
+                 -> for option above, <key> will be patset_name
                  ->                   metadata will contain description and switch settings
-                 -> Note to override antenna, load, noise, use one of those as the set_name.
-            If set_class == 'file':  use values from csv file.
-                 set_name: name of file and used as <key>.  First line is description.
+                 -> Note to override antenna, load, noise, use one of those as the patset_name.
+            If patset_type == 'file':  use values from csv file.
+                 patset_name: name of file and used as <key>.  First line is description.
 
         Will purge old values of <key> in redis if purge==True.
 
-        These sets may be read from redis via the load_atten_sets method.
+        These sets may be read from redis via the load_patset method.
 
         Parameters
         ----------
 
         """
-        class_param = {'current':
-                       {'key': 'pam_atten', 'time': self.state_time, 'method': 'get_current_state'},
-                       'calc':
-                       {'key': 'calc', 'time': self.calc_time, 'method': 'calc_equalization'},
-                       'file':
-                       {'key': set_name, 'time': None, 'method': 'read_setfile'}
-                       }
+        patset_par = {'current':  # patset_type
+                      {'key': 'pam_atten', 'time': self.state_time, 'method': 'get_current_state'},
+                      'calc':     # patset_type
+                      {'key': 'calc', 'time': self.calc_time, 'method': 'calc_equalization'},
+                      'file':     # patset_type
+                      {'key': patset_name, 'time': None, 'method': 'read_patset_file'}
+                      }
         self.outcome.handle = {'updated': set(), 'float_err': set(), 'unknown_switch': set()}
         handle_time = Time.now()
         filedesc = None
 
-        # Get set info ([set_name], use_switch_state, the_data, filedesc)
-        if set_class in ['current', 'calc']:
-            if class_param[set_class]['time'] is None:
-                print('Skipping - must {} first'.format(class_param[set_class]['method']))
+        # Get set info ([patset_name], use_switch_state, the_data, filedesc)
+        if patset_type in ['current', 'calc']:
+            if patset_par[patset_type]['time'] is None:
+                print('Skipping - must {} first'.format(patset_par[patset_type]['method']))
                 return
-            if set_name is None:
-                set_name = ["{}:{}".format(set_class, x) for x in Parameters.switch_states]
+            if patset_name is None:
+                patset_name = ["{}:{}".format(patset_type, x) for x in Parameters.switch_states]
                 use_switch_state = True
-            elif set_name in Parameters.switch_states:
-                set_name = ["{}:{}".format(set_class, set_name)]
+            elif patset_name in Parameters.switch_states:
+                patset_name = ["{}:{}".format(patset_type, patset_name)]
                 use_switch_state = True
             else:
-                set_name = [set_name]
+                patset_name = [patset_name]
                 use_switch_state = False
             the_data = self.antpols
-        elif set_class == 'file':
-            filedesc, the_data = self.read_setfile(set_name)
+        elif patset_type == 'file':
+            filedesc, the_data = self.read_patset_file(patset_name)
             if the_data is None:
-                print("Skipping - {} not found".format(set_name))
+                print("Skipping - {} not found".format(patset_name))
                 return
-            set_name = [set_name]
+            patset_name = [patset_name]
             use_switch_state = False
         else:
-            print("Skipping - {} is invalid set_class.".format(set_class))
+            print("Skipping - {} is invalid patset_type.".format(patset_type))
             return
 
         if purge:  # Purge if desired
-            self.purge_redis_set(set_name)
+            self.purge_patset_in_redis(patset_name)
 
         # Copy to self.antpols and redis.
-        for this_set_name in set_name:
-            self.loaded_sets.append(this_set_name)
-            this_switch_set = this_set_name.split(':')[-1] if use_switch_state else 'useit'
+        for this_patset in patset_name:
+            self.loaded_patsets.append(this_patset)
+            this_switch_set = this_patset.split(':')[-1] if use_switch_state else 'useit'
             for (ant, pol), state in the_data.items():
                 if use_switch_state:
                     update = "{}{}-{}".format(ant, pol, this_switch_set)
@@ -365,24 +374,24 @@ class Attenuator(HeraCorrelator):
                     update = "{}{}".format(ant, pol)
                     this_switch_state = 'useit'
                 try:
-                    this_value = float(state[class_param[set_class]['key']])
+                    this_value = float(state[patset_par[patset_type]['key']])
                 except (ValueError, TypeError):
                     self.outcome.handle['float_err'].add(update)
                     continue
                 if this_switch_set == this_switch_state:
-                    self.antpols[ant, pol][this_set_name] = this_value
+                    self.antpols[ant, pol][this_patset] = this_value
                     rkey = "atten:set:{}{}".format(ant, pol)
-                    self.r.hset(rkey, this_set_name, this_value)
+                    self.r.hset(rkey, this_patset, this_value)
                     self.outcome.handle['updated'].add(update)
 
         # Write metadata
         description = descriptor(description=description, file_description=filedesc,
-                                 set_class=set_class, set_name=', '.join(set_name),
+                                 patset_type=patset_type, patset_name=', '.join(patset_name),
                                  purge=str(purge), time=handle_time.isot)
-        for this_set in set_name:
-            self.atten_metadata['sets'][this_set] = description
-        self.r.hset('atten:set', 'metadata', json.dumps(self.atten_metadata))
-        self.sets_in_redis = list(self.atten_metadata['sets'].keys())
+        for this_set in patset_name:
+            self.patset_metadata['sets'][this_set] = description
+        self.r.hset('atten:set', 'metadata', json.dumps(self.patset_metadata))
+        self.patsets_in_redis = list(self.patset_metadata['sets'].keys())
         print("Out of {} antpols:".format(self.N_antpols))
         for key, val in self.outcome.handle.items():
             print("\t{}:  {}".format(key, len(val)))
