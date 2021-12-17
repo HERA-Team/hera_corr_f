@@ -193,7 +193,7 @@ class HeraCorrelator(object):
         # Instantiate CasperFpga connections to all the F-Engine.
 
         if hosts is None:
-            # in this one cose, get list direct from config
+            # in this one case, get list direct from config
             hosts = [host for host in self.config['fengines']
                      if host not in self.fengs]
         failed = self._call_on_hosts(
@@ -363,9 +363,6 @@ class HeraCorrelator(object):
         Inputs:
             host (str): Host to target.
         """
-        #keys = ['is_programmed', 'version', 'adc_is_configured',
-        #        'is_initialized', 'dest_is_configured', 'temp',
-        #        'timestamp', 'uptime', 'pps_count', 'serial']
         stats = self.r.hgetall('status:snap:%s' % host)
         return stats
 
@@ -1241,10 +1238,7 @@ class HeraCorrelator(object):
                 for host in hosts:
                     self.fengs[host].sync.sw_sync()
             sync_time = int(time.time())  # roughly  # noqa
-
-        after_sync = time.time()
-        self.logger.info('Synchronized in %.2f seconds' %
-                         (after_sync - start))
+        self.logger.info('Synchronized noise.')
 
     def enable_eths(self, hosts=None, verify=True):
         """
