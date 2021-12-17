@@ -4,6 +4,7 @@ import numpy as np
 import time
 import datetime
 import casperfpga
+import socket
 from blocks import *
 
 # 'source_sel' register only on fpga only uses lowest 2 bits
