@@ -343,7 +343,7 @@ class SnapFengine(object):
         # add adc snapshot statistics
         status.update(self.input.get_status())
         # add autocorrelation from on-board correlator
-        for stream in range(self.input.ninputs):
+        for stream in range(self.input.nstreams):
             status['stream%d_autocorr' % stream] = self.corr.get_new_corr(stream, stream)
         return status
 
