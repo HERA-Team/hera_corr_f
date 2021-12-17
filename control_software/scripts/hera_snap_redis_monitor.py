@@ -22,8 +22,6 @@ if __name__ == "__main__":
                         help='Host servicing redis requests')
     parser.add_argument('-d', dest='delay', type=float, default=10.0,
                         help='Seconds between polling loops')
-    parser.add_argument('-c', dest='poco', action='store_true', default=False,
-                        help='Upload pocket correlator output to redis')
     parser.add_argument('-D', dest='retrytime', type=float, default=300.0,
                         help='Seconds between reconnection attempts to dead boards')
     parser.add_argument('-l', dest='loglevel', type=str, default="INFO",
