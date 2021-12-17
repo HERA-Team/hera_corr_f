@@ -332,11 +332,11 @@ class SnapFengine(object):
         # populate pam status
         for i,pam in enumerate(self.pams):
             for key, val in pam.get_status().items():
-                status["pam%d_" (i) + key] = val
+                status["pam%d_" % (i) + key] = val
         # populate fem status
         for i,fem in enumerate(self.fems):
             for key, val in fem.get_status().items():
-                status["fem%d_" (i) + key] = val
+                status["fem%d_" % (i) + key] = val
         # fft overflow status
         rf_stats['fft_overflow'] = self.pfb.is_overflowing()
         self.pfb.rst_stats() # clear pfb overflow flag for next time
