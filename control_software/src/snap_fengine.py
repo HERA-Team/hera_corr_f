@@ -2,6 +2,7 @@ import logging
 from hera_corr_cm.handlers import add_default_log_handlers
 import numpy as np
 import time
+import json
 import datetime
 import casperfpga
 import socket
@@ -14,6 +15,24 @@ ADC_ALIGNED_BIT = 14
 INITIALIZED_BIT = 15
 PAM_MAX = 15
 PAM_MIN = 0
+
+def _jsonify(val, cast=True):
+    if not cast:
+        return val
+    # make a few explicit type conversions to coerce non-redis
+    # compatible variables into redis.
+    if isinstance(val, bool):
+        # bools are compared using lambda x: x == "True" later
+        val = str(val)
+    elif isinstance(val, (list, tuple)):
+        val = json.dumps(val)
+    elif isinstance(val, np.ndarray):
+        val = json.dumps(val.tolist())
+    elif val is None:
+        # newer redis-py does not accept Nonetype, wrap in json.dumps
+        val = json.dumps(val)
+    return val
+
 
 
 class SnapFengine(object):
@@ -312,23 +331,41 @@ class SnapFengine(object):
         else:
             return inputs
 
-    def get_status(self):
+    def get_status(self, jsonify=False):
         '''Return dict of config status.'''
+        jsonify = lambda val: _jsonify(val, cast=jsonify)
         status = {}
         # High-level configuration status
-        status['is_programmed'] = str(int(self.is_programmed()))
-        status['sample_rate'] = str(self.adc.lmx.getFreq())
-        status['version'] = '%d.%d' % self.version()
-        status['adc_is_configured'] = str(int(self.adc_is_configured()))
-        status['is_initialized'] = str(int(self.is_initialized()))
-        status['dest_is_configured'] = str(int(self.dest_is_configured()))
-        status['input'] = ','.join(self.get_input())
+        status['is_programmed'] = jsonify(self.is_programmed())
+        status['sample_rate'] = jsonify(self.adc.lmx.getFreq())
+        status['version'] = jsonify('%d.%d' % self.version())
+        status['adc_is_configured'] = jsonify(self.adc_is_configured())
+        status['is_initialized'] = jsonify(self.is_initialized())
+        status['dest_is_configured'] = jsonify(self.dest_is_configured())
+        status['input'] = jsonify(','.join(self.get_input()))
         # Lower level stuff, deprecates get_fpga_stats
-        status['temp'] = self.fpga.transport.get_temp()
-        status['timestamp'] = datetime.datetime.now().isoformat()
-        status['uptime'] = self.sync.uptime()
-        status['pps_count'] = self.sync.count()
-        status['serial'] = self.serial
+        status['temp'] = jsonify(self.fpga.transport.get_temp())
+        status['timestamp'] = jsonify(datetime.datetime.now().isoformat())
+        status['uptime'] = jsonify(self.sync.uptime())
+        status['pps_count'] = jsonify(self.sync.count())
+        status['serial'] = jsonify(self.serial)
+        # populate pam status
+        for i,pam in enumerate(self.pams):
+            for key, val in pam.get_status().items():
+                status["pam%d_" % (i) + key] = jsonify(val)
+        # populate fem status
+        for i,fem in enumerate(self.fems):
+            for key, val in fem.get_status().items():
+                status["fem%d_" % (i) + key] = jsonify(val)
+        # fft overflow status
+        status['fft_overflow'] = jsonify(self.pfb.is_overflowing())
+        self.pfb.rst_stats() # clear pfb overflow flag for next time
+        # add adc snapshot statistics
+        for key, val in self.input.get_status().items():
+            status[key] = jsonify(val)
+        # add autocorrelation from on-board correlator
+        for stream in range(self.input.ninput_mux_streams):
+            status['stream%d_autocorr' % stream] = jsonify(self.corr.get_new_corr(stream, stream).real)
         return status
 
 #    def get_pam_atten_by_target(self, chan, target_pow=None,

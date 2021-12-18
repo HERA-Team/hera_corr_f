@@ -23,6 +23,9 @@ from scipy.linalg import hadamard  # for walsh (hadamard) matrices
 I2CWARNING = logging.INFO - 5
 logging.addLevelName('I2CWARNING', I2CWARNING)
 
+HIST_BINS = np.arange(-128, 128) # for histogram of ADC inputs
+ERROR_VALUE = -1 # default value for status reports if comms are broken
+ERROR_STRING = 'UNKNOWN' # default string for status reports if comms are broken
 
 # Block Classes
 class Block(object):
@@ -560,7 +563,6 @@ class Adc(casperfpga.snapadc.SNAPADC):
                 return self.rampTest(nchecks=nchecks, retry=retry)
         return failed_chips
 
-
 class Sync(Block):
     def __init__(self, host, name, logger=None):
         super(Sync, self).__init__(host, name, logger)
@@ -709,6 +711,20 @@ class Input(Block):
         self.USE_ZERO  = 2
         self.INT_TIME  = 2**20 / 250.0e6
         self._SNAPSHOT_SAMPLES_PER_POL = 2048
+
+    def get_status(self):
+        '''Return dict of current status.'''
+        rv = {}
+        snapshots = {}
+        for stream in range(self.ninput_mux_streams//2): # bram holds stream and stream+1
+            snapshots[2*stream], snapshots[2*stream+1] = self.get_adc_snapshot(stream)
+        for stream,snapshot in snapshots.items():
+            rv['stream%d_hist' % stream] = np.histogram(snapshot, bins=HIST_BINS)[0]
+            rv['stream%d_mean' % stream] = np.mean(snapshot)
+            pwr = np.mean(np.abs(snapshot)**2)
+            rv['stream%d_power' % stream] = pwr
+            rv['stream%d_rms' % stream] = np.sqrt(pwr)
+        return rv
 
     def get_adc_snapshot(self, antenna):
         """
@@ -1941,6 +1957,24 @@ class Pam(Block):
         # set i2c bus to 10 kHz
         self.i2c.setClock(self.CLK_I2C_BUS, self.CLK_I2C_REF)
 
+    def get_status(self):
+        """Return a dict of config status."""
+        rv = {}
+        try:
+            rv["atten"] = self.get_attenuation()
+            rv["power_e"] = self.power('east')
+            rv["power_n"] = self.power('north')
+            rv["voltage"] = self.shunt("u")
+            rv["current"] = self.shunt("i")
+            rv["id"] = self.id()
+        except(RuntimeError, IOError):
+            rv["atten"] = ERROR_VALUE
+            rv["power_e"] = ERROR_VALUE
+            rv["power_n"] = ERROR_VALUE
+            rv["voltage"] = ERROR_VALUE
+            rv["current"] = ERROR_VALUE
+            rv["id"] = ERROR_STRING
+        return rv
 
     def get_attenuation(self):
         """Get East and North attenuation
@@ -2153,6 +2187,36 @@ class Fem(Block):
         # set i2c bus to 10 kHz
         self.i2c.setClock(self.CLK_I2C_BUS, self.CLK_I2C_REF)
 
+    def get_status(self):
+        '''Return dict of config status.'''
+        rv = {}
+        try:
+            switch, east, north = self.switch()
+            rv["switch"] = switch
+            rv["e_lna_power"] = east
+            rv["n_lna_power"] = north
+            rv["temp"] = self.temperature()
+            rv["voltage"] = self.shunt("u")
+            rv["current"] = self.shunt("i")
+            rv["id"] = self.id()
+            theta, phi = self.imu()
+            rv["imu_theta"] = theta
+            rv["imu_phi"] = phi
+            rv["pressure"] = self.pressure()
+            rv["humidity"] = self.humidity()
+        except(RuntimeError, IOError):
+            rv["switch"] = ERROR_STRING
+            rv["e_lna_power"] = ERROR_VALUE
+            rv["n_lna_power"] = ERROR_VALUE
+            rv["temp"] = ERROR_VALUE
+            rv["voltage"] = ERROR_VALUE
+            rv["current"] = ERROR_VALUE
+            rv["id"] = ERROR_STRING
+            rv["imu_theta"] = ERROR_VALUE
+            rv["imu_phi"] = ERROR_VALUE
+            rv["pressure"] = ERROR_VALUE
+            rv["humidity"] = ERROR_VALUE
+        return rv
 
     def pressure(self):
         """ Get air pressure

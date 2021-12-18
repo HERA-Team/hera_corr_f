@@ -1,4 +1,12 @@
 #! /usr/bin/env python
+'''
+Sets redis hash keys:
+    status:snap:<host>
+    status:snaprf:<host>:<stream 0-5>
+    status:ant:<antnum>:<pol>
+Also resets PFB overflow flag after reading.
+'''
+
 from __future__ import print_function
 import time
 import socket

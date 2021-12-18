@@ -5,7 +5,7 @@ from astropy.time import Time
 from argparse import Namespace
 import json
 
-
+# XXX why namespace
 Parameters = Namespace(fq0=46.9,  # low cut-off in MHz
                        fq1=234.3,  # high cut-off in MHz
                        nchan=6144,  # number of channels
@@ -26,6 +26,8 @@ def descriptor(**kwargs):
     return ""
 
 
+# XXX could this be stand-alone?
+# XXX could this object be a "patset"
 class Attenuator(HeraCorrelator):
     """
     This adds methods on top of HeraCorrelator to get and set pam attenuators.
@@ -33,8 +35,10 @@ class Attenuator(HeraCorrelator):
     Defines pam attenuation sets or "patsets" as pam attenuation settings per antpol
     and stored in redis.
     """
+    # XXX if inheritance, not passing anything to children
     def __init__(self):
         super(Attenuator, self).__init__()
+        # XXX does HeraCorrelator have this already?
         self.antpols = {}
         for ant, val in self.ant_to_snap.items():
             for pol, hookup in val.items():
@@ -43,7 +47,8 @@ class Attenuator(HeraCorrelator):
                                                         'channel': hookup['channel']}
         self.state_time = None
         self.calc_time = None
-        self.N_antpols = len(self.antpols)
+        self.N_antpols = len(self.antpols) # XXX redundant w/ antpols
+        # XXX what is this metadata
         self.patset_metadata = json.loads(self.r.hget('atten:set', 'metadata'))
         self.patsets_in_redis = list(self.patset_metadata['sets'].keys())
         self.loaded_patsets = []
@@ -52,6 +57,7 @@ class Attenuator(HeraCorrelator):
     def show_set_metadata(self):
         print(json.dumps(self.patset_metadata, indent=4))
 
+    # XXX scope of this method nebulous, sprawling
     def get_current_state(self, update_bad_from_redis=False, verbose=False):
         """
         Get the PAM attenuators and FEM switch state from redis and correlator.
@@ -92,6 +98,7 @@ class Attenuator(HeraCorrelator):
             rkey = 'auto:{}{}'.format(ant, pol)
             try:
                 self.antpols[ant, pol]['auto'] = np.frombuffer(self.r_bytes.get(rkey), np.float32)
+            # XXX bare except
             except:  # noqa
                 self.antpols[ant, pol]['auto'] = None
                 self.outcome.get_state['redis_auto_err'].add(outkey)
@@ -101,8 +108,10 @@ class Attenuator(HeraCorrelator):
                 err_type = 'snap_{}_err'.format(cval)
                 try:
                     self.antpols[ant, pol][cval] = func(ant, pol)
+                # XXX bare except
                 except:  # noqa
                     self.outcome.get_state[err_type].add(outkey)
+                    # XXX use loggers
                     if verbose:
                         print("{:>3s}{} {} not found:".format(str(ant), pol, cval), end='  ')
                     if update_bad_from_redis:
@@ -135,6 +144,7 @@ class Attenuator(HeraCorrelator):
         for key, val in self.outcome.get_state.items():
             print("\t{}:  {}".format(key, len(val)))
 
+    # XXX separate stand-alone function
     def calc_equalization(self, cf=168.0, bw=8.0,
                           target_power=75.0, default_atten=8.0, verbose=False):
         """
@@ -191,6 +201,7 @@ class Attenuator(HeraCorrelator):
         for key, val in self.outcome.calc_eq.items():
             print("\t{}:  {}".format(key, len(val)))
 
+    # XXX repeats HeraCorrelator functionality
     def set_pam_attenuation(self, patset_to='calc', retries=3):
         """
         Tries to set the pam attenuation to self.antpols[ant, pol][patset_to].
@@ -228,6 +239,7 @@ class Attenuator(HeraCorrelator):
         for key, val in self.outcome.set_pam.items():
             print("\t{}:  {}".format(key, len(val)))
 
+    # XXX worried about proliferation of sets within redis
     def load_patset(self, patset_to='calc:antenna'):
         """
         Pull attenuation values from redis as set.antpols[ant, pol][patset_to] options.
@@ -263,6 +275,7 @@ class Attenuator(HeraCorrelator):
         """
         pass
 
+    # XXX worried about proliferation of sets within redis
     def purge_patset_in_redis(self, keys):
         """
         Purge all of an atten set in redis.
@@ -272,6 +285,7 @@ class Attenuator(HeraCorrelator):
             for patset in keys:
                 self.r.hdel(rkey, patset)
 
+    # XXX worried about proliferation of sets within redis
     def read_patset_file(self, fname):
         """Read csv file for atten set."""
         fdata = {fname: {}}
@@ -286,6 +300,8 @@ class Attenuator(HeraCorrelator):
             return None, None
         return fdesc, fdata
 
+    # XXX scope of this method too broad, sprawling.
+    # XXX how do we ensure settings aren't lost?
     def handle_patsets(self, patset_type, patset_name=None, purge=False, description=None):
         """
         Put atten values into redis and self.antpols[ant, pol][<key>]
