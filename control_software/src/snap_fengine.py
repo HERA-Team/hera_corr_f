@@ -25,9 +25,9 @@ def _jsonify(val, cast=True):
         # bools are compared using lambda x: x == "True" later
         val = str(val)
     elif isinstance(val, list):
-        # values that are appearing as lists as loaded
-        # with json.loads in corr_cm
         val = json.dumps(val)
+    elif isinstance(val, np.ndarray):
+        val = json.dumps(val.tolist())
     elif val is None:
         # newer redis-py does not accept Nonetype, wrap in json.dumps
         val = json.dumps(val)
