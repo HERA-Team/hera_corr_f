@@ -24,6 +24,8 @@ I2CWARNING = logging.INFO - 5
 logging.addLevelName('I2CWARNING', I2CWARNING)
 
 HIST_BINS = np.arange(-128, 128) # for histogram of ADC inputs
+ERROR_VALUE = -1 # default value for status reports if comms are broken
+ERROR_STRING = 'UNKNOWN' # default string for status reports if comms are broken
 
 # Block Classes
 class Block(object):
@@ -1958,12 +1960,20 @@ class Pam(Block):
     def get_status(self):
         """Return a dict of config status."""
         rv = {}
-        rv["atten"] = self.get_attenuation()
-        rv["power_e"] = self.power('east')
-        rv["power_n"] = self.power('north')
-        rv["voltage"] = self.shunt("u")
-        rv["current"] = self.shunt("i")
-        rv["id"] = self.id()
+        try:
+            rv["atten"] = self.get_attenuation()
+            rv["power_e"] = self.power('east')
+            rv["power_n"] = self.power('north')
+            rv["voltage"] = self.shunt("u")
+            rv["current"] = self.shunt("i")
+            rv["id"] = self.id()
+        except(RuntimeError):
+            rv["atten"] = ERROR_VALUE
+            rv["power_e"] = ERROR_VALUE
+            rv["power_n"] = ERROR_VALUE
+            rv["voltage"] = ERROR_VALUE
+            rv["current"] = ERROR_VALUE
+            rv["id"] = ERROR_STRING
         return rv
 
     def get_attenuation(self):
@@ -2180,19 +2190,32 @@ class Fem(Block):
     def get_status(self):
         '''Return dict of config status.'''
         rv = {}
-        switch, east, north = self.switch()
-        rv["switch"] = switch
-        rv["e_lna_power"] = east
-        rv["n_lna_power"] = north
-        rv["temp"] = self.temperature()
-        rv["voltage"] = self.shunt("u")
-        rv["current"] = self.shunt("i")
-        rv["id"] = self.id()
-        theta, phi = self.imu()
-        rv["imu_theta"] = theta
-        rv["imu_phi"] = phi
-        rv["pressure"] = self.pressure()
-        rv["humidity"] = self.humidity()
+        try:
+            switch, east, north = self.switch()
+            rv["switch"] = switch
+            rv["e_lna_power"] = east
+            rv["n_lna_power"] = north
+            rv["temp"] = self.temperature()
+            rv["voltage"] = self.shunt("u")
+            rv["current"] = self.shunt("i")
+            rv["id"] = self.id()
+            theta, phi = self.imu()
+            rv["imu_theta"] = theta
+            rv["imu_phi"] = phi
+            rv["pressure"] = self.pressure()
+            rv["humidity"] = self.humidity()
+        except(RuntimeError):
+            rv["switch"] = ERROR_STRING
+            rv["e_lna_power"] = ERROR_VALUE
+            rv["n_lna_power"] = ERROR_VALUE
+            rv["temp"] = ERROR_VALUE
+            rv["voltage"] = ERROR_VALUE
+            rv["current"] = ERROR_VALUE
+            rv["id"] = ERROR_STRING
+            rv["imu_theta"] = ERROR_VALUE
+            rv["imu_phi"] = ERROR_VALUE
+            rv["pressure"] = ERROR_VALUE
+            rv["humidity"] = ERROR_VALUE
         return rv
 
     def pressure(self):
