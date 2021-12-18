@@ -336,7 +336,7 @@ class SnapFengine(object):
         jsonify = lambda val: _jsonify(val, cast=jsonify)
         status = {}
         # High-level configuration status
-        status['is_programmed'] = jsonify(self.is_programmed()))
+        status['is_programmed'] = jsonify(self.is_programmed())
         status['sample_rate'] = jsonify(self.adc.lmx.getFreq())
         status['version'] = jsonify('%d.%d' % self.version())
         status['adc_is_configured'] = jsonify(self.adc_is_configured())
