@@ -345,7 +345,7 @@ class SnapFengine(object):
         status.update(self.input.get_status(jsonify=jsonify))
         # add autocorrelation from on-board correlator
         for stream in range(self.input.ninput_mux_streams):
-            auto = self.corr.get_new_corr(stream, stream)
+            auto = self.corr.get_new_corr(stream, stream).real
             if jsonify:
                 auto = json.dumps(auto.tolist())
             status['stream%d_autocorr' % stream] = auto
