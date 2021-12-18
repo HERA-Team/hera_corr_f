@@ -331,7 +331,7 @@ class SnapFengine(object):
         else:
             return inputs
 
-    def get_status(self, jsonify=True):
+    def get_status(self, jsonify=False):
         '''Return dict of config status.'''
         jsonify = lambda val: _jsonify(val, cast=jsonify)
         status = {}
