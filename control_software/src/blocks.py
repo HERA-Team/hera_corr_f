@@ -2,6 +2,7 @@ from __future__ import print_function
 import logging
 import numpy as np
 import struct
+import json
 import socket
 import time
 import random
@@ -712,18 +713,26 @@ class Input(Block):
         self.INT_TIME  = 2**20 / 250.0e6
         self._SNAPSHOT_SAMPLES_PER_POL = 2048
 
-    def get_status(self):
+    def get_status(self, jsonify=True):
         '''Return dict of current status.'''
         rv = {}
         snapshots = {}
         for stream in range(self.ninput_mux_streams//2): # bram holds stream and stream+1
             snapshots[2*stream], snapshots[2*stream+1] = self.get_adc_snapshot(stream)
         for stream,snapshot in snapshots.items():
-            rv['stream%d_hist' % stream] = np.histogram(snapshot, bins=HIST_BINS)[0]
-            rv['stream%d_mean' % stream] = np.mean(snapshot)
+            hist = np.histogram(snapshot, bins=HIST_BINS)[0]
+            mean = np.mean(snapshot)
             pwr = np.mean(np.abs(snapshot)**2)
+            rms = np.sqrt(pwr)
+            if jsonify:
+                hist = json.dumps(hist.tolist())
+                mean = json.dumps(mean.tolist())
+                pwr = json.dumps(pwr.tolist())
+                rms = json.dumps(rms.tolist())
+            rv['stream%d_hist' % stream] = hist
+            rv['stream%d_mean' % stream] = mean
             rv['stream%d_power' % stream] = pwr
-            rv['stream%d_rms' % stream] = np.sqrt(pwr)
+            rv['stream%d_rms' % stream] = rms
         return rv
 
     def get_adc_snapshot(self, antenna):

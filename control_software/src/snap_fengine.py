@@ -2,6 +2,7 @@ import logging
 from hera_corr_cm.handlers import add_default_log_handlers
 import numpy as np
 import time
+import json
 import datetime
 import casperfpga
 import socket
@@ -312,7 +313,7 @@ class SnapFengine(object):
         else:
             return inputs
 
-    def get_status(self):
+    def get_status(self, jsonify=True):
         '''Return dict of config status.'''
         status = {}
         # High-level configuration status
@@ -341,10 +342,13 @@ class SnapFengine(object):
         status['fft_overflow'] = self.pfb.is_overflowing()
         self.pfb.rst_stats() # clear pfb overflow flag for next time
         # add adc snapshot statistics
-        status.update(self.input.get_status())
+        status.update(self.input.get_status(jsonify=jsonify))
         # add autocorrelation from on-board correlator
         for stream in range(self.input.ninput_mux_streams):
-            status['stream%d_autocorr' % stream] = self.corr.get_new_corr(stream, stream)
+            auto = self.corr.get_new_corr(stream, stream)
+            if jsonify:
+                auto = json.dumps(auto.tolist())
+            status['stream%d_autocorr' % stream] = auto
         return status
 
 #    def get_pam_atten_by_target(self, chan, target_pow=None,

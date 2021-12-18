@@ -332,7 +332,7 @@ class HeraCorrelator(object):
             host (str): Host to target.
         """
         feng = self.fengs[host]
-        status = feng.get_status()
+        status = feng.get_status(jsonify=True)
         self.r.hmset('status:snap:%s' % host, status)
 
     def set_redis_status_fengs(self, hosts=None,
