@@ -24,7 +24,7 @@ def _jsonify(val, cast=True):
     if isinstance(val, bool):
         # bools are compared using lambda x: x == "True" later
         val = str(val)
-    elif isinstance(val, list):
+    elif isinstance(val, (list, tuple)):
         val = json.dumps(val)
     elif isinstance(val, np.ndarray):
         val = json.dumps(val.tolist())
