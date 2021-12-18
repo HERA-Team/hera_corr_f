@@ -1967,7 +1967,7 @@ class Pam(Block):
             rv["voltage"] = self.shunt("u")
             rv["current"] = self.shunt("i")
             rv["id"] = self.id()
-        except(RuntimeError):
+        except(RuntimeError, IOError):
             rv["atten"] = ERROR_VALUE
             rv["power_e"] = ERROR_VALUE
             rv["power_n"] = ERROR_VALUE
@@ -2204,7 +2204,7 @@ class Fem(Block):
             rv["imu_phi"] = phi
             rv["pressure"] = self.pressure()
             rv["humidity"] = self.humidity()
-        except(RuntimeError):
+        except(RuntimeError, IOError):
             rv["switch"] = ERROR_STRING
             rv["e_lna_power"] = ERROR_VALUE
             rv["n_lna_power"] = ERROR_VALUE
