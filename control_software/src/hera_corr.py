@@ -608,12 +608,12 @@ class HeraCorrelator(object):
                     # will error if verification fails
                     fem.switch(mode,east=east,north=north,verify=verify)
                     self.r.hset('status:snap:%s' % host,
-                                'fem[%d]' % cnt, mode)
+                                'fem%d_switch' % cnt, mode)
                 except(RuntimeError,AssertionError,IOError):
-                    self.logger.warning('Failed to switch %s.fem[%d]' %
+                    self.logger.warning('Failed to switch %s.fem%d' %
                                         (host, cnt))
                     self.r.hset('status:snap:%s' % host,
-                                'fem[%d]' % cnt, 'failed')
+                                'fem%d_switch' % cnt, 'failed')
                     # only logging failures at resolution of host
                     failed.append(host)
         return set(failed) # only return unique hosts
