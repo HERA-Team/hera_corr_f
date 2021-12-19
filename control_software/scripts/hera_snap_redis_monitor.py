@@ -15,8 +15,7 @@ import argparse
 from os import path as op
 from datetime import datetime
 
-from hera_corr_f import __version__, __package__
-from hera_corr_f import hcf_snap_reporter
+from hera_corr_f import HeraCorrelator, __version__, __package__
 from hera_corr_cm.handlers import add_default_log_handlers
 
 logger = add_default_log_handlers(logging.getLogger(__file__))
@@ -34,6 +33,7 @@ if __name__ == "__main__":
                         help='Seconds between reconnection attempts to dead boards')
     parser.add_argument('-l', dest='loglevel', type=str, default="INFO",
                         help='Log level. DEBUG / INFO / WARNING / ERROR')
+    parser.add_argument('--verbose', help='Make more verbose.', action='store_true')
     args = parser.parse_args()
 
     if args.loglevel not in ["DEBUG", "INFO", "WARNING", "ERROR"]:
@@ -42,11 +42,10 @@ if __name__ == "__main__":
         for handler in logger.handlers:
             handler.setLevel(getattr(logging, args.loglevel))
 
-    corr = hcf_snap_reporter.SnapReporter(redishost=args.redishost,
-                                          block_monitoring=False,
-                                          logger=logger)
+    corr = HeraCorrelator(redishost=args.redishost, block_monitoring=False)
     upload_time = corr.r.hget('snap_configuration', 'upload_time')
-    corr.print_ant_log_messages()
+    if args.verbose:
+        corr.print_ant_log_messages()
 
     retry_tick = time.time()
     script_redis_key = "status:script:{:s}:{:s}".format(hostname, __file__)
@@ -70,14 +69,12 @@ if __name__ == "__main__":
         if corr.r.hget('snap_configuration', 'upload_time') != upload_time:
             upload_time = corr.r.hget('snap_configuration', 'upload_time')
             logger.info('New configuration detected. Reinitializing fengine list')
-            corr = hcf_snap_reporter.SnapReporter(redishost=args.redishost,
-                                                  redis_transport=(not args.noredistapcp),
-                                                  block_monitoring=False,
-                                                  logger=logger)
-            corr.print_ant_log_messages()
+            corr = HeraCorrelator(redishost=args.redishost, block_monitoring=False)
+            if args.verbose:
+                corr.print_ant_log_messages()
 
         # Recompute the hookup every time. It's fast
-        corr._hookup_from_redis()
+        # corr._hookup_from_redis()
 
         # load this module's version into redis
         corr.r.hmset(
@@ -88,52 +85,55 @@ if __name__ == "__main__":
         for host in corr.fengs:
             if corr.r.exists("disable_monitoring"):
                 continue
+            # Put full set into redis.
+            corr.set_redis_status_fengs()
 
-            fpga_stats = corr.fengs[host].get_fpga_stats()
-            corr.r.hmset("status:snap:{:s}".format(host), fpga_stats)
-
-            antpols = corr.snap_to_ant[host]
-            # there are 6 antpols possibly attached to each feng
-            for stream in range(6):
-                if corr.r.exists("disable_monitoring"):
-                    continue
-                if stream % 2 == 0:
-                    # adc_stats returns both polarizations, so only read every other
-                    adc_stats = corr.get_adc_stats(host, stream)
-                    this_pol = 'x'
-                else:
-                    this_pol = 'y'
-
-                # Build snap_rf_stats and add to redis
-                snap_rf_stats = {}
-                snap_rf_stats["timestamp"] = datetime.now().isoformat()
-                snap_rf_stats["autocorrelation"] = corr.get_auto(host, stream)
-                snap_rf_stats["eq_coeffs"] = corr.get_eq_coeff(host, stream)
-                snap_rf_stats["fft_of"] = corr.get_fft_of(host, stream)
-                snap_rf_stats["histogram"] = adc_stats[this_pol]['histogram']
-                snap_rf_stats = hcf_snap_reporter.validate_redis_dict(snap_rf_stats)
-
-                snaprf_status_redis_key = "status:snaprf:{}:{}".format(host, stream)
-                corr.r.hmset(snaprf_status_redis_key, snap_rf_stats)
-
-                # lookup if this is known to cm, if not no antenna is listed so skip
-                ant, pol = antpols[stream]
-                if ant is None or pol is None:
-                    continue
-
-                # Build ant_status and add to redis.
-                ant_status = {}
-                ant_status['f_host'] = host
-                ant_status['host_ant_id'] = stream
-                for val in ['timestamp', 'autocorrelation', 'eq_coeffs', 'fft_of', 'histogram']:
-                    ant_status[val] = snap_rf_stats[val]
-                for val in ['adc_mean', 'adc_power', 'adc_rms', 'histogram']:
-                    ant_status[val] = adc_stats[this_pol][val.split('_')[-1]]
-                ant_status.update(corr.get_pam_stats(host, stream, pol))
-                ant_status.update(corr.get_fem_stats(host, stream))
-                ant_status = hcf_snap_reporter.validate_redis_dict(ant_status)
-                ant_status_redis_key = "status:ant:{:d}:{:s}".format(ant, pol)
-                corr.r.hmset(ant_status_redis_key, ant_status)
+            # Copy values over to legacy redis keys:  status:snaprf,
+            # fpga_stats = corr.fengs[host].get_fpga_stats()
+            # corr.r.hmset("status:snap:{:s}".format(host), fpga_stats)
+            #
+            # antpols = corr.snap_to_ant[host]
+            # # there are 6 antpols possibly attached to each feng
+            # for stream in range(6):
+            #     if corr.r.exists("disable_monitoring"):
+            #         continue
+            #     if stream % 2 == 0:
+            #         # adc_stats returns both polarizations, so only read every other
+            #         adc_stats = corr.get_adc_stats(host, stream)
+            #         this_pol = 'x'
+            #     else:
+            #         this_pol = 'y'
+            #
+            #     # Build snap_rf_stats and add to redis
+            #     snap_rf_stats = {}
+            #     snap_rf_stats["timestamp"] = datetime.now().isoformat()
+            #     snap_rf_stats["autocorrelation"] = corr.get_auto(host, stream)
+            #     snap_rf_stats["eq_coeffs"] = corr.get_eq_coeff(host, stream)
+            #     snap_rf_stats["fft_of"] = corr.get_fft_of(host, stream)
+            #     snap_rf_stats["histogram"] = adc_stats[this_pol]['histogram']
+            #     snap_rf_stats = hcf_snap_reporter.validate_redis_dict(snap_rf_stats)
+            #
+            #     snaprf_status_redis_key = "status:snaprf:{}:{}".format(host, stream)
+            #     corr.r.hmset(snaprf_status_redis_key, snap_rf_stats)
+            #
+            #     # lookup if this is known to cm, if not no antenna is listed so skip
+            #     ant, pol = antpols[stream]
+            #     if ant is None or pol is None:
+            #         continue
+            #
+            #     # Build ant_status and add to redis.
+            #     ant_status = {}
+            #     ant_status['f_host'] = host
+            #     ant_status['host_ant_id'] = stream
+            #     for val in ['timestamp', 'autocorrelation', 'eq_coeffs', 'fft_of', 'histogram']:
+            #         ant_status[val] = snap_rf_stats[val]
+            #     for val in ['adc_mean', 'adc_power', 'adc_rms', 'histogram']:
+            #         ant_status[val] = adc_stats[this_pol][val.split('_')[-1]]
+            #     ant_status.update(corr.get_pam_stats(host, stream, pol))
+            #     ant_status.update(corr.get_fem_stats(host, stream))
+            #     ant_status = hcf_snap_reporter.validate_redis_dict(ant_status)
+            #     ant_status_redis_key = "status:ant:{:d}:{:s}".format(ant, pol)
+            #     corr.r.hmset(ant_status_redis_key, ant_status)
 
             # all the data throughput from the adc call can cause network issues
             # a small sleep can help
