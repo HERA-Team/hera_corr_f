@@ -1946,7 +1946,7 @@ class Pam(Block):
         super(Pam, self).__init__(host, name, logger)
 
         self.i2c = i2c.I2C(host, name, retry=self.I2C_RETRY)
-        self._cached_atten = None # for checking I2C stability
+        self._cached_atten = None  # for checking I2C stability
 
     def _warning(self, msg, *args, **kwargs):
         self.logger.log(I2CWARNING, self._prefix_log(msg), *args, **kwargs)
@@ -2001,9 +2001,9 @@ class Pam(Block):
             self._atten = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
 
         self._atten.write(self._db2gpio(east, north))
-        self._cached_atten = (east, north) # cache for stability check
+        self._cached_atten = (east, north)  # cache for stability check
         if verify:
-            assert((east,north) == self.get_attenuation())
+            assert((east, north) == self.get_attenuation())
 
     def shunt(self, name='i'):
         """ Get current/voltage of the power supply

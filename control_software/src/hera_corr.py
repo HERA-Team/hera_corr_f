@@ -331,8 +331,10 @@ class HeraCorrelator(object):
         Inputs:
             host (str): Host to target.
         """
-        feng = self.fengs[host]
-        status = feng.get_status(jsonify=True)
+        _p = ['e', 'n']
+        ap = ["{}{}".format(ant, _p[i % 2]) for i, (ant, pol) in enumerate(self.snap_to_ant[host])]
+        status = self.fengs[host].get_status(jsonify=True)
+        status.update({'antpols': json.dumps(ap)})
         self.r.hmset('status:snap:%s' % host, status)
 
     def set_redis_status_fengs(self, hosts=None,
