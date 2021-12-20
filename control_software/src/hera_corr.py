@@ -333,10 +333,7 @@ class HeraCorrelator(object):
         Inputs:
             host (str): Host to target.
         """
-        _p = ['e', 'n']
-        ap = ["{}{}".format(ant, _p[i % 2]) for i, (ant, pol) in enumerate(self.snap_to_ant[host])]
         status = self.fengs[host].get_status(jsonify=True)
-        status.update({'antpols': json.dumps(ap)})
         self.r.hmset('status:snap:%s' % host, status)
 
     def set_redis_status_fengs(self, hosts=None,
@@ -812,7 +809,7 @@ class HeraCorrelator(object):
                 coeffs = self.lookup_eq_coeffs(ant, pol)
                 try:
                     feng.eq.set_coeffs(stream, coeffs, verify=verify)
-                except(AssertionError,RuntimeError):
+                except(AssertionError, RuntimeError):
                     # Catch errs so an attempt is made for each stream
                     failed.append((stream, (ant, pol)))
         if len(failed) > 0:

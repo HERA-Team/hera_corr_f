@@ -352,11 +352,7 @@ class SnapFengine(object):
         # populate pam status
         for i, pam in enumerate(self.pams):
             for key, val in pam.get_status().items():
-                if key == 'atten':
-                    status["pam%d_e_atten" % i] = jsonify(val[0])
-                    status["pam%d_n_atten" % i] = jsonify(val[1])
-                else:
-                    status["pam%d_" % (i) + key] = jsonify(val)
+                status["pam%d_" % (i) + key] = jsonify(val)
         # populate fem status
         for i, fem in enumerate(self.fems):
             for key, val in fem.get_status().items():

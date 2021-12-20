@@ -1969,14 +1969,15 @@ class Pam(Block):
         """Return a dict of config status."""
         rv = {}
         try:
-            rv["atten"] = self.get_attenuation()
+            rv["atten_e"], rv["atten_n"] = self.get_attenuation()
             rv["power_e"] = self.power('east')
             rv["power_n"] = self.power('north')
             rv["voltage"] = self.shunt("u")
             rv["current"] = self.shunt("i")
             rv["id"] = self.id()
         except(RuntimeError, IOError):
-            rv["atten"] = ERROR_VALUE
+            rv["atten_e"] = ERROR_VALUE
+            rv["atten_n"] = ERROR_VALUE
             rv["power_e"] = ERROR_VALUE
             rv["power_n"] = ERROR_VALUE
             rv["voltage"] = ERROR_VALUE
@@ -2201,8 +2202,8 @@ class Fem(Block):
         try:
             switch, east, north = self.switch()
             rv["switch"] = switch
-            rv["e_lna_power"] = east
-            rv["n_lna_power"] = north
+            rv["lna_power_e"] = east
+            rv["lna_power_n"] = north
             rv["temp"] = self.temperature()
             rv["voltage"] = self.shunt("u")
             rv["current"] = self.shunt("i")
@@ -2214,8 +2215,8 @@ class Fem(Block):
             rv["humidity"] = self.humidity()
         except(RuntimeError, IOError):
             rv["switch"] = ERROR_STRING
-            rv["e_lna_power"] = ERROR_VALUE
-            rv["n_lna_power"] = ERROR_VALUE
+            rv["lna_power_e"] = ERROR_VALUE
+            rv["lna_power_n"] = ERROR_VALUE
             rv["temp"] = ERROR_VALUE
             rv["voltage"] = ERROR_VALUE
             rv["current"] = ERROR_VALUE

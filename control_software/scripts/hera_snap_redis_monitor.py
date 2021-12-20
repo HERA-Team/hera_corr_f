@@ -12,7 +12,6 @@ import time
 import socket
 import logging
 import argparse
-import json
 from os import path as op
 from datetime import datetime
 
@@ -21,6 +20,52 @@ from hera_corr_cm.handlers import add_default_log_handlers
 
 logger = add_default_log_handlers(logging.getLogger(__file__))
 hostname = socket.gethostname()
+
+# Values to write to redis.
+snaprf_mon = {'autocorrelation': 'stream${STREAMNUM}_autocorr',
+              'eq_coeffs': 'stream${STREAMNUM}_eq_coeffs',
+              'histogram': 'stream${STREAMNUM}_hist',
+              'adc_mean': 'stream${STREAMNUM}_mean',
+              'adc_power': 'stream${STREAMNUM}_power',
+              'adc_rms': 'stream${STREAMNUM}_rms'}
+antpol_mon = {  # These are in addition to snaprf_mon items above
+              'pam_power': 'pam${DEVNUM}_power_${POL}',
+              'pam_atten': 'pam${DEVNUM}_atten_${POL}',
+              'pam_current': 'pam${DEVNUM}_current',
+              'pam_voltage': 'pam${DEVNUM}_voltage',
+              'pam_id': 'pam${DEVNUM}_id',
+              'fem_lna_power': 'fem${DEVNUM}_lna_power_${POL}',
+              'fem_current': 'fem${DEVNUM}_current',
+              'fem_voltage': 'fem${DEVNUM}_voltage',
+              'fem_switch': 'fem${DEVNUM}_switch',
+              'fem_humidity': 'fem${DEVNUM}_humidity',
+              'fem_temp': 'fem${DEVNUM}_temp',
+              'fem_id': 'fem${DEVNUM}_id',
+              'fem_imu_phi': 'fem${DEVNUM}_imu_phi',
+              'fem_imu_theta': 'fem${DEVNUM}_imu_theta',
+              'fem_pressure': 'fem${DEVNUM}_pressure'
+              }
+stream2pol = {0: 'e', 1: 'n'}
+
+
+def print_ant_log_messages(fengs):
+    for ant, antval in self.ant_to_snap.iteritems():
+        for pol, polval in antval.iteritems():
+            # Skip if the antenna is associated with a board we can't reach
+            if polval['host'] is not None:
+                host = polval['host']
+                chan = polval['channel']
+                try:
+                    _ = fengs[host]
+                    logger.debug("Expecting data from Ant {}, Pol {} from host {} input {}"
+                                 .format(ant, pol, host, chan))
+                except KeyError:
+                    # If the entry is set to a bogus hostname I suppose.
+                    logger.warning("Failed to find F-Eng {} associated with ant/pol {}/{}"
+                                   .format(polval['host'], ant, pol))
+            else:
+                logger.warning("Failed to find F-Eng {} associated with ant/pol {}/{}"
+                               .format(polval['host'], ant, pol))
 
 
 if __name__ == "__main__":
@@ -46,7 +91,7 @@ if __name__ == "__main__":
     corr = HeraCorrelator(redishost=args.redishost, block_monitoring=False)
     upload_time = corr.r.hget('snap_configuration', 'upload_time')
     if args.verbose:
-        corr.print_ant_log_messages()
+        print_ant_log_messages()
 
     retry_tick = time.time()
     script_redis_key = "status:script:{:s}:{:s}".format(hostname, __file__)
@@ -72,10 +117,10 @@ if __name__ == "__main__":
             logger.info('New configuration detected. Reinitializing fengine list')
             corr = HeraCorrelator(redishost=args.redishost, block_monitoring=False)
             if args.verbose:
-                corr.print_ant_log_messages()
+                print_ant_log_messages()
 
         # Recompute the hookup every time. It's fast
-        # corr._hookup_from_redis()
+        corr._hookup_from_redis()
 
         # load this module's version into redis
         corr.r.hmset(
@@ -88,31 +133,38 @@ if __name__ == "__main__":
         # Put full set into redis status:snap:<host>
         corr.set_redis_status_fengs()
 
-        # Copy values over to status:snaprf:<host> and status:ant:<ant>:<pol>
+        # Copy values over to status:snaprf:<host>:<stream> and status:ant:<ant>:<pol>
         for host in corr.fengs:
-            feng = corr.r.hgetall("status:snap:{}".format(host))
-            fft_overflow = corr.r.hget("status:snap:{}".format(host), "fft_overflow")
-            clip_count = corr.r.hget("status:snap:{}".format(host), "eq_clip_count")
-            for stream, antpol in enumerate(json.loads(feng['antpols'])):  #May not work!!!
+            sskey = "status:snap:{}".format(host)
+            feng = corr.r.hgetall(sskey)
+            fft_overflow = corr.r.hget(sskey, "fft_overflow")
+            clip_count = corr.r.hget(sskey, "eq_clip_count")
+            antpols = corr.snap_to_ant(host)
+            for stream, (ant, pol) in enumerate(antpols):
+                if ant is None:  # no antenna there
+                    continue
+
+                # Update status:snaprf:<host>:<stream>
                 snap_rf_stats = {}
                 snap_rf_stats["timestamp"] = datetime.now().isoformat()
-                snap_rf_stats["autocorrelation"] = feng['stream{}_autocorr'.format(stream)]
-                snap_rf_stats["eq_coeffs"] = feng['stream{}_eq_coeffs'.format(stream)]
                 snap_rf_stats["fft_of"] = fft_overflow
                 snap_rf_stats["clip_count"] = clip_count
-                snap_rf_stats["histogram"] = feng['stream{}_hist'.format(stream)]
+                for key, val in snaprf_mon.items():
+                    hval = val.replace("${STREAMNUM}", str(stream))
+                    snap_rf_stats[key] = feng[hval]
                 snaprf_status_redis_key = "status:snaprf:{}:{}".format(host, stream)
                 corr.r.hmset(snaprf_status_redis_key, snap_rf_stats)
 
+                # Update status:ant:<ant>:<pol>
                 ant_status = {}
                 ant_status['f_host'] = host
                 ant_status['host_ant_id'] = stream
-                for val in ['timestamp', 'autocorrelation', 'eq_coeffs', 'fft_of', 'histogram']:
-                    ant_status[val] = snap_rf_stats[val]
-                for val in ['adc_mean', 'adc_power', 'adc_rms', 'histogram']:
-                    ant_status[val] = adc_stats[this_pol][val.split('_')[-1]]
-                ant_status.update(corr.get_pam_stats(host, stream, pol))
-                ant_status.update(corr.get_fem_stats(host, stream))
+                ant_status.update(snap_rf_stats)
+                devnum = stream // 2
+                pol = stream2pol[stream % 2]
+                for key, val in antpol_mon.keys():
+                    hval = val.replace("${DEVNUM}", str(devnum)).replace("${POL}", pol)
+                    ant_status[key] = feng[hval]
                 ant_status_redis_key = "status:ant:{:d}:{:s}".format(ant, pol)
                 corr.r.hmset(ant_status_redis_key, ant_status)
 

@@ -145,7 +145,7 @@ class Attenuator(HeraCorrelator):
             print("\t{}:  {}".format(key, len(val)))
 
     # XXX separate stand-alone function
-    def calc_equalization(self, cf=168.0, bw=8.0,
+    def calc_leveling(self, cf=168.0, bw=8.0,
                           target_power=75.0, default_atten=8.0, verbose=False):
         """
         Calculates all of the equalization attenuations.
