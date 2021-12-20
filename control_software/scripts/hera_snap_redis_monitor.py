@@ -12,6 +12,7 @@ import time
 import socket
 import logging
 import argparse
+import json
 from os import path as op
 from datetime import datetime
 
@@ -82,63 +83,39 @@ if __name__ == "__main__":
             {"version": __version__, "timestamp": datetime.now().isoformat()}
         )
 
+        if corr.r.exists("disable_monitoring"):
+            continue
+        # Put full set into redis status:snap:<host>
+        corr.set_redis_status_fengs()
+
+        # Copy values over to status:snaprf:<host> and status:ant:<ant>:<pol>
         for host in corr.fengs:
-            if corr.r.exists("disable_monitoring"):
-                continue
-            # Put full set into redis.
-            corr.set_redis_status_fengs()
+            feng = corr.r.hgetall("status:snap:{}".format(host))
+            fft_overflow = corr.r.hget("status:snap:{}".format(host), "fft_overflow")
+            clip_count = corr.r.hget("status:snap:{}".format(host), "eq_clip_count")
+            for stream, antpol in enumerate(json.loads(feng['antpols'])):  #May not work!!!
+                snap_rf_stats = {}
+                snap_rf_stats["timestamp"] = datetime.now().isoformat()
+                snap_rf_stats["autocorrelation"] = feng['stream{}_autocorr'.format(stream)]
+                snap_rf_stats["eq_coeffs"] = feng['stream{}_eq_coeffs'.format(stream)]
+                snap_rf_stats["fft_of"] = fft_overflow
+                snap_rf_stats["clip_count"] = clip_count
+                snap_rf_stats["histogram"] = feng['stream{}_hist'.format(stream)]
+                snaprf_status_redis_key = "status:snaprf:{}:{}".format(host, stream)
+                corr.r.hmset(snaprf_status_redis_key, snap_rf_stats)
 
-            # Copy values over to legacy redis keys:  status:snaprf,
-            # fpga_stats = corr.fengs[host].get_fpga_stats()
-            # corr.r.hmset("status:snap:{:s}".format(host), fpga_stats)
-            #
-            # antpols = corr.snap_to_ant[host]
-            # # there are 6 antpols possibly attached to each feng
-            # for stream in range(6):
-            #     if corr.r.exists("disable_monitoring"):
-            #         continue
-            #     if stream % 2 == 0:
-            #         # adc_stats returns both polarizations, so only read every other
-            #         adc_stats = corr.get_adc_stats(host, stream)
-            #         this_pol = 'x'
-            #     else:
-            #         this_pol = 'y'
-            #
-            #     # Build snap_rf_stats and add to redis
-            #     snap_rf_stats = {}
-            #     snap_rf_stats["timestamp"] = datetime.now().isoformat()
-            #     snap_rf_stats["autocorrelation"] = corr.get_auto(host, stream)
-            #     snap_rf_stats["eq_coeffs"] = corr.get_eq_coeff(host, stream)
-            #     snap_rf_stats["fft_of"] = corr.get_fft_of(host, stream)
-            #     snap_rf_stats["histogram"] = adc_stats[this_pol]['histogram']
-            #     snap_rf_stats = hcf_snap_reporter.validate_redis_dict(snap_rf_stats)
-            #
-            #     snaprf_status_redis_key = "status:snaprf:{}:{}".format(host, stream)
-            #     corr.r.hmset(snaprf_status_redis_key, snap_rf_stats)
-            #
-            #     # lookup if this is known to cm, if not no antenna is listed so skip
-            #     ant, pol = antpols[stream]
-            #     if ant is None or pol is None:
-            #         continue
-            #
-            #     # Build ant_status and add to redis.
-            #     ant_status = {}
-            #     ant_status['f_host'] = host
-            #     ant_status['host_ant_id'] = stream
-            #     for val in ['timestamp', 'autocorrelation', 'eq_coeffs', 'fft_of', 'histogram']:
-            #         ant_status[val] = snap_rf_stats[val]
-            #     for val in ['adc_mean', 'adc_power', 'adc_rms', 'histogram']:
-            #         ant_status[val] = adc_stats[this_pol][val.split('_')[-1]]
-            #     ant_status.update(corr.get_pam_stats(host, stream, pol))
-            #     ant_status.update(corr.get_fem_stats(host, stream))
-            #     ant_status = hcf_snap_reporter.validate_redis_dict(ant_status)
-            #     ant_status_redis_key = "status:ant:{:d}:{:s}".format(ant, pol)
-            #     corr.r.hmset(ant_status_redis_key, ant_status)
+                ant_status = {}
+                ant_status['f_host'] = host
+                ant_status['host_ant_id'] = stream
+                for val in ['timestamp', 'autocorrelation', 'eq_coeffs', 'fft_of', 'histogram']:
+                    ant_status[val] = snap_rf_stats[val]
+                for val in ['adc_mean', 'adc_power', 'adc_rms', 'histogram']:
+                    ant_status[val] = adc_stats[this_pol][val.split('_')[-1]]
+                ant_status.update(corr.get_pam_stats(host, stream, pol))
+                ant_status.update(corr.get_fem_stats(host, stream))
+                ant_status_redis_key = "status:ant:{:d}:{:s}".format(ant, pol)
+                corr.r.hmset(ant_status_redis_key, ant_status)
 
-            # all the data throughput from the adc call can cause network issues
-            # a small sleep can help
-            # 02/24/2021 MJK: is this sleep still necessary, we're not slamming
-            # all the fengs one after another anymore
             time.sleep(0.1)
 
         # If the retry period has been exceeded, try to reconnect to dead boards:

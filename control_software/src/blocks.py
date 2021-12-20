@@ -1155,6 +1155,7 @@ class PhaseSwitch(Block):
         self.disable_demod(verify=verify)
         self.set_delay(0, verify=verify)
 
+
 class Eq(Block):
     def __init__(self, host, name, nstreams=8, ncoeffs=2**10, logger=None):
         """
@@ -1171,7 +1172,7 @@ class Eq(Block):
         self.ncoeffs = ncoeffs
         self.width = 16
         self.bin_point = 5
-        self.format = 'H'#'L'
+        self.format = 'H'  # 'L'
         self.streamsize = struct.calcsize(self.format)*self.ncoeffs
 
     def set_coeffs(self, stream, coeffs, verify=False):
@@ -1202,6 +1203,12 @@ class Eq(Block):
                          offset=(self.streamsize * stream))
         return data
 
+    def get_status(self, stream):
+        """
+        Return the Eq status:  coeffs (per stream) and clip_count (for all)
+        """
+        return {'coeffs': self.get_coeffs(stream), 'clip_count': self.clip_count()}
+
     def get_coeffs(self, stream):
         """
         Read the coefficients being used from the board.
@@ -1228,8 +1235,9 @@ class Eq(Block):
         """
         for stream in range(self.nstreams):
             self.set_coeffs(stream,
-               coeffs * np.ones(self.ncoeffs, dtype='>%s' % self.format),
-               verify=verify)
+                            coeffs * np.ones(self.ncoeffs, dtype='>%s' % self.format),
+                            verify=verify)
+
 
 class EqTvg(Block):
     def __init__(self, host, name, nstreams=8, nchans=2**13, logger=None):
