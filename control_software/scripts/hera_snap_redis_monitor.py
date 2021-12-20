@@ -100,6 +100,8 @@ if __name__ == "__main__":
 
     while(True):
         tick = time.time()
+        if args.verbose:
+            print(datetime.now().isoformat())
         corr.r.set(script_redis_key, "alive", ex=max(60, args.delay * 2))
         while corr.r.exists('disable_monitoring'):
             if not locked_out:
@@ -139,7 +141,7 @@ if __name__ == "__main__":
             feng = corr.r.hgetall(sskey)
             fft_overflow = corr.r.hget(sskey, "fft_overflow")
             clip_count = corr.r.hget(sskey, "eq_clip_count")
-            antpols = corr.snap_to_ant(host)
+            antpols = corr.snap_to_ant[host]
             for stream, (ant, pol) in enumerate(antpols):
                 if ant is None:  # no antenna there
                     continue
