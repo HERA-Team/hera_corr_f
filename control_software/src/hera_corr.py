@@ -49,6 +49,8 @@ class HeraCorrelator(object):
         self.r_bytes = redis.Redis(redishost, decode_responses=False)
         self.redis_transport = redis_transport  # XXX why have this (ARP 11/3/21)?
         self.passive = passive
+        if isinstance(hosts, str):  # So that you can just use one as a str.
+            hosts = [hosts]
 
         self.fengs = {}
         self.get_config(config)  # sets self.config
