@@ -164,7 +164,7 @@ if __name__ == "__main__":
                 ant_status.update(snap_rf_stats)
                 devnum = stream // 2
                 pol = stream2pol[stream % 2]
-                for key, val in antpol_mon.keys():
+                for key, val in antpol_mon.items():
                     hval = val.replace("${DEVNUM}", str(devnum)).replace("${POL}", pol)
                     ant_status[key] = feng[hval]
                 ant_status_redis_key = "status:ant:{:d}:{:s}".format(ant, pol)
