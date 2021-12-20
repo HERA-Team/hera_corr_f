@@ -91,7 +91,7 @@ if __name__ == "__main__":
     corr = HeraCorrelator(redishost=args.redishost, block_monitoring=False)
     upload_time = corr.r.hget('snap_configuration', 'upload_time')
     if args.verbose:
-        print_ant_log_messages()
+        print_ant_log_messages(corr)
 
     retry_tick = time.time()
     script_redis_key = "status:script:{:s}:{:s}".format(hostname, __file__)
@@ -117,7 +117,7 @@ if __name__ == "__main__":
             logger.info('New configuration detected. Reinitializing fengine list')
             corr = HeraCorrelator(redishost=args.redishost, block_monitoring=False)
             if args.verbose:
-                print_ant_log_messages()
+                print_ant_log_messages(corr)
 
         # Recompute the hookup every time. It's fast
         corr._hookup_from_redis()
