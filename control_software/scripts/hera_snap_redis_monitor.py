@@ -48,15 +48,15 @@ antpol_mon = {  # These are in addition to snaprf_mon items above
 stream2pol = {0: 'e', 1: 'n'}
 
 
-def print_ant_log_messages(fengs):
-    for ant, antval in self.ant_to_snap.iteritems():
+def print_ant_log_messages(corr):
+    for ant, antval in corr.ant_to_snap.iteritems():
         for pol, polval in antval.iteritems():
             # Skip if the antenna is associated with a board we can't reach
             if polval['host'] is not None:
                 host = polval['host']
                 chan = polval['channel']
                 try:
-                    _ = fengs[host]
+                    _ = corr.fengs[host]
                     logger.debug("Expecting data from Ant {}, Pol {} from host {} input {}"
                                  .format(ant, pol, host, chan))
                 except KeyError:
