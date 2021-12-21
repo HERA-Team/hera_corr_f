@@ -153,7 +153,12 @@ if __name__ == "__main__":
                 snap_rf_stats["clip_count"] = clip_count
                 for key, val in snaprf_mon.items():
                     hval = val.replace("${STREAMNUM}", str(stream))
-                    snap_rf_stats[key] = feng[hval]
+                    try:
+                        snap_rf_stats[key] = feng[hval]
+                    except KeyError:
+                        if args.verbose:
+                            print("snap_rf:  No key {} in host {}".format(hval, host))
+                        pass
                 snaprf_status_redis_key = "status:snaprf:{}:{}".format(host, stream)
                 corr.r.hmset(snaprf_status_redis_key, snap_rf_stats)
 
@@ -166,7 +171,12 @@ if __name__ == "__main__":
                 pol = stream2pol[stream % 2]
                 for key, val in antpol_mon.items():
                     hval = val.replace("${DEVNUM}", str(devnum)).replace("${POL}", pol)
-                    ant_status[key] = feng[hval]
+                    try:
+                        ant_status[key] = feng[hval]
+                    except KeyError:
+                        if args.verbose:
+                            print("ant_status: No key {} in host {}".format(hval, host))
+                        pass
                 ant_status_redis_key = "status:ant:{:d}:{:s}".format(ant, pol)
                 corr.r.hmset(ant_status_redis_key, ant_status)
 
