@@ -1,12 +1,11 @@
 #! /usr/bin/env python
-'''
+"""
 Sets redis hash keys:
-    status:snap:<host>
-    status:snaprf:<host>:<stream 0-5>
-    status:ant:<antnum>:<pol>
+    status:snap:<host>                    Done from HeraCorrelator
+    status:snaprf:<host>:<stream 0-5>     Duplicated data taken from redis
+    status:ant:<antnum>:<pol>             Duplicated data taken from redis
 Also resets PFB overflow flag after reading.
-'''
-
+"""
 from __future__ import print_function
 import time
 import socket
@@ -21,14 +20,14 @@ from hera_corr_cm.handlers import add_default_log_handlers
 logger = add_default_log_handlers(logging.getLogger(__file__))
 hostname = socket.gethostname()
 
-# Values to write to redis.
+# Values to write to redis - status:snaprf:<host>:<stream>
 snaprf_mon = {'autocorrelation': 'stream${STREAMNUM}_autocorr',
               'eq_coeffs': 'stream${STREAMNUM}_eq_coeffs',
               'histogram': 'stream${STREAMNUM}_hist',
               'adc_mean': 'stream${STREAMNUM}_mean',
               'adc_power': 'stream${STREAMNUM}_power',
               'adc_rms': 'stream${STREAMNUM}_rms'}
-antpol_mon = {  # These are in addition to snaprf_mon items above
+antpol_mon = {  # These are in addition to snaprf_mon items above - status:ant:<ant>:<pol>
               'pam_power': 'pam${DEVNUM}_power_${POL}',
               'pam_atten': 'pam${DEVNUM}_atten_${POL}',
               'pam_current': 'pam${DEVNUM}_current',
@@ -44,7 +43,7 @@ antpol_mon = {  # These are in addition to snaprf_mon items above
               'fem_imu_phi': 'fem${DEVNUM}_imu_phi',
               'fem_imu_theta': 'fem${DEVNUM}_imu_theta',
               'fem_pressure': 'fem${DEVNUM}_pressure'
-              }
+              }  # entries without ${POL} are duplicated over both pol
 stream2pol = {0: 'e', 1: 'n'}
 
 
@@ -98,10 +97,12 @@ if __name__ == "__main__":
     locked_out = False
     logger.info('Starting SNAP redis monitor')
 
+    counter = 0
     while(True):
         tick = time.time()
+        counter += 1
         if args.verbose:
-            print(datetime.now().isoformat())
+            print("Tick {}:  {}".format(counter, datetime.now().isoformat()))
         corr.r.set(script_redis_key, "alive", ex=max(60, args.delay * 2))
         while corr.r.exists('disable_monitoring'):
             if not locked_out:
@@ -160,7 +161,7 @@ if __name__ == "__main__":
                         snap_rf_stats[key] = feng[hval]
                     except KeyError:
                         if args.verbose:
-                            print("snap_rf:  No key {} in host {}".format(hval, host))
+                            logger.info("snap_rf:  No key {} in host {}".format(hval, host))
                         pass
                 snaprf_status_redis_key = "status:snaprf:{}:{}".format(host, stream)
                 corr.r.hmset(snaprf_status_redis_key, snap_rf_stats)
@@ -178,7 +179,7 @@ if __name__ == "__main__":
                         ant_status[key] = feng[hval]
                     except KeyError:
                         if args.verbose:
-                            print("ant_status: No key {} in host {}".format(hval, host))
+                            logger.info("ant_status: No key {} in host {}".format(hval, host))
                         pass
                 ant_status_redis_key = "status:ant:{:d}:{:s}".format(ant, pol)
                 corr.r.hmset(ant_status_redis_key, ant_status)
