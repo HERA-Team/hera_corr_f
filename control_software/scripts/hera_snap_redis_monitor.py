@@ -13,6 +13,7 @@ import logging
 import argparse
 from os import path as op
 from datetime import datetime
+from redis import exceptions as RedisException
 
 from hera_corr_f import HeraCorrelator, __version__, __package__
 from hera_corr_cm.handlers import add_default_log_handlers
@@ -164,7 +165,10 @@ if __name__ == "__main__":
                             logger.info("snap_rf:  No key {} in host {}".format(hval, host))
                         pass
                 snaprf_status_redis_key = "status:snaprf:{}:{}".format(host, stream)
-                corr.r.hmset(snaprf_status_redis_key, snap_rf_stats)
+                try:
+                    corr.r.hmset(snaprf_status_redis_key, snap_rf_stats)
+                except RedisException.DataError as msg:
+                    logger.warning(msg)
 
                 # Update status:ant:<ant>:<pol>
                 ant_status = {}
@@ -182,7 +186,10 @@ if __name__ == "__main__":
                             logger.info("ant_status: No key {} in host {}".format(hval, host))
                         pass
                 ant_status_redis_key = "status:ant:{:d}:{:s}".format(ant, pol)
-                corr.r.hmset(ant_status_redis_key, ant_status)
+                try:
+                    corr.r.hmset(ant_status_redis_key, ant_status)
+                except RedisException.DataError as msg:
+                    logger.warning(msg)
 
             time.sleep(0.1)
 
