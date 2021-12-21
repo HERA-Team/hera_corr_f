@@ -133,7 +133,10 @@ if __name__ == "__main__":
         if corr.r.exists("disable_monitoring"):
             continue
         # Put full set into redis status:snap:<host>
-        corr.set_redis_status_fengs()
+        try:
+            corr.set_redis_status_fengs()
+        except Exception as e:
+            logger.warning(str(e))
 
         # Copy values over to status:snaprf:<host>:<stream> and status:ant:<ant>:<pol>
         for host in corr.fengs:
