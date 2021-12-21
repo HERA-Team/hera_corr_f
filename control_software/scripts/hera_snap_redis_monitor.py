@@ -168,7 +168,7 @@ if __name__ == "__main__":
                 try:
                     corr.r.hmset(snaprf_status_redis_key, snap_rf_stats)
                 except RedisException.DataError as msg:
-                    logger.warning(msg)
+                    logger.warning(str(msg))
 
                 # Update status:ant:<ant>:<pol>
                 ant_status = {}
@@ -189,7 +189,7 @@ if __name__ == "__main__":
                 try:
                     corr.r.hmset(ant_status_redis_key, ant_status)
                 except RedisException.DataError as msg:
-                    logger.warning(msg)
+                    logger.warning(str(msg))
 
             time.sleep(0.1)
 
