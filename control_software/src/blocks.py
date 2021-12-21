@@ -563,18 +563,22 @@ class Adc(casperfpga.snapadc.SNAPADC):
                 return self.rampTest(nchecks=nchecks, retry=retry)
         return failed_chips
 
+
 class Sync(Block):
     def __init__(self, host, name, logger=None):
         super(Sync, self).__init__(host, name, logger)
-        self.OFFSET_ARM_SYNC  = 0
+        self.OFFSET_ARM_SYNC = 0
         self.OFFSET_ARM_NOISE = 1
-        self.OFFSET_SW_SYNC   = 4
+        self.OFFSET_SW_SYNC = 4
 
     def uptime(self):
         """
         Returns uptime in seconds, assumes 250 MHz FPGA clock
         """
-        return self.read_uint('uptime')
+        try:
+            return self.read_uint('uptime')
+        except RuntimeError:
+            return ERROR_VALUE
 
     def set_delay(self, delay):
         """
