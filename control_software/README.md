@@ -1,5 +1,13 @@
 Control software for SNAP-based HERA F-engines
 
+# Updating snaps (aka fengines) in the correlator.
+The config as held in the redis hashkey snap_configuration:config is the definitive version.
+To update:
+ - `hera_download_config_from_redis.py > temp_config_file_name`
+ - Make the updates in the file.
+ - `hera_upload_config_to_redis.py temp_config_file_name`
+ - `rm temp_config_file_name`
+
 # Controlling a single board with SnapFengine
 
 ```python
@@ -50,9 +58,9 @@ Print stats for all 12 ADC cores (2 cores per ADC stream):
 
 ```python
 s.input.print_status()
-mean: -0.261475 -0.608231 -0.757507 -0.712189 -0.252167 -0.780624 -0.435150 -0.507614 -0.291031 -0.790634 -0.262146 -0.217178 
-power: 0.261475 0.608231 0.757507 0.712189 0.252167 0.780624 0.435150 0.507614 0.291031 0.790634 0.262146 0.217178 
-rms: 0.511346 0.779891 0.870349 0.843913 0.502162 0.883530 0.659659 0.712470 0.539473 0.889176 0.512002 0.466024 
+mean: -0.261475 -0.608231 -0.757507 -0.712189 -0.252167 -0.780624 -0.435150 -0.507614 -0.291031 -0.790634 -0.262146 -0.217178
+power: 0.261475 0.608231 0.757507 0.712189 0.252167 0.780624 0.435150 0.507614 0.291031 0.790634 0.262146 0.217178
+rms: 0.511346 0.779891 0.870349 0.843913 0.502162 0.883530 0.659659 0.712470 0.539473 0.889176 0.512002 0.466024
 ```
 
 Or, capture stats, with the option to sum cores together so you get per-pol rather than per-core statistics:
@@ -173,5 +181,3 @@ hera_snap_fengine_init.py -p -i -s -e --config_file my_config_file.yaml
 This command will store various parameters, such as sync time, in a redis database, which is expected to be found being server from the host names `redishost`.
 
 Various simulation modes exist to both replace data streams with known test vectors, and also tweak Ethernet headers to make one SNAP board look like many. This latter feature is particularly useful for (eg) benchmarking an X-engine at full data rate but without a full complement of SNAP boards.
-   
-
