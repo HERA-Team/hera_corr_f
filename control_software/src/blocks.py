@@ -563,18 +563,22 @@ class Adc(casperfpga.snapadc.SNAPADC):
                 return self.rampTest(nchecks=nchecks, retry=retry)
         return failed_chips
 
+
 class Sync(Block):
     def __init__(self, host, name, logger=None):
         super(Sync, self).__init__(host, name, logger)
-        self.OFFSET_ARM_SYNC  = 0
+        self.OFFSET_ARM_SYNC = 0
         self.OFFSET_ARM_NOISE = 1
-        self.OFFSET_SW_SYNC   = 4
+        self.OFFSET_SW_SYNC = 4
 
     def uptime(self):
         """
         Returns uptime in seconds, assumes 250 MHz FPGA clock
         """
-        return self.read_uint('uptime')
+        try:
+            return self.read_uint('uptime')
+        except RuntimeError:
+            return ERROR_VALUE
 
     def set_delay(self, delay):
         """
@@ -1155,6 +1159,7 @@ class PhaseSwitch(Block):
         self.disable_demod(verify=verify)
         self.set_delay(0, verify=verify)
 
+
 class Eq(Block):
     def __init__(self, host, name, nstreams=8, ncoeffs=2**10, logger=None):
         """
@@ -1171,7 +1176,7 @@ class Eq(Block):
         self.ncoeffs = ncoeffs
         self.width = 16
         self.bin_point = 5
-        self.format = 'H'#'L'
+        self.format = 'H'  # 'L'
         self.streamsize = struct.calcsize(self.format)*self.ncoeffs
 
     def set_coeffs(self, stream, coeffs, verify=False):
@@ -1202,6 +1207,12 @@ class Eq(Block):
                          offset=(self.streamsize * stream))
         return data
 
+    def get_status(self, stream):
+        """
+        Return the Eq status:  coeffs (per stream) and clip_count (for all)
+        """
+        return {'coeffs': self.get_coeffs(stream), 'clip_count': self.clip_count()}
+
     def get_coeffs(self, stream):
         """
         Read the coefficients being used from the board.
@@ -1228,8 +1239,9 @@ class Eq(Block):
         """
         for stream in range(self.nstreams):
             self.set_coeffs(stream,
-               coeffs * np.ones(self.ncoeffs, dtype='>%s' % self.format),
-               verify=verify)
+                            coeffs * np.ones(self.ncoeffs, dtype='>%s' % self.format),
+                            verify=verify)
+
 
 class EqTvg(Block):
     def __init__(self, host, name, nstreams=8, nchans=2**13, logger=None):
@@ -1946,7 +1958,7 @@ class Pam(Block):
         super(Pam, self).__init__(host, name, logger)
 
         self.i2c = i2c.I2C(host, name, retry=self.I2C_RETRY)
-        self._cached_atten = None # for checking I2C stability
+        self._cached_atten = None  # for checking I2C stability
 
     def _warning(self, msg, *args, **kwargs):
         self.logger.log(I2CWARNING, self._prefix_log(msg), *args, **kwargs)
@@ -1961,14 +1973,15 @@ class Pam(Block):
         """Return a dict of config status."""
         rv = {}
         try:
-            rv["atten"] = self.get_attenuation()
+            rv["atten_e"], rv["atten_n"] = self.get_attenuation()
             rv["power_e"] = self.power('east')
             rv["power_n"] = self.power('north')
             rv["voltage"] = self.shunt("u")
             rv["current"] = self.shunt("i")
             rv["id"] = self.id()
         except(RuntimeError, IOError):
-            rv["atten"] = ERROR_VALUE
+            rv["atten_e"] = ERROR_VALUE
+            rv["atten_n"] = ERROR_VALUE
             rv["power_e"] = ERROR_VALUE
             rv["power_n"] = ERROR_VALUE
             rv["voltage"] = ERROR_VALUE
@@ -2001,9 +2014,9 @@ class Pam(Block):
             self._atten = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
 
         self._atten.write(self._db2gpio(east, north))
-        self._cached_atten = (east, north) # cache for stability check
+        self._cached_atten = (east, north)  # cache for stability check
         if verify:
-            assert((east,north) == self.get_attenuation())
+            assert((east, north) == self.get_attenuation())
 
     def shunt(self, name='i'):
         """ Get current/voltage of the power supply
@@ -2193,8 +2206,8 @@ class Fem(Block):
         try:
             switch, east, north = self.switch()
             rv["switch"] = switch
-            rv["e_lna_power"] = east
-            rv["n_lna_power"] = north
+            rv["lna_power_e"] = east
+            rv["lna_power_n"] = north
             rv["temp"] = self.temperature()
             rv["voltage"] = self.shunt("u")
             rv["current"] = self.shunt("i")
@@ -2206,8 +2219,8 @@ class Fem(Block):
             rv["humidity"] = self.humidity()
         except(RuntimeError, IOError):
             rv["switch"] = ERROR_STRING
-            rv["e_lna_power"] = ERROR_VALUE
-            rv["n_lna_power"] = ERROR_VALUE
+            rv["lna_power_e"] = ERROR_VALUE
+            rv["lna_power_n"] = ERROR_VALUE
             rv["temp"] = ERROR_VALUE
             rv["voltage"] = ERROR_VALUE
             rv["current"] = ERROR_VALUE

@@ -16,6 +16,7 @@ INITIALIZED_BIT = 15
 PAM_MAX = 15
 PAM_MIN = 0
 
+
 def _jsonify(val, cast=True):
     if not cast:
         return val
@@ -24,7 +25,7 @@ def _jsonify(val, cast=True):
     if isinstance(val, bool):
         # bools are compared using lambda x: x == "True" later
         val = str(val)
-    elif isinstance(val, (list, tuple)):
+    elif isinstance(val, (list, tuple, dict)):
         val = json.dumps(val)
     elif isinstance(val, np.ndarray):
         val = json.dumps(val.tolist())
@@ -32,7 +33,6 @@ def _jsonify(val, cast=True):
         # newer redis-py does not accept Nonetype, wrap in json.dumps
         val = json.dumps(val)
     return val
-
 
 
 class SnapFengine(object):
@@ -350,22 +350,28 @@ class SnapFengine(object):
         status['pps_count'] = jsonify(self.sync.count())
         status['serial'] = jsonify(self.serial)
         # populate pam status
-        for i,pam in enumerate(self.pams):
+        for i, pam in enumerate(self.pams):
             for key, val in pam.get_status().items():
                 status["pam%d_" % (i) + key] = jsonify(val)
         # populate fem status
-        for i,fem in enumerate(self.fems):
+        for i, fem in enumerate(self.fems):
             for key, val in fem.get_status().items():
                 status["fem%d_" % (i) + key] = jsonify(val)
         # fft overflow status
         status['fft_overflow'] = jsonify(self.pfb.is_overflowing())
-        self.pfb.rst_stats() # clear pfb overflow flag for next time
+        self.pfb.rst_stats()  # clear pfb overflow flag for next time
         # add adc snapshot statistics
         for key, val in self.input.get_status().items():
             status[key] = jsonify(val)
         # add autocorrelation from on-board correlator
         for stream in range(self.input.ninput_mux_streams):
             status['stream%d_autocorr' % stream] = jsonify(self.corr.get_new_corr(stream, stream).real)
+        for stream in range(self.eq.nstreams):
+            for key, val in self.eq.get_status(stream).items():
+                if key == 'clip_count':  # There is only one of these per snap.
+                    status['eq_%s' % key] = jsonify(val)
+                else:
+                    status['stream%d_eq_%s' % (stream, key)] = jsonify(val)
         return status
 
 #    def get_pam_atten_by_target(self, chan, target_pow=None,

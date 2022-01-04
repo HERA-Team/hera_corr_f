@@ -49,6 +49,8 @@ class HeraCorrelator(object):
         self.r_bytes = redis.Redis(redishost, decode_responses=False)
         self.redis_transport = redis_transport  # XXX why have this (ARP 11/3/21)?
         self.passive = passive
+        if isinstance(hosts, str):  # So that you can just use one as a str.
+            hosts = [hosts]
 
         self.fengs = {}
         self.get_config(config)  # sets self.config
@@ -331,8 +333,7 @@ class HeraCorrelator(object):
         Inputs:
             host (str): Host to target.
         """
-        feng = self.fengs[host]
-        status = feng.get_status(jsonify=True)
+        status = self.fengs[host].get_status(jsonify=True)
         self.r.hmset('status:snap:%s' % host, status)
 
     def set_redis_status_fengs(self, hosts=None,
@@ -608,12 +609,12 @@ class HeraCorrelator(object):
                     # will error if verification fails
                     fem.switch(mode,east=east,north=north,verify=verify)
                     self.r.hset('status:snap:%s' % host,
-                                'fem[%d]' % cnt, mode)
+                                'fem%d_switch' % cnt, mode)
                 except(RuntimeError,AssertionError,IOError):
-                    self.logger.warning('Failed to switch %s.fem[%d]' %
+                    self.logger.warning('Failed to switch %s.fem%d' %
                                         (host, cnt))
                     self.r.hset('status:snap:%s' % host,
-                                'fem[%d]' % cnt, 'failed')
+                                'fem%d_switch' % cnt, 'failed')
                     # only logging failures at resolution of host
                     failed.append(host)
         return set(failed) # only return unique hosts
@@ -808,7 +809,7 @@ class HeraCorrelator(object):
                 coeffs = self.lookup_eq_coeffs(ant, pol)
                 try:
                     feng.eq.set_coeffs(stream, coeffs, verify=verify)
-                except(AssertionError,RuntimeError):
+                except(AssertionError, RuntimeError):
                     # Catch errs so an attempt is made for each stream
                     failed.append((stream, (ant, pol)))
         if len(failed) > 0:
