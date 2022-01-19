@@ -1125,8 +1125,9 @@ class HeraCorrelator(object):
         # Map fengs to ports
         source_ports = {
             # if source port unspecified, auto-increment mod 4
+            # JXK: chaning source port, auto-increment to mod 8 for ibverbs
             h: self.config['fengines'][h].get('source_port',
-                                              dest_port + (cnt % 4))
+                                              dest_port + (cnt % 8))
             for cnt,h in enumerate(self.fengs.keys())
         }
         # Extract xeng channel mappings, ips, and macs
