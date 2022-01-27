@@ -107,7 +107,8 @@ if __name__ == "__main__":
         corr.r.set(script_redis_key, "alive", ex=max(60, args.delay * 2))
         while corr.r.exists('disable_monitoring'):
             if not locked_out:
-                logger.warning('Monitoring locked out. Retrying every 10 seconds')
+                logger.warning('Monitoring locked out by {}. Retrying every 10 seconds'
+                               .format(corr.r.get('disable_monitoring')))
                 locked_out = True
             corr.r.set(script_redis_key, "locked out", ex=20)
             time.sleep(10)
