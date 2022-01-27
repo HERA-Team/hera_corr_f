@@ -1,13 +1,9 @@
 #! /usr/bin/env python
 
+from __future__ import print_function
 import argparse
-from hera_corr_f import HeraCorrelator, __version__
+from hera_corr_f import HeraCorrelator
 from hera_corr_cm.handlers import add_default_log_handlers
-import numpy as np
-import struct
-import collections
-import time
-import yaml
 import logging
 
 logger = add_default_log_handlers(logging.getLogger(__file__))
@@ -24,7 +20,7 @@ args = parser.parse_args()
 corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)
 
 for feng in corr.fengs:
-    corr.disable_monitoring(30, wait=True)
+    corr.disable_monitoring(__file__, 30, verify=True)
     for pn, pam in enumerate(feng.pams):
         ants = feng.ants[2*pn: 2*pn + 2]
         try:
@@ -34,6 +30,7 @@ for feng in corr.fengs:
             logger.error("Failed to read power from antenna %s. Skipping EQ" % ants)
             continue
         att_e, att_n = pam.attenuation()
-        print "Antenna %s power: N: %.2f (attenuation %d dB) E: %.2f (attenuation %d dB)" % (ants, pow_n, att_n, pow_e, att_e)
+        print("Antenna %s power: N: %.2f (attenuation %d dB) E: %.2f (attenuation %d dB)"
+              % (ants, pow_n, att_n, pow_e, att_e))
 
 corr.enable_monitoring(30, wait=True)

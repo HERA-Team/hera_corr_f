@@ -3,9 +3,7 @@
 import argparse
 from hera_corr_f import HeraCorrelator, __version__
 from hera_corr_cm import handlers
-import redis
 import time
-import yaml
 import logging
 import json
 import sys
@@ -101,7 +99,7 @@ def main():
         # Before we start manipulating boards, prevent monitoing scripts from
         # sending TFTP traffic. Expire the key after 5 minutes to lazily account for
         # issues with this script crashing.
-        corr.disable_monitoring(expiry=600)
+        corr.disable_monitoring(__file__, expiry=600)
 
         if args.program or args.forceprogram:
             kwargs = {
@@ -146,7 +144,7 @@ def main():
 
             failed = corr.disable_phase_switches(**kwargs)
             warn_failed(logger, failed, 'disable_phase_switches', all_snaps=args.allsnaps)
-            
+
             # Initialize FEM and PAM but accept failure
             fem_failed = corr.switch_fems('antenna', **kwargs)
             pam_failed = corr.initialize_pams(**kwargs)
@@ -188,7 +186,7 @@ def main():
         # Sync logic. Do global sync first, and then noise generators
         # wait for a PPS to pass then arm all the boards
         if args.sync:
-            #corr.disable_eths() # ARP: no need to disable, and keeping them enabled reduces risk of them going incommunicado 
+            #corr.disable_eths() # ARP: no need to disable, and keeping them enabled reduces risk of them going incommunicado
             #corr.do_for_all_f("change_period", block="sync", args=[0])
             corr.sync()
             #corr.sync_noise(manual=args.mansync)
