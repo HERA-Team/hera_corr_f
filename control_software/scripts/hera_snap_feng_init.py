@@ -131,11 +131,9 @@ def main():
                     break
                 logger.warn('Reinitializing because ADC alignment failed: %s' % (','.join(failed)))
                 failed = corr.align_adcs(hosts=failed, reinit=True, **kwargs)
-            corr.set_redis_status_fengs()
             warn_failed(logger, failed, 'align_adcs', all_snaps=args.allsnaps)
 
             failed = corr.initialize_dsps(**kwargs)
-            corr.set_redis_status_fengs()
             warn_failed(logger, failed, 'initialize_dsps', all_snaps=args.allsnaps)
 
             failed = corr.fft_shift_pfbs(**kwargs)
@@ -170,7 +168,6 @@ def main():
             # Channels not assigned to Xengs in the config file are
             # ignored. Following are the assumed globals:
             failed = corr.config_dest_eths(**kwargs)
-            corr.set_redis_status_fengs()
             warn_failed(logger, failed, 'config_dest_eths', all_snaps=args.allsnaps)
 
         #if args.tvg:
