@@ -131,11 +131,9 @@ def main():
                     break
                 logger.warn('Reinitializing because ADC alignment failed: %s' % (','.join(failed)))
                 failed = corr.align_adcs(hosts=failed, reinit=True, **kwargs)
-            corr.set_redis_status_fengs()
             warn_failed(logger, failed, 'align_adcs', all_snaps=args.allsnaps)
 
             failed = corr.initialize_dsps(**kwargs)
-            corr.set_redis_status_fengs()
             warn_failed(logger, failed, 'initialize_dsps', all_snaps=args.allsnaps)
 
             failed = corr.fft_shift_pfbs(**kwargs)
@@ -150,6 +148,7 @@ def main():
             # Initialize FEM and PAM but accept failure
             fem_failed = corr.switch_fems('antenna', **kwargs)
             pam_failed = corr.initialize_pams(**kwargs)
+            corr.set_redis_status_fengs()
             if len(fem_failed) > 0:
                 logger.warn('FEM initialization failed: %s' % (','.join(fem_failed)))
             if len(pam_failed) > 0:
