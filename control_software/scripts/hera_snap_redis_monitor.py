@@ -154,7 +154,7 @@ if __name__ == "__main__":
 
                 # Update status:snaprf:<host>:<stream>
                 snap_rf_stats = {}
-                snap_rf_stats["timestamp"] = datetime.now().isoformat()
+                snap_rf_stats["timestamp"] = feng['timestamp']
                 snap_rf_stats["fft_of"] = fft_overflow
                 snap_rf_stats["clip_count"] = clip_count
                 for key, val in snaprf_mon.items():
