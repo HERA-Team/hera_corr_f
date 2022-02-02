@@ -148,7 +148,6 @@ def main():
             # Initialize FEM and PAM but accept failure
             fem_failed = corr.switch_fems('antenna', **kwargs)
             pam_failed = corr.initialize_pams(**kwargs)
-            corr.set_redis_status_fengs()
             if len(fem_failed) > 0:
                 logger.warn('FEM initialization failed: %s' % (','.join(fem_failed)))
             if len(pam_failed) > 0:
@@ -169,7 +168,6 @@ def main():
             # Channels not assigned to Xengs in the config file are
             # ignored. Following are the assumed globals:
             failed = corr.config_dest_eths(**kwargs)
-            corr.set_redis_status_fengs()
             warn_failed(logger, failed, 'config_dest_eths', all_snaps=args.allsnaps)
 
         #if args.tvg:
