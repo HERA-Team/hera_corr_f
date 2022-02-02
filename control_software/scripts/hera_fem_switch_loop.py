@@ -90,7 +90,7 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
     for host in SNAP_HOST:
         # Disable the monitoring process for 5 minutes,
         # to stop it interfering with this script
-        c.disable_monitoring(300, wait=True)
+        c.disable_monitoring(__file__, 300)
 
         snap = SnapFengine(host, redishost=redishost)
 
@@ -120,7 +120,7 @@ def main(redishost='redishost', hostname=None, antenna_input=None,
                                                           ant=antenna_ind)
                         )
 
-            c.disable_monitoring(60, wait=True)
+            c.disable_monitoring(__file__, 60, verify=True)
             fem_ind = antenna_ind / 2
             fem_pol = antenna_ind % 2
             fem = snap.fems[fem_ind]

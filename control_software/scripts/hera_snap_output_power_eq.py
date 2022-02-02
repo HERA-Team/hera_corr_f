@@ -33,9 +33,9 @@ n_loop_max = 4
 eq_start_val = 1000
 
 for ant, snap in corr.ant_to_snap.iteritems():
-    corr.disable_monitoring(expiry=60, wait=True)
+    corr.disable_monitoring(__file__, expiry=60, verify=True)
     for pol, snap_chan in snap.iteritems():
-        corr.disable_monitoring(expiry=30)
+        corr.disable_monitoring(__file__, expiry=30)
         # Start with coefficients at some nominal value.
         # Otherwise we'll never recover from (eg) coefficients of 0
         corr.set_eq(ant, pol, eq=eq_start_val)

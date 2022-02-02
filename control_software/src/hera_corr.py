@@ -58,7 +58,7 @@ class HeraCorrelator(object):
 
         if not passive:
             if block_monitoring:  # XXX still necessary (ARP 11/3/21)?
-                self.disable_monitoring(60, verify=True)
+                self.disable_monitoring('hera_corr.py', 60, verify=True)
             self._hookup_from_redis()
             self._unconnected = self.connect_fengs(hosts=hosts)
 
@@ -387,21 +387,22 @@ class HeraCorrelator(object):
             major (int): Major version to match. Default MAJOR_VERSION
         """
         feng = self.fengs[host]
-        _maj,_min = feng.version()
+        _maj, _min = feng.version()
         if major is not None:
             assert(_maj in major)
 
-    def disable_monitoring(self, expiry=60, verify=True, timeout=60):
+    def disable_monitoring(self, src, expiry=60, verify=True, timeout=60):
         """
         Set "disable_monitoring" key in redis, signaling other processes
         to stop monitoring (which can interfere with TFTP traffic).
 
         Inputs:
+            src (str): source of disable command
             expiry (float): Period (in seconds) to disable monitoring
             verify (bool): Check success.  Default: True
-            timeout (float): Timeout in seconds. Default: 60.
+            timeout (float): Timeout in seconds if verify == True. Default: 60.
         """
-        self.r.set('disable_monitoring', 1, ex=expiry)
+        self.r.set('disable_monitoring', src, ex=expiry)
         if verify:
             start = time.time()
             while self.is_monitoring():

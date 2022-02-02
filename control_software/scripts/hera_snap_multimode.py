@@ -53,7 +53,7 @@ corr = HeraCorrelator(redishost=args.redishost, config=args.config_file,
 # Before we start manipulating boards, prevent monitoing scripts from
 # sending TFTP traffic. Expire the key after 5 minutes to lazily account for
 # issues with this script crashing.
-corr.disable_monitoring(expiry=600, wait=True)
+corr.disable_monitoring(__file__, expiry=600, verify=True)
 
 
 with open(args.config_file, 'r') as fp:
