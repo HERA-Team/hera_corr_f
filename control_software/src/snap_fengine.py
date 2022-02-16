@@ -333,7 +333,7 @@ class SnapFengine(object):
 
     def get_status(self, jsonify=False):
         '''Return dict of config status.'''
-        jsonify = lambda val: _jsonify(var, val, cast=jsonify)
+        jsonify = lambda var, val: _jsonify(var, val, cast=jsonify)
         status = {}
         # High-level configuration status
         status['is_programmed'] = jsonify('is_programmed', self.is_programmed())
@@ -371,7 +371,7 @@ class SnapFengine(object):
                 if key == 'clip_count':  # There is only one of these per snap.
                     status['eq_%s' % key] = jsonify('eq_%s' % key, val)
                 else:
-                    status['stream%d_eq_%s' % (stream, key)] = jsonify('stream%d_eq_%s', val)
+                    status['stream%d_eq_%s' % (stream, key)] = jsonify('stream%d_eq_%s' % (stream, key), val)
         return status
 
 #    def get_pam_atten_by_target(self, chan, target_pow=None,
