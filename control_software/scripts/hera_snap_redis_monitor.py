@@ -149,7 +149,7 @@ if __name__ == "__main__":
         # Copy values over to status:snaprf:<host>:<stream> and status:ant:<ant>:<pol>
         for host in corr.fengs:
             sskey = "status:snap:{}".format(host)
-            feng = corr.r.hgetall(sskey)
+            feng = corr.r_bytes.hgetall(sskey)
             fft_overflow = corr.r.hget(sskey, "fft_overflow")
             clip_count = corr.r.hget(sskey, "eq_clip_count")
             antpols = corr.snap_to_ant[host]

@@ -28,7 +28,7 @@ def _jsonify(val, cast=True):
     elif isinstance(val, (list, tuple, dict)):
         val = json.dumps(val)
     elif isinstance(val, np.ndarray):
-        val = json.dumps(val.tolist())
+        val = val.tobytes()
     elif val is None:
         # newer redis-py does not accept Nonetype, wrap in json.dumps
         val = json.dumps(val)
