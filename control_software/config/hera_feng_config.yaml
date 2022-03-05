@@ -48,7 +48,7 @@ fft_shift: 0x1557
 # Specify a full path to an F-Engine fpg files
 # or redis:<fpg filename> if the fpg file has been uploaded to redis
 #fpgfile: '/home/hera/src/hera_corr_f/snap_fengine/outputs/snap_fengine.fpg'
-fpgfile: '/home/hera/src/hera_corr_f/snap_fengine/outputs/snap_fengine_2021-03-03_1621.fpg'
+fpgfile: '/home/hera/src/hera_corr_f/snap_fengine/outputs/snap_fengine_2021-10-07_2108.fpg'
 
 # Destination port for SNAP data
 dest_port: 8511
@@ -75,6 +75,7 @@ fengines:
     heraNode12Snap3:
         phase_switch_index: [19,20,21,22,23,24]
         ants: [93, 94, 95]
+# JK 3/16/21 PAM control broken
     heraNode0Snap0:
         phase_switch_index: [1,2,3,4,5,6]
         ants: [0, 1, 2]
@@ -128,20 +129,21 @@ fengines:
 #    heraNode7Snap3:
 #        phase_switch_index: [19,20,21,22,23,24]
 #        ants: [45, 46, 47]
-## WR in Node4 deactivated due to packet issues
-##    heraNode4Snap0: # ARP: not syncing 2/28/20
-##        phase_switch_index: [1,2,3,4,5,6]
-##        ants: [48, 49, 50]
-##    heraNode4Snap1:
-##        phase_switch_index: [7,8,9,10,11,12]
-##        ants: [51, 52, 53]
-##    heraNode4Snap2:
-##        phase_switch_index: [13,14,15,16,17,18]
-##        ants: [54, 55, 56]
-##    heraNode4Snap3:
-##        phase_switch_index: [19,20,21,22,23,24]
-##        ants: [57, 58, 59]
-    heraNode5Snap0: # ARP 2/28/20 not syncing
+# WR in Node4 deactivated due to packet issues
+# ARP installed new NCM into Node4 (DDB) 10/16/21
+    heraNode4Snap0: # ARP: not syncing 2/28/20
+        phase_switch_index: [1,2,3,4,5,6]
+        ants: [48, 49, 50]
+    heraNode4Snap1:
+        phase_switch_index: [7,8,9,10,11,12]
+        ants: [51, 52, 53]
+    heraNode4Snap2:
+        phase_switch_index: [13,14,15,16,17,18]
+        ants: [54, 55, 56]
+    heraNode4Snap3:
+        phase_switch_index: [19,20,21,22,23,24]
+        ants: [57, 58, 59]
+    heraNode5Snap0: # ARP 2/28/20 not syncing JK 3/16/21 WR lock lost, returned 3/19/21
         phase_switch_index: [1,2,3,4,5,6]
         ants: [60, 61, 62]
 #  JK: MMCM not locking: Still broken (20-Jan-21)
@@ -159,33 +161,33 @@ fengines:
 #        phase_switch_index: [19,20,21,22,23,24]
 #        ants: [69, 70, 71]
 #  JK: node13 not turning on (20-Jan-21)
-#    heraNode13Snap0:
-#        phase_switch_index: [1,2,3,4,5,6]
-#        ants: [72, 73, 74]
-#    heraNode13Snap1:
-#        phase_switch_index: [7,8,9,10,11,12]
-#        ants: [75, 76, 77]
-#    heraNode13Snap2:
-#        phase_switch_index: [13,14,15,16,17,18]
-#        ants: [78, 79, 80]
-#    heraNode13Snap3:
-#        phase_switch_index: [19,20,21,22,23,24]
-#        ants: [81, 82, 83]
+    heraNode13Snap0:
+        phase_switch_index: [1,2,3,4,5,6]
+        ants: [72, 73, 74]
+    heraNode13Snap1:
+        phase_switch_index: [7,8,9,10,11,12]
+        ants: [75, 76, 77]
+    heraNode13Snap2:
+        phase_switch_index: [13,14,15,16,17,18]
+        ants: [78, 79, 80]
+    heraNode13Snap3:
+        phase_switch_index: [19,20,21,22,23,24]
+        ants: [81, 82, 83]
 ## ARP 08/21/20 WR on Node3 not communicating, no phase lock
 ## ARP 08/26/20 power cycle fixed
 ## ARP 10/07/20 WR "active" but not in PHASE_LOCK, some evidence that it may drift out of lock, deactivating for now
-#    heraNode3Snap0:
-#        phase_switch_index: [1,2,3,4,5,6]
-#        ants: [96, 97, 98]
-#    heraNode3Snap1:
-#        phase_switch_index: [7,8,9,10,11,12]
-#        ants: [99, 100, 101]
-#    heraNode3Snap2:
-#        phase_switch_index: [13,14,15,16,17,18]
-#        ants: [102, 103, 104]
-#    heraNode3Snap3:
-#        phase_switch_index: [19,20,21,22,23,24]
-#        ants: [105, 106, 107]
+    heraNode3Snap0:
+        phase_switch_index: [1,2,3,4,5,6]
+        ants: [96, 97, 98]
+    heraNode3Snap1:
+        phase_switch_index: [7,8,9,10,11,12]
+        ants: [99, 100, 101]
+    heraNode3Snap2:
+        phase_switch_index: [13,14,15,16,17,18]
+        ants: [102, 103, 104]
+    heraNode3Snap3:
+        phase_switch_index: [19,20,21,22,23,24]
+        ants: [105, 106, 107]
     heraNode10Snap0:
         phase_switch_index: [1,2,3,4,5,6]
         ants: [108, 109, 110]
@@ -198,7 +200,7 @@ fengines:
     heraNode10Snap3:
         phase_switch_index: [19,20,21,22,23,24]
         ants: [117, 118, 119]
-    heraNode14Snap0:
+    heraNode14Snap0: # JK 3/16/21 WR lock lost, returned 3/19/21
         phase_switch_index: [1,2,3,4,5,6]
         ants: [120, 121, 122]
     heraNode14Snap1:
@@ -223,18 +225,31 @@ fengines:
         phase_switch_index: [19,20,21,22,23,24]
         ants: [141, 142, 143]
 # JK: MMCM not locking 22-Jan-21
+# ARP Node15Snap0 not initializing 10/17/21
 #    heraNode15Snap0:
 #        phase_switch_index: [1,2,3,4,5,6]
 #        ants: [144, 145, 146]
-#    heraNode15Snap1:
-#        phase_switch_index: [7,8,9,10,11,12]
-#        ants: [147, 148, 149]
-#    heraNode15Snap2:
-#        phase_switch_index: [13,14,15,16,17,18]
-#        ants: [150, 151, 152]
-#    heraNode15Snap3:
-#        phase_switch_index: [19,20,21,22,23,24]
-#        ants: [153, 154, 155]
+    heraNode15Snap1:
+        phase_switch_index: [7,8,9,10,11,12]
+        ants: [147, 148, 149]
+    heraNode15Snap2:
+        phase_switch_index: [13,14,15,16,17,18]
+        ants: [150, 151, 152]
+    heraNode15Snap3:
+        phase_switch_index: [19,20,21,22,23,24]
+        ants: [153, 154, 155]
+    heraNode2Snap0:
+        phase_switch_index: [1,2,3,4,5,6]
+        ants: [156, 157, 158]
+    heraNode2Snap1:
+        phase_switch_index: [7,8,9,10,11,12]
+        ants: [159, 160, 161]
+    heraNode2Snap2:
+        phase_switch_index: [13,14,15,16,17,18]
+        ants: [162, 163, 164]
+    heraNode2Snap3:
+        phase_switch_index: [19,20,21,22,23,24]
+        ants: [165, 166, 167]
 #
 # Data is sent assuming a total of 32 Xengines and
 # a maximum of 48 channels per Xengine. If all the

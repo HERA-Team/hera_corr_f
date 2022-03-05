@@ -1,8 +1,11 @@
 import logging
 from hera_corr_cm.handlers import add_default_log_handlers
 import numpy as np
+import time
+import json
 import datetime
 import casperfpga
+import socket
 from blocks import *
 
 # 'source_sel' register only on fpga only uses lowest 2 bits
@@ -12,6 +15,25 @@ ADC_ALIGNED_BIT = 14
 INITIALIZED_BIT = 15
 PAM_MAX = 15
 PAM_MIN = 0
+
+
+def _jsonify(val, cast=True):
+    if not cast:
+        return val
+    # make a few explicit type conversions to coerce non-redis
+    # compatible variables into redis.
+    if isinstance(val, bool):
+        # bools are compared using lambda x: x == "True" later
+        val = str(val)
+    elif isinstance(val, (list, tuple, dict)):
+        val = json.dumps(val)
+    elif isinstance(val, np.ndarray):
+        val = json.dumps(val.tolist())
+    elif val is None:
+        # newer redis-py does not accept Nonetype, wrap in json.dumps
+        val = json.dumps(val)
+    return val
+
 
 class SnapFengine(object):
     def __init__(self, host, ant_indices=None, logger=None,
@@ -37,9 +59,9 @@ class SnapFengine(object):
 
         # blocks
         self.synth = Synth(self.fpga, 'lmx_ctrl')
-        self.adc = Adc(self.fpga) # not a subclass of Block
+        self.adc = Adc(self.fpga)  # not a subclass of Block
         self.sync = Sync(self.fpga, 'sync')
-        #self.noise = NoiseGen(self.fpga, 'noise', nstreams=3)
+        self.noise = NoiseGen(self.fpga, 'noise', nstreams=6)
         self.input = Input(self.fpga, 'input', nstreams=12)
         self.delay = Delay(self.fpga, 'delay', nstreams=6)
         self.pfb = Pfb(self.fpga, 'pfb')
@@ -63,12 +85,12 @@ class SnapFengine(object):
             self.synth,
             self.adc,
             self.sync,
-            #self.noise, # temporarily removed
+            self.noise,
             self.input,
             self.delay,
             self.pfb,
             self.eq,
-            #self.eq_tvg, # temporarily removed
+            # self.eq_tvg, # temporarily removed
             self.reorder,
             self.packetizer,
             self.eth,
@@ -122,10 +144,10 @@ class SnapFengine(object):
                 time.sleep(0.1)
             assert(self.fpga.is_running())
 
-    def initialize_adc(self, verify=False):
-        """Initialize Synth and Adc blocks, then reprogram FPGA."""        
+    def initialize_adc(self, sample_rate=500., verify=False):
+        """Initialize Synth and Adc blocks, then reprogram FPGA."""
         self.synth.initialize(verify=verify)
-        self.adc.init(verify=verify)
+        self.adc.init(sample_rate=sample_rate, verify=verify)
         # Mark ADC as uncalibrated
         self._set_adc_status(0)
 
@@ -145,12 +167,12 @@ class SnapFengine(object):
         if len(fails) > 0:
             self.logger.warning("rampTest failed on: " + str(fails))
         else:
-            self._set_adc_status(1) # record status
+            self._set_adc_status(1)  # record status
         if verify:
-            assert(self.adc_is_configured()) # errors if anything failed
+            assert(self.adc_is_configured())  # errors if anything failed
         # Otherwise, finish up here.
         self.adc.selectADC()
-        self.adc.adc.selectInput([1,1,3,3])
+        self.adc.adc.selectInput([1, 1, 3, 3])
         self.adc.set_gain(4)
 
     def _set_adc_status(self, val):
@@ -158,8 +180,8 @@ class SnapFengine(object):
 
     def adc_is_configured(self):
         """
-        Read the source_sel register 
-        within the Input block is see if the ADC is configured. 
+        Read the source_sel register
+        within the Input block is see if the ADC is configured.
         """
         return self.input.get_reg_bits('source_sel', ADC_ALIGNED_BIT, 1)
 
@@ -173,15 +195,20 @@ class SnapFengine(object):
             self._add_i2c()
         if self.is_initialized():
             return
-        
-        # Init all blocks other than Synth and ADC 
+
+        if self.version()[0] < 7:
+            # Version 6 had no noise generator
+            self.blocks = [blk for blk in self.blocks
+                           if blk not in [self.noise]]
+
+        # Init all blocks other than Synth and ADC
         blocks_to_init = [blk for blk in self.blocks
                           if blk not in [self.synth, self.adc]]
 
         for block in blocks_to_init:
             self.logger.info("Initializing block: %s" % block.name)
             block.initialize(verify=verify)
-        
+
         self._set_initialized(1)
 
     def _set_initialized(self, value):
@@ -190,8 +217,8 @@ class SnapFengine(object):
 
     def is_initialized(self):
         """
-        16th bit from LSB (0x8000) of the source_sel register 
-        within the Input block is set when the Fengine is 
+        16th bit from LSB (0x8000) of the source_sel register
+        within the Input block is set when the Fengine is
         initialized. Look for this bit and return.
         """
         return self.input.get_reg_bits('source_sel', INITIALIZED_BIT, 1)
@@ -256,6 +283,96 @@ class SnapFengine(object):
         """
         """
         return self.input.get_reg_bits('source_sel', DEST_CONFIG_BIT, 1)
+
+    def set_input(self, source, seed=0, stream=None, verify=True):
+        """
+        Choose the input to the F-Engine.
+
+        Inputs:
+            source (str): Either 'adc' or 'noise'.
+            seed (int): Initialization seed if source is 'noise'.
+            stream (int): Which stream to switch. If None, switch all.
+            verify (bool): Verify configuration. Default True.
+        """
+        if source == 'adc':
+            self.input.use_adc(stream=stream, verify=verify)
+        elif source == 'noise':
+            # inputs share noisegens, so relevant seed may be below
+            self.noise.set_seed(stream=stream, seed=seed, verify=verify)
+            self.input.use_noise(stream=stream, verify=verify)
+        else:
+            raise ValueError('Unsupported source: %s' % (source))
+
+    def get_input(self, stream=None):
+        """
+        Read input mode for F-Engine.
+
+        Inputs:
+            stream (int): Which stream to read input mode. If None, all.
+        """
+        if stream is None:
+            streams = list(range(self.input.ninput_mux_streams))
+        else:
+            streams = [stream]
+        inputs = []
+        for stream in streams:
+            code = self.input.get_reg_bits('source_sel',
+                            2*(self.input.ninput_mux_streams-1-stream), 2)
+            if code == self.input.USE_ADC:
+                inputs.append('adc')
+            elif code == self.input.USE_NOISE:
+                # inputs share noisegens, so relevant seed may be below
+                seed = self.noise.get_seed(2*(stream//2))
+                inputs.append('noise-%d' % (seed))
+            else:
+                raise ValueError('Unrecognized input: %d' % (code))
+        if len(streams) == 1:
+            return inputs[0]
+        else:
+            return inputs
+
+    def get_status(self, jsonify=False):
+        '''Return dict of config status.'''
+        jsonify = lambda val: _jsonify(val, cast=jsonify)
+        status = {}
+        # High-level configuration status
+        status['is_programmed'] = jsonify(self.is_programmed())
+        status['sample_rate'] = jsonify(self.adc.lmx.getFreq())
+        status['version'] = jsonify('%d.%d' % self.version())
+        status['adc_is_configured'] = jsonify(self.adc_is_configured())
+        status['is_initialized'] = jsonify(self.is_initialized())
+        status['dest_is_configured'] = jsonify(self.dest_is_configured())
+        status['input'] = jsonify(','.join(self.get_input()))
+        # Lower level stuff, deprecates get_fpga_stats
+        status['temp'] = jsonify(self.fpga.transport.get_temp())
+        status['timestamp'] = jsonify(datetime.datetime.now().isoformat())
+        status['uptime'] = jsonify(self.sync.uptime())
+        status['pps_count'] = jsonify(self.sync.count())
+        status['serial'] = jsonify(self.serial)
+        # populate pam status
+        for i, pam in enumerate(self.pams):
+            for key, val in pam.get_status().items():
+                status["pam%d_" % (i) + key] = jsonify(val)
+        # populate fem status
+        for i, fem in enumerate(self.fems):
+            for key, val in fem.get_status().items():
+                status["fem%d_" % (i) + key] = jsonify(val)
+        # fft overflow status
+        status['fft_overflow'] = jsonify(self.pfb.is_overflowing())
+        self.pfb.rst_stats()  # clear pfb overflow flag for next time
+        # add adc snapshot statistics
+        for key, val in self.input.get_status().items():
+            status[key] = jsonify(val)
+        # add autocorrelation from on-board correlator
+        for stream in range(self.input.ninput_mux_streams):
+            status['stream%d_autocorr' % stream] = jsonify(self.corr.get_new_corr(stream, stream).real)
+        for stream in range(self.eq.nstreams):
+            for key, val in self.eq.get_status(stream).items():
+                if key == 'clip_count':  # There is only one of these per snap.
+                    status['eq_%s' % key] = jsonify(val)
+                else:
+                    status['stream%d_eq_%s' % (stream, key)] = jsonify(val)
+        return status
 
 #    def get_pam_atten_by_target(self, chan, target_pow=None,
 #                                target_rms=None):

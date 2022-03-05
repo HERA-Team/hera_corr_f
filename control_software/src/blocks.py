@@ -4,6 +4,7 @@ import numpy as np
 import struct
 import socket
 import time
+import random
 import casperfpga
 import casperfpga.snapadc
 from hera_corr_cm.handlers import add_default_log_handlers
@@ -22,6 +23,9 @@ from scipy.linalg import hadamard  # for walsh (hadamard) matrices
 I2CWARNING = logging.INFO - 5
 logging.addLevelName('I2CWARNING', I2CWARNING)
 
+HIST_BINS = np.arange(-128, 128) # for histogram of ADC inputs
+ERROR_VALUE = -1 # default value for status reports if comms are broken
+ERROR_STRING = 'UNKNOWN' # default string for status reports if comms are broken
 
 # Block Classes
 class Block(object):
@@ -63,17 +67,12 @@ class Block(object):
     def _exception(self, msg, *args, **kwargs):
         self.logger.exception(self._prefix_log(msg), *args, **kwargs)
 
-    def listdev(self):
-        """
-        return a list of all register names within
-        the block.
-        """
-
     def initialize(self, verify=False):
         """
         Individual blocks should override this
         method to configure themselves appropriately
         """
+        pass
 
     def listdev(self):
         """
@@ -118,9 +117,9 @@ class Block(object):
 
 
 class Synth(casperfpga.synth.LMX2581):
-    def __init__(self, host, name, logger=None):
+    def __init__(self, host, name, fosc=10, logger=None):
         self.logger = logger or add_default_log_handlers(logging.getLogger(__name__ + "%s" % (host.host)))
-        super(Synth, self).__init__(host, name)
+        super(Synth, self).__init__(host, name, fosc=fosc)
         self.host = host
 
     def initialize(self, verify=False):
@@ -133,29 +132,51 @@ class Synth(casperfpga.synth.LMX2581):
         #self.powerOn()
         pass
 
+    def getFreq(self):
+        """
+        Infer the output sample clock from the configuration of
+        the LMX registers.
+        """
+        VCO_DIV = self.getWord('VCO_DIV')
+        VCO_DIV = 2 * (VCO_DIV + 1)
+        PLL_NUM_H = self.getWord('PLL_NUM_H')
+        PLL_NUM_L = self.getWord('PLL_NUM_L')
+        PLL_N = self.getWord('PLL_N')
+        PLL_DEN = self.getWord('PLL_DEN')
+        PLL_NUM = (PLL_NUM_H & 0b1111111111) << 12
+        PLL_NUM += PLL_NUM_L & 0b111111111111
+        return self.FOSC * (PLL_N + PLL_NUM / PLL_DEN) / VCO_DIV
+
 class Adc(casperfpga.snapadc.SNAPADC):
-    def __init__(self, host, sample_rate=500, num_chans=2, resolution=8, ref=10, logger=None, **kwargs):
+    def __init__(self, host, num_chans=2, resolution=8, ref=10,
+                 logger=None, **kwargs):
         """
         Instantiate an ADC block.
 
         Inputs:
            host (casperfpga.Casperfpga): Host FPGA
-           sample_rate (float): Sample rate in MS/s
            num_chans (int): Number of channels per ADC chip. Valid values are 1, 2, or 4.
            resolution (int): Bit resolution of the ADC. Valid values are 8, 12.
            ref (float): Reference frequency (in MHz) from which ADC clock is derived. If None, an external sampling clock must be used.
         """
-        self.logger = logger or add_default_log_handlers(logging.getLogger(__name__ + ":%s" % (host.host)))
-        casperfpga.snapadc.SNAPADC.__init__(self, host, ref=ref, logger=self.logger)
+        self.logger = logger or add_default_log_handlers(
+                      logging.getLogger(__name__ + ":%s" % (host.host)))
+        # Purposely setting ref=None below to prevent LMX object
+        # from being attached so we can do it ourselves
+        casperfpga.snapadc.SNAPADC.__init__(self, host, ref=None,
+                                            logger=self.logger)
+        # Attach our own wrapping of LMX
+        self.lmx = Synth(host, 'lmx_ctrl', fosc=ref)
         self.name            = 'SNAP_adc'
         self.num_chans       = num_chans
         self.interleave_mode = 4 >> num_chans
         self.clock_divide    = 1
-        self.sample_rate     = sample_rate
         self.resolution      = resolution
         self.host = host # the SNAPADC class doesn't directly expose this
+        self.working_taps = {}
         self._retry_cnt = 0
-        self._retry = kwargs.get('retry',7)
+        #self._retry = kwargs.get('retry',7)
+        self._retry = kwargs.get('retry',20)
         self._retry_wait = kwargs.get('retry_wait',1)
 
     def set_gain(self, gain):
@@ -186,8 +207,9 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.adc.write((gain_map[gain]<<4) + gain_map[gain], 0x2b)
 
     # OVERWRITING casperfpga.snapadc.SNAPADC.init
-    def init(self, verify=False):
-        """ Get SNAP ADCs into working condition
+    def init(self, sample_rate=500., verify=False):
+        """
+        Get SNAP ADCs into working condition
 
         Supported frequency range: 60MHz ~ 1000MHz. Set resolution to
         None to let init() automatically decide the best resolution.
@@ -195,10 +217,13 @@ class Adc(casperfpga.snapadc.SNAPADC):
         1. configuring frequency synthesizer LMX2581
         2. configuring clock source switch HMC922
         3. configuring ADCs HMCAD1511 (support HMCAD1520 in future)
-        4. configuring IDELAYE2 and ISERDESE2 inside of FPGA """
+        4. configuring IDELAYE2 and ISERDESE2 inside of FPGA
+
+        Inputs:
+           sample_rate (float): Sample rate in MS/s. Default: 500.
+        """
 
         # XXX verify currently not implemented
-        samplingRate = self.sample_rate
         numChannel = self.num_chans
         if self.lmx is not None:
             self.logger.debug("Reseting frequency synthesizer")
@@ -206,7 +231,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
             self.logger.debug("Disabling Synth output A")
             self.lmx.setWord(1, "OUTA_PD")
             self.logger.debug("Configuring frequency synthesizer")
-            assert(self.lmx.setFreq(samplingRate)) # Error if failed
+            assert(self.lmx.setFreq(sample_rate)) # Error if failed
 
         self.logger.debug("Configuring clock source switch")
         if self.lmx is not None:
@@ -220,7 +245,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.logger.debug("Initialising ADCs")
         self.adc.init() # resets: don't set ADC registers before here
 
-        # SNAP only uses one of the 3 ADC chips to provide clocks, 
+        # SNAP only uses one of the 3 ADC chips to provide clocks,
         # set others to lowest drive strength possible and terminate them
         self.selectADC([1,2]) # Talk to the 2nd and 3rd ADCs
         # Please refer to HMCAD1511 datasheet for more details
@@ -243,14 +268,14 @@ class Adc(casperfpga.snapadc.SNAPADC):
         # Select all ADCs and continue initialization
         self.selectADC()
 
-        if numChannel==1 and samplingRate<240:
+        if numChannel==1 and sample_rate<240:
             lowClkFreq = True
-        elif numChannel==2 and samplingRate<120:
+        elif numChannel==2 and sample_rate<120:
             lowClkFreq = True
-        elif numChannel==4 and samplingRate<60:
+        elif numChannel==4 and sample_rate<60:
             lowClkFreq = True
         # XXX this case already covered above
-        #elif numChannel==4 and self.RESOLUTION==14 and samplingRate<30:
+        #elif numChannel==4 and self.RESOLUTION==14 and sample_rate<30:
         #    lowClkFreq = True
         else:
             lowClkFreq = False
@@ -268,7 +293,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.selectADC()
         self.logger.debug('Reprogrammed')
 
-        # Select the clock source switch again. The reprogramming 
+        # Select the clock source switch again. The reprogramming
         # seems to lose this information
         self.logger.debug('Configuring clock source switch')
         if self.lmx is not None:
@@ -279,6 +304,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         # Snipped off ADC calibration here; it's now in
         # snap_fengine.
         self._retry_cnt = 0
+        self.working_taps = {} # initializing invalidates cached values
         return
 
     def bitslip(self, chipSel=None, laneSel=None, verify=False):
@@ -309,7 +335,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
                 val = self._set(val, ls, self.M_WB_W_ISERDES_BITSLIP_LANE_SEL)
 
                 # The registers related to reset, request, bitslip, and other
-                # commands after being set will not be automatically cleared.  
+                # commands after being set will not be automatically cleared.
                 # Therefore we have to clear them by ourselves.
                 self.adc._write(0x0, self.A_WB_W_CTRL)
                 if verify:
@@ -324,10 +350,10 @@ class Adc(casperfpga.snapadc.SNAPADC):
                     assert(self.adc._read(self.A_WB_W_CTRL) & self.M_WB_W_DELAY_TAP == 0x00)
 
 
-    # The ADC16 controller word (the offset in write_int method) 2 and 3 are for delaying 
+    # The ADC16 controller word (the offset in write_int method) 2 and 3 are for delaying
     # taps of A and B lanes, respectively.
     #
-    # Refer to the memory map word 2 and word 3 for clarification.  The memory map was made 
+    # Refer to the memory map word 2 and word 3 for clarification.  The memory map was made
     # for a ROACH design so it has chips A-H.  SNAP 1 design has three chips.
     def delay(self, tap, chipSel=None, laneSel=None, verify=False):
         if chipSel==None:
@@ -374,7 +400,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
 
         valt = self._set(0x0, tap, self.M_WB_W_DELAY_TAP)
 
-        # Don't be misled by the naming - "DELAY_STROBE" in casper repo.  It doesn't 
+        # Don't be misled by the naming - "DELAY_STROBE" in casper repo.  It doesn't
         # generate strobe at all.  You have to manually clear the bits that you set.
         self.adc._write(0x00, self.A_WB_W_CTRL)
         self.adc._write(0x00, self.A_WB_W_DELAY_STROBE_L)
@@ -402,61 +428,69 @@ class Adc(casperfpga.snapadc.SNAPADC):
             for ls in laneSel:
                 self.curDelay[cs,ls] = tap
 
+    def _find_working_taps(self, ker_size=5, maxtries=5):
+        '''Generate a dictionary of working tap values per chip/lane.
+        ker: size of convolutional kernel used as a stand-off from
+             marginal tap values. Default 7.'''
+        nchips, nlanes, ntaps = len(self.adcList), len(self.laneList), 32
+        # Make sure we have enough taps to work with, otherwise reinit ADC
+        for cnt in range(maxtries):
+            try:
+                for chip in self.adcList:
+                    assert(self.working_taps[chip].size > 0)
+                return
+            except(KeyError, AssertionError):
+                self.logger.info('Not enough working taps. Reinitializing.')
+                if len(self.working_taps) > 0:
+                    self.init()
+                self.working_taps = {}
+                h = np.zeros((nchips, ntaps), dtype=int)
+                self.setDemux(numChannel=1)
+                self.selectADC() # select all chips
+                self.adc.test('pat_deskew')
+                for t in range(ntaps):
+                    for L in self.laneList:
+                        for chip in self.adcList:
+                            self.delay(t, chip, L)
+                    self.snapshot()
+                    for chip,d in self.readRAM(signed=False).items():
+                        h[chip,t] = (np.sum(d == d[:1], axis=(0,1)) == d.shape[0] * d.shape[1])
+                self.selectADC() # select all chips
+                self.adc.test('off')
+                self.setDemux(numChannel=self.num_chans)
+                ker = np.ones(ker_size)
+                for chip in self.adcList:
+                    # identify taps that work for all lanes of chip
+                    taps = np.where(np.convolve(h[chip], ker, 'same') == ker_size)[0]
+                    self.working_taps[chip] = taps
+        raise RuntimeError('Failed to find working taps.')
 
-    def alignLineClock(self, chips_lanes=None, max_tries=100, ncapture=5):
+    def alignLineClock(self, chips_lanes=None, ker_size=5):
+        """Find a tap for the line clock that produces reliable bit
+        capture from ADC."""
         if chips_lanes is None:
             chips_lanes = {chip:self.laneList for chip in self.adcList}
-        self.logger.debug('Aligning line clock on ADCs/lanes: %s' % \
+        self.logger.info('Aligning line clock on ADCs/lanes: %s' % \
                           str(chips_lanes))
-        NTAPS = 32
-        NLANES = len(self.laneList)
-        failed_chips = {}
+        try:
+            self._find_working_taps(ker_size=ker_size)
+        except(RuntimeError):
+            self.logger.info('Failed to find working taps.')
+            return chips_lanes # total failure
         self.setDemux(numChannel=1)
         for chip, lanes in chips_lanes.items():
             self.selectADC(chip)
-            self.adc.test('pat_deskew')
-            taps = np.arange(1, NTAPS-1)
-            np.random.shuffle(taps)
-            match = {L: np.zeros(NTAPS, dtype=np.int) for L in lanes}
-            tries = {L: np.zeros(NTAPS, dtype=np.int) for L in lanes}
-            lane_taps = {L:0 for L in lanes}
-            for cnt in range(max_tries):
-                self.logger.debug('ADC=%d, iter=%d lane/taps: %s' % \
-                                  (chip, cnt, lane_taps))
-                for L,i in lane_taps.items():
-                    self.delay(taps[i], chip, L)
-                self.snapshot()
-                d = self.readRAM(chip).reshape(-1, NLANES)
-                for L,i in lane_taps.items():
-                    t = taps[i]
-                    m = np.unique(d[:,L], return_counts=True)[1].max()
-                    match[L][t] += m
-                    tries[L][t] += d.shape[0]
-                    if match[L][t] != tries[L][t]:
-                        # bit error happened, try a new tap
-                        lane_taps[L] = (i + 1) % len(taps)
-                has_winner = {L: np.where(tries[L] >= ncapture * d.shape[0],
-                                     match[L] == tries[L], 0) for L in lanes}
-                if np.all([np.any(has_winner[L]) for L in lanes]):
-                    # everyone has a winning tap, so we are done
-                    break
-            self.adc.test('off')
-            # time to pick our best choice
-            match = {L: np.where(match[L] == tries[L], match[L], 0)
-                        for L in lanes}
-            winner = {L: np.argmax(match[L], axis=0) for L in lanes}
-            self.logger.info('ADC=%d lane/taps: %s' % (chip, winner))
-            failed_lanes = []
-            for L,tap in winner.items():
+            taps = self.working_taps[chip]
+            tap = random.choice(taps)
+            for L in self.laneList: # redo all lanes to be the same
                 self.delay(tap, chip, L)
-                if match[L][tap] == 0:
-                    failed_lanes.append(L)
-            if len(failed_lanes) > 0:
-                failed_chips[chip] = failed_lanes
+            # Remove from future consideration if tap doesn't work out
+            self.working_taps[chip] = taps[np.abs(taps - tap) >= ker_size//2]
+            self.logger.info('Setting ADC=%d tap=%s' % (chip, tap))
         self.setDemux(numChannel=self.num_chans)
-        return failed_chips
+        return {} # success
 
-    def alignFrameClock(self, chips_lanes=None):
+    def alignFrameClock(self, chips_lanes=None, retry=True):
         """Align frame clock with data frame."""
         if chips_lanes is None:
             chips_lanes = {chip:self.laneList for chip in self.adcList}
@@ -489,57 +523,62 @@ class Adc(casperfpga.snapadc.SNAPADC):
             if len(failed_lanes) > 0:
                 failed_chips[chip] = failed_lanes
         self.setDemux(numChannel=self.num_chans)
-        if len(failed_chips) > 0:
+        if len(failed_chips) > 0 and retry:
             if self._retry_cnt < self._retry:
                 self._retry_cnt += 1
-                self.logger.debug('retry=%d/%d redo Line on ADCs/lanes: %s' % \
+                self.logger.info('retry=%d/%d redo Line on ADCs/lanes: %s' % \
                             (self._retry_cnt, self._retry, failed_chips))
                 self.alignLineClock(failed_chips)
                 return self.alignFrameClock(failed_chips)
         return failed_chips
 
-    def rampTest(self, chips=None):
-        if chips is None:
-            chips = self.adcList
+    def rampTest(self, nchecks=300, retry=False):
+        chips = self.adcList
         self.logger.debug('Ramp test on ADCs: %s' % str(chips))
         failed_chips = {}
         self.setDemux(numChannel=1)
-        for chip in chips:
-            self.selectADC(chip)
-            self.adc.test("en_ramp")
+        predicted = np.arange(128).reshape(-1,1)
+        self.selectADC() # select all chips
+        self.adc.test("en_ramp")
+        for cnt in range(nchecks):
             self.snapshot()
-            d = self.readRAM(chip).reshape(-1, self.RESOLUTION)
-            start = np.median(d[0])
-            ans = np.arange(start, start+d.shape[0])
-            ans = np.where(ans > 127, ans - 256, ans)
-            failed_lanes = [L for L in self.laneList if np.any(d[:,L] != ans)]
-            self.adc.test('off')
-            if len(failed_lanes) > 0:
-                failed_chips[chip] = failed_lanes
+            for chip,d in self.readRAM(signed=False).items():
+            	ans = (predicted + d[0,0]) % 256
+                failed_lanes = np.sum(d != ans, axis=0)
+                if np.any(failed_lanes) > 0:
+                    failed_chips[chip] = np.where(failed_lanes)[0]
+            if (retry is False) and len(failed_chips) > 0:
+                # can bail out if we aren't retrying b/c we don't need list of failures.
+                break
+        self.selectADC() # select all chips
+        self.adc.test('off')
         self.setDemux(numChannel=self.num_chans)
-        if len(failed_chips) > 0:
+        if len(failed_chips) > 0 and retry:
             if self._retry_cnt < self._retry:
                 self._retry_cnt += 1
-                self.logger.debug('retry=%d/%d redo Line/Frame on ADCs/lanes: %s' % \
+                self.logger.info('retry=%d/%d redo Line/Frame on ADCs/lanes: %s' % \
                             (self._retry_cnt, self._retry, failed_chips))
                 self.alignLineClock(failed_chips)
                 self.alignFrameClock(failed_chips)
-                return self.rampTest(failed_chips.keys())
+                return self.rampTest(nchecks=nchecks, retry=retry)
         return failed_chips
 
 
 class Sync(Block):
     def __init__(self, host, name, logger=None):
         super(Sync, self).__init__(host, name, logger)
-        self.OFFSET_ARM_SYNC  = 0
+        self.OFFSET_ARM_SYNC = 0
         self.OFFSET_ARM_NOISE = 1
-        self.OFFSET_SW_SYNC   = 4
+        self.OFFSET_SW_SYNC = 4
 
     def uptime(self):
         """
         Returns uptime in seconds, assumes 250 MHz FPGA clock
         """
-        return self.read_uint('uptime')
+        try:
+            return self.read_uint('uptime')
+        except RuntimeError:
+            return ERROR_VALUE
 
     def set_delay(self, delay):
         """
@@ -619,37 +658,43 @@ class NoiseGen(Block):
         super(NoiseGen, self).__init__(host, name, logger)
         self.nstreams = nstreams
 
-    def set_seed(self, stream, seed):
+    def set_seed(self, stream=None, seed=0, verify=True):
         """
-        Set the seed of the noise generator for a given stream.
-        """
-        if stream > self.nstreams:
-            self._error('Tried to set noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
-            return
-        if seed > 255:
-            self._error('Seed value is an 8-bit integer. It cannot be %d' % seed)
-            return
-        stream = 2*stream # latest block counts in antennas
-        regname = 'seed_%d' % (stream // 4)
-        self.set_reg_bits(regname, seed, 8 * (stream % 4), 8)
+        Set the seed of the noise generator for a given stream. Six 8-b
+        seeds are stored in two 32-b registers from LSB to MSB. Of these,
+        only seeds 0, 2, and 4 are used, going to the 3 LFSRs that serve
+        inputs 0-1, 2-3, and 4-5 respectively.
 
-    def get_seed(self, stream):
+        Inputs:
+            stream (int): Which stream to switch. If None, switch all.
+            seed (int): int 0-255 for seeding digital noise generator.
+        """
+        if stream is None:
+            for stm in range(self.nstreams):
+                self.set_seed(stream=stm, seed=seed, verify=verify)
+        else:
+            assert stream < self.nstreams
+            assert seed < 256
+            regname = 'seed_%d' % (stream // 4)
+            self.set_reg_bits(regname, seed, 8 * (stream % 4), 8)
+            if verify:
+                assert seed == self.get_seed(stream)
+
+    def get_seed(self, stream=None):
         """
         Get the seed of the noise generator for a given stream.
-        """
-        if stream > self.nstreams:
-            self._error('Tried to get noise generator seed for stream %d > nstreams (%d)' % (stream, self.nstreams))
-            return
-        stream = 2*stream # latest block counts in antennas
-        regname = 'seed_%d' % (stream // 4)
-        return (self.read_uint(regname) >> (8 * stream % 4)) & 0xff
 
+        Inputs:
+            stream (int): Which stream to switch. If None, switch all.
+        """
+        if stream is None:
+            return [self.get_seed(stm) for stm in range(self.nstreams)]
+        assert stream <= self.nstreams
+        regname = 'seed_%d' % (stream // 4)
+        return (self.read_uint(regname) >> (8 * (stream % 4))) & 0xff
 
     def initialize(self, verify=False):
-        for stream in range(self.nstreams):
-            self.set_seed(stream, 0)
-            if verify:
-                assert(self.get_seed(stream) == 0)
+        self.set_seed(verify=verify)
 
 
 class Input(Block):
@@ -670,6 +715,20 @@ class Input(Block):
         self.USE_ZERO  = 2
         self.INT_TIME  = 2**20 / 250.0e6
         self._SNAPSHOT_SAMPLES_PER_POL = 2048
+
+    def get_status(self):
+        '''Return dict of current status.'''
+        rv = {}
+        snapshots = {}
+        for stream in range(self.ninput_mux_streams//2): # bram holds stream and stream+1
+            snapshots[2*stream], snapshots[2*stream+1] = self.get_adc_snapshot(stream)
+        for stream,snapshot in snapshots.items():
+            rv['stream%d_hist' % stream] = np.histogram(snapshot, bins=HIST_BINS)[0]
+            rv['stream%d_mean' % stream] = np.mean(snapshot)
+            pwr = np.mean(np.abs(snapshot)**2)
+            rv['stream%d_power' % stream] = pwr
+            rv['stream%d_rms' % stream] = np.sqrt(pwr)
+        return rv
 
     def get_adc_snapshot(self, antenna):
         """
@@ -759,7 +818,7 @@ class Input(Block):
         """
         self._select_input(self.USE_ADC, stream=stream, verify=verify)
 
-    def use_zero(self, stream=None):
+    def use_zero(self, stream=None, verify=False):
         """
         Switch input to zeros.
         Inputs:
@@ -1100,6 +1159,7 @@ class PhaseSwitch(Block):
         self.disable_demod(verify=verify)
         self.set_delay(0, verify=verify)
 
+
 class Eq(Block):
     def __init__(self, host, name, nstreams=8, ncoeffs=2**10, logger=None):
         """
@@ -1116,7 +1176,7 @@ class Eq(Block):
         self.ncoeffs = ncoeffs
         self.width = 16
         self.bin_point = 5
-        self.format = 'H'#'L'
+        self.format = 'H'  # 'L'
         self.streamsize = struct.calcsize(self.format)*self.ncoeffs
 
     def set_coeffs(self, stream, coeffs, verify=False):
@@ -1141,11 +1201,17 @@ class Eq(Block):
         self.write('coeffs', data, offset=(self.streamsize * stream))
         if verify:
             assert(data == self._raw_read(stream))
-        
+
     def _raw_read(self, stream):
         data = self.read('coeffs', self.streamsize,
                          offset=(self.streamsize * stream))
         return data
+
+    def get_status(self, stream):
+        """
+        Return the Eq status:  coeffs (per stream) and clip_count (for all)
+        """
+        return {'coeffs': self.get_coeffs(stream), 'clip_count': self.clip_count()}
 
     def get_coeffs(self, stream):
         """
@@ -1172,9 +1238,10 @@ class Eq(Block):
         Currently, this is 100.0
         """
         for stream in range(self.nstreams):
-            self.set_coeffs(stream, 
-               coeffs * np.ones(self.ncoeffs, dtype='>%s' % self.format),
-               verify=verify)
+            self.set_coeffs(stream,
+                            coeffs * np.ones(self.ncoeffs, dtype='>%s' % self.format),
+                            verify=verify)
+
 
 class EqTvg(Block):
     def __init__(self, host, name, nstreams=8, nchans=2**13, logger=None):
@@ -1280,7 +1347,7 @@ class ChanReorder(Block):
     def reindex_channel(self, actual_index, output_index, verify=False):
         self.write_int('reorder3_map1', actual_index, word_offset=output_index)
         if verify:
-            assert(actual_index == self.read_int('reorder3_map1', 
+            assert(actual_index == self.read_int('reorder3_map1',
                                                  word_offset=output_index))
 
     def initialize(self, verify=False):
@@ -1485,7 +1552,8 @@ class Eth(Block):
 
     def get_arp_table(self):
         MAX_MACS = 256 # XXX is 256 the maximum number of macs?
-        macs_str = self.read('sw', MAX_MACS, offset=self.BASE_ARP_OFFSET)
+        macs_str = self.read('sw', MAX_MACS * struct.calcsize('Q'),
+                             offset=self.BASE_ARP_OFFSET)
         macs = struct.unpack('>%dQ' % (MAX_MACS), macs_str)
         return macs
 
@@ -1699,7 +1767,7 @@ class Corr(Block):
         Set the number of spectra to accumulate to `acc_len`
         """
         self.acc_len = acc_len
-        # Convert to clks from spectra. FFT output length = 8192 
+        # Convert to clks from spectra. FFT output length = 8192
         # with 8 samples in parallel = 8192/8 clocks per spectrum
         self.write_int('acc_len', 1024 * self.acc_len)
         if verify:
@@ -1890,7 +1958,7 @@ class Pam(Block):
         super(Pam, self).__init__(host, name, logger)
 
         self.i2c = i2c.I2C(host, name, retry=self.I2C_RETRY)
-        self._cached_atten = None # for checking I2C stability
+        self._cached_atten = None  # for checking I2C stability
 
     def _warning(self, msg, *args, **kwargs):
         self.logger.log(I2CWARNING, self._prefix_log(msg), *args, **kwargs)
@@ -1901,6 +1969,25 @@ class Pam(Block):
         # set i2c bus to 10 kHz
         self.i2c.setClock(self.CLK_I2C_BUS, self.CLK_I2C_REF)
 
+    def get_status(self):
+        """Return a dict of config status."""
+        rv = {}
+        try:
+            rv["atten_e"], rv["atten_n"] = self.get_attenuation()
+            rv["power_e"] = self.power('east')
+            rv["power_n"] = self.power('north')
+            rv["voltage"] = self.shunt("u")
+            rv["current"] = self.shunt("i")
+            rv["id"] = self.id()
+        except(RuntimeError, IOError):
+            rv["atten_e"] = ERROR_VALUE
+            rv["atten_n"] = ERROR_VALUE
+            rv["power_e"] = ERROR_VALUE
+            rv["power_n"] = ERROR_VALUE
+            rv["voltage"] = ERROR_VALUE
+            rv["current"] = ERROR_VALUE
+            rv["id"] = ERROR_STRING
+        return rv
 
     def get_attenuation(self):
         """Get East and North attenuation
@@ -1927,9 +2014,9 @@ class Pam(Block):
             self._atten = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
 
         self._atten.write(self._db2gpio(east, north))
-        self._cached_atten = (east, north) # cache for stability check
+        self._cached_atten = (east, north)  # cache for stability check
         if verify:
-            assert((east,north) == self.get_attenuation())
+            assert((east, north) == self.get_attenuation())
 
     def shunt(self, name='i'):
         """ Get current/voltage of the power supply
@@ -2080,8 +2167,8 @@ class Fem(Block):
     RMS2DC_INTERCEPT = -55.15991678
 
     IMU_ORIENT = [[0,0,1],[0,1,0],[1,0,0]]
-    SWMODE = {'load':0b001,'antenna':0b111,'noise':0b000}
-    SWMODE_REV = {0b001:'load', 0b111:'antenna', 0b000:'noise',}
+    SWMODE = {'load':0b000,'antenna':0b110,'noise':0b001}
+    SWMODE_REV = {0b000:'load', 0b110:'antenna', 0b001:'noise',}
 
     def __init__(self, host, name, logger=None):
         """ Front End Module (FEM) digital control class
@@ -2113,6 +2200,36 @@ class Fem(Block):
         # set i2c bus to 10 kHz
         self.i2c.setClock(self.CLK_I2C_BUS, self.CLK_I2C_REF)
 
+    def get_status(self):
+        '''Return dict of config status.'''
+        rv = {}
+        try:
+            switch, east, north = self.switch()
+            rv["switch"] = switch
+            rv["lna_power_e"] = east
+            rv["lna_power_n"] = north
+            rv["temp"] = self.temperature()
+            rv["voltage"] = self.shunt("u")
+            rv["current"] = self.shunt("i")
+            rv["id"] = self.id()
+            theta, phi = self.imu()
+            rv["imu_theta"] = theta
+            rv["imu_phi"] = phi
+            rv["pressure"] = self.pressure()
+            rv["humidity"] = self.humidity()
+        except(RuntimeError, IOError):
+            rv["switch"] = ERROR_STRING
+            rv["lna_power_e"] = ERROR_VALUE
+            rv["lna_power_n"] = ERROR_VALUE
+            rv["temp"] = ERROR_VALUE
+            rv["voltage"] = ERROR_VALUE
+            rv["current"] = ERROR_VALUE
+            rv["id"] = ERROR_STRING
+            rv["imu_theta"] = ERROR_VALUE
+            rv["imu_phi"] = ERROR_VALUE
+            rv["pressure"] = ERROR_VALUE
+            rv["humidity"] = ERROR_VALUE
+        return rv
 
     def pressure(self):
         """ Get air pressure
@@ -2255,8 +2372,8 @@ class Fem(Block):
             val = self._sw.read()
         except:
             raise RuntimeError("I2C RF switch read failure")
-        cur_e = bool(val & 0b00010000)
-        cur_n = bool(val & 0b00001000)
+        cur_e = bool(val & 0b00001000)
+        cur_n = bool(val & 0b00010000)
         cur_mode = self.SWMODE_REV.get(val & 0b00000111, 'Unknown')
         if mode is None and east is None and north is None:
             return cur_mode, cur_e, cur_n
@@ -2268,9 +2385,9 @@ class Fem(Block):
             mode = cur_mode
         new_val = 0b00000000
         if east:
-            new_val |= 0b00010000
-        if north:
             new_val |= 0b00001000
+        if north:
+            new_val |= 0b00010000
         new_val |= self.SWMODE.get(mode, val & 0b00000111)
         self._sw.write(new_val)
         if verify:

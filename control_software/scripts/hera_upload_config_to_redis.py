@@ -27,3 +27,4 @@ with open(args.config_file, 'r') as fh:
     md5 = hashlib.md5(config).hexdigest()
     r.hmset('snap_configuration', {'config':config, 'md5':md5, 'name':fh.name,
                                    'upload_time':upload_time, 'upload_time_str':time.ctime(upload_time)})
+    print('Success!')

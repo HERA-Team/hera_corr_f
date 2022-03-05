@@ -3,14 +3,20 @@
 import argparse
 from hera_corr_f import HeraCorrelator, __version__
 from hera_corr_cm import handlers
-import redis
 import time
-import yaml
 import logging
 import json
+import sys
 
 TIMEOUT = 10
 NTRIES = 3
+
+def warn_failed(logger, failed, who, all_snaps=False):
+    if len(failed) == 0:
+        return
+    logger.warning('Stage %s failed on: %s' % (who, ','.join(failed)))
+    if all_snaps:
+        sys.exit(1)
 
 def main():
     parser = argparse.ArgumentParser(description='Interact with a programmed SNAP board for'
@@ -49,8 +55,8 @@ def main():
     group_prog.add_argument('-P', '--forceprogram', action='store_true', default=False,
                         help='Program FPGAs with the fpgfile specified in the config file'
                              'irrespective of whether they are programmed already')
-    parser.add_argument('--multithread', action='store_true', default=False,
-                        help='Multithread initialization (not recommended for a high number of SNAPs)')
+    parser.add_argument('--nomultithread', action='store_true', default=False,
+                        help='Disable multithread ADC initialization.')
     parser.add_argument('--allsnaps', action='store_true', default=False,
                         help='Require communication with all snaps (exit if any are put in dead_fengs")')
     parser.add_argument('--ipython', action='store_true', default=False,
@@ -60,7 +66,7 @@ def main():
     logger = handlers.add_default_log_handlers(logging.getLogger(__file__))
     handlers.log_notify(logger)  # send a NOTIFY level message that this script has started
 
-    corr = HeraCorrelator(hosts=args.hosts, redishost=args.redishost, config=args.config_file, use_redis=False)
+    corr = HeraCorrelator(hosts=args.hosts, redishost=args.redishost, config=args.config_file)
 
     try:
         if args.allsnaps:
@@ -93,7 +99,7 @@ def main():
         # Before we start manipulating boards, prevent monitoing scripts from
         # sending TFTP traffic. Expire the key after 5 minutes to lazily account for
         # issues with this script crashing.
-        corr.disable_monitoring(expiry=600)
+        corr.disable_monitoring(__file__, expiry=600)
 
         if args.program or args.forceprogram:
             kwargs = {
@@ -102,15 +108,15 @@ def main():
                 'timeout': 300.,
             }
             failed = corr.program_fengs(force=args.forceprogram)
-            assert(len(failed) == 0)
+            warn_failed(logger, failed, 'program_fengs', all_snaps=args.allsnaps)
 
-        failed = corr.check_version_fengs()
-        assert(len(failed) == 0) # end session if bitfile is incompatible with this software
+        #failed = corr.check_version_fengs()
+        #assert(len(failed) == 0) # end session if bitfile is incompatible with this software
 
         if args.initialize or args.forceinitialize:
             # XXX forceinitialize not treated properly
             kwargs = {
-                'multithread': True,
+                'multithread': not args.nomultithread,
                 'verify': True,
                 'timeout': 300.,
             }
@@ -123,16 +129,20 @@ def main():
                     break
                 logger.warn('Reinitializing because ADC alignment failed: %s' % (','.join(failed)))
                 failed = corr.align_adcs(hosts=failed, reinit=True, **kwargs)
-            assert(len(failed) == 0)
+            warn_failed(logger, failed, 'align_adcs', all_snaps=args.allsnaps)
+
             failed = corr.initialize_dsps(**kwargs)
-            assert(len(failed) == 0)
+            warn_failed(logger, failed, 'initialize_dsps', all_snaps=args.allsnaps)
+
             failed = corr.fft_shift_pfbs(**kwargs)
-            assert(len(failed) == 0)
+            warn_failed(logger, failed, 'fft_shift_pfbs', all_snaps=args.allsnaps)
+
             failed = corr.initialize_eqs(**kwargs)
-            assert(len(failed) == 0)
+            warn_failed(logger, failed, 'initialize_eqs', all_snaps=args.allsnaps)
+
             failed = corr.disable_phase_switches(**kwargs)
-            assert(len(failed) == 0)
-            
+            warn_failed(logger, failed, 'disable_phase_switches', all_snaps=args.allsnaps)
+
             # Initialize FEM and PAM but accept failure
             fem_failed = corr.switch_fems('antenna', **kwargs)
             pam_failed = corr.initialize_pams(**kwargs)
@@ -156,7 +166,7 @@ def main():
             # Channels not assigned to Xengs in the config file are
             # ignored. Following are the assumed globals:
             failed = corr.config_dest_eths(**kwargs)
-            assert(len(failed) == 0)
+            warn_failed(logger, failed, 'config_dest_eths', all_snaps=args.allsnaps)
 
         #if args.tvg:
         #    logger.info('Enabling EQ TVGs...')
@@ -173,15 +183,17 @@ def main():
         # Sync logic. Do global sync first, and then noise generators
         # wait for a PPS to pass then arm all the boards
         if args.sync:
-            corr.disable_eths()
+            #corr.disable_eths() # ARP: no need to disable, and keeping them enabled reduces risk of them going incommunicado
             #corr.do_for_all_f("change_period", block="sync", args=[0])
             corr.sync()
             #corr.sync_noise(manual=args.mansync)
 
         if args.eth:
-            corr.enable_eths()
+            failed = corr.enable_eths()
+            warn_failed(logger, failed, 'enable_eths', all_snaps=args.allsnaps)
         else:
-            corr.disable_eths()
+            failed = corr.disable_eths()
+            warn_failed(logger, failed, 'disable_eths', all_snaps=args.allsnaps)
 
         # Re-enable the monitoring process
         corr.enable_monitoring()
