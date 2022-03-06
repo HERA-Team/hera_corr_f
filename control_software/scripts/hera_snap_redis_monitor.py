@@ -71,6 +71,8 @@ def print_ant_log_messages(corr):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Polling SNAPs for FPGA/PAM/FEM monitoring data',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--hosts', type=str, default=None,
+                        help='Hosts to monitor (None uses all).')
     parser.add_argument('-r', dest='redishost', type=str, default='redishost',
                         help='Host servicing redis requests')
     parser.add_argument('-d', dest='delay', type=float, default=10.0,
@@ -83,12 +85,15 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.loglevel not in ["DEBUG", "INFO", "WARNING", "ERROR"]:
-        logger.error("I don't undestand log level %s" % args.loglevel)
+        logger.error("I don't understand log level %s" % args.loglevel)
     else:
         for handler in logger.handlers:
             handler.setLevel(getattr(logging, args.loglevel))
 
-    corr = HeraCorrelator(redishost=args.redishost, block_monitoring=False)
+    if args.hosts is not None:
+        args.hosts = args.host.split(',')
+
+    corr = HeraCorrelator(hosts=args.hosts, redishost=args.redishost, block_monitoring=False)
     upload_time = corr.r.hget('snap_configuration', 'upload_time')
     if args.verbose:
         print_ant_log_messages(corr)
