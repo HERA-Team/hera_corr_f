@@ -142,7 +142,7 @@ if __name__ == "__main__":
             continue
         # Put full set into redis status:snap:<host>
         try:
-            corr.set_redis_status_fengs()
+            corr.set_redis_status_fengs(args.hosts)
         except Exception as e:
             logger.warning(str(e))
 
