@@ -91,7 +91,7 @@ if __name__ == "__main__":
             handler.setLevel(getattr(logging, args.loglevel))
 
     if args.hosts is not None:
-        args.hosts = args.host.split(',')
+        args.hosts = args.hosts.split(',')
 
     corr = HeraCorrelator(hosts=args.hosts, redishost=args.redishost, block_monitoring=False)
     upload_time = corr.r.hget('snap_configuration', 'upload_time')
