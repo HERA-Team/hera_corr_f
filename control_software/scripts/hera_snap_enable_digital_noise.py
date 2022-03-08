@@ -21,18 +21,20 @@ def main():
     parser.add_argument('-r', dest='redishost', type=str, default='redishost',
                         help='Host servicing redis requests')
     parser.add_argument('--source',choices=['adc','noise'], required=True)
+    parser.add_argument('--seed', choices=['diff','same'], default='diff', required=False)
     args = parser.parse_args()
 
     logger = handlers.add_default_log_handlers(logging.getLogger(__file__))
     handlers.log_notify(logger)  # send a NOTIFY level message that this script has started
 
+    logger.info('Setting input to %s, seed=%s' % (args.source, args.seed))
     corr = HeraCorrelator(hosts=args.hosts, redishost=args.redishost)
     try:
         if len(corr.fengs) == 0:
             logger.error("No F-Engines are connected. Is the power off?")
             return
     	init_time = time.time()
-        snap_failed = corr.set_input_fengs(source=args.source)
+        snap_failed = corr.set_input_fengs(source=args.source, seed=args.seed)
     	if len(snap_failed) > 0:
     	    logger.warn('SNAP initialization failed: %s' % (','.join(snap_failed)))
     except(AssertionError) as e:
