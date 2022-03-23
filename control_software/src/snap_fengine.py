@@ -6,7 +6,7 @@ import json
 import datetime
 import casperfpga
 import socket
-from blocks import *
+import blocks as snap_blocks
 
 # 'source_sel' register only on fpga only uses lowest 2 bits
 # using the others to mark status bits
@@ -58,24 +58,24 @@ class SnapFengine(object):
             self.serial = None
 
         # blocks
-        self.synth = Synth(self.fpga, 'lmx_ctrl')
-        self.adc = Adc(self.fpga)  # not a subclass of Block
-        self.sync = Sync(self.fpga, 'sync')
-        self.noise = NoiseGen(self.fpga, 'noise', nstreams=6)
-        self.input = Input(self.fpga, 'input', nstreams=12)
-        self.delay = Delay(self.fpga, 'delay', nstreams=6)
-        self.pfb = Pfb(self.fpga, 'pfb')
-        self.eq = Eq(self.fpga, 'eq_core', nstreams=6, ncoeffs=2**10)
-        #self.eq_tvg = EqTvg(self.fpga, 'eqtvg', nstreams=6, nchans=2**13)
-        self.reorder = ChanReorder(self.fpga, 'chan_reorder', nchans=2**10)
-        #self.rotator = Rotator(self.fpga, 'rotator', n_chans=2**13,
+        self.synth = snap_blocks.Synth(self.fpga, 'lmx_ctrl')
+        self.adc = snap_blocks.Adc(self.fpga)  # not a subclass of Block
+        self.sync = snap_blocks.Sync(self.fpga, 'sync')
+        self.noise = snap_blocks.NoiseGen(self.fpga, 'noise', nstreams=6)
+        self.input = snap_blocks.Input(self.fpga, 'input', nstreams=12)
+        self.delay = snap_blocks.Delay(self.fpga, 'delay', nstreams=6)
+        self.pfb = snap_blocks.Pfb(self.fpga, 'pfb')
+        self.eq = snap_blocks.Eq(self.fpga, 'eq_core', nstreams=6, ncoeffs=2**10)
+        #self.eq_tvg = snap_blocks.EqTvg(self.fpga, 'eqtvg', nstreams=6, nchans=2**13)
+        self.reorder = snap_blocks.ChanReorder(self.fpga, 'chan_reorder', nchans=2**10)
+        #self.rotator = snap_blocks.Rotator(self.fpga, 'rotator', n_chans=2**13,
         #                  n_streams=2**3, max_spec=2**19, block_size=2**10)
         # Packetizer n_time_demux: Round robin time packets to two dests
-        self.packetizer = Packetizer(self.fpga, 'packetizer',
+        self.packetizer = snap_blocks.Packetizer(self.fpga, 'packetizer',
                                      n_time_demux=2)
-        self.eth = Eth(self.fpga, 'eth')
-        self.corr = Corr(self.fpga,'corr_0')
-        self.phase_switch = PhaseSwitch(self.fpga, 'phase_switch')
+        self.eth = snap_blocks.Eth(self.fpga, 'eth')
+        self.corr = snap_blocks.Corr(self.fpga,'corr_0')
+        self.phase_switch = snap_blocks.PhaseSwitch(self.fpga, 'phase_switch')
 
         # store antenna numbers used in packet headers
         self.ant_indices = ant_indices or range(3)
@@ -110,8 +110,8 @@ class SnapFengine(object):
                 self.logger.warning("Failed to register I2C")
 
     def _add_i2c(self):
-        self.pams = [Pam(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
-        self.fems = [Fem(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
+        self.pams = [snap_blocks.Pam(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
+        self.fems = [snap_blocks.Fem(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
         # initialize the FEMs/PAMs to get access to their methods.
         for pam in self.pams:
             pam.initialize()

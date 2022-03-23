@@ -335,6 +335,8 @@ class HeraCorrelator(object):
         """
         status = self.fengs[host].get_status(jsonify=True)
         self.r.hmset('status:snap:%s' % host, status)
+        antpols = self.snap_to_ant[host]
+        self.r.hset('status:snap:%s' % host, SnapFengine._jsonify('antpol', antpols, True))
 
     def set_redis_status_fengs(self, hosts=None,
                                multithread=True, timeout=300.):

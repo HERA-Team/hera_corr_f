@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 """
 Sets redis hash keys:
-    status:snap:<host>                    Done from HeraCorrelator
+    status:snap:<host>                    Done from HeraCorrelator, but adds antpol
     status:snaprf:<host>:<stream 0-5>     Duplicated data taken from redis
     status:ant:<antnum>:<pol>             Duplicated data taken from redis
 Also resets PFB overflow flag after reading.
@@ -13,7 +13,8 @@ import logging
 import argparse
 from os import path as op
 from datetime import datetime
-from redis import exceptions as RedisException
+# WON'T NEED WITH CHANGE IN HERA_MC
+# from redis import exceptions as RedisException
 
 from hera_corr_f import HeraCorrelator, __version__, __package__
 from hera_corr_cm.handlers import add_default_log_handlers
@@ -21,31 +22,32 @@ from hera_corr_cm.handlers import add_default_log_handlers
 logger = add_default_log_handlers(logging.getLogger(__file__))
 hostname = socket.gethostname()
 
+# WON'T NEED THIS WITH CHANGE IN HERA_MC
 # Values to write to redis - status:snaprf:<host>:<stream>
-snaprf_mon = {'autocorrelation': 'stream${STREAMNUM}_autocorr',
-              'eq_coeffs': 'stream${STREAMNUM}_eq_coeffs',
-              'histogram': 'stream${STREAMNUM}_hist',
-              'adc_mean': 'stream${STREAMNUM}_mean',
-              'adc_power': 'stream${STREAMNUM}_power',
-              'adc_rms': 'stream${STREAMNUM}_rms'}
-antpol_mon = {  # These are in addition to snaprf_mon items above - status:ant:<ant>:<pol>
-              'pam_power': 'pam${DEVNUM}_power_${POL}',
-              'pam_atten': 'pam${DEVNUM}_atten_${POL}',
-              'pam_current': 'pam${DEVNUM}_current',
-              'pam_voltage': 'pam${DEVNUM}_voltage',
-              'pam_id': 'pam${DEVNUM}_id',
-              'fem_lna_power': 'fem${DEVNUM}_lna_power_${POL}',
-              'fem_current': 'fem${DEVNUM}_current',
-              'fem_voltage': 'fem${DEVNUM}_voltage',
-              'fem_switch': 'fem${DEVNUM}_switch',
-              'fem_humidity': 'fem${DEVNUM}_humidity',
-              'fem_temp': 'fem${DEVNUM}_temp',
-              'fem_id': 'fem${DEVNUM}_id',
-              'fem_imu_phi': 'fem${DEVNUM}_imu_phi',
-              'fem_imu_theta': 'fem${DEVNUM}_imu_theta',
-              'fem_pressure': 'fem${DEVNUM}_pressure'
-              }  # entries without ${POL} are duplicated over both pol
-stream2pol = {0: 'e', 1: 'n'}
+# snaprf_mon = {'autocorrelation': 'stream${STREAMNUM}_autocorr',
+#               'eq_coeffs': 'stream${STREAMNUM}_eq_coeffs',
+#               'histogram': 'stream${STREAMNUM}_hist',
+#               'adc_mean': 'stream${STREAMNUM}_mean',
+#               'adc_power': 'stream${STREAMNUM}_power',
+#               'adc_rms': 'stream${STREAMNUM}_rms'}
+# antpol_mon = {  # These are in addition to snaprf_mon items above - status:ant:<ant>:<pol>
+#               'pam_power': 'pam${DEVNUM}_power_${POL}',
+#               'pam_atten': 'pam${DEVNUM}_atten_${POL}',
+#               'pam_current': 'pam${DEVNUM}_current',
+#               'pam_voltage': 'pam${DEVNUM}_voltage',
+#               'pam_id': 'pam${DEVNUM}_id',
+#               'fem_lna_power': 'fem${DEVNUM}_lna_power_${POL}',
+#               'fem_current': 'fem${DEVNUM}_current',
+#               'fem_voltage': 'fem${DEVNUM}_voltage',
+#               'fem_switch': 'fem${DEVNUM}_switch',
+#               'fem_humidity': 'fem${DEVNUM}_humidity',
+#               'fem_temp': 'fem${DEVNUM}_temp',
+#               'fem_id': 'fem${DEVNUM}_id',
+#               'fem_imu_phi': 'fem${DEVNUM}_imu_phi',
+#               'fem_imu_theta': 'fem${DEVNUM}_imu_theta',
+#               'fem_pressure': 'fem${DEVNUM}_pressure'
+#               }  # entries without ${POL} are duplicated over both pol
+# stream2pol = {0: 'e', 1: 'n'}
 
 
 def print_ant_log_messages(corr):
@@ -138,66 +140,65 @@ if __name__ == "__main__":
             {"version": __version__, "timestamp": datetime.now().isoformat()}
         )
 
-        if corr.r.exists("disable_monitoring"):
-            continue
         # Put full set into redis status:snap:<host>
         try:
             corr.set_redis_status_fengs(args.hosts)
         except Exception as e:
             logger.warning(str(e))
 
+        # WON'T NEED OF THE BELOW WITH CHANGE IN HERA_MC
         # Copy values over to status:snaprf:<host>:<stream> and status:ant:<ant>:<pol>
-        for host in corr.fengs:
-            sskey = "status:snap:{}".format(host)
-            feng = corr.r_bytes.hgetall(sskey)
-            fft_overflow = corr.r.hget(sskey, "fft_overflow")
-            clip_count = corr.r.hget(sskey, "eq_clip_count")
-            antpols = corr.snap_to_ant[host]
-            for stream, (ant, pol) in enumerate(antpols):
-                if ant is None:  # no antenna there
-                    continue
-
-                # Update status:snaprf:<host>:<stream>
-                snap_rf_stats = {}
-                snap_rf_stats["timestamp"] = feng['timestamp']
-                snap_rf_stats["fft_of"] = fft_overflow
-                snap_rf_stats["clip_count"] = clip_count
-                for key, val in snaprf_mon.items():
-                    hval = val.replace("${STREAMNUM}", str(stream))
-                    try:
-                        snap_rf_stats[key] = feng[hval]
-                    except KeyError:
-                        if args.verbose:
-                            logger.info("snap_rf:  No key {} in host {}".format(hval, host))
-                        pass
-                snaprf_status_redis_key = "status:snaprf:{}:{}".format(host, stream)
-                try:
-                    corr.r.hmset(snaprf_status_redis_key, snap_rf_stats)
-                except RedisException.DataError as msg:
-                    logger.warning(str(msg))
-
-                # Update status:ant:<ant>:<pol>
-                ant_status = {}
-                ant_status['f_host'] = host
-                ant_status['host_ant_id'] = stream
-                ant_status.update(snap_rf_stats)
-                devnum = stream // 2
-                pol = stream2pol[stream % 2]
-                for key, val in antpol_mon.items():
-                    hval = val.replace("${DEVNUM}", str(devnum)).replace("${POL}", pol)
-                    try:
-                        ant_status[key] = feng[hval]
-                    except KeyError:
-                        if args.verbose:
-                            logger.info("ant_status: No key {} in host {}".format(hval, host))
-                        pass
-                ant_status_redis_key = "status:ant:{:d}:{:s}".format(ant, pol)
-                try:
-                    corr.r.hmset(ant_status_redis_key, ant_status)
-                except RedisException.DataError as msg:
-                    logger.warning(str(msg))
-
-            time.sleep(0.1)
+        # for host in corr.fengs:
+        #     sskey = "status:snap:{}".format(host)
+        #     feng = corr.r_bytes.hgetall(sskey)
+        #     fft_overflow = corr.r.hget(sskey, "fft_overflow")
+        #     clip_count = corr.r.hget(sskey, "eq_clip_count")
+        #     antpols = corr.snap_to_ant[host]
+        #     for stream, (ant, pol) in enumerate(antpols):
+        #         if ant is None:  # no antenna there
+        #             continue
+        #
+        #         # Update status:snaprf:<host>:<stream>
+        #         snap_rf_stats = {}
+        #         snap_rf_stats["timestamp"] = feng['timestamp']
+        #         snap_rf_stats["fft_of"] = fft_overflow
+        #         snap_rf_stats["clip_count"] = clip_count
+        #         for key, val in snaprf_mon.items():
+        #             hval = val.replace("${STREAMNUM}", str(stream))
+        #             try:
+        #                 snap_rf_stats[key] = feng[hval]
+        #             except KeyError:
+        #                 if args.verbose:
+        #                     logger.info("snap_rf:  No key {} in host {}".format(hval, host))
+        #                 pass
+        #         snaprf_status_redis_key = "status:snaprf:{}:{}".format(host, stream)
+        #         try:
+        #             corr.r.hmset(snaprf_status_redis_key, snap_rf_stats)
+        #         except RedisException.DataError as msg:
+        #             logger.warning(str(msg))
+        #
+        #         # Update status:ant:<ant>:<pol>
+        #         ant_status = {}
+        #         ant_status['f_host'] = host
+        #         ant_status['host_ant_id'] = stream
+        #         ant_status.update(snap_rf_stats)
+        #         devnum = stream // 2
+        #         pol = stream2pol[stream % 2]
+        #         for key, val in antpol_mon.items():
+        #             hval = val.replace("${DEVNUM}", str(devnum)).replace("${POL}", pol)
+        #             try:
+        #                 ant_status[key] = feng[hval]
+        #             except KeyError:
+        #                 if args.verbose:
+        #                     logger.info("ant_status: No key {} in host {}".format(hval, host))
+        #                 pass
+        #         ant_status_redis_key = "status:ant:{:d}:{:s}".format(ant, pol)
+        #         try:
+        #             corr.r.hmset(ant_status_redis_key, ant_status)
+        #         except RedisException.DataError as msg:
+        #             logger.warning(str(msg))
+        #
+        #     time.sleep(0.1)
 
         # If the retry period has been exceeded, try to reconnect to dead boards:
         if time.time() > (retry_tick + args.retrytime):
