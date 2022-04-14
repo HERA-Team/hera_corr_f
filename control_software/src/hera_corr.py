@@ -334,6 +334,7 @@ class HeraCorrelator(object):
             host (str): Host to target.
         """
         status = self.fengs[host].get_status(jsonify=True)
+        status['antpols'] = antpols = self.snap_to_ant[host]  # list of antpols for the six streams
         self.r.hmset('status:snap:%s' % host, status)
         antpols = self.snap_to_ant[host]
         self.r.hset('status:snap:%s' % host, SnapFengine._jsonify('antpol', antpols, True))
