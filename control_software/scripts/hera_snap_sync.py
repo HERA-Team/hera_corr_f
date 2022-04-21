@@ -36,7 +36,7 @@ xengs = config['xengines']
 
 # sending TFTP traffic. Expire the key after 1 minute to lazily account for
 # issues with this script crashing.
-r.set('disable_monitoring', 1, ex=60)
+r.set('disable_monitoring', 'hera_snap_sync.py', ex=60)
 time.sleep(1)
 
 # Initialize, set input according to command line flags.

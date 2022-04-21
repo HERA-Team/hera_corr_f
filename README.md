@@ -2,9 +2,9 @@
 A repository for HERA SNAP F-engine firmware and control software.
 
 ## Software Versions:
-- Ubuntu 16.04
-- Xilinx Vivado System Edition 2016.4
-- MATLAB/Simulink 2016b
+- Ubuntu 16.04/18.04
+- Xilinx Vivado System Edition 2019.1
+- MATLAB/Simulink 2019a
 
 ## To open/modify/compile:
 

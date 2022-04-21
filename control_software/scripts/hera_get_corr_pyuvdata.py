@@ -46,7 +46,7 @@ raise NotImplementedError(
 )
 
 corr = HeraCorrelator(redishost=args.redishost)
-corr.r.set('disable_monitoring', 1, ex=60)
+corr.disable_monitoring(__file__, 60)
 logger.warning('Disabling the monitoring.')
 time.sleep(2)
 

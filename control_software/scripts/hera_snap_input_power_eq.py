@@ -34,7 +34,7 @@ args = parser.parse_args()
 corr = HeraCorrelator(redishost=args.redishost, config=args.config_file)
 
 for feng in corr.fengs:
-    corr.disable_monitoring(60, wait=True)
+    corr.disable_monitoring(__file__, 60, verify=True)
     for input_n, antenna in enumerate(feng.ants):
         if antenna is None:
             continue
@@ -42,15 +42,19 @@ for feng in corr.fengs:
         pol = antenna[-1].lower()
         if pol == 'e':
             if args.edb is not None:
-                corr.logger.info("Setting %s E-pol (SNAP %s, input %d) attenuation to %d" % (antenna, feng.host, input_n, args.edb))
+                corr.logger.info("Setting %s E-pol (SNAP %s, input %d) attenuation to %d"
+                                 % (antenna, feng.host, input_n, args.edb))
                 corr.set_pam_attenuation(ant, pol, val=args.edb)
             else:
-                corr.logger.info("Balancing %s E-pol (SNAP %s, input %d)" % (antenna, feng.host, input_n))
+                corr.logger.info("Balancing %s E-pol (SNAP %s, input %d)"
+                                 % (antenna, feng.host, input_n))
                 corr.tune_pam_attenuation(ant, pol, target_pow=args.epower, target_rms=args.erms)
         elif pol == 'n':
             if args.ndb is not None:
-                corr.logger.info("Setting %s N-pol (SNAP %s, input %d) attenuation to %d" % (antenna, feng.host, input_n, args.edb))
+                corr.logger.info("Setting %s N-pol (SNAP %s, input %d) attenuation to %d"
+                                 % (antenna, feng.host, input_n, args.edb))
                 corr.set_pam_attenuation(ant, pol, val=args.ndb)
             else:
-                corr.logger.info("Balancing %s N-pol (SNAP %s, input %d)" % (antenna, feng.host, input_n))
+                corr.logger.info("Balancing %s N-pol (SNAP %s, input %d)"
+                                 % (antenna, feng.host, input_n))
                 corr.tune_pam_attenuation(ant, pol, target_pow=args.npower, target_rms=args.nrms)

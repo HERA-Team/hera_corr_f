@@ -11,10 +11,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set DSPFamily {kintex7}
 	set DSPPackage {fbg676}
 	set DSPSpeed {-3}
-	set FPGAClockPeriod 10
+	set FPGAClockPeriod 4
 	set GenerateTestBench 0
 	set HDLLanguage {vhdl}
-	set IPOOCCacheRootPath {/home/kocz/.Xilinx/Sysgen/SysgenVivado/lnx64.o/ip}
+	set IPOOCCacheRootPath {/home/jackh/.Xilinx/Sysgen/SysgenVivado/lnx64.o/ip}
 	set IP_Auto_Infer {1}
 	set IP_Categories_Text {System_Generator_for_DSP}
 	set IP_Common_Repos {0}
@@ -24,7 +24,7 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	set IP_LifeCycle_Menu {2}
 	set IP_Logo {sysgen_icon_100.png}
 	set IP_Name {}
-	set IP_Revision {264546063}
+	set IP_Revision {277363212}
 	set IP_Socket_IP {0}
 	set IP_Socket_IP_Proj_Path {}
 	set IP_Vendor_Text {User_Company}
@@ -79,10 +79,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 		{{xpm_8a3683_vivado.mem}}
 		{{xpm_4b6fda_vivado.mem}}
 		{{xpm_1c5cde_vivado.mem}}
+		{{xpm_2be436_vivado.mem}}
 		{{xpm_1f8fc2_vivado.mem}}
 		{{xpm_a7dc62_vivado.mem}}
 		{{xpm_e12e42_vivado.mem}}
-		{{xpm_2be436_vivado.mem}}
 		{{xpm_7a5e25_vivado.mem}}
 		{{xpm_60a890_vivado.mem}}
 		{{xpm_b8ecfc_vivado.mem}}
@@ -114,10 +114,10 @@ namespace eval ::xilinx::dsp::planaheaddriver {
 	}
 	set SimPeriod 1
 	set SimTime 262144
-	set SimulationTime {2621650.00000000 ns}
+	set SimulationTime {1048780.00000000 ns}
 	set SynthStrategyName {Vivado Synthesis Defaults}
 	set SynthesisTool {Vivado}
-	set TargetDir {/data/home/kocz/casper/models/hera_corr_f/pfb_fir_8192ch_core}
+	set TargetDir {/data/home/jackh/src/2022/hera_corr_f/pfb_fir_8192ch_core}
 	set TopLevelModule {pfb_fir_8192ch_core}
 	set TopLevelSimulinkHandle 74189
 	set VHDLLib {xil_defaultlib}
