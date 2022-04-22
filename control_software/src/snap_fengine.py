@@ -8,7 +8,7 @@ import casperfpga
 import socket
 import blocks as snap_blocks
 
-# 'source_sel' register only on fpga only uses lowest 2 bits
+# 'source_sel' register only on fpgax only uses lowest 2 bits
 # using the others to mark status bits
 DEST_CONFIG_BIT = 13
 ADC_ALIGNED_BIT = 14
@@ -17,9 +17,14 @@ PAM_MAX = 15
 PAM_MIN = 0
 
 
+TROUBLESHOOT = True
+
+
 def _jsonify(var, val, cast=True):
     if not cast:
         return val
+    if TROUBLESHOOT:
+        print(var, type(val))
     # make a few explicit type conversions to coerce non-redis
     # compatible variables into redis.
     if isinstance(val, bool):
@@ -47,8 +52,7 @@ class SnapFengine(object):
             self.fpga = casperfpga.CasperFpga(host=host,
                                 transport=casperfpga.TapcpTransport)
         else:
-            self.fpga = casperfpga.CasperFpga(host=host,
-                                redishost=redishost,
+            self.fpga = casperfpga.CasperFpga(host=host, redishost=redishost,
                                 transport=casperfpga.RedisTapcpTransport)
         # Try and get the canonical name of the host
         # to use as a serial number
