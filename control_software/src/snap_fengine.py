@@ -17,13 +17,10 @@ PAM_MAX = 15
 PAM_MIN = 0
 
 
-TROUBLESHOOT = True
-
-
-def _jsonify(var, val, cast=True):
+def _jsonify(var, val, cast=True, debug=False):
     if not cast:
         return val
-    if TROUBLESHOOT:
+    if debug:
         print(var, type(val))
     # make a few explicit type conversions to coerce non-redis
     # compatible variables into redis.
