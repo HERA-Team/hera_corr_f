@@ -47,6 +47,7 @@ class Attenuator(HeraCorrelator):
                                                         'channel': hookup['channel']}
         self.state_time = None
         self.calc_time = None
+        self.N_antpols = len(self.antpols) # XXX redundant w/ antpols
         # XXX what is this metadata
         self.patset_metadata = json.loads(self.r.hget('atten:set', 'metadata'))
         self.patsets_in_redis = list(self.patset_metadata['sets'].keys())
@@ -139,7 +140,7 @@ class Attenuator(HeraCorrelator):
         age = float(self.state_time.jd - self.auto_timestamp_jd)
         print("Age of autos are {:.1f} sec  =  {:.2f} hours  =  {:.2f} days."
               .format(age * 3600.0 * 24.0, age * 24.0, age))
-        print("Out of {} antpols:".format(len(self.antpols)))
+        print("Out of {} antpols:".format(self.N_antpols))
         for key, val in self.outcome.get_state.items():
             print("\t{}:  {}".format(key, len(val)))
 
@@ -196,7 +197,7 @@ class Attenuator(HeraCorrelator):
                 print("{:>3s}{}:  {}  {} -> {}"
                       .format(str(ant), pol, state['fem_switch'], state['pam_atten'], set_val))
         self.loaded_patsets.append('calc')
-        print("Out of {} antpols:".format(len(self.antpols)))
+        print("Out of {} antpols:".format(self.N_antpols))
         for key, val in self.outcome.calc_eq.items():
             print("\t{}:  {}".format(key, len(val)))
 
@@ -234,7 +235,7 @@ class Attenuator(HeraCorrelator):
                     break
                 else:
                     self.outcome.set_pam['failed'].add("{}{}".format(ant, pol))
-        print("Out of {} antpols:".format(len(self.antpols)))
+        print("Out of {} antpols:".format(self.N_antpols))
         for key, val in self.outcome.set_pam.items():
             print("\t{}:  {}".format(key, len(val)))
 
@@ -266,7 +267,7 @@ class Attenuator(HeraCorrelator):
                 self.antpols[ant, pol][patset_to] = None
         self.loaded_patsets.append(patset_to)
         print("Found {} of {} for set {}"
-              .format(len(self.outcome.get_redis['found']), len(self.antpols), patset_to))
+              .format(len(self.outcome.get_redis['found']), self.N_antpols, patset_to))
 
     def test_recent_settings(self):
         """
@@ -407,6 +408,6 @@ class Attenuator(HeraCorrelator):
             self.patset_metadata['sets'][this_set] = description
         self.r.hset('atten:set', 'metadata', json.dumps(self.patset_metadata))
         self.patsets_in_redis = list(self.patset_metadata['sets'].keys())
-        print("Out of {} antpols:".format(len(self.antpols)))
+        print("Out of {} antpols:".format(self.N_antpols))
         for key, val in self.outcome.handle.items():
             print("\t{}:  {}".format(key, len(val)))
