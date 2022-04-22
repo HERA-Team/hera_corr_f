@@ -6,9 +6,9 @@ import json
 import datetime
 import casperfpga
 import socket
-from blocks import *
+import blocks as snap_blocks
 
-# 'source_sel' register only on fpga only uses lowest 2 bits
+# 'source_sel' register only on fpgax only uses lowest 2 bits
 # using the others to mark status bits
 DEST_CONFIG_BIT = 13
 ADC_ALIGNED_BIT = 14
@@ -17,9 +17,14 @@ PAM_MAX = 15
 PAM_MIN = 0
 
 
-def _jsonify(val, cast=True):
+TROUBLESHOOT = True
+
+
+def _jsonify(var, val, cast=True):
     if not cast:
         return val
+    if TROUBLESHOOT:
+        print(var, type(val))
     # make a few explicit type conversions to coerce non-redis
     # compatible variables into redis.
     if isinstance(val, bool):
@@ -28,7 +33,7 @@ def _jsonify(val, cast=True):
     elif isinstance(val, (list, tuple, dict)):
         val = json.dumps(val)
     elif isinstance(val, np.ndarray):
-        val = json.dumps(val.tolist())
+        val = val.tobytes()
     elif val is None:
         # newer redis-py does not accept Nonetype, wrap in json.dumps
         val = json.dumps(val)
@@ -47,8 +52,7 @@ class SnapFengine(object):
             self.fpga = casperfpga.CasperFpga(host=host,
                                 transport=casperfpga.TapcpTransport)
         else:
-            self.fpga = casperfpga.CasperFpga(host=host,
-                                redishost=redishost,
+            self.fpga = casperfpga.CasperFpga(host=host, redishost=redishost,
                                 transport=casperfpga.RedisTapcpTransport)
         # Try and get the canonical name of the host
         # to use as a serial number
@@ -58,24 +62,24 @@ class SnapFengine(object):
             self.serial = None
 
         # blocks
-        self.synth = Synth(self.fpga, 'lmx_ctrl')
-        self.adc = Adc(self.fpga)  # not a subclass of Block
-        self.sync = Sync(self.fpga, 'sync')
-        self.noise = NoiseGen(self.fpga, 'noise', nstreams=6)
-        self.input = Input(self.fpga, 'input', nstreams=12)
-        self.delay = Delay(self.fpga, 'delay', nstreams=6)
-        self.pfb = Pfb(self.fpga, 'pfb')
-        self.eq = Eq(self.fpga, 'eq_core', nstreams=6, ncoeffs=2**10)
-        #self.eq_tvg = EqTvg(self.fpga, 'eqtvg', nstreams=6, nchans=2**13)
-        self.reorder = ChanReorder(self.fpga, 'chan_reorder', nchans=2**10)
-        #self.rotator = Rotator(self.fpga, 'rotator', n_chans=2**13,
+        self.synth = snap_blocks.Synth(self.fpga, 'lmx_ctrl')
+        self.adc = snap_blocks.Adc(self.fpga)  # not a subclass of Block
+        self.sync = snap_blocks.Sync(self.fpga, 'sync')
+        self.noise = snap_blocks.NoiseGen(self.fpga, 'noise', nstreams=6)
+        self.input = snap_blocks.Input(self.fpga, 'input', nstreams=12)
+        self.delay = snap_blocks.Delay(self.fpga, 'delay', nstreams=6)
+        self.pfb = snap_blocks.Pfb(self.fpga, 'pfb')
+        self.eq = snap_blocks.Eq(self.fpga, 'eq_core', nstreams=6, ncoeffs=2**10)
+        #self.eq_tvg = snap_blocks.EqTvg(self.fpga, 'eqtvg', nstreams=6, nchans=2**13)
+        self.reorder = snap_blocks.ChanReorder(self.fpga, 'chan_reorder', nchans=2**10)
+        #self.rotator = snap_blocks.Rotator(self.fpga, 'rotator', n_chans=2**13,
         #                  n_streams=2**3, max_spec=2**19, block_size=2**10)
         # Packetizer n_time_demux: Round robin time packets to two dests
-        self.packetizer = Packetizer(self.fpga, 'packetizer',
+        self.packetizer = snap_blocks.Packetizer(self.fpga, 'packetizer',
                                      n_time_demux=2)
-        self.eth = Eth(self.fpga, 'eth')
-        self.corr = Corr(self.fpga,'corr_0')
-        self.phase_switch = PhaseSwitch(self.fpga, 'phase_switch')
+        self.eth = snap_blocks.Eth(self.fpga, 'eth')
+        self.corr = snap_blocks.Corr(self.fpga,'corr_0')
+        self.phase_switch = snap_blocks.PhaseSwitch(self.fpga, 'phase_switch')
 
         # store antenna numbers used in packet headers
         self.ant_indices = ant_indices or range(3)
@@ -110,8 +114,8 @@ class SnapFengine(object):
                 self.logger.warning("Failed to register I2C")
 
     def _add_i2c(self):
-        self.pams = [Pam(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
-        self.fems = [Fem(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
+        self.pams = [snap_blocks.Pam(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
+        self.fems = [snap_blocks.Fem(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
         # initialize the FEMs/PAMs to get access to their methods.
         for pam in self.pams:
             pam.initialize()
@@ -333,45 +337,45 @@ class SnapFengine(object):
 
     def get_status(self, jsonify=False):
         '''Return dict of config status.'''
-        jsonify = lambda val: _jsonify(val, cast=jsonify)
+        jsonify = lambda var, val: _jsonify(var, val, cast=jsonify)
         status = {}
         # High-level configuration status
-        status['is_programmed'] = jsonify(self.is_programmed())
-        status['sample_rate'] = jsonify(self.adc.lmx.getFreq())
-        status['version'] = jsonify('%d.%d' % self.version())
-        status['adc_is_configured'] = jsonify(self.adc_is_configured())
-        status['is_initialized'] = jsonify(self.is_initialized())
-        status['dest_is_configured'] = jsonify(self.dest_is_configured())
-        status['input'] = jsonify(','.join(self.get_input()))
+        status['is_programmed'] = jsonify('is_programmed', self.is_programmed())
+        status['sample_rate'] = jsonify('sample_rate', self.adc.lmx.getFreq())
+        status['version'] = jsonify('version', '%d.%d' % self.version())
+        status['adc_is_configured'] = jsonify('adc_is_configured', self.adc_is_configured())
+        status['is_initialized'] = jsonify('is_initialized', self.is_initialized())
+        status['dest_is_configured'] = jsonify('dest_is_configured', self.dest_is_configured())
+        status['input'] = jsonify('input', ','.join(self.get_input()))
         # Lower level stuff, deprecates get_fpga_stats
-        status['temp'] = jsonify(self.fpga.transport.get_temp())
-        status['timestamp'] = jsonify(datetime.datetime.now().isoformat())
-        status['uptime'] = jsonify(self.sync.uptime())
-        status['pps_count'] = jsonify(self.sync.count())
-        status['serial'] = jsonify(self.serial)
+        status['temp'] = jsonify('temp', self.fpga.transport.get_temp())
+        status['timestamp'] = jsonify('timestamp', datetime.datetime.now().isoformat())
+        status['uptime'] = jsonify('uptime', self.sync.uptime())
+        status['pps_count'] = jsonify('pps_count', self.sync.count())
+        status['serial'] = jsonify('serial', self.serial)
         # populate pam status
         for i, pam in enumerate(self.pams):
             for key, val in pam.get_status().items():
-                status["pam%d_" % (i) + key] = jsonify(val)
+                status["pam%d_" % (i) + key] = jsonify("pam%d_" % (i) + key, val)
         # populate fem status
         for i, fem in enumerate(self.fems):
             for key, val in fem.get_status().items():
-                status["fem%d_" % (i) + key] = jsonify(val)
+                status["fem%d_" % (i) + key] = jsonify("fem%d_" % (i) + key, val)
         # fft overflow status
-        status['fft_overflow'] = jsonify(self.pfb.is_overflowing())
+        status['fft_overflow'] = jsonify('fft_overflow', self.pfb.is_overflowing())
         self.pfb.rst_stats()  # clear pfb overflow flag for next time
         # add adc snapshot statistics
         for key, val in self.input.get_status().items():
-            status[key] = jsonify(val)
+            status[key] = jsonify(key, val)
         # add autocorrelation from on-board correlator
         for stream in range(self.input.ninput_mux_streams):
-            status['stream%d_autocorr' % stream] = jsonify(self.corr.get_new_corr(stream, stream).real)
+            status['stream%d_autocorr' % stream] = jsonify('stream%d_autocorr' % stream, self.corr.get_new_corr(stream, stream).real)
         for stream in range(self.eq.nstreams):
             for key, val in self.eq.get_status(stream).items():
                 if key == 'clip_count':  # There is only one of these per snap.
-                    status['eq_%s' % key] = jsonify(val)
+                    status['eq_%s' % key] = jsonify('eq_%s' % key, val)
                 else:
-                    status['stream%d_eq_%s' % (stream, key)] = jsonify(val)
+                    status['stream%d_eq_%s' % (stream, key)] = jsonify('stream%d_eq_%s' % (stream, key), val)
         return status
 
 #    def get_pam_atten_by_target(self, chan, target_pow=None,

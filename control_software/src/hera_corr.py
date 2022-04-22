@@ -334,6 +334,7 @@ class HeraCorrelator(object):
             host (str): Host to target.
         """
         status = self.fengs[host].get_status(jsonify=True)
+        status['antpols'] = SnapFengine._jsonify('antpol', self.snap_to_ant[host], True)
         self.r.hmset('status:snap:%s' % host, status)
 
     def set_redis_status_fengs(self, hosts=None,
@@ -1035,7 +1036,7 @@ class HeraCorrelator(object):
         Generate a mapping of antenna names to F-engines.
         """
         hookup = redis_cm.read_maps_from_redis(self.r)
-        assert(hookup is not None) # antenna hookup missing in redis
+        assert(hookup is not None)  # antenna hookup missing in redis
         self.ant_to_snap = hookup['ant_to_snap']
         self.snap_to_ant = {key: [(int(v[2:-1]), v[-1].lower())
                                         if v is not None else (None, None)
