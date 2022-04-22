@@ -12,6 +12,7 @@ import hashlib
 from Queue import Queue
 from threading import Thread
 from hera_corr_f import SnapFengine
+from hera_corr_f.snap_fengine import _jsonify
 import numpy as np
 
 LOGGER = add_default_log_handlers(logging.getLogger(__name__))
@@ -334,7 +335,7 @@ class HeraCorrelator(object):
             host (str): Host to target.
         """
         status = self.fengs[host].get_status(jsonify=True)
-        status['antpols'] = SnapFengine._jsonify('antpol', self.snap_to_ant[host], True)
+        status['antpols'] = _jsonify('antpol', self.snap_to_ant[host], True)
         self.r.hmset('status:snap:%s' % host, status)
 
     def set_redis_status_fengs(self, hosts=None,
