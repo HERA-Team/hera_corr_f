@@ -17,7 +17,7 @@ PAM_MAX = 15
 PAM_MIN = 0
 
 
-def _jsonify(var, val, cast=True, debug=False):
+def jsonify(var, val, cast=True, debug=False):
     if not cast:
         return val
     if debug:
@@ -332,47 +332,47 @@ class SnapFengine(object):
         else:
             return inputs
 
-    def get_status(self, jsonify=False):
+    def get_status(self, jsonify_values=False):
         '''Return dict of config status.'''
-        jsonify = lambda var, val: _jsonify(var, val, cast=jsonify)
+        _cjsonify = lambda var, val: jsonify(var, val, cast=jsonify_values)
         status = {}
         # High-level configuration status
-        status['is_programmed'] = jsonify('is_programmed', self.is_programmed())
-        status['sample_rate'] = jsonify('sample_rate', self.adc.lmx.getFreq())
-        status['version'] = jsonify('version', '%d.%d' % self.version())
-        status['adc_is_configured'] = jsonify('adc_is_configured', self.adc_is_configured())
-        status['is_initialized'] = jsonify('is_initialized', self.is_initialized())
-        status['dest_is_configured'] = jsonify('dest_is_configured', self.dest_is_configured())
-        status['input'] = jsonify('input', ','.join(self.get_input()))
+        status['is_programmed'] = _cjsonify('is_programmed', self.is_programmed())
+        status['sample_rate'] = _cjsonify('sample_rate', self.adc.lmx.getFreq())
+        status['version'] = _cjsonify('version', '%d.%d' % self.version())
+        status['adc_is_configured'] = _cjsonify('adc_is_configured', self.adc_is_configured())
+        status['is_initialized'] = _cjsonify('is_initialized', self.is_initialized())
+        status['dest_is_configured'] = _cjsonify('dest_is_configured', self.dest_is_configured())
+        status['input'] = _cjsonify('input', ','.join(self.get_input()))
         # Lower level stuff, deprecates get_fpga_stats
-        status['temp'] = jsonify('temp', self.fpga.transport.get_temp())
-        status['timestamp'] = jsonify('timestamp', datetime.datetime.now().isoformat())
-        status['uptime'] = jsonify('uptime', self.sync.uptime())
-        status['pps_count'] = jsonify('pps_count', self.sync.count())
-        status['serial'] = jsonify('serial', self.serial)
+        status['temp'] = _cjsonify('temp', self.fpga.transport.get_temp())
+        status['timestamp'] = _cjsonify('timestamp', datetime.datetime.now().isoformat())
+        status['uptime'] = _cjsonify('uptime', self.sync.uptime())
+        status['pps_count'] = _cjsonify('pps_count', self.sync.count())
+        status['serial'] = _cjsonify('serial', self.serial)
         # populate pam status
         for i, pam in enumerate(self.pams):
             for key, val in pam.get_status().items():
-                status["pam%d_" % (i) + key] = jsonify("pam%d_" % (i) + key, val)
+                status["pam%d_" % (i) + key] = _cjsonify("pam%d_" % (i) + key, val)
         # populate fem status
         for i, fem in enumerate(self.fems):
             for key, val in fem.get_status().items():
-                status["fem%d_" % (i) + key] = jsonify("fem%d_" % (i) + key, val)
+                status["fem%d_" % (i) + key] = _cjsonify("fem%d_" % (i) + key, val)
         # fft overflow status
-        status['fft_overflow'] = jsonify('fft_overflow', self.pfb.is_overflowing())
+        status['fft_overflow'] = _cjsonify('fft_overflow', self.pfb.is_overflowing())
         self.pfb.rst_stats()  # clear pfb overflow flag for next time
         # add adc snapshot statistics
         for key, val in self.input.get_status().items():
-            status[key] = jsonify(key, val)
+            status[key] = _cjsonify(key, val)
         # add autocorrelation from on-board correlator
         for stream in range(self.input.ninput_mux_streams):
-            status['stream%d_autocorr' % stream] = jsonify('stream%d_autocorr' % stream, self.corr.get_new_corr(stream, stream).real)
+            status['stream%d_autocorr' % stream] = _cjsonify('stream%d_autocorr' % stream, self.corr.get_new_corr(stream, stream).real)
         for stream in range(self.eq.nstreams):
             for key, val in self.eq.get_status(stream).items():
                 if key == 'clip_count':  # There is only one of these per snap.
-                    status['eq_%s' % key] = jsonify('eq_%s' % key, val)
+                    status['eq_%s' % key] = _cjsonify('eq_%s' % key, val)
                 else:
-                    status['stream%d_eq_%s' % (stream, key)] = jsonify('stream%d_eq_%s' % (stream, key), val)
+                    status['stream%d_eq_%s' % (stream, key)] = _cjsonify('stream%d_eq_%s' % (stream, key), val)
         return status
 
 #    def get_pam_atten_by_target(self, chan, target_pow=None,
