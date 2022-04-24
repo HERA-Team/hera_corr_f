@@ -336,7 +336,9 @@ class HeraCorrelator(object):
         """
         status = self.fengs[host].get_status(jsonify=True)
         status['antpols'] = _jsonify('antpol', self.snap_to_ant[host], True)
-        self.r.hmset('status:snap:%s' % host, status)
+        this_key = 'status:snap:{}'.format(host)
+        self.r.hmset(this_key, status)
+        self.r.expire(this_key, 72 * 3600)
 
     def set_redis_status_fengs(self, hosts=None,
                                multithread=True, timeout=300.):
