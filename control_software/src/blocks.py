@@ -1117,37 +1117,49 @@ class PhaseSwitch(Block):
         if verify:
             assert(delay == self.read_int('gpio_switch_offset'))
 
-    def enable_mod(self, verify=False):
+    def enable_mod(self, streams='111111', verify=False):
         """
-        Turn on the modulation patterns
+        Turn on the modulation patterns. Streams is an string
+        with each character representing an antenna stream, 
+        with the order 5,4,3,2,1,0. Default is all streams on. 
         """
-        self.write_int('enable_mod', 1)
+        streams_int = int(streams, 2)
+        self.write_int('enable_mod', streams_int)
         if verify:
-            assert(1 == self.read_int('enable_mod'))
+            assert(streams_int == self.read_int('enable_mod'))
 
-    def disable_mod(self, verify=False):
+    def disable_mod(self, streams='000000', verify=False):
         """
-        Turn off the modulation patterns
+        Turn off the modulation patterns. Streams is an string
+        with each character representing an antenna stream, 
+        with the order 5,4,3,2,1,0. Default is all streams off.
         """
-        self.write_int('enable_mod', 0)
+        streams_int = int(streams, 2)
+        self.write_int('enable_mod', streams_int)
         if verify:
-            assert(0 == self.read_int('enable_mod'))
+            assert(streams_int == self.read_int('enable_mod'))
 
-    def enable_demod(self, verify=False):
+    def enable_demod(self, streams='111111', verify=False):
         """
-        Turn on the demodulation patterns
+        Turn on the demodulation patterns. Streams is an string
+        with each character representing an antenna stream, 
+        with the order 5,4,3,2,1,0. Default is all streams on.
         """
-        self.write_int('enable_demod', 1)
+        streams_int = int(streams, 2)
+        self.write_int('enable_demod', streams_int)
         if verify:
-            assert(1 == self.read_int('enable_demod'))
+            assert(streams_int == self.read_int('enable_demod'))
 
-    def disable_demod(self, verify=False):
+    def disable_demod(self, streams='000000', verify=False):
         """
-        Turn off the demodulation patterns
+        Turn off the demodulation patterns. Streams is an string
+        with each character representing an antenna stream, 
+        with the order 5,4,3,2,1,0. Default is all streams off.
         """
+        streams_int = int(streams, 2)
         self.write_int('enable_demod', 0)
         if verify:
-            assert(0 == self.read_int('enable_demod'))
+            assert(streams_int  == self.read_int('enable_demod'))
 
     def initialize(self, verify=False):
         """
