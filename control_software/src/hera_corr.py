@@ -335,7 +335,7 @@ class HeraCorrelator(object):
             host (str): Host to target.
         """
         status = self.fengs[host].get_status(jsonify_values=True)
-        status['antpols'] = jsonify('antpol', self.snap_to_ant[host], True)
+        status['antpols'] = jsonify(self.snap_to_ant[host], True)
         this_key = 'status:snap:{}'.format(host)
         self.r.hmset(this_key, status)
         self.r.expire(this_key, 72 * 3600)
