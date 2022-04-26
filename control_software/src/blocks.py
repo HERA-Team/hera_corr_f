@@ -2130,7 +2130,7 @@ class Fem(Block):
                 # Current sensor
                 self._cur = i2c_volt.INA219(self.i2c, self.ADDR_INA)
                 self._cur.init()
-            except Attribute Error:
+            except AttributeError:
                 raise AttributeError
             except Exception as e:
                 self._warning("Failed to initialize I2C FEM current sensor: " + str(e))
