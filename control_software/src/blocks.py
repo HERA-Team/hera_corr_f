@@ -1885,7 +1885,7 @@ class Pam(Block):
                 self._cur.init()
             except AttributeError:
                 raise AttributeError
-            except exception as e:
+            except Exception as e:
                 self._warning("Failed to initialize I2C current sensor: " + str(e))
                 return None
 
