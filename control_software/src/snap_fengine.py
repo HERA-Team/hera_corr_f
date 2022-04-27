@@ -334,7 +334,7 @@ class SnapFengine(object):
 
     def get_status(self, jsonify_values=False):
         '''Return dict of config status.'''
-        _cdjsonify = lambda var, val: jsonify(val, cast=jsonify_values)
+        _cdjsonify = lambda val: jsonify(val, cast=jsonify_values)
         status = {}
         # High-level configuration status
         status['is_programmed'] = _cdjsonify(self.is_programmed())
