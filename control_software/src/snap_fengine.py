@@ -17,14 +17,9 @@ PAM_MAX = 15
 PAM_MIN = 0
 
 
-TROUBLESHOOT = True
-
-
-def _jsonify(var, val, cast=True):
+def jsonify(val, cast=True):
     if not cast:
         return val
-    if TROUBLESHOOT:
-        print(var, type(val))
     # make a few explicit type conversions to coerce non-redis
     # compatible variables into redis.
     if isinstance(val, bool):
@@ -110,8 +105,10 @@ class SnapFengine(object):
         if self.fpga.is_connected() and self.is_programmed():
             try:
                 self._add_i2c()
-            except:
-                self.logger.warning("Failed to register I2C")
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self.logger.warning("Failed to register I2C: " + str(e))
 
     def _add_i2c(self):
         self.pams = [snap_blocks.Pam(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
@@ -335,47 +332,47 @@ class SnapFengine(object):
         else:
             return inputs
 
-    def get_status(self, jsonify=False):
+    def get_status(self, jsonify_values=False):
         '''Return dict of config status.'''
-        jsonify = lambda var, val: _jsonify(var, val, cast=jsonify)
+        _cdjsonify = lambda val: jsonify(val, cast=jsonify_values)
         status = {}
         # High-level configuration status
-        status['is_programmed'] = jsonify('is_programmed', self.is_programmed())
-        status['sample_rate'] = jsonify('sample_rate', self.adc.lmx.getFreq())
-        status['version'] = jsonify('version', '%d.%d' % self.version())
-        status['adc_is_configured'] = jsonify('adc_is_configured', self.adc_is_configured())
-        status['is_initialized'] = jsonify('is_initialized', self.is_initialized())
-        status['dest_is_configured'] = jsonify('dest_is_configured', self.dest_is_configured())
-        status['input'] = jsonify('input', ','.join(self.get_input()))
+        status['is_programmed'] = _cdjsonify(self.is_programmed())
+        status['sample_rate'] = _cdjsonify(self.adc.lmx.getFreq())
+        status['version'] = _cdjsonify('%d.%d' % self.version())
+        status['adc_is_configured'] = _cdjsonify(self.adc_is_configured())
+        status['is_initialized'] = _cdjsonify(self.is_initialized())
+        status['dest_is_configured'] = _cdjsonify(self.dest_is_configured())
+        status['input'] = _cdjsonify(','.join(self.get_input()))
         # Lower level stuff, deprecates get_fpga_stats
-        status['temp'] = jsonify('temp', self.fpga.transport.get_temp())
-        status['timestamp'] = jsonify('timestamp', datetime.datetime.now().isoformat())
-        status['uptime'] = jsonify('uptime', self.sync.uptime())
-        status['pps_count'] = jsonify('pps_count', self.sync.count())
-        status['serial'] = jsonify('serial', self.serial)
+        status['temp'] = _cdjsonify(self.fpga.transport.get_temp())
+        status['timestamp'] = _cdjsonify(datetime.datetime.now().isoformat())
+        status['uptime'] = _cdjsonify(self.sync.uptime())
+        status['pps_count'] = _cdjsonify(self.sync.count())
+        status['serial'] = _cdjsonify(self.serial)
         # populate pam status
         for i, pam in enumerate(self.pams):
             for key, val in pam.get_status().items():
-                status["pam%d_" % (i) + key] = jsonify("pam%d_" % (i) + key, val)
+                status["pam%d_" % (i) + key] = _cdjsonify(val)
         # populate fem status
         for i, fem in enumerate(self.fems):
             for key, val in fem.get_status().items():
-                status["fem%d_" % (i) + key] = jsonify("fem%d_" % (i) + key, val)
+                status["fem%d_" % (i) + key] = _cdjsonify(val)
         # fft overflow status
-        status['fft_overflow'] = jsonify('fft_overflow', self.pfb.is_overflowing())
+        status['fft_overflow'] = _cdjsonify(self.pfb.is_overflowing())
         self.pfb.rst_stats()  # clear pfb overflow flag for next time
         # add adc snapshot statistics
         for key, val in self.input.get_status().items():
-            status[key] = jsonify(key, val)
+            status[key] = _cdjsonify(val)
         # add autocorrelation from on-board correlator
         for stream in range(self.input.ninput_mux_streams):
-            status['stream%d_autocorr' % stream] = jsonify('stream%d_autocorr' % stream, self.corr.get_new_corr(stream, stream).real)
+            status['stream%d_autocorr' % stream] = _cdjsonify(self.corr.get_new_corr(stream, stream).real)
         for stream in range(self.eq.nstreams):
             for key, val in self.eq.get_status(stream).items():
                 if key == 'clip_count':  # There is only one of these per snap.
-                    status['eq_%s' % key] = jsonify('eq_%s' % key, val)
+                    status['eq_%s' % key] = _cdjsonify(val)
                 else:
-                    status['stream%d_eq_%s' % (stream, key)] = jsonify('stream%d_eq_%s' % (stream, key), val)
+                    status['stream%d_eq_%s' % (stream, key)] = _cdjsonify(val)
         return status
 
 #    def get_pam_atten_by_target(self, chan, target_pow=None,

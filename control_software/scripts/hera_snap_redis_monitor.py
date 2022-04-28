@@ -49,15 +49,13 @@ if __name__ == "__main__":
     parser.add_argument('-D', dest='retrytime', type=float, default=300.0,
                         help='Seconds between reconnection attempts to dead boards')
     parser.add_argument('-l', dest='loglevel', type=str, default="INFO",
-                        help='Log level. DEBUG / INFO / WARNING / ERROR')
+                        help='Log level. DEBUG / INFO / WARNING / ERROR',
+                        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'])
     parser.add_argument('--verbose', help='Make more verbose.', action='store_true')
     args = parser.parse_args()
 
-    if args.loglevel not in ["DEBUG", "INFO", "WARNING", "ERROR"]:
-        logger.error("I don't understand log level %s" % args.loglevel)
-    else:
-        for handler in logger.handlers:
-            handler.setLevel(getattr(logging, args.loglevel))
+    for handler in logger.handlers:
+        handler.setLevel(getattr(logging, args.loglevel))
 
     if args.hosts is not None:
         args.hosts = args.hosts.split(',')
@@ -109,7 +107,7 @@ if __name__ == "__main__":
 
         # Put full set into redis status:snap:<host>
         try:
-            corr.set_redis_status_fengs(args.hosts)
+            corr.set_redis_status_fengs()
         except Exception as e:
             logger.warning(str(e))
 

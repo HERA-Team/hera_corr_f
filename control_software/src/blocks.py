@@ -1465,8 +1465,8 @@ class Rotator(Block):
         """
         try:
             phases = np.array(phases)
-        except:
-            self._error("Couldn't convert phase coefficients to numpy array")
+        except Exception as e:
+            self._error("Couldn't convert phase coefficients to numpy array: " + str(e))
             return
         n_coeffs = phases.shape[0]
         if self.n_slots % n_coeffs != 0:
@@ -1883,8 +1883,10 @@ class Pam(Block):
                 # Current sensor
                 self._cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
                 self._cur.init()
-            except:
-                self._warning("Failed to initialize I2C current sensor")
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize I2C current sensor: " + str(e))
                 return None
 
         try:
@@ -1908,9 +1910,11 @@ class Pam(Block):
         if not hasattr(self, "_id"):
             try:
                 # ID chip
-                self._sn=i2c_sn.DS28CM00(self.i2c, self.ADDR_SN)
-            except:
-                self._warning("Failed to initialize I2C ID chip")
+                self._sn = i2c_sn.DS28CM00(self.i2c, self.ADDR_SN)
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize I2C ID chip:  " + str(e))
                 return None
 
         try:
@@ -1931,8 +1935,10 @@ class Pam(Block):
                 # Power detector
                 self._pow = i2c_volt.MAX11644(self.i2c, self.ADDR_VOLT)
                 self._pow.init()
-            except:
-                self._warning("Failed to initialize I2C power sensor")
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize I2C power sensor: " + str(e))
                 return None
         LOSS = 9.8
         if name not in ['east','north']:
@@ -1962,13 +1968,15 @@ class Pam(Block):
         if not hasattr(self, "_rom"):
             try:
                 # ROM
-                self._rom=i2c_eeprom.EEP24XX64(self.i2c, self.ADDR_ROM)
-            except:
-                self._warning("Failed to initialize I2C ROM")
+                self._rom = i2c_eeprom.EEP24XX64(self.i2c, self.ADDR_ROM)
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize I2C ROM: " + str(e))
                 return None
 
         try:
-            if string == None:
+            if string is None:
                 return self._rom.readString()
             else:
                 self._rom.writeString(string)
@@ -2095,8 +2103,10 @@ class Fem(Block):
                 # Barometer
                 self._bar = i2c_bar.MS5611_01B(self.i2c, self.ADDR_BAR)
                 self._bar.init()
-            except:
-                self._warning("Failed to initialize I2C barometer")
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize I2C barometer: " + str(e))
                 return None
 
         try:
@@ -2118,10 +2128,12 @@ class Fem(Block):
         if not hasattr(self, "_cur"):
             try:
                 # Current sensor
-                self._cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
+                self._cur = i2c_volt.INA219(self.i2c, self.ADDR_INA)
                 self._cur.init()
-            except:
-                self._warning("Failed to initialize I2C FEM current sensor")
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize I2C FEM current sensor: " + str(e))
                 return None
 
         try:
@@ -2146,8 +2158,10 @@ class Fem(Block):
             try:
                 # Temperature
                 self._temp = i2c_temp.Si7051(self.i2c, self.ADDR_TEMP)
-            except:
-                self._warning("Failed to initialize I2C temperature sensor")
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize I2C temperature sensor: " + str(e))
                 return None
 
         try:
@@ -2162,11 +2176,13 @@ class Fem(Block):
         if not hasattr(self, "_imu"):
             try:
                 # IMU
-                self._imu = i2c_motion.IMUSimple(self.i2c,self.ADDR_ACCEL,
-                                                orient=self.IMU_ORIENT)
+                self._imu = i2c_motion.IMUSimple(self.i2c, self.ADDR_ACCEL,
+                                                 orient=self.IMU_ORIENT)
                 self._imu.init()
-            except:
-                self._warning("Failed to initialize I2C IMU")
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize I2C IMU: " + str(e))
                 return None, None
 
         try:
@@ -2175,7 +2191,7 @@ class Fem(Block):
         except Exception:
             self._warning('Failed to read I2C IMU')
             del self._imu
-            return None,None
+            return None, None
 
     def rom(self, string=None):
         """ Read string from ROM or write String to ROM
@@ -2187,20 +2203,21 @@ class Fem(Block):
         if not hasattr(self, "_rom"):
             try:
                 # ROM
-                self._rom=i2c_eeprom.EEP24XX64(self.i2c,self.ADDR_ROM)
-            except:
-                self._warning("Failed to initialize FEM I2C ROM")
+                self._rom = i2c_eeprom.EEP24XX64(self.i2c, self.ADDR_ROM)
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize FEM I2C ROM: " + str(e))
                 return None
 
         try:
-            if string == None:
+            if string is None:
                 return self.rom.readString()
             else:
                 self.rom.writeString(string)
         except Exception:
             self._warning("Failed to operate FEM I2C ROM")
             return None
-
 
     def switch(self, mode=None, east=None, north=None, verify=False):
         """ Switch between antenna, noise and load mode
@@ -2218,12 +2235,14 @@ class Fem(Block):
         if not hasattr(self, "_sw"):
             try:
                 # instantiate switch
-                self._sw = i2c_gpio.PCF8574(self.i2c,self.ADDR_GPIO)
-            except:
-                raise RuntimeError('Failed to initialize I2C RF switch')
+                self._sw = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                raise RuntimeError('Failed to initialize I2C RF switch: ' + str(e))
         try:
             val = self._sw.read()
-        except:
+        except Exception:
             raise RuntimeError("I2C RF switch read failure")
         cur_e = bool(val & 0b00001000)
         cur_n = bool(val & 0b00010000)
@@ -2253,8 +2272,10 @@ class Fem(Block):
             try:
                 # Relative Humidity
                 self._rh = i2c_temp.Si7021(self.i2c, self.ADDR_TEMP)
-            except:
-                self._info("Failed to initialize I2C humidity sensor")
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._info("Failed to initialize I2C humidity sensor: " + str(e))
                 return None
 
         if self._rh.model() != 'Si7021':
@@ -2269,8 +2290,10 @@ class Fem(Block):
             try:
                 # Temperature
                 self._temp = i2c_temp.Si7051(self.i2c, self.ADDR_TEMP)
-            except:
-                self._info("Failed to initialize I2C temperature sensor")
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._info("Failed to initialize I2C temperature sensor: " + str(e))
                 return None
         try:
             return self._temp.readTemp()
