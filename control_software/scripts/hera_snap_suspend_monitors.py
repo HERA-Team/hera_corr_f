@@ -9,7 +9,7 @@ logger = add_default_log_handlers(logging.getLogger(__file__))
 
 parser = argparse.ArgumentParser(description='Suspend snap monitors for a specified time period',
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('-s', '--src', help="Name of source of disable command.", default='unspecified')
+parser.add_argument('-s', '--src', help="Name of source of disable command.", default='suspend_script')
 parser.add_argument('-r', dest='redishost', type=str, default='redishost',
                     help='Host servicing redis requests')
 parser.add_argument('-t', dest='suspend_mins', type=float, default=5.0,
