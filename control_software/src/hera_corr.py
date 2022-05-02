@@ -322,6 +322,9 @@ class HeraCorrelator(object):
                 if dest_configed and not self.fengs[h].dest_is_configured():
                     continue
                 filtered_hosts.append(h)
+            except AttributeError as e:
+                self.logger.error("Comms failed permanently on %s with error %s" % (h,e.message))
+                raise AttributeError
             except Exception as e:
                 self.logger.warn("Comms failed on %s: %s" % (h, e.message))
         return filtered_hosts
