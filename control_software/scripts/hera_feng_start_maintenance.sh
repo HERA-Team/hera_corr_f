@@ -17,4 +17,4 @@ echo >> $LOGFILE
 echo hera_feng_start.sh: Synchronizing and Starting TX >> $LOGFILE
 hera_snap_feng_init.py -s -e &>> $LOGFILE
 
-hera_snap_enable_monitor.py
+hera_snap_enable_monitors.py
