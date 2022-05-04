@@ -1465,8 +1465,8 @@ class Rotator(Block):
         """
         try:
             phases = np.array(phases)
-        except:
-            self._error("Couldn't convert phase coefficients to numpy array")
+        except Exception as e:
+            self._error("Couldn't convert phase coefficients to numpy array: " + str(e))
             return
         n_coeffs = phases.shape[0]
         if self.n_slots % n_coeffs != 0:
@@ -1777,153 +1777,6 @@ class Corr(Block):
         self.set_acc_len(self.acc_len, verify=verify)
 
 
-#class RoachInput(Block):
-#    def __init__(self, host, name, nstreams=32, logger=None):
-#        super(RoachInput, self).__init__(host, name, logger)
-#        self.nstreams  = nstreams
-#        self.nregs     = nstreams // 8
-#        self.nstreams_per_reg = 8
-#        self.USE_ADC   = 0
-#    # There are two separate noise streams we can switch in. TODO: figure out how (and why) to use these.
-#        self.USE_NOISE = 1
-#        self.USE_ZERO  = 3
-#
-#    def use_noise(self, stream=None):
-#        if stream is None:
-#            for reg in range(self.nregs):
-#                v = 0
-#                for stream in range(self.nstreams_per_reg):
-#                    v += self.USE_NOISE << (4 * stream)
-#                self.write_int('sel%d' % reg, v)
-#        else:
-#            raise NotImplementedError('Different input selects not supported yet!')
-#
-#    def use_adc(self, stream=None):
-#        if stream is None:
-#            for reg in range(self.nregs):
-#                v = 0
-#                for stream in range(self.nstreams_per_reg):
-#                    v += self.USE_ADC << (4 * stream)
-#                self.write_int('sel%d' % reg, v)
-#        else:
-#            raise NotImplementedError('Different input selects not supported yet!')
-#
-#    def use_zero(self, stream=None):
-#        if stream is None:
-#            for reg in range(self.nregs):
-#                v = 0
-#                for stream in range(self.nstreams_per_reg):
-#                    v += self.USE_ZERO << (4 * stream)
-#                self.write_int('sel%d' % reg, v)
-#        else:
-#            raise NotImplementedError('Different input selects not supported yet!')
-#
-#    def get_stats(self):
-#        self.write_int('rms_enable', 1)
-#        time.sleep(0.01)
-#        self.write_int('rms_enable', 0)
-#        x = np.array(struct.unpack('>%dl' % (2*self.nstreams), self.read('rms_levels', self.nstreams * 8)))
-#        self.write_int('rms_enable', 1)
-#        means = x[0::2]
-#        sds   = x[1::2]
-#        return {'means':means, 'sds':sds}
-#
-#    def initialize(self):
-#        self.use_adc()
-#        #self.write_int('rms_enable', 1)
-#
-#class RoachDelay(Block):
-#    def __init__(self, host, name, nstreams=6, logger=None):
-#        super(RoachDelay, self).__init__(host, name, logger)
-#        self.nstreams = nstreams
-#        self.nregs = nstreams // 4
-#
-#    def set_delay(self, stream, delay):
-#        if stream > self.nstreams:
-#            self._error('Tried to set delay for stream %d > nstreams (%d)' % (stream, self.nstreams))
-#        delay_reg = stream // 4
-#        reg_pos   = stream % 4
-#        self.set_reg_bits('%d' % delay_reg, delay, 8*reg_pos, 8)
-#
-#    def initialize(self):
-#        for i in range(self.nregs):
-#            self.write_int('%d' % i, 0)
-
-#class RoachPfb(Block):
-#    def __init__(self, host, name, logger=None):
-#        super(RoachPfb, self).__init__(host, name, logger)
-#        self.host = host
-#        self.SHIFT_OFFSET = 0
-#        self.SHIFT_WIDTH  = 11
-#        self.PRESHIFT_OFFSET = 11
-#        self.PRESHIFT_WIDTH  = 2
-#        #self.STAT_RST_BIT = 14
-#
-#    def set_fft_shift(self, shift):
-#        self.set_reg_bits('fft_shift', shift, self.SHIFT_OFFSET, self.SHIFT_WIDTH)
-#
-#    def set_fft_preshift(self, shift):
-#        self.set_reg_bits('fft_shift', shift, self.PRESHIFT_OFFSET, self.PRESHIFT_WIDTH)
-#
-#    def initialize(self):
-#        self.host.write_int('fft_shift', 0)
-
-#class RoachEth(Block):
-#    def __init__(self, host, name, port=10000, logger=None):
-#        super(RoachEth, self).__init__(host, name, logger)
-#        self.port = port
-#
-#    def set_arp_table(self, macs):
-#        """
-#        Set the ARP table with a list of MAC addresses.
-#        The list, `macs`, is passed such that the zeroth
-#        element is the MAC address of the device with
-#        IP XXX.XXX.XXX.0, and element N is the MAC
-#        address of the device with IP XXX.XXX.XXX.N
-#        """
-#        macs = list(macs)
-#        macs_pack = struct.pack('>%dQ' % (len(macs)), *macs)
-#        self.write('sw', macs_pack, offset=0x3000)
-#
-#
-#    def get_core_status(self, core=0):
-#        stat = self.read_uint('%d_sw_status' % core)
-#        rv = {}
-#        rv['rx_overrun'  ] = (stat >> 0) & 1
-#        rv['rx_bad_frame'] = (stat >> 1) & 1
-#        rv['tx_of'       ] = (stat >> 2) & 1
-#        rv['tx_afull'    ] = (stat >> 3) & 1
-#        rv['tx_led'      ] = (stat >> 4) & 1
-#        rv['rx_led'      ] = (stat >> 5) & 1
-#        rv['up'          ] = (stat >> 6) & 1
-#        rv['eof_cnt'     ] = (stat >> 7) & (2**25-1)
-#        return rv
-#
-#    def status_reset(self):
-#        self.set_reg_bits('ctrl', 0, 8)
-#        self.set_reg_bits('ctrl', 1, 8)
-#        self.set_reg_bits('ctrl', 0, 8)
-#
-#    def set_port(self, port):
-#        self.set_reg_bits('ctrl', port, 2, 16)
-#
-#    def reset(self):
-#        # disable core before resetting
-#        self.disable_tx()
-#        # toggle reset
-#        self.set_reg_bits('ctrl', 0, 4)
-#        self.set_reg_bits('ctrl', 1, 4)
-#        self.set_reg_bits('ctrl', 0, 4)
-#
-#    def enable_tx(self):
-#        self.set_reg_bits('ctrl', 1, 0)
-#
-#    def disable_tx(self):
-#        self.set_reg_bits('ctrl', 0, 0)
-#
-#    def config_tge_core(self, core_num, mac, ip, port, arp_table):
-#        self.host.config_10gbe_core(self.name + '_%d_sw' % core_num, mac, ip, port, arp_table)
-
 class Pam(Block):
 
     ADDR_VOLT = 0x36
@@ -2030,8 +1883,10 @@ class Pam(Block):
                 # Current sensor
                 self._cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
                 self._cur.init()
-            except:
-                self._warning("Failed to initialize I2C current sensor")
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize I2C current sensor: " + str(e))
                 return None
 
         try:
@@ -2055,9 +1910,11 @@ class Pam(Block):
         if not hasattr(self, "_id"):
             try:
                 # ID chip
-                self._sn=i2c_sn.DS28CM00(self.i2c, self.ADDR_SN)
-            except:
-                self._warning("Failed to initialize I2C ID chip")
+                self._sn = i2c_sn.DS28CM00(self.i2c, self.ADDR_SN)
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize I2C ID chip:  " + str(e))
                 return None
 
         try:
@@ -2078,8 +1935,10 @@ class Pam(Block):
                 # Power detector
                 self._pow = i2c_volt.MAX11644(self.i2c, self.ADDR_VOLT)
                 self._pow.init()
-            except:
-                self._warning("Failed to initialize I2C power sensor")
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize I2C power sensor: " + str(e))
                 return None
         LOSS = 9.8
         if name not in ['east','north']:
@@ -2109,13 +1968,15 @@ class Pam(Block):
         if not hasattr(self, "_rom"):
             try:
                 # ROM
-                self._rom=i2c_eeprom.EEP24XX64(self.i2c, self.ADDR_ROM)
-            except:
-                self._warning("Failed to initialize I2C ROM")
+                self._rom = i2c_eeprom.EEP24XX64(self.i2c, self.ADDR_ROM)
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize I2C ROM: " + str(e))
                 return None
 
         try:
-            if string == None:
+            if string is None:
                 return self._rom.readString()
             else:
                 self._rom.writeString(string)
@@ -2242,8 +2103,10 @@ class Fem(Block):
                 # Barometer
                 self._bar = i2c_bar.MS5611_01B(self.i2c, self.ADDR_BAR)
                 self._bar.init()
-            except:
-                self._warning("Failed to initialize I2C barometer")
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize I2C barometer: " + str(e))
                 return None
 
         try:
@@ -2265,10 +2128,12 @@ class Fem(Block):
         if not hasattr(self, "_cur"):
             try:
                 # Current sensor
-                self._cur=i2c_volt.INA219(self.i2c,self.ADDR_INA)
+                self._cur = i2c_volt.INA219(self.i2c, self.ADDR_INA)
                 self._cur.init()
-            except:
-                self._warning("Failed to initialize I2C FEM current sensor")
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize I2C FEM current sensor: " + str(e))
                 return None
 
         try:
@@ -2293,8 +2158,10 @@ class Fem(Block):
             try:
                 # Temperature
                 self._temp = i2c_temp.Si7051(self.i2c, self.ADDR_TEMP)
-            except:
-                self._warning("Failed to initialize I2C temperature sensor")
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize I2C temperature sensor: " + str(e))
                 return None
 
         try:
@@ -2309,11 +2176,13 @@ class Fem(Block):
         if not hasattr(self, "_imu"):
             try:
                 # IMU
-                self._imu = i2c_motion.IMUSimple(self.i2c,self.ADDR_ACCEL,
-                                                orient=self.IMU_ORIENT)
+                self._imu = i2c_motion.IMUSimple(self.i2c, self.ADDR_ACCEL,
+                                                 orient=self.IMU_ORIENT)
                 self._imu.init()
-            except:
-                self._warning("Failed to initialize I2C IMU")
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize I2C IMU: " + str(e))
                 return None, None
 
         try:
@@ -2322,7 +2191,7 @@ class Fem(Block):
         except Exception:
             self._warning('Failed to read I2C IMU')
             del self._imu
-            return None,None
+            return None, None
 
     def rom(self, string=None):
         """ Read string from ROM or write String to ROM
@@ -2334,20 +2203,21 @@ class Fem(Block):
         if not hasattr(self, "_rom"):
             try:
                 # ROM
-                self._rom=i2c_eeprom.EEP24XX64(self.i2c,self.ADDR_ROM)
-            except:
-                self._warning("Failed to initialize FEM I2C ROM")
+                self._rom = i2c_eeprom.EEP24XX64(self.i2c, self.ADDR_ROM)
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._warning("Failed to initialize FEM I2C ROM: " + str(e))
                 return None
 
         try:
-            if string == None:
+            if string is None:
                 return self.rom.readString()
             else:
                 self.rom.writeString(string)
         except Exception:
             self._warning("Failed to operate FEM I2C ROM")
             return None
-
 
     def switch(self, mode=None, east=None, north=None, verify=False):
         """ Switch between antenna, noise and load mode
@@ -2365,12 +2235,14 @@ class Fem(Block):
         if not hasattr(self, "_sw"):
             try:
                 # instantiate switch
-                self._sw = i2c_gpio.PCF8574(self.i2c,self.ADDR_GPIO)
-            except:
-                raise RuntimeError('Failed to initialize I2C RF switch')
+                self._sw = i2c_gpio.PCF8574(self.i2c, self.ADDR_GPIO)
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                raise RuntimeError('Failed to initialize I2C RF switch: ' + str(e))
         try:
             val = self._sw.read()
-        except:
+        except Exception:
             raise RuntimeError("I2C RF switch read failure")
         cur_e = bool(val & 0b00001000)
         cur_n = bool(val & 0b00010000)
@@ -2400,8 +2272,10 @@ class Fem(Block):
             try:
                 # Relative Humidity
                 self._rh = i2c_temp.Si7021(self.i2c, self.ADDR_TEMP)
-            except:
-                self._info("Failed to initialize I2C humidity sensor")
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._info("Failed to initialize I2C humidity sensor: " + str(e))
                 return None
 
         if self._rh.model() != 'Si7021':
@@ -2416,8 +2290,10 @@ class Fem(Block):
             try:
                 # Temperature
                 self._temp = i2c_temp.Si7051(self.i2c, self.ADDR_TEMP)
-            except:
-                self._info("Failed to initialize I2C temperature sensor")
+            except AttributeError:
+                raise AttributeError
+            except Exception as e:
+                self._info("Failed to initialize I2C temperature sensor: " + str(e))
                 return None
         try:
             return self._temp.readTemp()
