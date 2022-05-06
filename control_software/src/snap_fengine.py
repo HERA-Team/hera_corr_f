@@ -368,7 +368,7 @@ class SnapFengine(object):
         for stream in range(self.input.ninput_mux_streams):
             status['stream%d_autocorr' % stream] = _cdjsonify(self.corr.get_new_corr(stream, stream).real)
         for stream in range(self.eq.nstreams):
-            for key, val in self.eq.get_status(stream, include_eq_coeffs).items():
+            for key, val in self.eq.get_status(stream, include_coeffs=include_eq_coeffs).items():
                 if key == 'clip_count':  # There is only one of these per snap.
                     status['eq_%s' % key] = _cdjsonify(val)
                 else:
