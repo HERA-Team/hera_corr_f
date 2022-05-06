@@ -32,15 +32,20 @@ def main():
                         help='Use this flag to sync the F-engine(s) and Noise generators from PPS')
     #parser.add_argument('-m', dest='mansync', action='store_true', default=False,
     #                    help='Use this flag to manually sync the F-engines with an asynchronous software trigger')  # noqa
+
     group_init = parser.add_mutually_exclusive_group()
     group_init.add_argument('-i', dest='initialize', action='store_true', default=None,
                             help='Use this flag to initialize the uninitialized F-engine(s)')
     group_init.add_argument('-I', dest='forceinitialize', action='store_true', default=None,
                             help='Use this flag to initialize all F-engine(s)')
+
     #parser.add_argument('-t', dest='tvg', action='store_true', default=False,
     #                    help='Use this flag to switch to EQ TVG outputs')
-    #parser.add_argument('-n', dest='noise', action='store_true', default=False,
-    #                    help='Use this flag to switch to Noise inputs')
+    parser.add_argument('--fem_state', choices=['antenna','noise','load'], default='antenna',
+                        help='Target FEM switch state (antenna, noise, or load). Default: antenna')
+    parser.add_argument('--snap_source',choices=['adc','noise'], default='adc')
+    parser.add_argument('--snap_seed', choices=['diff','same'], default='diff')
+
     group_dest = parser.add_mutually_exclusive_group()
     group_dest.add_argument('-d', dest='dest', action='store_true', default=False,
                         help='Configure Ethernet destinations.')
@@ -48,6 +53,7 @@ def main():
                         help='Configure Ethernet destinations.')
     parser.add_argument('-e', dest='eth', action='store_true', default=False,
                         help='Use this flag to switch on the Ethernet outputs')
+
     group_prog = parser.add_mutually_exclusive_group()
     group_prog.add_argument('-p', '--program', action='store_true', default=False,
                         help='Program FPGAs with the fpgfile specified in the config file'
@@ -55,12 +61,14 @@ def main():
     group_prog.add_argument('-P', '--forceprogram', action='store_true', default=False,
                         help='Program FPGAs with the fpgfile specified in the config file'
                              'irrespective of whether they are programmed already')
+
     parser.add_argument('--nomultithread', action='store_true', default=False,
                         help='Disable multithread ADC initialization.')
     parser.add_argument('--allsnaps', action='store_true', default=False,
                         help='Require communication with all snaps (exit if any are put in dead_fengs")')
     parser.add_argument('--ipython', action='store_true', default=False,
                         help='Drop into IPython prompt at end of script')
+
     args = parser.parse_args()
 
     logger = handlers.add_default_log_handlers(logging.getLogger(__file__))
@@ -144,10 +152,12 @@ def main():
             warn_failed(logger, failed, 'disable_phase_switches', all_snaps=args.allsnaps)
 
             # Initialize FEM and PAM but accept failure
-            fem_failed = corr.switch_fems('antenna', **kwargs)
-            pam_failed = corr.initialize_pams(**kwargs)
+            init_time = time.time()
+            fem_failed = corr.switch_fems(args.fem_state, **kwargs)
             if len(fem_failed) > 0:
                 logger.warn('FEM initialization failed: %s' % (','.join(fem_failed)))
+
+            pam_failed = corr.initialize_pams(**kwargs)
             if len(pam_failed) > 0:
                 logger.warn('PAM initialization failed: %s' % (','.join(pam_failed)))
 
@@ -173,20 +183,16 @@ def main():
         #    corr.do_for_all_f("write_freq_ramp", block="eq_tvg")
         #    corr.do_for_all_f("tvg_enable", block="eq_tvg")
 
-        #if args.noise:
-        #    logger.info('Setting noise TVGs...')
-        #    seed = 23
-        #    for stream in range(3):
-        #        corr.do_for_all_f("set_seed", block="noise", args=[stream, seed])
-        #    corr.do_for_all_f("use_noise", block="input")
+        # Select SNAP F-Engine input to be adc or digital noise
+        init_time = time.time()
+        failed = corr.set_input_fengs(source=args.snap_source, seed=args.snap_seed)
+        warn_failed(logger, failed, 'set_input_fengs', all_snaps=args.allsnaps)
 
         # Sync logic. Do global sync first, and then noise generators
         # wait for a PPS to pass then arm all the boards
         if args.sync:
             #corr.disable_eths() # ARP: no need to disable, and keeping them enabled reduces risk of them going incommunicado
-            #corr.do_for_all_f("change_period", block="sync", args=[0])
             corr.sync()
-            #corr.sync_noise(manual=args.mansync)
 
         if args.eth:
             failed = corr.enable_eths()

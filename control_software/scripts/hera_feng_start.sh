@@ -7,11 +7,10 @@ set -e
 
 echo hera_feng_start.sh: Initializing F-Engines > $LOGFILE
 date >> $LOGFILE
-hera_snap_feng_init.py -p -i -d &>> $LOGFILE
+hera_snap_feng_init.py -p -i -d -s -e &>> $LOGFILE
 
 echo >> $LOGFILE
 echo >> $LOGFILE
-echo hera_feng_start.sh: Synchronizing and Starting TX >> $LOGFILE
-hera_snap_feng_init.py -s -e &>> $LOGFILE
+echo hera_feng_start.sh: Synchronized and Started TX >> $LOGFILE
 
 hera_snap_enable_monitors.py
