@@ -1207,11 +1207,14 @@ class Eq(Block):
                          offset=(self.streamsize * stream))
         return data
 
-    def get_status(self, stream):
+    def get_status(self, stream, include_coeffs=False):
         """
         Return the Eq status:  coeffs (per stream) and clip_count (for all)
         """
-        return {'coeffs': self.get_coeffs(stream), 'clip_count': self.clip_count()}
+        if include_coeffs:
+            return {'coeffs': self.get_coeffs(stream), 'clip_count': self.clip_count()}
+        else:
+            return {'clip_count': self.clip_count()}
 
     def get_coeffs(self, stream):
         """
