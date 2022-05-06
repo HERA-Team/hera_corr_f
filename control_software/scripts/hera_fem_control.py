@@ -31,12 +31,11 @@ def main():
         if len(corr.fengs) == 0:
             logger.error("No F-Engines are connected. Is the power off?")
             return
-    	#TODO communicate what we do to redis which is in turn monitored by M&C
     	init_time = time.time()
     	fem_failed = corr.switch_fems(args.state)
     	if len(fem_failed) > 0:
     	    logger.warn('FEM initialization failed: %s' % (','.join(fem_failed)))
-    	corr.r.hmset('corr:fem_switch_state',{'state':args.state,'time':init_time})
+    	#corr.r.hmset('corr:fem_switch_state',{'state':args.state,'time':init_time}) # done in switch_fems
     except(AssertionError) as e:
         logger.error('FAILURE!\n' + e.message)
 if __name__ == "__main__":
