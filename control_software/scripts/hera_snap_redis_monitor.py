@@ -6,6 +6,7 @@ from __future__ import print_function
 import time
 import socket
 import logging
+import redis
 import argparse
 from os import path as op
 import sys
@@ -56,26 +57,28 @@ if __name__ == "__main__":
     if args.hosts is not None:
         args.hosts = args.hosts.split(',')
 
-    corr = HeraCorrelator(hosts=args.hosts, redishost=args.redishost, block_monitoring=False)
-    if args.verbose:
-        print_ant_log_messages(corr)
-
     script_redis_key = "status:script:{:s}:{:s}".format(hostname, __file__)
     logger.info('Starting SNAP redis monitor')
 
-    corr.r.set(script_redis_key, "alive", ex=max(60, args.delay * 2))
+    r = redis.Redis(args.redishost, decode_responses=True)
 
-    if corr.r.exists('disable_monitoring'):
-        logger.warning('Monitoring locked out by {}.'
-                           .format(corr.r.get('disable_monitoring')))
+    if r.exists('disable_monitoring'):
+        r.set(script_redis_key, "locked out (%s)" % datetime.now())
+        logger.warning('Monitoring locked out by {}.'.format(r.get('disable_monitoring')))
     else:
+        corr = HeraCorrelator(hosts=args.hosts, redishost=args.redishost, block_monitoring=False)
+        if args.verbose:
+            print_ant_log_messages(corr)
+
         corr.r.hmset(
             "version:{:s}:{:s}".format(__package__, op.basename(__file__)),
             {"version": __version__, "timestamp": datetime.now().isoformat()}
         )
 
         # Put full set into redis status:snap:<host>
+        corr.r.set(script_redis_key, "getting status (%s)" % datetime.now())
         try:
             corr.set_redis_status_fengs()
         except Exception as e:
             logger.warning(str(e))
+    logger.info('Finished SNAP redis monitor')
