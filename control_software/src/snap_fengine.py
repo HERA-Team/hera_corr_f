@@ -6,7 +6,7 @@ import json
 import datetime
 import casperfpga
 import socket
-import blocks as snap_blocks
+from . import blocks as snap_blocks
 
 # 'source_sel' register only on fpgax only uses lowest 2 bits
 # using the others to mark status bits

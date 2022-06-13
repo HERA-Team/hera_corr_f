@@ -147,7 +147,7 @@ class Synth(casperfpga.synth.LMX2581):
         PLL_NUM += PLL_NUM_L & 0b111111111111
         return self.FOSC * (PLL_N + PLL_NUM / PLL_DEN) / VCO_DIV
 
-class Adc(casperfpga.snapadc.SNAPADC):
+class Adc(casperfpga.snapadc.SnapAdc):
     def __init__(self, host, num_chans=2, resolution=8, ref=10,
                  logger=None, **kwargs):
         """
@@ -163,7 +163,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
                       logging.getLogger(__name__ + ":%s" % (host.host)))
         # Purposely setting ref=None below to prevent LMX object
         # from being attached so we can do it ourselves
-        casperfpga.snapadc.SNAPADC.__init__(self, host, ref=None,
+        casperfpga.snapadc.SnapAdc.__init__(self, host, ref=None,
                                             logger=self.logger)
         # Attach our own wrapping of LMX
         self.lmx = Synth(host, 'lmx_ctrl', fosc=ref)
@@ -543,7 +543,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         for cnt in range(nchecks):
             self.snapshot()
             for chip,d in self.readRAM(signed=False).items():
-            	ans = (predicted + d[0,0]) % 256
+                ans = (predicted + d[0,0]) % 256
                 failed_lanes = np.sum(d != ans, axis=0)
                 if np.any(failed_lanes) > 0:
                     failed_chips[chip] = np.where(failed_lanes)[0]

@@ -9,7 +9,7 @@ import json
 from hera_corr_cm.handlers import add_default_log_handlers
 from hera_corr_cm import redis_cm
 import hashlib
-from Queue import Queue
+from queue import Queue
 from threading import Thread
 from hera_corr_f import SnapFengine
 from hera_corr_f.snap_fengine import jsonify
