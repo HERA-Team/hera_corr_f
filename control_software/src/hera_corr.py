@@ -337,7 +337,7 @@ class HeraCorrelator(object):
         Inputs:
             host (str): Host to target.
         """
-        status = self.fengs[host].get_status(jsonify_values=True, include_eq_coeffs=include_eq_coeffs)
+        status = self.fengs[host].get_status(jsonify_values=True, include_eq_coeffs=include_eq_coeffs, include_i2c=True)
         status['antpols'] = jsonify(self.snap_to_ant[host], True)
         this_key = 'status:snap:{}'.format(host)
         self.r.hmset(this_key, status)
