@@ -148,8 +148,8 @@ class Synth(casperfpga.synth.LMX2581):
         return self.FOSC * (PLL_N + PLL_NUM / PLL_DEN) / VCO_DIV
 
 class Adc(casperfpga.snapadc.SnapAdc):
-    def __init__(self, host, num_chans=2, resolution=8, ref=10,
-                 logger=None, **kwargs):
+    # def __init__(self, host, device_name=None, device_info={}, num_chans=2, resolution=8, ref=10, logger=None, **kwargs):
+    def __init__(self, host, num_chans=2, resolution=8, ref=10, logger=None, **kwargs):
         """
         Instantiate an ADC block.
 
@@ -159,12 +159,11 @@ class Adc(casperfpga.snapadc.SnapAdc):
            resolution (int): Bit resolution of the ADC. Valid values are 8, 12.
            ref (float): Reference frequency (in MHz) from which ADC clock is derived. If None, an external sampling clock must be used.
         """
-        self.logger = logger or add_default_log_handlers(
-                      logging.getLogger(__name__ + ":%s" % (host.host)))
+        self.logger = logger or add_default_log_handlers(logging.getLogger(__name__ + ":%s" % (host.host)))
         # Purposely setting ref=None below to prevent LMX object
         # from being attached so we can do it ourselves
-        casperfpga.snapadc.SnapAdc.__init__(self, host, ref=None,
-                                            logger=self.logger)
+        # casperfpga.snapadc.SnapAdc.__init__(self, host, ref=None, device_name=None, device_info={})
+        casperfpga.snapadc.SnapAdc.__init__(self, host, ref=None)
         # Attach our own wrapping of LMX
         self.lmx = Synth(host, 'lmx_ctrl', fosc=ref)
         self.name            = 'SNAP_adc'
@@ -289,7 +288,7 @@ class Adc(casperfpga.snapadc.SnapAdc):
 
         # ADC init/lmx select messes with FPGA clock, so reprogram
         self.logger.debug('Reprogramming the FPGA for ADCs')
-        self.interface.transport.prog_user_image()
+        self.adc.itf.transport.prog_user_image()
         self.selectADC()
         self.logger.debug('Reprogrammed')
 
