@@ -36,7 +36,7 @@ def test_identical_noise(f, rng_int):
     noise_seed = rng_int(0, 256)
     n_outputs = f.noise.nstreams
     for i in range(n_outputs):
-        logger.info("Setting noise seed of generator %d to %d" % (i, noise_seed + i))
+        logger.info("Setting noise seed of generator %d to %d" % (i, noise_seed))
         f.noise.set_seed(i, noise_seed)
     f.input.use_noise()
     f.sync.arm_sync()
@@ -136,7 +136,7 @@ def test_zeros(f, zero_chans, rng_int):
     noise_seed = rng_int(0, 256)
     n_outputs = f.noise.nstreams
     for i in range(n_outputs):
-        logger.info("Setting noise seed of generator %d to %d" % (i, noise_seed + i))
+        logger.info("Setting noise seed of generator %d to %d" % (i, noise_seed))
         f.noise.set_seed(i, noise_seed)
     f.input.use_noise()
     f.sync.arm_sync()
@@ -295,7 +295,7 @@ def test_delays(f, delays, rng_int):
     noise_seed = rng_int(0, 256)
     n_outputs = f.noise.nstreams
     for i in range(n_outputs):
-        logger.info("Setting noise seed of generator %d to %d" % (i, noise_seed + i))
+        logger.info("Setting noise seed of generator %d to %d" % (i, noise_seed))
         f.noise.set_seed(i, noise_seed)
     f.input.use_noise()
     f.sync.arm_sync()
@@ -352,9 +352,10 @@ def main(args):
     # Earlier numpys (not sure what version the change happens in)
     np.random.seed(args.seed)
     rng_int = np.random.randint
-    f = snap_fengine.SnapFengine(args.host)
+    f = snap_fengine.SnapFengine(args.host, redishost=None)
     if args.initialize:
         f.initialize_adc()
+        #f.align_adc()
         f.initialize()
 
     # Reset blocks being used even in the absense of an initialize arg
@@ -363,7 +364,7 @@ def main(args):
         block.initialize()
 
     # Set EQ to empirically possibly reasonable value for noise generators and default FFT shift
-    for i in range(N_ANTS_PER_BOARD):
+    for i in range(2*N_ANTS_PER_BOARD):
         f.eq.set_coeffs(i, 10*np.ones(f.eq.ncoeffs))
 
 
