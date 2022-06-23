@@ -371,7 +371,8 @@ class Adc(casperfpga.snapadc.SnapAdc):
         elif laneSel not in self.laneList:
             raise ValueError("Invalid parameter")
 
-        if not isinstance(tap, np.intc):
+        tap = int(tap)
+        if not isinstance(tap, int):
             raise ValueError("Invalid parameter")
 
         strl = ','.join([str(c) for c in laneSel])
