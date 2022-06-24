@@ -515,6 +515,9 @@ class Adc(casperfpga.snapadc.SnapAdc):
                 lanes = [L for L in lanes if L not in failed_lanes]
                 for lane in lanes:
                     if not d[0,lane] in [ans1, ans2]:
+                        if cnt == 2*self.RESOLUTION - 1:
+                            # Failed on last try
+                            failed_lanes += [lane]
                         self.bitslip(chip, lane)
                         slipped = True
                 if not slipped:
@@ -555,7 +558,7 @@ class Adc(casperfpga.snapadc.SnapAdc):
         self.setDemux(numChannel=self.num_chans)
         if len(failed_chips) > 0 and retry:
             if self._retry_cnt < self._retry:
-                self._retry_cnt += 1
+                self._retry_cnt += 1  
                 self.logger.info('retry=%d/%d redo Line/Frame on ADCs/lanes: %s' % \
                             (self._retry_cnt, self._retry, failed_chips))
                 self.alignLineClock(failed_chips)
