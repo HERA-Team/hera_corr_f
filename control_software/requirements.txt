@@ -1,0 +1,4 @@
+redis
+numpy<1.19
+crcmod
+astropy
