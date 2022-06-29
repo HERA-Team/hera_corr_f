@@ -1196,9 +1196,17 @@ class HeraCorrelator(object):
             self.fengs.values()[0].sync.wait_for_sync()
         start = time.time()
         self.logger.info('Sync passed (t=%.2f)' % (start))
-        # Consider multithreading if gets too slow
-        for host in hosts:
-            self.fengs[host].sync.arm_sync()
+        # Multithread arm:
+        failed = self._call_on_hosts(
+                            target=self.sync.arm_sync(),
+                            args=(),
+                            kwargs={},
+                            hosts=hosts,
+                            multithread=True,
+                            timeout=timeout,
+        )
+        #for host in hosts:
+        #    self.fengs[host].sync.arm_sync()
         elapsed_time = time.time() - start
         if not manual:
             # XXX use sync.count to verify no sync has passed
