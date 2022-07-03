@@ -329,27 +329,34 @@ class HeraCorrelator(object):
                 self.logger.warn("Comms failed on %s: %s" % (h, e.message))
         return filtered_hosts
 
-    def feng_set_redis_status(self, host, include_eq_coeffs=False):
+    def feng_set_redis_status(self, host, include_eq_coeffs=False,
+                              include_i2c=False):
         """
         Upload SnapFengine.get_status() dict to redis under key
         'status:snap:<host>'.
 
         Inputs:
             host (str): Host to target.
+            include_eq_coeffs (bool): include eq coeffs in redis. Default False
+            include_i2c (bool): poll i2c devices for redis. Default False
         """
-        status = self.fengs[host].get_status(jsonify_values=True, include_eq_coeffs=include_eq_coeffs, include_i2c=True)
+        status = self.fengs[host].get_status(jsonify_values=True,
+                  include_eq_coeffs=include_eq_coeffs, include_i2c=include_i2c)
         status['antpols'] = jsonify(self.snap_to_ant[host], True)
         this_key = 'status:snap:{}'.format(host)
         self.r.hmset(this_key, status)
         self.r.expire(this_key, 72 * 3600)
 
     def set_redis_status_fengs(self, hosts=None, include_eq_coeffs=False,
+                               include_i2c=False,
                                multithread=True, timeout=300.):
         """
         Upload status dictionaries to redis for specified hosts.
 
         Inputs:
             hosts (list): List of hosts to target. Default: all
+            include_eq_coeffs (bool): include eq coeffs in redis. Default False
+            include_i2c (bool): poll i2c devices for redis. Default False
             multithread (bool): Multithread across hosts. Default: True
             timeout (float): Timeout in seconds.  Default: 300.
         """
@@ -357,7 +364,8 @@ class HeraCorrelator(object):
         failed = self._call_on_hosts(
                             target=self.feng_set_redis_status,
                             args=(),
-                            kwargs={"include_eq_coeffs": include_eq_coeffs},
+                            kwargs={"include_eq_coeffs": include_eq_coeffs,
+                                    "include_i2c": include_i2c},
                             hosts=hosts,
                             multithread=multithread,
                             timeout=timeout

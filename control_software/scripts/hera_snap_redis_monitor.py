@@ -78,7 +78,7 @@ if __name__ == "__main__":
         # Put full set into redis status:snap:<host>
         corr.r.set(script_redis_key, "getting status (%s)" % datetime.now())
         try:
-            corr.set_redis_status_fengs()
+            corr.set_redis_status_fengs(include_i2c=False)
         except Exception as e:
             logger.warning(str(e))
     logger.info('Finished SNAP redis monitor')
