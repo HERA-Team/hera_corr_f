@@ -618,10 +618,16 @@ class HeraCorrelator(object):
         hosts = self.get_feng_hostnames(hosts=hosts)
         failed = []
         for host in hosts:
-            for cnt,fem in enumerate(self.fengs[host].fems):
+            try:
+                fems = self.fengs[host].fems
+            except(AttributeError):
+                # happens if host is reset or uninitialized
+                fems = [None, None, None]
+            for cnt, fem in enumerate(fems):
                 self.logger.info('Switching %s.fem[%d] to %s' %
                                  (host, cnt, mode))
                 try:
+                    assert fem is not None  # catch init error above
                     # will error if verification fails
                     fem.switch(mode,east=east,north=north,verify=verify)
                     self.r.hset('status:snap:%s' % host,
@@ -1178,7 +1184,23 @@ class HeraCorrelator(object):
         )
         return failed
 
-    def sync(self, manual=False, hosts=None, maxtime=0.8):
+    def arm_sync(self, host, sync=True, noise=False):
+        """
+        Arm sync/noise on a single host. Used in multithreaded call in sync.
+
+        Inputs:
+            host (str): Name of host to target.
+            sync (bool): Arm sync. Default True
+            noise (bool): Arm noise. Defaul False
+        """
+        feng = self.fengs[host]
+        if sync:
+            self.logger.info("Arming sync on %s" % (host))
+            feng.sync.arm_sync()
+        if noise:
+            feng.sync.arm_noise()
+
+    def sync(self, manual=False, hosts=None, timeout=300, maxtime=0.8):
         """
         Synchronize boards to PPS.
 
@@ -1204,9 +1226,15 @@ class HeraCorrelator(object):
             self.fengs.values()[0].sync.wait_for_sync()
         start = time.time()
         self.logger.info('Sync passed (t=%.2f)' % (start))
-        # Consider multithreading if gets too slow
-        for host in hosts:
-            self.fengs[host].sync.arm_sync()
+        # Multithread arm:
+        failed = self._call_on_hosts(
+                            target=self.arm_sync,
+                            args=(),
+                            kwargs={'sync': True, 'noise': False},
+                            hosts=hosts,
+                            multithread=True,
+                            timeout=timeout,
+        )
         elapsed_time = time.time() - start
         if not manual:
             # XXX use sync.count to verify no sync has passed
@@ -1225,7 +1253,7 @@ class HeraCorrelator(object):
         self.r['corr:feng_sync_time_str'] = time.ctime(sync_time)
         self.r['feng:sync_time'] = sync_time # in UTC seconds
 
-    def sync_noise(self, manual=False, hosts=None, maxtime=0.8):
+    def sync_noise(self, manual=False, hosts=None, timeout=300, maxtime=0.8):
         """
         Synchronize internal noise generators to PPS.
 
@@ -1242,8 +1270,15 @@ class HeraCorrelator(object):
             self.fengs.values()[0].sync.wait_for_sync()
         start = time.time()
         self.logger.info('Sync passed (t=%.2f)' % (start))
-        for host in hosts:
-            self.fengs[host].sync.arm_noise()
+        # Multithread arm:
+        failed = self._call_on_hosts(
+                            target=self.arm_sync,
+                            args=(),
+                            kwargs={'sync': False, 'noise': True},
+                            hosts=hosts,
+                            multithread=True,
+                            timeout=timeout,
+        )
         elapsed_time = time.time() - start
         if not manual:
             if elapsed_time > maxtime:
