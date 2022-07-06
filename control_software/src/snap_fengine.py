@@ -77,7 +77,8 @@ class SnapFengine(object):
         self.packetizer = snap_blocks.Packetizer(self.fpga, 'packetizer',
                                      n_time_demux=2)
         self.eth = snap_blocks.Eth(self.fpga, 'eth')
-        self.corr = snap_blocks.Corr(self.fpga,'corr_0')
+        self.corr_0 = snap_blocks.Corr_0(self.fpga,'corr_0')
+        self.corr_1 = snap_blocks.Corr_1(self.fpga, 'corr_1')
         self.phase_switch = snap_blocks.PhaseSwitch(self.fpga, 'phase_switch')
 
         # store antenna numbers used in packet headers
@@ -97,7 +98,8 @@ class SnapFengine(object):
             self.reorder,
             self.packetizer,
             self.eth,
-            self.corr,
+            self.corr_0,
+            self.corr_1,
             self.phase_switch,
         ]
 
