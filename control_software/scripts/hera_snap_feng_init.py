@@ -53,6 +53,8 @@ def main():
                         help='Configure Ethernet destinations.')
     parser.add_argument('-e', dest='eth', action='store_true', default=False,
                         help='Use this flag to switch on the Ethernet outputs')
+    parser.add_argument('--max_eth_enabled', dest='eth', type=int, default=None,
+                        help='Maximum number of snaps to enable. Default None = no limit')
 
     group_prog = parser.add_mutually_exclusive_group()
     group_prog.add_argument('-p', '--program', action='store_true', default=False,
@@ -195,7 +197,7 @@ def main():
             corr.sync()
 
         if args.eth:
-            failed = corr.enable_eths()
+            failed = corr.enable_eths(max_enabled=args.max_eth_enabled)
             warn_failed(logger, failed, 'enable_eths', all_snaps=args.allsnaps)
         else:
             failed = corr.disable_eths()

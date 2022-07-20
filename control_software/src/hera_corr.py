@@ -1249,27 +1249,36 @@ class HeraCorrelator(object):
             sync_time = int(time.time())  # roughly  # noqa
         self.logger.info('Synchronized noise.')
 
-    def enable_eths(self, hosts=None, verify=True):
+    def enable_eths(self, hosts=None, max_enabled=None, verify=True):
         """
         Enable ethernet outputs.
 
         Inputs:
             hosts (list): List of hosts to target. Default: all
+            max_enabled (int): Maximum number of snaps to enable. Default: None -> no limit
+                This is a stopgap solution for something that should ideally be solved
+                at the catcher rx level
             verify (bool): Check success.  Default: False
         """
         self.logger.info('Enabling ethernet output')
         # Only enable snaps that are fully configured
         hosts = self.get_feng_hostnames(hosts=hosts, adc_aligned=True,
                                         dest_configed=True)
+        hosts = sorted(hosts)  # put in a deterministic order, for now, for repeatability
         unconfigured = [h for h in self.fengs.keys() if h not in hosts]
         if len(unconfigured) > 0:
             self.logger.warning('Not enabling eths on unconfiged hosts: %s'
                                % (','.join(unconfigured)))
         failed = []
+        n_enabled = 0
         for host in hosts:
+            if max_enabled is not None and n_enabled >= max_enabled:
+                self.logger.warning('Max enabled reached: not enabling %s.eth' % (host))
+                continue
             try:
                 assert host not in unconfigured
                 self.fengs[host].eth.enable_tx(verify=verify)
+                n_enabled += 1
             except(AssertionError, RuntimeError):
                 self.logger.warning('Failed to enable %s.eth' % (host))
                 failed.append(host)
