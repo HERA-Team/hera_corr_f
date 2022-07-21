@@ -332,7 +332,8 @@ class SnapFengine(object):
         else:
             return inputs
 
-    def get_status(self, jsonify_values=False, include_eq_coeffs=False):
+    def get_status(self, jsonify_values=False, include_eq_coeffs=False,
+                   include_i2c=False):
         '''Return dict of config status.'''
         _cdjsonify = lambda val: jsonify(val, cast=jsonify_values)
         status = {}
@@ -350,14 +351,15 @@ class SnapFengine(object):
         status['uptime'] = _cdjsonify(self.sync.uptime())
         status['pps_count'] = _cdjsonify(self.sync.count())
         status['serial'] = _cdjsonify(self.serial)
-        # populate pam status
-        for i, pam in enumerate(self.pams):
-            for key, val in pam.get_status().items():
-                status["pam%d_" % (i) + key] = _cdjsonify(val)
-        # populate fem status
-        for i, fem in enumerate(self.fems):
-            for key, val in fem.get_status().items():
-                status["fem%d_" % (i) + key] = _cdjsonify(val)
+        if include_i2c:
+            # populate pam status
+            for i, pam in enumerate(self.pams):
+                for key, val in pam.get_status().items():
+                    status["pam%d_" % (i) + key] = _cdjsonify(val)
+            # populate fem status
+            for i, fem in enumerate(self.fems):
+                for key, val in fem.get_status().items():
+                    status["fem%d_" % (i) + key] = _cdjsonify(val)
         # fft overflow status
         status['fft_overflow'] = _cdjsonify(self.pfb.is_overflowing())
         self.pfb.rst_stats()  # clear pfb overflow flag for next time
