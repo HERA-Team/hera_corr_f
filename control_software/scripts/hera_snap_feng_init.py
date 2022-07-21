@@ -53,7 +53,7 @@ def main():
                         help='Configure Ethernet destinations.')
     parser.add_argument('-e', dest='eth', action='store_true', default=False,
                         help='Use this flag to switch on the Ethernet outputs')
-    parser.add_argument('--max_eth_enabled', dest='eth', type=int, default=None,
+    parser.add_argument('--max_eth_enabled', dest='max_eth_enabled', type=int, default=None,
                         help='Maximum number of snaps to enable. Default None = no limit')
 
     group_prog = parser.add_mutually_exclusive_group()
