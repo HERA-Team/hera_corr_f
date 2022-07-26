@@ -43,8 +43,8 @@ done
 
 echo hera_feng_start.sh: Initializing F-Engines > $LOGFILE
 date >> $LOGFILE
-echo hera_snap_feng_init.py -p -i -d --fem_state=${fem} --snap_source=${input} --snap_seed=${seed} -s -e >> $LOGFILE
-hera_snap_feng_init.py -p -i -d --fem_state=${fem} --snap_source=${input} --snap_seed=${seed} -s -e &>> $LOGFILE
+echo hera_snap_feng_init.py -p -i -d --fem_state=${fem} --snap_source=${input} --snap_seed=${seed} -s -e --max_eth_enabled=46 >> $LOGFILE
+hera_snap_feng_init.py -p -i -d --fem_state=${fem} --snap_source=${input} --snap_seed=${seed} -s -e --max_eth_enabled=46 &>> $LOGFILE
 echo hera_feng_start.sh: Synchronized and Started TX >> $LOGFILE
 
 hera_snap_enable_monitors.py
