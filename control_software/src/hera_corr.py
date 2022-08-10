@@ -1341,6 +1341,7 @@ class HeraCorrelator(object):
         for host in hosts:
             try:
                 self.fengs[host].eth.disable_tx(verify=verify)
+                self.fengs[host].eth.reset()  # reset so it can be re-enabled later
             except(AssertionError):
                 self.logger.warning('Failed to enable %s.eth' % (host))
                 failed.append(host)
