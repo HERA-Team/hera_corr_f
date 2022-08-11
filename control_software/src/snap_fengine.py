@@ -360,6 +360,15 @@ class SnapFengine(object):
             for i, fem in enumerate(self.fems):
                 for key, val in fem.get_status().items():
                     status["fem%d_" % (i) + key] = _cdjsonify(val)
+        else:
+            # put null into pam and fem status
+            for i in range(len(self.pams)):
+                for key in ['id', 'voltage', 'current', 'atten_e', 'atten_n', 'power_e', 'power_n']:
+                    status["pam%d_" % (i) + key] = _cdjsonify(None)
+            for i in range(len(self.fems)):
+                for key in ['id', 'voltage', 'current', 'pressure', 'imu_phi', 'imu_theta',
+                            'switch', 'temp', 'humidity', 'lna_power_e', 'lna_power_n']:
+                    status["fem%d_" % (i) + key] = _cdjsonify(None)
         # fft overflow status
         status['fft_overflow'] = _cdjsonify(self.pfb.is_overflowing())
         self.pfb.rst_stats()  # clear pfb overflow flag for next time
