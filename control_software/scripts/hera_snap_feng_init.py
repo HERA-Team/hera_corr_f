@@ -1,7 +1,7 @@
 #!/home/hera/anaconda2/envs/venv/bin/python
 
 import argparse
-from hera_corr_f import HeraCorrelator, __version__
+from hera_corr_f import HeraCorrelator, __version__, snap_start_log_to_redis
 from hera_corr_cm import handlers
 import time
 import logging
@@ -218,3 +218,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+    snap_log = snap_start_log_to_redis.SnapLog('/home/hera/snap_start.log')
+    snap_log.load()
+    snap_log.split()
+    snap_log.redis()
