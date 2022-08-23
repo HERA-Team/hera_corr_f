@@ -115,15 +115,15 @@ class SnapFengine(object):
                 self.logger.warning("Failed to register I2C: " + str(e))
 
     def _add_i2c(self):
-        #self.pams = [snap_blocks.Pam(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
-        #self.fems = [snap_blocks.Fem(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
+        self.pams = [snap_blocks.Pam(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
+        self.fems = [snap_blocks.Fem(self.fpga, 'i2c_ant%d' % i) for i in range(3)]
         # initialize the FEMs/PAMs to get access to their methods.
-        #for pam in self.pams:
-            #pam.initialize()
-        #for fem in self.fems:
-            #fem.initialize()
-        #self.blocks += self.pams
-        #self.blocks += self.fems
+        for pam in self.pams:
+            pam.initialize()
+        for fem in self.fems:
+            fem.initialize()
+        self.blocks += self.pams
+        self.blocks += self.fems
         self.i2c_initialized = True
 
     def is_programmed(self):
@@ -196,8 +196,8 @@ class SnapFengine(object):
             self._set_initialized(0)
             self.i2c_initialized = False
         # Init PAMs and FEMs
-        #if not self.i2c_initialized:
-            #self._add_i2c()
+        if not self.i2c_initialized:
+            self._add_i2c()
         if self.is_initialized():
             return
 
