@@ -1042,7 +1042,7 @@ class PhaseSwitch(Block):
         # The counter in the FPGA cycles through <depth> ram addresses, so repeat
         # the sequence. Since N_round and 2**stepperiod are always powers of 2,
         # this is always an integer number of cycles
-        vec = np.array(walsh_func_stretch.tolist() * (self.depth/ 2**stepperiod / N_round), dtype=np.int)
+        vec = np.array(walsh_func_stretch.tolist() * int((self.depth/ 2**stepperiod / N_round)), dtype=np.int)
 
         #Modify the appropriate bits of the bram
         # note reverse direction of gpio vs software bit assignments
