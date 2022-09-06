@@ -16,7 +16,7 @@ Help()
 maxeth="44"
 
 # Process input arguments
-while getopts "m:" option; do
+while getopts "hm:" option; do
     case $option in
         h) # display Help
             Help
