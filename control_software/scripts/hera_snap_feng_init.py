@@ -10,6 +10,8 @@ import sys
 
 TIMEOUT = 10
 NTRIES = 3
+LOGFILE = '/home/hera/snap_start.log'
+
 
 def warn_failed(logger, failed, who, all_snaps=False):
     if len(failed) == 0:
@@ -214,11 +216,8 @@ def main():
         if args.ipython:
             import IPython
             IPython.embed()
+    snap_start_log_to_redis.send_log_to_redis(LOGFILE)
 
 
 if __name__ == "__main__":
     main()
-    snap_log = snap_start_log_to_redis.SnapLog('/home/hera/snap_start.log')
-    snap_log.load()
-    snap_log.split()
-    snap_log.redis()

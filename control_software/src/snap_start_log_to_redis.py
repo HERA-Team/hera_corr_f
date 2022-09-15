@@ -2,6 +2,13 @@ import datetime
 import redis
 
 
+def send_log_to_redis(logfile):
+    snap_log = SnapLog(logfile)
+    snap_log.load()
+    snap_log.split()
+    snap_log.redis()
+
+
 class SnapLog:
     log_designators = ['INFO', 'WARNING', 'ERROR']
 
