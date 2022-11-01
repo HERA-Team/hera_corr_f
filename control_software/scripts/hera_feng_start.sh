@@ -13,7 +13,7 @@ Help()
 }
 
 # Default values
-maxeth="44"
+maxeth="440"
 
 # Process input arguments
 while getopts "hm:" option; do

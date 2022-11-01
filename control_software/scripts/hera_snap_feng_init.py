@@ -9,7 +9,7 @@ import json
 import sys
 
 TIMEOUT = 10
-NTRIES = 3
+NTRIES = 6
 
 def warn_failed(logger, failed, who, all_snaps=False):
     if len(failed) == 0:
