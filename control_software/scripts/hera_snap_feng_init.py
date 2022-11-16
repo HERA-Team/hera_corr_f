@@ -194,7 +194,13 @@ def main():
         # wait for a PPS to pass then arm all the boards
         if args.sync:
             #corr.disable_eths() # ARP: no need to disable, and keeping them enabled reduces risk of them going incommunicado
-            corr.sync()
+            synced = False
+            while not synced:
+                try:
+                    corr.sync()
+                    synced = True
+                except(RuntimeError):
+                    logger.warning('Synchronization failed. Retrying...')
 
         if args.eth:
             failed = corr.enable_eths(max_enabled=args.max_eth_enabled)
