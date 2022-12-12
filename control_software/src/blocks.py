@@ -1208,7 +1208,7 @@ class Eq(Block):
         # ensure all coefficients in range
         assert(np.all(coeffs <= 2**self.width - 1))
         assert(np.all(coeffs >= 0))
-        assert(coeffs.size == np.size(self.ncoeffs))
+        assert(coeffs.size == self.ncoeffs)
         coeffs_str = struct.pack('>%d%s' % (self.ncoeffs, self.format),
                                  *coeffs)
         self._raw_write(stream, coeffs_str, verify=verify)
