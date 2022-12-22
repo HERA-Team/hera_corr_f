@@ -187,8 +187,12 @@ def main():
 
         # Select SNAP F-Engine input to be adc or digital noise
         init_time = time.time()
-        failed = corr.set_input_fengs(source=args.snap_source, seed=args.snap_seed)
-        warn_failed(logger, failed, 'set_input_fengs', all_snaps=args.allsnaps)
+        try:
+            failed = corr.set_input_fengs(source=args.snap_source, seed=args.snap_seed)
+            warn_failed(logger, failed, 'set_input_fengs', all_snaps=args.allsnaps)
+        except(RuntimeError):
+            logger.warning("Digital Noise Sync Failed!")
+
 
         # Sync logic. Do global sync first, and then noise generators
         # wait for a PPS to pass then arm all the boards
