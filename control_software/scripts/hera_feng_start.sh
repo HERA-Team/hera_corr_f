@@ -32,7 +32,7 @@ done
 
 echo hera_feng_start.sh: Initializing up to ${maxeth} F-Engines > $LOGFILE
 date >> $LOGFILE
-hera_snap_feng_init.py -p -i -d -s -e --max_eth_enabled=${maxeth} &>> $LOGFILE
+hera_snap_feng_init.py -p -i -D -s -e --max_eth_enabled=${maxeth} &>> $LOGFILE
 
 echo >> $LOGFILE
 echo >> $LOGFILE
