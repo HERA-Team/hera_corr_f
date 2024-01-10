@@ -1200,7 +1200,7 @@ class HeraCorrelator(object):
         if noise:
             feng.sync.arm_noise()
 
-    def sync(self, manual=False, hosts=None, timeout=300, maxtime=0.8):
+    def sync(self, manual=False, hosts=None, timeout=300):
         """
         Synchronize boards to PPS.
 
@@ -1208,7 +1208,6 @@ class HeraCorrelator(object):
             manual (bool): synchronize to software trigger instead of
                 external PPS. Default: False
             hosts (list): List of hosts to target. Default: all
-            maxtime (float): Max seconds to wait for a sync. Default: 0.8
         """
         self.logger.info('Synchronizing F-Engines')
         hosts = self.get_feng_hostnames(hosts=hosts)
@@ -1223,27 +1222,28 @@ class HeraCorrelator(object):
             self.logger.info('Waiting for PPS (t=%.2f)' % time.time())
             # this is hanging forever if ADC is not configured
             # consider adding a timeout
-            self.fengs.values()[0].sync.wait_for_sync()
-        start = time.time()
-        self.logger.info('Sync passed (t=%.2f)' % (start))
-        # Multithread arm:
-        failed = self._call_on_hosts(
-                            target=self.arm_sync,
-                            args=(),
-                            kwargs={'sync': True, 'noise': False},
-                            hosts=hosts,
-                            multithread=True,
-                            timeout=timeout,
-        )
-        elapsed_time = time.time() - start
-        if not manual:
-            # XXX use sync.count to verify no sync has passed
-            if elapsed_time > maxtime:
-                raise RuntimeError("Sync time (%.2f) exceeded max (%.2f)"\
-                                   % (elapsed_time, maxtime))
+            feng = self.fengs[hosts[0]]
+            feng.sync.wait_for_sync()
+            start = time.time()
+            sync_cnt = feng.sync.count()
+            self.logger.info('Sync passed (t=%.2f)' % (start))
+            # Multithread arm:
+            failed = self._call_on_hosts(
+                                target=self.arm_sync,
+                                args=(),
+                                kwargs={'sync': True, 'noise': False},
+                                hosts=hosts,
+                                multithread=True,
+                                timeout=timeout,
+            )
+            new_sync_cnt = feng.sync.count()
+            assert new_sync_cnt == sync_cnt  # arming took too long
+            assert len(failed) == 0  # make sure everyone armed
             sync_time = int(start) + 1 + 3  # Takes 3 PPS pulses to arm
         else:
             self.logger.warning('Using manual sync trigger')
+            for host in hosts:
+                self.fengs[host].arm_sync(sync=True, noise=False)
             for i in range(3):  # takes 3 syncs to trigger
                 for host in hosts:
                     self.fengs[host].sync.sw_sync()

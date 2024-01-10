@@ -133,28 +133,33 @@ def main():
             corr.disable_eths() # shut off 10GbE if reinitializing
 
             # Initialize ADC and FPGA; this cannot be allowed to fail
-            failed = corr.align_adcs(**kwargs)
+            # Adding retry of DSP initialization to prevent network spamming
+            failed = None
+            reinit = False
             for cnt in range(NTRIES):
-                if len(failed) == 0:
-                    break
-                logger.warn('Reinitializing because ADC alignment failed: %s' % (','.join(failed)))
-                failed = corr.align_adcs(hosts=failed, reinit=True, **kwargs)
-            warn_failed(logger, failed, 'align_adcs', all_snaps=args.allsnaps)
+                if cnt > 0:
+                    if len(failed) == 0:
+                        break
+                    logger.warn('Reinitializing because ADC alignment/DSP init failed: %s' % (','.join(failed)))
+                adc_failed = corr.align_adcs(hosts=failed, reinit=reinit, **kwargs)
+                warn_failed(logger, adc_failed, 'align_adcs', all_snaps=args.allsnaps)
 
-            failed = corr.initialize_dsps(**kwargs)
-            warn_failed(logger, failed, 'initialize_dsps', all_snaps=args.allsnaps)
+                dsp_failed = corr.initialize_dsps(hosts=failed, **kwargs)
+                warn_failed(logger, dsp_failed, 'initialize_dsps', all_snaps=args.allsnaps)
 
-            failed = corr.fft_shift_pfbs(**kwargs)
-            warn_failed(logger, failed, 'fft_shift_pfbs', all_snaps=args.allsnaps)
+                fft_failed = corr.fft_shift_pfbs(hosts=failed, **kwargs)
+                warn_failed(logger, fft_failed, 'fft_shift_pfbs', all_snaps=args.allsnaps)
 
-            failed = corr.initialize_eqs(**kwargs)
-            warn_failed(logger, failed, 'initialize_eqs', all_snaps=args.allsnaps)
+                eqs_failed = corr.initialize_eqs(hosts=failed, **kwargs)
+                warn_failed(logger, eqs_failed, 'initialize_eqs', all_snaps=args.allsnaps)
 
-            failed = corr.disable_phase_switches(**kwargs)
-            warn_failed(logger, failed, 'disable_phase_switches', all_snaps=args.allsnaps)
+                phs_failed = corr.disable_phase_switches(hosts=failed, **kwargs)
+                warn_failed(logger, phs_failed, 'disable_phase_switches', all_snaps=args.allsnaps)
+
+                failed = list(set(adc_failed + dsp_failed + fft_failed + eqs_failed + phs_failed))
+                reinit = True
 
             # Initialize FEM and PAM but accept failure
-            init_time = time.time()
             fem_failed = corr.switch_fems(args.fem_state, **kwargs)
             if len(fem_failed) > 0:
                 logger.warn('FEM initialization failed: %s' % (','.join(fem_failed)))
@@ -186,7 +191,6 @@ def main():
         #    corr.do_for_all_f("tvg_enable", block="eq_tvg")
 
         # Select SNAP F-Engine input to be adc or digital noise
-        init_time = time.time()
         try:
             failed = corr.set_input_fengs(source=args.snap_source, seed=args.snap_seed)
             warn_failed(logger, failed, 'set_input_fengs', all_snaps=args.allsnaps)
