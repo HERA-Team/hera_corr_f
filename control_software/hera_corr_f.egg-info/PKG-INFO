@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: hera-corr-f
+Version: 0.0.2
+Summary: Python libraries and scripts to control the HERA correlator F-Engines
+Home-page: https://github.com/hera-team/hera_corr_f
+Author: Jack Hickish
+Author-email: jackhickish@gmail.com
+License: UNKNOWN
+Platform: UNKNOWN
+Provides: hera_corr_f
+
+UNKNOWN
+

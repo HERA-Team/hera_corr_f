@@ -147,9 +147,9 @@ class Synth(casperfpga.synth.LMX2581):
         PLL_NUM += PLL_NUM_L & 0b111111111111
         return self.FOSC * (PLL_N + PLL_NUM / PLL_DEN) / VCO_DIV
 
-class Adc(casperfpga.snapadc.SNAPADC):
-    def __init__(self, host, num_chans=2, resolution=8, ref=10,
-                 logger=None, **kwargs):
+class Adc(casperfpga.snapadc.SnapAdc):
+    # def __init__(self, host, device_name=None, device_info={}, num_chans=2, resolution=8, ref=10, logger=None, **kwargs):
+    def __init__(self, host, num_chans=2, resolution=8, ref=10, logger=None, **kwargs):
         """
         Instantiate an ADC block.
 
@@ -159,12 +159,11 @@ class Adc(casperfpga.snapadc.SNAPADC):
            resolution (int): Bit resolution of the ADC. Valid values are 8, 12.
            ref (float): Reference frequency (in MHz) from which ADC clock is derived. If None, an external sampling clock must be used.
         """
-        self.logger = logger or add_default_log_handlers(
-                      logging.getLogger(__name__ + ":%s" % (host.host)))
+        self.logger = logger or add_default_log_handlers(logging.getLogger(__name__ + ":%s" % (host.host)))
         # Purposely setting ref=None below to prevent LMX object
         # from being attached so we can do it ourselves
-        casperfpga.snapadc.SNAPADC.__init__(self, host, ref=None,
-                                            logger=self.logger)
+        # casperfpga.snapadc.SnapAdc.__init__(self, host, ref=None, device_name=None, device_info={})
+        casperfpga.snapadc.SnapAdc.__init__(self, host, ref=None)
         # Attach our own wrapping of LMX
         self.lmx = Synth(host, 'lmx_ctrl', fosc=ref)
         self.name            = 'SNAP_adc'
@@ -289,7 +288,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
 
         # ADC init/lmx select messes with FPGA clock, so reprogram
         self.logger.debug('Reprogramming the FPGA for ADCs')
-        self.interface.transport.prog_user_image()
+        self.adc.itf.transport.prog_user_image()
         self.selectADC()
         self.logger.debug('Reprogrammed')
 
@@ -372,6 +371,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         elif laneSel not in self.laneList:
             raise ValueError("Invalid parameter")
 
+        tap = int(tap)
         if not isinstance(tap, int):
             raise ValueError("Invalid parameter")
 
@@ -515,6 +515,9 @@ class Adc(casperfpga.snapadc.SNAPADC):
                 lanes = [L for L in lanes if L not in failed_lanes]
                 for lane in lanes:
                     if not d[0,lane] in [ans1, ans2]:
+                        if cnt == 2*self.RESOLUTION - 1:
+                            # Failed on last try
+                            failed_lanes += [lane]
                         self.bitslip(chip, lane)
                         slipped = True
                 if not slipped:
@@ -543,7 +546,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         for cnt in range(nchecks):
             self.snapshot()
             for chip,d in self.readRAM(signed=False).items():
-            	ans = (predicted + d[0,0]) % 256
+                ans = (predicted + d[0,0]) % 256
                 failed_lanes = np.sum(d != ans, axis=0)
                 if np.any(failed_lanes) > 0:
                     failed_chips[chip] = np.where(failed_lanes)[0]
@@ -555,7 +558,7 @@ class Adc(casperfpga.snapadc.SNAPADC):
         self.setDemux(numChannel=self.num_chans)
         if len(failed_chips) > 0 and retry:
             if self._retry_cnt < self._retry:
-                self._retry_cnt += 1
+                self._retry_cnt += 1  
                 self.logger.info('retry=%d/%d redo Line/Frame on ADCs/lanes: %s' % \
                             (self._retry_cnt, self._retry, failed_chips))
                 self.alignLineClock(failed_chips)

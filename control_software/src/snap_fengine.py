@@ -6,7 +6,7 @@ import json
 import datetime
 import casperfpga
 import socket
-import blocks as snap_blocks
+from . import blocks as snap_blocks
 
 # 'source_sel' register only on fpgax only uses lowest 2 bits
 # using the others to mark status bits
@@ -37,18 +37,22 @@ def jsonify(val, cast=True):
 
 class SnapFengine(object):
     def __init__(self, host, ant_indices=None, logger=None,
-                 redishost='redishost'):
+                 transport='redis', redishost='redishost'):
         self.host = host
         if logger is None:
             logger = add_default_log_handlers(
                         logging.getLogger(__name__ + "(%s)" % host))
         self.logger = logger
-        if redishost is None:
+        assert transport in ('redis', 'tapcp', 'default')
+        if transport == 'tapcp':
             self.fpga = casperfpga.CasperFpga(host=host,
                                 transport=casperfpga.TapcpTransport)
-        else:
+        elif transport == 'redis':
+            assert redishost != None
             self.fpga = casperfpga.CasperFpga(host=host, redishost=redishost,
                                 transport=casperfpga.RedisTapcpTransport)
+        else:
+            self.fpga = casperfpga.CasperFpga(host=host)
         # Try and get the canonical name of the host
         # to use as a serial number
         try:
