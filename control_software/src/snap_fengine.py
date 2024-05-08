@@ -151,7 +151,6 @@ class SnapFengine(object):
 
     def initialize_adc(self, sample_rate=500., verify=False):
         """Initialize Synth and Adc blocks, then reprogram FPGA."""
-        self.synth.initialize(verify=verify)
         self.adc.init(sample_rate=sample_rate, verify=verify)
         # Mark ADC as uncalibrated
         self._set_adc_status(0)
