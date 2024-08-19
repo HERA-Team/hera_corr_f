@@ -9,7 +9,7 @@ import json
 from hera_corr_cm.handlers import add_default_log_handlers
 from hera_corr_cm import redis_cm
 import hashlib
-from Queue import Queue
+from queue import Queue
 from threading import Thread
 from hera_corr_f import SnapFengine
 from hera_corr_f.snap_fengine import jsonify
@@ -110,11 +110,11 @@ class HeraCorrelator(object):
         self.logger.info("Connecting %s with antenna indices %s" %
                          (host, ant_indices))
         if self.redis_transport:
-            redishost = self.redishost
+            transport = 'redis'
         else:
-            redishost = None
+            transport = 'tapcp'
         feng = SnapFengine(host, ant_indices=ant_indices,
-                           redishost=redishost)
+                           transport=transport, redishost=self.redishost)
         if feng.fpga.is_connected():
             self.fengs[host] = feng  # single dict call is threadsafe
             self.r.hset('status:snap:%s' % host, 'connected', '1')
